@@ -3,6 +3,7 @@ import "./_css/base.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { RegisterProvider } from './_components/register/RegisterProvider';
+import NavBar from "./_components/navbar/NavBar";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -22,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <RegisterProvider>
-        <body className={inter.className}>{children}</body>
+        <body className={inter.className}>
+          {children}
+          <NavBar />
+        </body>
       </RegisterProvider>
     </html>
   );

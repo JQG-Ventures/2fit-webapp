@@ -32,4 +32,11 @@ body {
   }
 }
 
+/* Add this in your global CSS or component-specific CSS */
+body {
+  transition: opacity 0.3s ease-in-out;
+}
 
+body.fade {
+  opacity: 0;
+}
