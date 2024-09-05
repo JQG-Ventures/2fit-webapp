@@ -50,7 +50,7 @@ export default function RegisterStep2() {
                             key={index}
                             id={`digit-${index}`}
                             type="text"
-                            maxLength="1"
+                            maxLength={1}
                             value={digit}
                             onChange={(e) => handleChange(index, e.target.value)}
                             className="w-14 h-14 text-center text-2xl border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
