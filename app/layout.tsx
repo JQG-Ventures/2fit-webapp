@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { RegisterProvider } from "./_components/register/RegisterProvider";
 import NavBar from "./_components/navbar/NavBar";
-import { Providers as AuthProvider } from "@/providers/authProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,15 +18,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <AuthProvider>
-      <html lang="en">
-        <RegisterProvider>
-          <body className={inter.className}>
-            {children}
-            <NavBar />
-          </body>
-        </RegisterProvider>
-      </html>
-    </AuthProvider>
+    <html lang="en">
+      <RegisterProvider>
+        <body className={inter.className}>
+          {children}
+          <NavBar />
+        </body>
+      </RegisterProvider>
+    </html>
   );
 }

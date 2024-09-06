@@ -1,29 +1,21 @@
-// app/login/page.tsx
 "use client";
-
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import * as actions from "@/actions";
+import { signInF } from "@/app/actions";
 
 export default function Login() {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    const result = await actions.signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
-
-    if (result?.ok) {
-      router.push("/");
+    const formData = new FormData(e.currentTarget);
+    const response = await signInF(formData);
+    if (!!response?.error) {
+      console.error(response.error);
+      setError(response?.error);
     } else {
-      console.error("Authentication failed:", result?.error);
-      setError(result?.error || "Authentication failed");
+      router.push("/");
     }
   };
 
@@ -37,16 +29,16 @@ export default function Login() {
         <input
           type="email"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          name="email"
+          id="email"
           required
           className="w-full p-3 mb-4 border border-gray-300 rounded"
         />
         <input
           type="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          name="password"
+          id="password"
           required
           className="w-full p-3 mb-6 border border-gray-300 rounded"
         />
