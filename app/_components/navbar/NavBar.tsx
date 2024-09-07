@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import DesktopNavBar from './DesktopNavBar';
-import MobileNavBar from './MobileNavBar';
+import MobileNavBar from './MobileNavBar';  // Existing mobile navbar for small screens
 import { usePathname } from 'next/navigation';
 import { FaHome, FaDumbbell, FaRobot, FaUser } from 'react-icons/fa';
+import { useMediaQuery } from 'react-responsive';
 
 const navItems = [
     { href: '/home', label: 'Home', icon: <FaHome /> },
@@ -15,20 +16,7 @@ const navItems = [
 
 const NavBar: React.FC = () => {
     const pathname = usePathname();
-    const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
-
-    useEffect(() => {
-        const updateMedia = () => {
-            setIsDesktopOrLaptop(window.innerWidth >= 1224);
-        };
-
-        updateMedia();
-        window.addEventListener('resize', updateMedia);
-        
-        return () => window.removeEventListener('resize', updateMedia);
-    }, []);
-
-    const currentPage = navItems.find(item => pathname.startsWith(item.href))?.label?.toLowerCase() || 'home';
+    const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
     const showNavBarPaths = ['/home', '/workouts', '/bot', '/profile'];
     const shouldShowNavBar = showNavBarPaths.some(path => pathname.startsWith(path));
 
@@ -36,8 +24,9 @@ const NavBar: React.FC = () => {
         return null;
     }
 
+    const currentPage = navItems.find(item => pathname.startsWith(item.href))?.label?.toLowerCase() || 'home';
     return isDesktopOrLaptop ? (
-        <DesktopNavBar navItems={navItems} currentPage={currentPage} />
+        <DesktopNavBar navItems={navItems} currentPage={currentPage} /> 
     ) : (
         <MobileNavBar navItems={navItems} currentPage={currentPage} />
     );

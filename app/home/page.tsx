@@ -1,78 +1,79 @@
+'use client';
+
 import React from 'react';
+import GreetingSection from '../_sections/GreetingSection';
+import SearchBar from '../_components/searchbar/SearchBarComponent';
+import ExerciseBannerSection from '../_sections/ExerciseBannerSection';
+import GuidedWorkoutsSection from '../_sections/GuidedWorkoutsSection';
+import MotivationSection from '../_sections/MotivationSection';
+import WorkoutLibrarySection from '../_sections/WorkoutLibraryWidgetSection';
+import SavedWorkoutsSection from '../_sections/SavedWorkoutsSection';
+import { useMediaQuery } from 'react-responsive';
+import Footer from '../_sections/Footer';
 
-const HomeScreen: React.FC = () => {
+
+const HomePage = () => {
+    const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
+    const isMobile = useMediaQuery({ query: '(max-width: 1224px)' });
+    const user = { name: 'John Smith', hasRoutine: true };
+    
+    const exercises = [
+        { name: 'Strength and Conditioning Circuit', image: '/images/homeBanner/banner1.jpg' },
+        { name: 'Cardio for the heart', image: '/images/homeBanner/banner2.jpg' },
+        { name: 'High Intensity Interval Training', image: '/images/homeBanner/banner3.jpg' }
+    ];
+
+    const workouts = [
+        { title: 'Arms Killer Workout', image: '/images/guidedBanner/banner1.jpg', muscles: ['Biceps', 'Forearm', 'Triceps'] },
+        { title: 'Leg Day Domination', image: '/images/guidedBanner/banner2.jpg', muscles: ['Lats', 'Biceps', 'Upper-Back'] },
+        { title: 'Core Strength Builder', image: '/images/guidedBanner/banner3.jpg', muscles: ['Full-Body', 'Abs', 'Legs'] }
+    ];
+
+    const libraryWorkouts = [
+        { title: 'Arms Killer Workout', workoutCount: 200, description: "Text here that needs to be changed for better look", image: '/images/guidedBanner/banner1.jpg' },
+        { title: 'Arms Killer Workout', workoutCount: 200, description: "Text here that needs to be changed for better look", image: '/images/guidedBanner/banner2.jpg' },
+        { title: 'Arms Killer Workout', workoutCount: 200, description: "Text here that needs to be changed for better look", image: '/images/guidedBanner/banner3.jpg' },
+        { title: 'Arms Killer Workout', workoutCount: 200, description: "Text here that needs to be changed for better look", image: '/images/guidedBanner/banner1.jpg' },
+        { title: 'Arms Killer Workout', workoutCount: 200, description: "Text here that needs to be changed for better look", image: '/images/guidedBanner/banner2.jpg' },
+        { title: 'Arms Killer Workout', workoutCount: 200, description: "Text here that needs to be changed for better look", image: '/images/guidedBanner/banner3.jpg' },
+    ];
+
+    const savedWorkouts = [
+        { title: 'Arms Killer Workout', image: '/images/guidedBanner/banner1.jpg' },
+        { title: 'Leg Day Domination', image: '/images/guidedBanner/banner2.jpg' },
+        { title: 'Core Strength Builder', image: '/images/guidedBanner/banner3.jpg' },
+        { title: 'Arms Killer Workout', image: '/images/guidedBanner/banner1.jpg' },
+        { title: 'Leg Day Domination', image: '/images/guidedBanner/banner2.jpg' },
+        { title: 'Arms Killer Workout', image: '/images/guidedBanner/banner1.jpg' },
+        { title: 'Leg Day Domination', image: '/images/guidedBanner/banner2.jpg' },
+        { title: 'Core Strength Builder', image: '/images/guidedBanner/banner3.jpg' },
+        { title: 'Core Strength Builder', image: '/images/guidedBanner/banner3.jpg' }
+    ];
+
+
     return (
-        <div className="min-h-screen bg-gray-100 p-4">
-            {/* Header Section */}
-            <header className="flex flex-col">
-                <h1 className="text-2xl font-bold">Good Morning 👋</h1>
-                <h2 className="text-xl mt-1">Pramuditya Uzumaki</h2>
-            </header>
-
-            {/* Search Bar */}
-            <div className="mt-4">
-                <input 
-                    type="text" 
-                    placeholder="Search" 
-                    className="w-full p-2 rounded-lg border border-gray-300"
-                />
-            </div>
-
-            {/* Highlighted Workout */}
-            <div className="mt-6 relative">
-                <img 
-                    src="/path/to/highlighted-workout.jpg" 
-                    alt="Strength & Stretch For Runners" 
-                    className="w-full h-48 object-cover rounded-lg"
-                />
-                <div className="absolute bottom-2 left-4 text-white">
-                    <h3 className="text-lg font-bold">Strength & Stretch For Runners.</h3>
-                    <button className="mt-2 bg-green-500 text-sm px-4 py-2 rounded-lg">See more</button>
+        <div className="home-page-container bg-white space-y-12 pt-10"> {/* Adjusted the bottom padding */}
+            <div className="flex flex-col lg:flex-row lg:space-x-8"> {/* Use flex-row for larger screens */}
+                <div className="flex-1">
+                    <GreetingSection userName={user.name} />
                 </div>
-            </div>
-
-            {/* Today Plan */}
-            <div className="mt-8">
-                <h3 className="text-xl font-semibold mb-4">Today Plan</h3>
-
-                {/* Card 1 */}
-                <div className="relative mb-4">
-                    <img 
-                        src="/path/to/strength-card.jpg" 
-                        alt="Strength and Conditioning Circuit" 
-                        className="w-full h-40 object-cover rounded-lg"
-                    />
-                    <div className="absolute bottom-2 left-4 text-white">
-                        <h4 className="text-lg font-bold">Strength and Conditioning Circuit</h4>
-                        <div className="flex items-center mt-2">
-                            <button className="bg-white text-black text-sm px-4 py-2 rounded-full mr-2">
-                                💚
-                            </button>
-                            <span className="bg-black text-white text-sm px-4 py-2 rounded-full">2</span>
-                        </div>
+                {!isMobile && (
+                    <div className="flex-1 mt-8">
+                        <MotivationSection isBotUser={user.hasRoutine} />
                     </div>
-                </div>
-
-                {/* Card 2 */}
-                <div className="relative">
-                    <img 
-                        src="/path/to/hiit-card.jpg" 
-                        alt="High Intensity Interval Training" 
-                        className="w-full h-40 object-cover rounded-lg"
-                    />
-                    <div className="absolute bottom-2 left-4 text-white">
-                        <h4 className="text-lg font-bold">High Intensity Interval Training</h4>
-                        <div className="flex items-center mt-2">
-                            <button className="bg-white text-black text-sm px-4 py-2 rounded-full mr-2">
-                                💚
-                            </button>
-                            <span className="bg-black text-white text-sm px-4 py-2 rounded-full">2</span>
-                        </div>
-                    </div>
-                </div>
+                )}
             </div>
+            {!isDesktopOrLaptop && <SearchBar />}
+            <div className="space-y-12">
+                <ExerciseBannerSection hasRoutine={user.hasRoutine} exercises={exercises} />
+                {!isDesktopOrLaptop && <MotivationSection isBotUser={true}/>}
+                <GuidedWorkoutsSection workouts={workouts} />
+                <WorkoutLibrarySection workouts={libraryWorkouts}/>
+                <SavedWorkoutsSection workouts={savedWorkouts} />
+            </div>
+            <Footer />
         </div>
     );
-}
+};
 
-export default HomeScreen;
+export default HomePage;
