@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInF } from "@/app/actions";
+import * as actions from "@/actions";
 
 export default function Login() {
   const [error, setError] = useState<string | null>(null);
@@ -10,7 +10,7 @@ export default function Login() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const response = await signInF(formData);
+    const response = await actions.signIn(formData);
     if (!!response?.error) {
       console.error(response.error);
       setError(response?.error);

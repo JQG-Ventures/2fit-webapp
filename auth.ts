@@ -1,10 +1,12 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-const options = {
-  session: {
-    strategy: "jwt" as const,
-  },
+export const {
+  handlers: { GET, POST },
+  auth,
+  signOut,
+  signIn,
+} = NextAuth({
   providers: [
     CredentialsProvider({
       credentials: {
@@ -13,9 +15,8 @@ const options = {
       },
       async authorize(credentials) {
         console.log("Received credentials:", credentials);
-
         try {
-          const res = await fetch("http://localhost:5002/login", {
+          const res = await fetch(process.env.AUTH_API + "/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -41,6 +42,9 @@ const options = {
       },
     }),
   ],
+  session: {
+    strategy: "jwt" as const,
+  },
   callbacks: {
     async jwt({ token, user }: any) {
       if (user) {
@@ -55,8 +59,4 @@ const options = {
       return session;
     },
   },
-};
-
-const handler = NextAuth(options);
-
-export { handler as GET, handler as POST };
+});
