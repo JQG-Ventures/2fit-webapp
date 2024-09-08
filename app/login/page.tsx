@@ -15,7 +15,7 @@ export default function Login() {
       console.error(response.error);
       setError(response?.error);
     } else {
-      router.push("/");
+      router.push("/home");
     }
   };
 
