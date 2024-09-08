@@ -1,4 +1,5 @@
 "use client";
+import { FaApple, FaFacebook, FaGoogle } from "react-icons/fa";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import * as actions from "@/actions";
@@ -27,8 +28,8 @@ export default function Login() {
         className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md"
       >
         <input
-          type="email"
-          placeholder="Email"
+          type="text"
+          placeholder="Phone/Email"
           name="email"
           id="email"
           required
@@ -44,18 +45,49 @@ export default function Login() {
         />
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition"
+          className="w-full bg-black text-white p-3 rounded hover:bg-blue-600 transition"
         >
           Login
         </button>
       </form>
       {error && <p className="mt-4 text-red-500">{error}</p>}
-      <p className="mt-4">
-        Don't have an account?{" "}
-        <a href="/register/step1" className="text-blue-500 hover:underline">
-          Register
+      {/* <p className="mt-4">
+        <a href="/" className="font-medium hover:underline">
+          Forgot Password?
         </a>
-      </p>
+      </p> */}
+
+      <div className="absolute bottom-[30px] ">
+        <div className="flex justify-center mb-20">
+          <div className="text-center">
+            <p className="text-gray-500 mb-12">Or sign in with</p>
+            <div className="flex justify-center space-x-8">
+              {[FaApple, FaFacebook, FaGoogle].map((Icon, idx) => (
+                <button key={idx} className="text-6xl">
+                  <Icon
+                    className={
+                      idx === 1
+                        ? "text-blue-600"
+                        : idx === 2
+                        ? "text-red-600"
+                        : ""
+                    }
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p className="mt-4">
+            Don't have an account?{" "}
+            <a href="/register/step1" className="text-blue-500 hover:underline">
+              Sign Up
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
