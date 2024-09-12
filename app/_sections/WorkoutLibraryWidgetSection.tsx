@@ -28,7 +28,7 @@ const WorkoutLibrarySection = ({ workouts }) => {
     const displayedWorkoutsGrid = workouts.slice(0, 6); // Show up to 6 cards in grid layout
 
     return (
-        <section className="relative workout-library-section bg-gray-100 p-8 rounded-xl my-16 md:px-12 lg:px-20">
+        <div className="relative workout-library-section bg-gray-100 p-8 rounded-xl my-16 md:px-12 lg:px-20">
             <div className="relative z-10 p-6 lg:p-12">
                 <h2 className="text-2xl font-bold mb-8 lg:text-3xl">Explore Our Workout Library</h2>
 
@@ -67,7 +67,7 @@ const WorkoutLibrarySection = ({ workouts }) => {
                     </button>
                 </div>
             </div>
-        </section>
+        </div>
     );
 };
 

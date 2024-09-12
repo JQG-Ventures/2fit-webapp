@@ -14,7 +14,7 @@ const ExerciseBannerSection = ({ hasRoutine, exercises }) => {
     };
 
     return (
-        <section className="exercise-banner-section px-6 pt-10 md:px-12 lg:px-20">
+        <div className="exercise-banner-section px-6 pt-10 md:px-12 lg:px-20">
             <h2 className="text-2xl font-bold mb-6 lg:text-3xl">
                 {hasRoutine ? "What's the plan for today?" : "Explore Workouts"}
             </h2>
@@ -53,7 +53,7 @@ const ExerciseBannerSection = ({ hasRoutine, exercises }) => {
                     </div>
                 </div>
             )}
-        </section>
+        </div>
     );
 };
 

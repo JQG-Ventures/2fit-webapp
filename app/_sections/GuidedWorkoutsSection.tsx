@@ -24,7 +24,7 @@ const GuidedWorkoutsSection = ({ workouts }: { workouts: any[] }) => {
     const handleViewAll = () => router.push('/workouts');
 
     return (
-        <section className="guided-workouts-section pt-6 px-4 md:px-12 lg:px-20">
+        <div className="guided-workouts-section pt-6 px-4 md:px-12 lg:px-20">
             <div className="flex justify-between place-items-right">
                 <div className='ml-2 basis-3/4'>
                     <h2 className="text-2xl mb-2 font-bold lg:text-3xl">Guided Workouts</h2>
@@ -63,7 +63,7 @@ const GuidedWorkoutsSection = ({ workouts }: { workouts: any[] }) => {
                     </div>
                 ))}
             </div>
-        </section>
+        </div>
     );
 };
 

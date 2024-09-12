@@ -1,58 +1,46 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AiFillHeart, AiOutlineReload, AiOutlineClose } from 'react-icons/ai';
+import { AiFillHeart, AiOutlineClose } from 'react-icons/ai';
+import ConfirmationModal from '../_components/modals/confirmationModal';
 
-// Modal component
-const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
-    if (!isOpen) return null;
+interface Workout {
+    _id: string;
+    image_url: string;
+    name: string;
+}
 
-    return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg text-center relative z-60 w-11/12 max-w-lg sm:w-5/6">
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
-                >
-                    <AiOutlineClose size={20} />
-                </button>
-                <div className='py-4'>
-                    <h3 className="text-lg font-semibold mb-4">Are you sure?</h3>
-                    <p className="mb-6">Do you want to remove this workout from your saved list?</p>
-                </div>
-                <div className="flex justify-center space-x-4">
-                    <button
-                        onClick={onConfirm}
-                        className="bg-gray-300 text-gray-800 px-5 py-2 rounded-lg hover:bg-red-600"
-                    >
-                        Yes, Remove
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-gray-400"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
+interface SavedWorkoutsSectionProps {
+    workouts: Workout[];
+    deleteWorkout: (userId: string, workoutId: string) => Promise<void>;
+    emptyMessage: string;
+    sectionTitle: string
+}
 
-const SavedWorkoutsSection = ({ workouts }) => {
-    const [modalOpen, setModalOpen] = useState(false);
-    const [selectedWorkout, setSelectedWorkout] = useState(null);
-    const [savedWorkouts, setSavedWorkouts] = useState(workouts);
-    
-    const handleHeartClick = (workout) => {
+const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({ workouts, deleteWorkout, emptyMessage, sectionTitle }) => {
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
+    const [savedWorkouts, setSavedWorkouts] = useState<Workout[]>(workouts);
+    const userId = "user_50662633238";
+    const handleHeartClick = (workout: Workout) => {
         setSelectedWorkout(workout);
         setModalOpen(true);
     };
 
-    const handleConfirm = () => {
-        setSavedWorkouts(savedWorkouts.filter(workout => workout !== selectedWorkout));
-        setModalOpen(false);
-        setSelectedWorkout(null);
+    const handleConfirm = async () => {
+        if (selectedWorkout) {
+            try {
+                await deleteWorkout(userId, selectedWorkout._id);
+                setSavedWorkouts(savedWorkouts.filter(workout => workout._id !== selectedWorkout._id));
+                setModalOpen(false);
+                setSelectedWorkout(null);
+            } catch (error) {
+                console.error('Error removing workout from saved list:', error);
+            }
+        } else {
+            setModalOpen(false);
+            setSelectedWorkout(null);
+        }
     };
 
     const handleCancel = () => {
@@ -63,14 +51,14 @@ const SavedWorkoutsSection = ({ workouts }) => {
     return (
         <div className="bg-white p-4 rounded-lg">
             <div className="flex justify-between items-center mb-8 px-2">
-                <h2 className="text-4xl font-bold text-gray-800">Saved Workouts</h2>
+                <h2 className="text-4xl font-bold text-gray-800">{sectionTitle}</h2>
                 <a href="#" className="text-blue-600 hover:underline text-lg lg:text-2xl">View All</a>
             </div>
 
             {savedWorkouts.length === 0 ? (
                 // Empty State
                 <div className="border-dashed border-2 border-gray-400 p-8 rounded-lg flex justify-center items-center">
-                    <p className="text-gray-500 text-xl">Exercises that you like will appear here</p>
+                    <p className="text-gray-500 text-xl">{emptyMessage}</p>
                 </div>
             ) : (
                 // Populated State with Scrollable Workouts
@@ -81,12 +69,12 @@ const SavedWorkoutsSection = ({ workouts }) => {
                             className="relative w-44 h-44 bg-white rounded-lg flex-shrink-0 transition-transform transform hover:scale-110 hover:shadow-lg active:scale-95 lg:w-56 lg:h-56 xl:w-64 xl:h-64"
                         >
                             <img
-                                src={workout.image}
-                                alt={workout.title}
+                                src={workout.image_url}
+                                alt={workout.name}
                                 className="object-cover w-full h-full rounded-lg transition-opacity duration-300 ease-in-out"
                             />
                             <div className="absolute bottom-0 left-0 p-2 bg-opacity-75 bg-gray-800 text-white w-full rounded-b-lg transition-opacity duration-300 ease-in-out">
-                                <p className="text-lg truncate">{workout.title}</p>
+                                <p className="text-lg truncate">{workout.name}</p>
                             </div>
                             <div className="absolute top-2 right-2">
                                 <button
@@ -108,6 +96,9 @@ const SavedWorkoutsSection = ({ workouts }) => {
                 isOpen={modalOpen}
                 onClose={handleCancel}
                 onConfirm={handleConfirm}
+                question={"Do you want to remove this workout from your saved list?"}
+                confirmText={"Yes, Remove"}
+                cancelText={"Cancel"}
             />
         </div>
     );
