@@ -1,16 +1,24 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './NavBar.module.css';
 
+type NavItem = {
+    href: string;
+    label: string;
+    icon: JSX.Element;
+};
+
 type MobileNavBarProps = {
-    navItems: Array<{ href: string; label: string; icon: JSX.Element }>;
+    navItems: NavItem[];
     currentPage: string;
 };
 
 const MobileNavBar: React.FC<MobileNavBarProps> = ({ navItems, currentPage }) => {
     const pathname = usePathname();
-    const [previousPath, setPreviousPath] = useState(pathname);
+    const [previousPath, setPreviousPath] = useState<string>(pathname);
 
     const getAnimationClasses = (isActive: boolean, itemIndex: number) => {
         const currentIndex = navItems.findIndex(item => pathname.startsWith(item.href));
@@ -22,24 +30,21 @@ const MobileNavBar: React.FC<MobileNavBarProps> = ({ navItems, currentPage }) =>
 
         if (isActive) {
             if (Math.abs(currentIndex - prevIndex) === 1) {
-                if (currentIndex < prevIndex) {
-                    backgroundAnimation = styles['slide-left'];
-                    textInAnimation = styles['text-slide-in-right'];
-                } else if (currentIndex > prevIndex) {
-                    backgroundAnimation = styles['slide-right'];
-                    textInAnimation = styles['text-slide-in-left'];
-                }
-            } else if (currentIndex !== prevIndex) {
+                backgroundAnimation = currentIndex < prevIndex
+                    ? styles['slide-left']
+                    : styles['slide-right'];
+                textInAnimation = currentIndex < prevIndex
+                    ? styles['text-slide-in-right']
+                    : styles['text-slide-in-left'];
+            } else {
                 backgroundAnimation = styles['appear-center'];
                 textInAnimation = styles['appear-center'];
             }
         } else if (itemIndex === prevIndex) {
             if (Math.abs(currentIndex - prevIndex) === 1) {
-                if (currentIndex < prevIndex) {
-                    textOutAnimation = styles['text-slide-out-left'];
-                } else if (currentIndex > prevIndex) {
-                    textOutAnimation = styles['text-slide-out-right'];
-                }
+                textOutAnimation = currentIndex < prevIndex
+                    ? styles['text-slide-out-left']
+                    : styles['text-slide-out-right'];
             } else {
                 textOutAnimation = styles['disappear-center'];
             }
@@ -57,7 +62,7 @@ const MobileNavBar: React.FC<MobileNavBarProps> = ({ navItems, currentPage }) =>
     }, [pathname]);
 
     return (
-        <nav className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex bg-gray-800 text-white py-4 px-6 rounded-full w-4/5 h-18">
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex bg-gray-800 text-white py-4 px-6 rounded-full w-4/5 h-18">
             {navItems.map((item, index) => {
                 const isActive = pathname.startsWith(item.href);
                 const { backgroundAnimation, textOutAnimation, textInAnimation } = getAnimationClasses(isActive, index);
@@ -91,7 +96,7 @@ const MobileNavBar: React.FC<MobileNavBarProps> = ({ navItems, currentPage }) =>
                     </Link>
                 );
             })}
-        </nav>
+        </div>
     );
 };
 

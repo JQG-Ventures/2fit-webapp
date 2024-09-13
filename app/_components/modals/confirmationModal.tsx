@@ -1,6 +1,25 @@
+'use client';
+
+import { FC } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 
-const ConfirmationModal = ({ isOpen, onClose, onConfirm, question, confirmText, cancelText }) => {
+interface ConfirmationModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    question: string;
+    confirmText: string;
+    cancelText: string;
+}
+
+const ConfirmationModal: FC<ConfirmationModalProps> = ({
+    isOpen,
+    onClose,
+    onConfirm,
+    question,
+    confirmText,
+    cancelText
+}) => {
     if (!isOpen) return null;
 
     return (
@@ -9,6 +28,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, question, confirmText, 
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+                    aria-label="Close"
                 >
                     <AiOutlineClose size={20} />
                 </button>

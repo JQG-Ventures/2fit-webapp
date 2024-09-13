@@ -9,22 +9,25 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "2Fit App",
-  description: "Embark into your new fitness destiny",
+  description: "Embark on your new fitness journey",
+  // Additional meta tags can be added here
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <RegisterProvider>
-        <body className={inter.className} style={{ paddingTop: '64px' }}>
-          {children}
+      <head>
+        <meta charSet="UTF-8" />
+        {/* Additional head elements */}
+      </head>
+      <body id="test" className={inter.className}>
+        <RegisterProvider>
+          <div>
+            {children}
+          </div>  
           <NavBar />
-        </body>
-      </RegisterProvider>
+        </RegisterProvider>
+      </body>
     </html>
   );
 }

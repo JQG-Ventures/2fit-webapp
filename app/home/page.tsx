@@ -8,78 +8,84 @@ import GuidedWorkoutsSection from '../_sections/GuidedWorkoutsSection';
 import MotivationSection from '../_sections/MotivationSection';
 import WorkoutLibrarySection from '../_sections/WorkoutLibraryWidgetSection';
 import SavedWorkoutsSection from '../_sections/SavedWorkoutsSection';
-import { useMediaQuery } from 'react-responsive';
 import Footer from '../_sections/Footer';
-import { getSavedWorkoutPlansByUser, getWorkoutPlans } from '../_services/workoutService';
-import { deleteUserSavedWorkout } from '../_services/workoutService';
+import { 
+    getSavedWorkoutPlansByUser, 
+    getWorkoutPlans, 
+    getGuidedWorkouts,
+    getLibraryWorkoutCount, 
+    deleteUserSavedWorkout 
+} from '../_services/workoutService';
 
-const HomePage = () => {
-    const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
-    const isMobile = useMediaQuery({ query: '(max-width: 1224px)' });
+interface WorkoutPlan {
+    _id: string;
+    name: string;
+    image_url: string;
+}
 
-    const [workoutPlans, setWorkoutPlans] = useState([]);
-    const [savedWorkoutPlans, setSavedWorkoutPlans] = useState([]);
+interface User {
+    name: string;
+    hasRoutine: boolean;
+}
 
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const user = { name: 'John Smith', hasRoutine: true };
-
-    const exercises = [
-        { _id: '', name: 'Strength and Conditioning Circuit', image_url: '/images/homeBanner/banner1.jpg' },
-        { _id: '', name: 'Cardio for the heart', image_url: '/images/homeBanner/banner2.jpg' },
-        { _id: '', name: 'High Intensity Interval Training', image_url: '/images/homeBanner/banner3.jpg' }
-    ];
-
-    const workouts = [
-        { title: 'Arms Killer Workout', image: '/images/guidedBanner/banner1.jpg', muscles: ['Biceps', 'Forearm', 'Triceps'] },
-        { title: 'Leg Day Domination', image: '/images/guidedBanner/banner2.jpg', muscles: ['Lats', 'Biceps', 'Upper-Back'] },
-        { title: 'Core Strength Builder', image: '/images/guidedBanner/banner3.jpg', muscles: ['Full-Body', 'Abs', 'Legs'] }
-    ];
-
-    const libraryWorkouts = [
-        { title: 'Arms Killer Workout', workoutCount: 200, description: "Text here that needs to be changed for better look", image: '/images/guidedBanner/banner1.jpg' },
-        { title: 'Arms Killer Workout', workoutCount: 200, description: "Text here that needs to be changed for better look", image: '/images/guidedBanner/banner2.jpg' },
-        { title: 'Arms Killer Workout', workoutCount: 200, description: "Text here that needs to be changed for better look", image: '/images/guidedBanner/banner3.jpg' },
-        { title: 'Arms Killer Workout', workoutCount: 200, description: "Text here that needs to be changed for better look", image: '/images/guidedBanner/banner1.jpg' },
-        { title: 'Arms Killer Workout', workoutCount: 200, description: "Text here that needs to be changed for better look", image: '/images/guidedBanner/banner2.jpg' },
-        { title: 'Arms Killer Workout', workoutCount: 200, description: "Text here that needs to be changed for better look", image: '/images/guidedBanner/banner3.jpg' },
-    ];
+const HomePage: React.FC = () => {
+    const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-        const fetchWorkoutPlans = async () => {
+        const handleResize = () => {
+            setIsDesktopOrLaptop(window.innerWidth >= 1224);
+            setIsMobile(window.innerWidth < 1224);
+        };
+
+        handleResize(); // Initial check
+        window.addEventListener('resize', handleResize);
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const [workoutPlans, setWorkoutPlans] = useState<WorkoutPlan[]>([]);
+    const [savedWorkoutPlans, setSavedWorkoutPlans] = useState<WorkoutPlan[]>([]);
+    const [libraryWorkouts, setLibraryWorkouts] = useState<any[]>([]);
+    const [guidedWorkouts, setGuidedWorkouts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const user: User = { name: 'John Smith', hasRoutine: true };
+
+    useEffect(() => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await getWorkoutPlans();
-                console.log(response["message"]);
-                setWorkoutPlans(response["message"]);
+                const [workoutPlansResponse, savedWorkoutsResponse, libraryWorkouts, guidedWorkouts] = await Promise.all([
+                    getWorkoutPlans(),
+                    getSavedWorkoutPlansByUser("user_50662633238"),
+                    getLibraryWorkoutCount(),
+                    getGuidedWorkouts()
+                ]);
+
+                console.log(guidedWorkouts  );
+
+                setWorkoutPlans(workoutPlansResponse["message"]);
+                setSavedWorkoutPlans(savedWorkoutsResponse["message"]);
+                setLibraryWorkouts(libraryWorkouts["message"]);
+                setGuidedWorkouts(guidedWorkouts["message"])
             } catch (error) {
-                console.error('Error fetching workout plans:', error);
-                setError('Failed to load workout plans');
+                console.error('Error fetching data:', error);
+                setError('Failed to load data');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchWorkoutPlans();
+        fetchData();
     }, []);
 
-    // // Get Saved Workouts of user
-    // useEffect(() => {
-    //     const fetchSavedWorkouts = async () => {
-    //         try {
-    //             setLoading(true);
-    //             const response = await getSavedWorkoutPlansByUser("user_50662633238");
-    //             setSavedWorkoutPlans(response["message"]);
-    //         } catch (error) {
-    //             console.error('Error fetching saved workouts:', error);
-    //             setError('Failed to load saved workouts');
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-
-    //     fetchSavedWorkouts();
-    // }, []);
+    const renderLoading = (message: string) => (
+        <div className="flex justify-center items-center h-48">
+            <p>{message}</p>
+        </div>
+    );
 
     return (
         <div className="home-page-container bg-white space-y-12 pt-10">
@@ -88,47 +94,35 @@ const HomePage = () => {
                     <GreetingSection userName={user.name} />
                 </div>
                 {!isMobile && (
-                    <div className="flex-1 mt-8">
+                    <div className="flex flex-col flex-1 mt-16 pt-10">
+                        <div className="flex-grow"></div>
                         <MotivationSection isBotUser={user.hasRoutine} />
                     </div>
+
                 )}
             </div>
             {!isDesktopOrLaptop && <SearchBar />}
             <div className="space-y-12">
                 {loading ? (
-                    <div className="flex justify-center items-center h-48">
-                        <p>Loading workout plans...</p>
-                    </div>
+                    renderLoading('Loading workout plans and saved workouts...')
                 ) : error ? (
-                    <div className="flex justify-center items-center h-48">
-                        <p>{error}</p>
-                    </div>
+                    renderLoading(error)
                 ) : (
-                    <ExerciseBannerSection hasRoutine={user.hasRoutine} exercises={workoutPlans} />
+                    <>
+                        <ExerciseBannerSection hasRoutine={user.hasRoutine} exercises={workoutPlans} />
+                        {!isDesktopOrLaptop && <MotivationSection isBotUser={user.hasRoutine} />}
+                        <GuidedWorkoutsSection workouts={guidedWorkouts} />
+                        <WorkoutLibrarySection workouts={libraryWorkouts} />
+                        <SavedWorkoutsSection
+                            workouts={savedWorkoutPlans}
+                            deleteWorkout={deleteUserSavedWorkout}
+                            emptyMessage='Exercises that you like will appear here'
+                            sectionTitle='Saved Workouts Plans'
+                        />
+                    </>
                 )}
-                {!isDesktopOrLaptop && <MotivationSection isBotUser={true} />}
-                <GuidedWorkoutsSection workouts={workouts} />
-                <WorkoutLibrarySection workouts={libraryWorkouts} />
-                {loading ? (
-                    <div className="flex justify-center items-center h-48">
-                        <p>Loading saved workouts...</p>
-                        {/* Replace with a spinner or loading animation */}
-                    </div>
-                ) : error ? (
-                    <div className="flex justify-center items-center h-48">
-                        <p>{error}</p>
-                    </div>
-                ) : (
-                    <SavedWorkoutsSection 
-                        workouts={exercises} 
-                        deleteWorkout={deleteUserSavedWorkout}
-                        emptyMessage='Exercises that you like will appear here'
-                        sectionTitle='Saved Workouts Plans'
-                    />
-                )}
-                
             </div>
-            <Footer />
+            {isDesktopOrLaptop && <Footer />}
         </div>
     );
 };

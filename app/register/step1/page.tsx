@@ -30,7 +30,7 @@ export default function RegisterStep1() {
         { name: 'age', label: 'Age', placeholder: 'Age', type: 'number' } 
     ];
 
-    const handleChange = (e) => {
+    const handleChange = (e: any) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
