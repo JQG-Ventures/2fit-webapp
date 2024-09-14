@@ -22,13 +22,13 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-7xl font-semibold mt-0 mb-[3.5rem] ml-[4rem]">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white overflow-y-auto">
+      <h1 className="text-7xl font-semibold mt-[-7rem] mb-[10rem] ml-[4rem]">
         Login to your Account
       </h1>
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-lg w-full max-w-xl"
+        className=" p-10 rounded-lg w-full max-w-xl mb-5"
       >
         <div className="relative mb-6">
           <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
@@ -38,20 +38,27 @@ export default function Login() {
             name="email"
             id="email"
             required
-            className="w-full pl-10 pr-3 py-3 no-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-gray-200 pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        <div className="relative mb-[6rem]">
-          <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
-          <input
-            type="password"
-            placeholder="Password"
-            name="password"
-            id="password"
-            required
-            className="w-full pl-10 pr-3 py-3 no-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        <div className="pb-[5rem]">
+          <div className="relative">
+            <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
+            <input
+              type="password"
+              placeholder="Password"
+              name="password"
+              id="password"
+              required
+              className="w-full bg-gray-200 pl-10 c pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          <p className="mt-4 text-[12px] absolute right-0">
+            <a href="/login" className="font-medium hover:text-blue-500">
+              Forgot Password?
+            </a>
+          </p>
+          </div>
         </div>
 
         <button
@@ -62,11 +69,6 @@ export default function Login() {
         </button>
       </form>
       {error && <p className="mt-4 text-red-500">{error}</p>}
-      {/* <p className="mt-4">
-        <a href="/" className="font-medium hover:underline">
-          Forgot Password?
-        </a>
-      </p> */}
 
       <div className="absolute bottom-[30px] ">
         <div className="flex justify-center mb-20">
