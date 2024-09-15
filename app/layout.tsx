@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <meta charSet="UTF-8" />
-        {/* Additional head elements */}
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600&display=swap"></link>
       </head>
       <body id="test" className={inter.className}>
         <RegisterProvider>

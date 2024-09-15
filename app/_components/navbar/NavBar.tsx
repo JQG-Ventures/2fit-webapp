@@ -14,6 +14,7 @@ const navItems = [
     { href: '/profile', label: 'Profile', icon: <FaUser /> },
 ];
 
+
 const NavBar: React.FC = () => {
     const pathname = usePathname();
     const [isClient, setIsClient] = useState(false);
@@ -29,13 +30,11 @@ const NavBar: React.FC = () => {
         return null;
     }
 
-    const currentPage = navItems.find(item => pathname.startsWith(item.href))?.label || 'Home';
-
     return (
         <div>
             {isDesktopOrLaptop 
                 ? <DesktopNavBar navItems={navItems} /> 
-                : <MobileNavBar navItems={navItems} currentPage={currentPage} />}
+                : <MobileNavBar navItems={navItems} />}
         </div>
     );
 };

@@ -25,7 +25,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({ title, workoutCount, descript
         <div className="absolute inset-0 bg-gradient-to-r from-black opacity-50 to-transparent transition-opacity duration-300 ease-in-out"></div>
 
         {/* Content */}
-        <div className="relative z-10">
+        <div className="relative z-5">
             <h2 className="text-lg text-gray-200">{workoutCount}+ workouts</h2>
             <h4 className="text-2xl tracking-wide text-white font-semibold mb-4">{title}</h4>
             <p className="text-xl text-gray-200">{description}</p>
@@ -40,7 +40,7 @@ const WorkoutLibrarySection: React.FC<WorkoutLibrarySectionProps> = ({ workouts 
 
     return (
         <div className="relative bg-gray-100 p-8 rounded-xl my-16 md:px-12 lg:px-20">
-            <div className="relative z-10 p-6 lg:p-12">
+            <div className="relative z-5 p-6 lg:p-12">
                 <h2 className="text-2xl font-bold mb-8 lg:text-3xl">Explore Our Workout Library</h2>
 
                 {/* Container for column layout */}

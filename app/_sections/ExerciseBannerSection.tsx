@@ -60,7 +60,7 @@ const ExerciseCard: React.FC<{ exercise: Exercise, onSaveClick: (id: string, nam
         style={{ backgroundImage: `url(${exercise.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
         <div className="absolute inset-0 bg-black opacity-50 group-hover:opacity-30 transition-opacity"></div>
-        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center z-10">
+        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center z-5">
             <p className="font-bold text-xl whitespace-normal break-words max-w-[70%] lg:text-2xl">
                 {exercise.name}
             </p>

@@ -31,6 +31,7 @@ interface User {
 const HomePage: React.FC = () => {
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [navbarHeight, setNavbarHeight] = useState<number>(100); // State for navbar height
 
     useEffect(() => {
         const handleResize = () => {
@@ -64,12 +65,10 @@ const HomePage: React.FC = () => {
                     getGuidedWorkouts()
                 ]);
 
-                console.log(guidedWorkouts  );
-
                 setWorkoutPlans(workoutPlansResponse["message"]);
                 setSavedWorkoutPlans(savedWorkoutsResponse["message"]);
                 setLibraryWorkouts(libraryWorkouts["message"]);
-                setGuidedWorkouts(guidedWorkouts["message"])
+                setGuidedWorkouts(guidedWorkouts["message"]);
             } catch (error) {
                 console.error('Error fetching data:', error);
                 setError('Failed to load data');
@@ -87,8 +86,10 @@ const HomePage: React.FC = () => {
         </div>
     );
 
+    const mobilePaddingBottom = isMobile ? (navbarHeight + navbarHeight * 0.1) : 0;
+
     return (
-        <div className="home-page-container bg-white space-y-12 pt-10">
+        <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom: mobilePaddingBottom }}>
             <div className="flex flex-col lg:flex-row lg:space-x-8">
                 <div className="flex-1">
                     <GreetingSection userName={user.name} />
@@ -98,7 +99,6 @@ const HomePage: React.FC = () => {
                         <div className="flex-grow"></div>
                         <MotivationSection isBotUser={user.hasRoutine} />
                     </div>
-
                 )}
             </div>
             {!isDesktopOrLaptop && <SearchBar />}
@@ -117,12 +117,12 @@ const HomePage: React.FC = () => {
                             workouts={savedWorkoutPlans}
                             deleteWorkout={deleteUserSavedWorkout}
                             emptyMessage='Exercises that you like will appear here'
-                            sectionTitle='Saved Workouts Plans'
+                            sectionTitle='Saved Workouts'
                         />
                     </>
                 )}
+                {isDesktopOrLaptop && <Footer />}
             </div>
-            {isDesktopOrLaptop && <Footer />}
         </div>
     );
 };

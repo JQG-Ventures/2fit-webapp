@@ -4,8 +4,6 @@ import React, { useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const GuidedWorkoutsSection = ({ workouts }: { workouts: any[] }) => {
-
-    console.log(workouts)
     const sliderRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 

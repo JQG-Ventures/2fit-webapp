@@ -13,10 +13,9 @@ type NavItem = {
 
 type MobileNavBarProps = {
     navItems: NavItem[];
-    currentPage: string;
 };
 
-const MobileNavBar: React.FC<MobileNavBarProps> = ({ navItems, currentPage }) => {
+const MobileNavBar: React.FC<MobileNavBarProps> = ({ navItems }) => {
     const pathname = usePathname();
     const [previousPath, setPreviousPath] = useState<string>(pathname);
 
@@ -71,7 +70,7 @@ const MobileNavBar: React.FC<MobileNavBarProps> = ({ navItems, currentPage }) =>
                     <Link
                         href={item.href}
                         key={item.href}
-                        className={`flex-1 flex justify-center ${isActive ? 'relative z-10' : ''}`}
+                        className={`flex-1 flex justify-center ${isActive ? 'relative z-1' : ''}`}
                     >
                         <div
                             className={`flex items-center justify-center rounded-full h-full px-2 transition-all duration-500 ease-in-out ${backgroundAnimation} ${
