@@ -8,13 +8,12 @@ export const getSavedWorkoutPlansByUser = async (userId: String) => {
         });
 
         if (!response.ok) {
-            throw new Error('Could not retrieve saved workouts for the user');
+            return {};
         }
 
         return await response.json();
     } catch (error) {
-        console.error('Error retrieving the user saved workouts:', error);
-        throw error;
+        return {};
     }
 };
 
@@ -30,8 +29,7 @@ export const saveWorkout = async (userId: string, workoutId: string) => {
 
         return response;
     } catch (error) {
-        console.error('Error saving workout:', error);
-        throw error;
+        return {};
     }
 };
 
@@ -45,13 +43,13 @@ export const deleteUserSavedWorkout = async (userId: string, workoutId: string) 
         });
 
         if (!response.ok) {
-            throw new Error('Failed to delete workout');
+            return {};
         }
 
         return await response.json();
     } catch (error) {
         console.error('Error deleting workout:', error);
-        throw error;
+        return {};
     }
 };
 
@@ -65,13 +63,12 @@ export const getGuidedWorkouts = async () => {
         });
 
         if (!response.ok) {
-            throw new Error('Could not retrieve guided workouts');
+            return {};
         }
 
         return await response.json();
     } catch (error) {
-        console.error('Error retrieving the guided workouts:', error);
-        throw error;
+        return {};
     }
 };
 
@@ -85,13 +82,12 @@ export const getWorkoutPlans = async () => {
         });
 
         if (!response.ok) {
-            throw new Error('Could not retrieve workouts for the user');
+            return {};
         }
 
         return await response.json();
     } catch (error) {
-        console.error('Error retrieving the library workouts:', error);
-        throw error;
+        return {};
     }
 };
 
@@ -105,12 +101,11 @@ export const getLibraryWorkoutCount = async () => {
         });
 
         if (!response.ok) {
-            throw new Error('Could not retrieve library workouts.');
+            return {};
         }
 
         return await response.json();
     } catch (error) {
-        console.error('Error retrieving library workouts:', error);
-        throw error;
+        return {};
     }
 };
