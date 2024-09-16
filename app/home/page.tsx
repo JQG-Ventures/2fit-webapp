@@ -65,10 +65,10 @@ const HomePage: React.FC = () => {
                     getGuidedWorkouts()
                 ]);
 
-                setWorkoutPlans(workoutPlansResponse["message"]);
-                setSavedWorkoutPlans(savedWorkoutsResponse["message"]);
-                setLibraryWorkouts(libraryWorkouts["message"]);
-                setGuidedWorkouts(guidedWorkouts["message"]);
+                setWorkoutPlans(workoutPlansResponse["message"] || []);
+                setSavedWorkoutPlans(savedWorkoutsResponse["message"] || []);
+                setLibraryWorkouts(libraryWorkouts["message"] || []);
+                setGuidedWorkouts(guidedWorkouts["message"] || []);
             } catch (error) {
                 console.error('Error fetching data:', error);
                 setError('Failed to load data');
