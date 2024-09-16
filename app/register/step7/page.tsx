@@ -3,13 +3,15 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { IoChevronBack } from "react-icons/io5";
-import { useRegister } from '../../_components/register/RegisterProvider'; // Adjust this path as needed
+import { useRegister } from '../../_components/register/RegisterProvider';
+import RegistrationHeader from '../../_components/header/registrationHeader';
+
 
 export default function RegisterStep7() {
+    const { data, updateData } = useRegister();
     const [unit, setUnit] = useState('kg');
-    const [targetWeight, setTargetWeight] = useState(70);
+    const [targetWeight, setTargetWeight] = useState(data.target_weight || 70);
     const router = useRouter();
-    const { updateData } = useRegister();
 
     const toggleUnit = () => {
         if (unit === 'kg') {
@@ -34,18 +36,14 @@ export default function RegisterStep7() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-white p-4">
-            <div className="flex items-center justify-between px-4 mb-10 pt-16 sm:pt-24 md:pt-32">
-                <button onClick={() => handlePrevStep()} className="text-4xl">
-                    <IoChevronBack />
-                </button>
-                <p className="text-2xl font-medium">Step 5 of 8</p>
-                <button onClick={() => router.push('/next-step')} className="text-blue-500 text-2xl">Skip</button>
+        <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
+            <div className='h-[10%] w-full lg:max-w-3xl'>
+                <RegistrationHeader stepNumber={5} handlePrevStep={handlePrevStep}/>
             </div>
-
-            <div id="content" className="flex-grow flex flex-col items-center justify-center mt-[-100px]">
+            
+            <div className="h-[85%] content-center w-full lg:max-w-3xl">
                 <h2 className="text-4xl font-bold text-center mb-20">Select Target Weight</h2>
-                <div className="space-y-6 w-full px-8">
+                <div className="w-full px-8">
                     <div className="flex items-center bg-gray-100 rounded-full p-1 w-full max-w-xs mb-8 mx-auto justify-center">
                         <button
                             onClick={() => toggleUnit()}
@@ -60,7 +58,7 @@ export default function RegisterStep7() {
                             Kilograms
                         </button>
                     </div>
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-center my-28">
                         <input
                             type="number"
                             value={targetWeight}
@@ -69,7 +67,7 @@ export default function RegisterStep7() {
                         />
                         <span className="ml-2 text-2xl text-gray-700">{unit}</span>
                     </div>
-                    <div className="flex justify-center items-center pt-10">
+                    <div className="flex justify-center items-center">
                         <button
                             onClick={handleNextStep}
                             className="w-full max-w-xs sm:max-w-md py-3 bg-black text-white rounded-md font-semibold mt-10 flex justify-center items-center"
