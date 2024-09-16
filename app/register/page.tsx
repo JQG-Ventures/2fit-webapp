@@ -55,18 +55,21 @@ export default function RegisterStep1() {
     const handlePrevStep = () => router.push('/');
 
     return (
-        <div className="flex flex-col h-screen bg-white p-10 justify-between">
-            <div className='h-[15%] pt-20'>
-                <button onClick={handlePrevStep} className="text-4xl">
+        <div className="flex flex-col h-screen bg-white p-10 items-center">
+            <div className='h-[15%] pt-20 w-full lg:max-w-3xl'>
+                <button onClick={handlePrevStep} className="text-4xl lg:hidden">
                     <IoChevronBack />
                 </button>
             </div>
 
-            <div className='h-[15%]'>
+            <div className='h-[15%] flex flex-row w-full lg:max-w-3xl'>
+                <button onClick={handlePrevStep} className="hidden text-4xl lg:flex mr-14 mt-5 text-center">
+                    <IoChevronBack />
+                </button>
                 <h1 className='text-6xl font-semibold'>Create your <br />Account</h1>
             </div>
 
-            <div className='h-[50%] flex items-center justify-center'>
+            <div className='h-[50%] flex w-full items-center justify-center'>
                 <form className="w-full lg:max-w-3xl">
                     {user_data_fields.map(({ name, label, placeholder, type = 'text' }) => (
                         <div key={name} className="flex flex-wrap -mx-3 mb-6">

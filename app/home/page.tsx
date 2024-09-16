@@ -109,7 +109,7 @@ const HomePage: React.FC = () => {
                     renderLoading(error)
                 ) : (
                     <>
-                        <ExerciseBannerSection hasRoutine={user.hasRoutine} exercises={workoutPlans} />
+                        <ExerciseBannerSection hasRoutine={user.hasRoutine} exercises={workoutPlans} savedWorkoutPlans={savedWorkoutPlans} />
                         {!isDesktopOrLaptop && <MotivationSection isBotUser={user.hasRoutine} />}
                         <GuidedWorkoutsSection workouts={guidedWorkouts} />
                         <WorkoutLibrarySection workouts={libraryWorkouts} />

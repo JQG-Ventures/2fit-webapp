@@ -11,6 +11,7 @@ interface Exercise {
 interface ExerciseBannerSectionProps {
     hasRoutine: boolean;
     exercises: Exercise[];
+    savedWorkoutPlans: Exercise[];
 }
 
 const SavedMessage: React.FC<{ message: string }> = ({ message }) => (
@@ -21,20 +22,23 @@ const SavedMessage: React.FC<{ message: string }> = ({ message }) => (
     </div>
 );
 
-const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutine, exercises }) => {
+const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutine, exercises, savedWorkoutPlans }) => {
     const userId = "user_50662633238"; // TODO: REMOVE THIS
     const [savedMessage, setSavedMessage] = useState<string | null>(null);
+    const [savedExerciseIds, setSavedExerciseIds] = useState<string[]>(
+        savedWorkoutPlans.map(workout => workout._id) // Initialize with saved workouts
+    );
 
     const handleSaveClick = async (id: string, name: string) => {
         const result = await saveWorkout(userId, id);
 
         if (result.status === 400) {
-            setSavedMessage('Workout already saved!')
-        } 
-        else if (result.status === 200) {
+            setSavedMessage('Workout already saved!');
+        } else if (result.status === 200) {
             setSavedMessage(`${name} saved!`);
+            setSavedExerciseIds([...savedExerciseIds, id]); // Add new saved workout
         } else {
-            setSavedMessage('There was an error saving the message, try again')
+            setSavedMessage('There was an error saving the workout, try again.');
         }
         setTimeout(() => setSavedMessage(null), 2000);
     };
@@ -44,17 +48,33 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
             <h2 className="text-2xl font-bold mb-6 lg:text-3xl">
                 {hasRoutine ? "What's the plan for today?" : "Explore Workouts"}
             </h2>
-            <div className="flex space-x-4 overflow-x-scroll py-2">
-                {exercises.map((exercise, index) => (
-                    <ExerciseCard key={index} exercise={exercise} onSaveClick={handleSaveClick} />
-                ))}
-            </div>
+
+            {/* Conditionally render the exercise list or a "no exercises" message */}
+            {exercises.length > 0 ? (
+                <div className="flex space-x-4 overflow-x-scroll py-2">
+                    {exercises.map((exercise, index) => (
+                        <ExerciseCard
+                            key={index}
+                            exercise={exercise}
+                            onSaveClick={handleSaveClick}
+                            isSaved={savedExerciseIds.includes(exercise._id)} // Check if the exercise is already saved
+                        />
+                    ))}
+                </div>
+            ) : (
+                <div className="text-center py-10">
+                    <p className="text-gray-500 text-lg">
+                        Soon you will have access to a variety of workouts to get you fit, stay tuned!
+                    </p>
+                </div>
+            )}
+
             {savedMessage && <SavedMessage message={savedMessage} />}
         </div>
     );
 };
 
-const ExerciseCard: React.FC<{ exercise: Exercise, onSaveClick: (id: string, name: string) => void }> = ({ exercise, onSaveClick }) => (
+const ExerciseCard: React.FC<{ exercise: Exercise, onSaveClick: (id: string, name: string) => void, isSaved: boolean }> = ({ exercise, onSaveClick, isSaved }) => (
     <div
         className="min-w-[280px] h-[350px] bg-black text-white rounded-lg relative overflow-hidden group"
         style={{ backgroundImage: `url(${exercise.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
@@ -67,7 +87,8 @@ const ExerciseCard: React.FC<{ exercise: Exercise, onSaveClick: (id: string, nam
             <div className="flex space-x-4">
                 <button 
                     onClick={() => onSaveClick(exercise._id, exercise.name)}
-                    className="p-2 bg-gray-700 rounded-full transition-transform transform hover:scale-110 active:scale-90"
+                    className={`p-2 ${isSaved ? 'bg-red-500' : 'bg-gray-700'} rounded-full transition-transform transform hover:scale-110 active:scale-90`}
+                    disabled={isSaved} // Disable button if the workout is already saved
                 >
                     <AiFillHeart size={24} />
                 </button>

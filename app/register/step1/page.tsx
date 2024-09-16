@@ -5,6 +5,7 @@ import { FaApple, FaFacebook, FaGoogle } from 'react-icons/fa';
 import { IoChevronBack } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
+import { sendCode } from '../../_services/registerService';
 
 interface FormData {
     number: string;
@@ -19,15 +20,13 @@ interface ValidationErrors {
 
 export default function RegisterStep1() {
     const { data, updateData } = useRegister();
-    console.log(data);
-    
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState<FormData>({
         number: data.number || '',
         name: data.name || '',
         age: data.age || '',
         last: data.last || ''
     });
-    const [isChecked, setIsChecked] = useState(false);
     const [errors, setErrors] = useState<ValidationErrors>({});
     const router = useRouter();
 
@@ -45,7 +44,7 @@ export default function RegisterStep1() {
 
     const validatePhone = (phone: string) => /^\d{8,15}$/.test(phone);
 
-    const handleNextStep = () => {
+    const handleNextStep = async () => {
         const validationErrors: ValidationErrors = {};
 
         if (!formData.name) validationErrors.name = 'Please fill out this field.';
@@ -58,25 +57,38 @@ export default function RegisterStep1() {
 
         if (Object.keys(validationErrors).length === 0) {
             updateData(formData);
-            router.push('/register/step2');
+            const response_code = await sendCode(formData.number)
+
+            if (response_code == 200) {
+                router.push('/register/step2');
+            } else {
+                if (response_code == 400) {
+                    setError('The number entered is not valid. Please try another one.');
+                } else {
+                    setError('There was a problem sending the code. Please try again later.');
+                }
+            }
         }
     };
 
     const handlePrevStep = () => router.push('/register');
 
     return (
-        <div className="flex flex-col h-screen bg-white p-10 justify-between">
-            <div className='h-[15%] pt-20'>
-                <button onClick={handlePrevStep} className="text-4xl">
+        <div className="flex flex-col h-screen bg-white p-10 items-center">
+            <div className='h-[15%] pt-20 w-full lg:max-w-3xl'>
+            <button onClick={handlePrevStep} className="text-4xl lg:hidden">
                     <IoChevronBack />
                 </button>
             </div>
 
-            <div className='h-[15%]'>
+            <div className='h-[15%] flex flex-row w-full lg:max-w-3xl'>
+                <button onClick={handlePrevStep} className="hidden text-4xl lg:flex mr-14 mt-5 text-center">
+                    <IoChevronBack />
+                </button>
                 <h1 className='text-6xl font-semibold'>Create your <br />Account</h1>
             </div>
 
-            <div className='h-[50%] flex items-center justify-center'>
+            <div className='h-[50%] flex w-full items-center justify-center'>
                 <form className="w-full lg:max-w-3xl">
                     {user_data_fields.map(({ name, label, placeholder, type = 'text' }) => (
                         <div key={name} className="flex flex-wrap -mx-3 mb-6">
@@ -87,13 +99,14 @@ export default function RegisterStep1() {
                                     type={type}
                                     name={name}
                                     placeholder={placeholder}
-                                    value={formData[name]} // Corrected binding here
+                                    value={formData[name]}
                                     onChange={handleChange}
                                 />
-                                {errors[name] && <p className="text-red-500 text-xs italic">{errors[name]}</p>} {/* Corrected error handling */}
+                                {errors[name] && <p className="text-red-500 text-xs italic">{errors[name]}</p>}
                             </div>
                         </div>
                     ))}
+                    {error && <p className="text-red-500 text-center">{error}</p>}
                     <button
                         type="button"
                         onClick={handleNextStep}

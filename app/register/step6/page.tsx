@@ -35,12 +35,12 @@ export default function RegisterStep6() {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-white p-4">
-            <div className='h-[10%]'>
+        <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
+            <div className='h-[10%] w-full lg:max-w-3xl'>
                 <RegistrationHeader stepNumber={4} handlePrevStep={handlePrevStep}/>
             </div>
             
-            <div className="h-[85%] content-center">
+            <div className="h-[85%] content-center w-full lg:max-w-3xl">
                 <h2 className="text-4xl font-bold text-center mb-20">Select Weight</h2>
                 <div className="w-full px-8">
                     <div className="flex items-center bg-gray-100 rounded-full p-1 w-full max-w-xs mb-8 mx-auto justify-center">
