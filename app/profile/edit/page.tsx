@@ -2,20 +2,32 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaArrowLeft, FaCalendarAlt, FaEnvelope, FaGlobe, FaPhoneAlt, FaUser } from 'react-icons/fa';
-import countries from '@/app/data/countries.json';
+import { FaArrowLeft, FaRegEnvelope, FaPhoneAlt } from 'react-icons/fa';
+import { IoCalendarOutline } from "react-icons/io5";
+import { CiGlobe } from "react-icons/ci";
+import countries from '@/app/data/countries.json';  
+import countryCodes from '@/app/data/countryCodes.json';  
+import { detectCountryCode } from '@/app/utils/phoneUtils';  
 import { fetchUserData, UserProfile } from '../../_services/userService';
 
 const EditProfile: React.FC = () => {
   const router = useRouter();
   
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
+  const [countryCode, setCountryCode] = useState<string>("");  
+  const [phoneNumber, setPhoneNumber] = useState<string>("");  
 
   useEffect(() => {
     const loadUserProfile = async () => {
       try {
-        const data = await fetchUserData('50683285554');
+        const data = await fetchUserData('50662446780');
         setProfileData(data);
+        
+        if (data?.number) {
+          const detectedCountryCode = detectCountryCode(data.number);  
+          setCountryCode(detectedCountryCode.code);
+          setPhoneNumber(detectedCountryCode.number);
+        }
       } catch (error) {
         console.error('Error loading user profile:', error);
       }
@@ -27,7 +39,11 @@ const EditProfile: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
-    if (profileData) {
+    if (name === "countryCode") {
+      setCountryCode(value);  
+    } else if (name === "number") {
+      setPhoneNumber(value);  
+    } else if (profileData) {
       setProfileData((prevData) => ({
         ...prevData!,
         [name]: value,
@@ -40,7 +56,7 @@ const EditProfile: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white p-6">
+    <div className="min-h-screen bg-white p-6 pb-32">
       {/* Header */}
       <header className="flex justify-between items-center mb-6">
         <button onClick={() => router.back()} className="text-gray-700">
@@ -52,8 +68,8 @@ const EditProfile: React.FC = () => {
       
       <form className="space-y-6">
         {/* Name */}
-        <div className="pl-2">
-          <label className="block text-black mb-1 font-bold">Name</label>
+        <div className="pl-2 py-3">
+          <label className="block text-black mb-1">Name</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm">
             <input
               type="text"
@@ -67,8 +83,8 @@ const EditProfile: React.FC = () => {
         </div>
 
         {/* Birth Date */}
-        <div className="pl-2">
-          <label className="block text-black mb-1 font-bold">Birth Date</label>
+        <div className="pl-2 py-3">
+          <label className="block text-black mb-1">Birth Date</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <input
               type="text"
@@ -78,13 +94,13 @@ const EditProfile: React.FC = () => {
               placeholder="mm/dd/yyyy"
               className="w-full border-none focus:ring-0 placeholder-gray-500 bg-transparent"
             />
-            <FaCalendarAlt className="text-black" />
+            <IoCalendarOutline className="text-black w-8 h-8" />
           </div>
         </div>
 
         {/* Email */}
-        <div className="pl-2">
-          <label className="block text-black mb-1 font-bold">Email</label>
+        <div className="pl-2 py-3">
+          <label className="block text-black mb-1">Email</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <input
               type="email"
@@ -94,47 +110,68 @@ const EditProfile: React.FC = () => {
               placeholder="user@yourdomain.com"
               className="w-full border-none focus:ring-0 placeholder-gray-500 bg-transparent"
             />
-            <FaEnvelope className="text-black" />
+            <FaRegEnvelope className="text-black" />
           </div>
         </div>
 
         {/* Country */}
-        <div className="pl-2">
-          <label className="block text-black mb-1 font-bold">Country</label>
+        <div className="pl-2 py-3">
+          <label className="block text-black mb-1">Country</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <select
               name="country"
-              value={profileData.country}
+              value={profileData.country || ""}
               onChange={handleInputChange}
-              className="w-full border-none focus:ring-0 bg-transparent"
+              className="w-full border-none focus:ring-0 bg-transparent "
             >
+              <option value="">Select your country</option> {/* Placeholder */}
               {countries.map((country, index) => (
-                <option key={index} value={country}>{country}</option>
+                <option key={index} value={country}>
+                  {country}
+                </option>
               ))}
             </select>
-            <FaGlobe className="text-black" />
           </div>
         </div>
 
         {/* Phone Number */}
-        <div className="pl-2">
-          <label className="block text-black mb-1 font-bold">Phone Number</label>
+        <div className="pl-2 py-3">
+          <label className="block text-black mb-1">Phone Number</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <FaPhoneAlt className="text-black mr-2" />
+
+            {/* Dropdown list for country codes */}
+            <div className="mr-2">
+              <select
+                name="countryCode"
+                value={countryCode}  
+                onChange={handleInputChange}
+                className="bg-transparent text-black focus:ring-0 border-none"
+              >
+                <option value="">Select Code</option> {/* Placeholder */}
+                {countryCodes.map((country, index) => (
+                  <option key={index} value={country.code}>
+                    {country.code} <span className="text-gray-500">({country.abbreviation})</span>
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Phone number input */}
             <input
               type="tel"
               name="number"
-              value={profileData.number}
+              value={phoneNumber}
               onChange={handleInputChange}
-              placeholder="+1 111 467 378 399"
+              placeholder="111 467 378 399"
               className="w-full border-none focus:ring-0 placeholder-gray-500 bg-transparent"
             />
           </div>
         </div>
 
         {/* Gender */}
-        <div className="pl-2">
-          <label className="block text-black mb-1 font-bold">Gender</label>
+        <div className="pl-2 py-3">
+          <label className="block text-black mb-1">Gender</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <select
               name="gender"
@@ -146,13 +183,12 @@ const EditProfile: React.FC = () => {
               <option value="Female">Female</option>
               <option value="Other">Other</option>
             </select>
-            <FaUser className="text-black" />
           </div>
         </div>
 
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-green-400 to-green-600 text-white p-4 rounded-full text-2xl font-semibold shadow-lg"
+          className="w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-4 rounded-full text-2xl font-semibold shadow-lg py-8"
         >
           Update
         </button>
