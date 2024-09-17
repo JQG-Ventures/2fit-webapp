@@ -2,13 +2,14 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { IoChevronBack } from "react-icons/io5";
 import { useRegister } from '../../_components/register/RegisterProvider';
+import RegistrationHeader from '../../_components/header/registrationHeader';
 
 export default function RegisterStep9() {
     const [selectedActivities, setSelectedActivities] = useState<number[]>([]);
     const router = useRouter();
-    const { updateData } = useRegister();
+    const { data, updateData } = useRegister();
+    console.log(data);
 
     const activities = [
         { id: 1, label: 'Stretch', icon: '🧘' },
@@ -36,30 +37,25 @@ export default function RegisterStep9() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-white p-4">
-            <div className="flex items-center justify-between px-4 mb-10 pt-16 sm:pt-24 md:pt-32">
-                <button onClick={handlePrevStep} className="text-4xl">
-                    <IoChevronBack />
-                </button>
-                <p className="text-2xl font-medium">Step 7 of 8</p>
-                <button onClick={() => router.push('/next-step')} className="text-blue-500 text-2xl">Skip</button>
+        <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
+            <div className='h-[10%] w-full lg:max-w-3xl'>
+                <RegistrationHeader stepNumber={7} handlePrevStep={handlePrevStep}/>
             </div>
-
-            <div id="content" className="flex-grow flex flex-col items-center justify-center mt-[-100px]">
-                <h2 className="text-4xl font-bold text-center mb-4">Choose activities</h2>
-                <p className="text-2xl font-bold text-center mb-20">that you prefer</p>
-                <div className="space-y-4 w-full px-8">
+            
+            <div className="h-[85%] content-center w-full lg:max-w-3xl">
+            <h2 className="text-5xl font-bold text-center mb-20">Choose activities <br/>that you prefer</h2>
+                <div className="w-full px-8 py">
                     {activities.map((activity) => (
                         <button
                             key={activity.id}
                             onClick={() => handleActivitySelection(activity.id)}
-                            className={`flex items-center justify-between w-full p-8 border rounded-lg ${selectedActivities.includes(activity.id) ? 'border-black bg-gray-100' : 'border-gray-200'} ${activity.bgColor || 'bg-white'}`}
+                            className={`flex items-center justify-between w-full my-6 p-6 border rounded-lg ${selectedActivities.includes(activity.id) ? 'border-black bg-gray-100' : 'border-gray-200'} ${activity.bgColor || 'bg-white'}`}
                         >
                             <div className="flex items-center">
                                 <span className="text-3xl mr-4">{activity.icon}</span>
                                 <span className="text-2xl font-medium">{activity.label}</span>
                             </div>
-                            <span className={`w-6 h-6 border-2 rounded-full ${selectedActivities.includes(activity.id) ? 'bg-black border-black' : 'border-gray-400'}`}></span>
+                            <span className={`w-6 h-6 border-2 rounded-full ${selectedActivities.includes(activity.id) ? 'bg-green-600 border-green-600' : 'border-gray-400'}`}></span>
                         </button>
                     ))}
                 </div>
@@ -67,7 +63,7 @@ export default function RegisterStep9() {
                     <button
                         type="button"
                         onClick={handleNextStep}
-                        className="w-full py-3 bg-black text-white rounded-md font-semibold mt-20 px-8"
+                        className="w-full py-3 bg-black text-white rounded-md font-semibold  my-6 p-6"
                     >
                         Next
                     </button>
