@@ -1,78 +1,130 @@
-import React from 'react';
+'use client';
 
-const HomeScreen: React.FC = () => {
+import React, { useState, useEffect } from 'react';
+import GreetingSection from '../_sections/GreetingSection';
+import SearchBar from '../_components/searchbar/SearchBarComponent';
+import ExerciseBannerSection from '../_sections/ExerciseBannerSection';
+import GuidedWorkoutsSection from '../_sections/GuidedWorkoutsSection';
+import MotivationSection from '../_sections/MotivationSection';
+import WorkoutLibrarySection from '../_sections/WorkoutLibraryWidgetSection';
+import SavedWorkoutsSection from '../_sections/SavedWorkoutsSection';
+import Footer from '../_sections/Footer';
+import { 
+    getSavedWorkoutPlansByUser, 
+    getWorkoutPlans, 
+    getGuidedWorkouts,
+    getLibraryWorkoutCount, 
+    deleteUserSavedWorkout 
+} from '../_services/workoutService';
+
+interface WorkoutPlan {
+    _id: string;
+    name: string;
+    image_url: string;
+}
+
+interface User {
+    name: string;
+    hasRoutine: boolean;
+}
+
+const HomePage: React.FC = () => {
+    const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+    const [navbarHeight, setNavbarHeight] = useState<number>(100); // State for navbar height
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsDesktopOrLaptop(window.innerWidth >= 1224);
+            setIsMobile(window.innerWidth < 1224);
+        };
+
+        handleResize(); // Initial check
+        window.addEventListener('resize', handleResize);
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const [workoutPlans, setWorkoutPlans] = useState<WorkoutPlan[]>([]);
+    const [savedWorkoutPlans, setSavedWorkoutPlans] = useState<WorkoutPlan[]>([]);
+    const [libraryWorkouts, setLibraryWorkouts] = useState<any[]>([]);
+    const [guidedWorkouts, setGuidedWorkouts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const user: User = { name: 'John Smith', hasRoutine: true };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const [workoutPlansResponse, savedWorkoutsResponse, libraryWorkouts, guidedWorkouts] = await Promise.all([
+                    getWorkoutPlans(),
+                    getSavedWorkoutPlansByUser("user_50662633238"),
+                    getLibraryWorkoutCount(),
+                    getGuidedWorkouts()
+                ]);
+
+                setWorkoutPlans(workoutPlansResponse["message"] || []);
+                setSavedWorkoutPlans(savedWorkoutsResponse["message"] || []);
+                setLibraryWorkouts(libraryWorkouts["message"] || []);
+                setGuidedWorkouts(guidedWorkouts["message"] || []);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setError('Failed to load data');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const renderLoading = (message: string) => (
+        <div className="flex justify-center items-center h-48">
+            <p>{message}</p>
+        </div>
+    );
+
+    const mobilePaddingBottom = isMobile ? (navbarHeight + navbarHeight * 0.1) : 0;
+
     return (
-        <div className="min-h-screen bg-gray-100 p-4">
-            {/* Header Section */}
-            <header className="flex flex-col">
-                <h1 className="text-2xl font-bold">Good Morning 👋</h1>
-                <h2 className="text-xl mt-1">Pramuditya Uzumaki</h2>
-            </header>
-
-            {/* Search Bar */}
-            <div className="mt-4">
-                <input 
-                    type="text" 
-                    placeholder="Search" 
-                    className="w-full p-2 rounded-lg border border-gray-300"
-                />
-            </div>
-
-            {/* Highlighted Workout */}
-            <div className="mt-6 relative">
-                <img 
-                    src="/path/to/highlighted-workout.jpg" 
-                    alt="Strength & Stretch For Runners" 
-                    className="w-full h-48 object-cover rounded-lg"
-                />
-                <div className="absolute bottom-2 left-4 text-white">
-                    <h3 className="text-lg font-bold">Strength & Stretch For Runners.</h3>
-                    <button className="mt-2 bg-green-500 text-sm px-4 py-2 rounded-lg">See more</button>
+        <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom: mobilePaddingBottom }}>
+            <div className="flex flex-col lg:flex-row lg:space-x-8">
+                <div className="flex-1">
+                    <GreetingSection userName={user.name} />
                 </div>
-            </div>
-
-            {/* Today Plan */}
-            <div className="mt-8">
-                <h3 className="text-xl font-semibold mb-4">Today Plan</h3>
-
-                {/* Card 1 */}
-                <div className="relative mb-4">
-                    <img 
-                        src="/path/to/strength-card.jpg" 
-                        alt="Strength and Conditioning Circuit" 
-                        className="w-full h-40 object-cover rounded-lg"
-                    />
-                    <div className="absolute bottom-2 left-4 text-white">
-                        <h4 className="text-lg font-bold">Strength and Conditioning Circuit</h4>
-                        <div className="flex items-center mt-2">
-                            <button className="bg-white text-black text-sm px-4 py-2 rounded-full mr-2">
-                                💚
-                            </button>
-                            <span className="bg-black text-white text-sm px-4 py-2 rounded-full">2</span>
-                        </div>
+                {!isMobile && (
+                    <div className="flex flex-col flex-1 mt-16 pt-10">
+                        <div className="flex-grow"></div>
+                        <MotivationSection isBotUser={user.hasRoutine} />
                     </div>
-                </div>
-
-                {/* Card 2 */}
-                <div className="relative">
-                    <img 
-                        src="/path/to/hiit-card.jpg" 
-                        alt="High Intensity Interval Training" 
-                        className="w-full h-40 object-cover rounded-lg"
-                    />
-                    <div className="absolute bottom-2 left-4 text-white">
-                        <h4 className="text-lg font-bold">High Intensity Interval Training</h4>
-                        <div className="flex items-center mt-2">
-                            <button className="bg-white text-black text-sm px-4 py-2 rounded-full mr-2">
-                                💚
-                            </button>
-                            <span className="bg-black text-white text-sm px-4 py-2 rounded-full">2</span>
-                        </div>
-                    </div>
-                </div>
+                )}
+            </div>
+            {!isDesktopOrLaptop && <SearchBar />}
+            <div className="space-y-12">
+                {loading ? (
+                    renderLoading('Loading workout plans and saved workouts...')
+                ) : error ? (
+                    renderLoading(error)
+                ) : (
+                    <>
+                        <ExerciseBannerSection hasRoutine={user.hasRoutine} exercises={workoutPlans} savedWorkoutPlans={savedWorkoutPlans} />
+                        {!isDesktopOrLaptop && <MotivationSection isBotUser={user.hasRoutine} />}
+                        <GuidedWorkoutsSection workouts={guidedWorkouts} />
+                        <WorkoutLibrarySection workouts={libraryWorkouts} />
+                        <SavedWorkoutsSection
+                            workouts={savedWorkoutPlans}
+                            deleteWorkout={deleteUserSavedWorkout}
+                            emptyMessage='Exercises that you like will appear here'
+                            sectionTitle='Saved Workouts'
+                        />
+                    </>
+                )}
+                {isDesktopOrLaptop && <Footer />}
             </div>
         </div>
     );
-}
+};
 
-export default HomeScreen;
+export default HomePage;

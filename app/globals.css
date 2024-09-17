@@ -24,6 +24,7 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+    font-family: 'Urbanist', sans-serif;
 }
 
 @layer utilities {
@@ -39,4 +40,38 @@ body {
 
 body.fade {
   opacity: 0;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Add this to your global or module CSS */
+
+nav {
+  z-index: 1000; /* Ensure navbar is on top of other content */
+}
+
+@media (min-width: 1224px) {
+  .mobile-nav {
+      display: none; /* Hide mobile nav on larger screens */
+  }
+}
+
+@media (max-width: 1224px) {
+  .desktop-nav {
+      display: none; /* Hide desktop nav on smaller screens */
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
