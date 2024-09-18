@@ -1,6 +1,3 @@
-// services/userService.ts
-
-// Definimos la interfaz para el perfil del usuario
 export interface UserProfile {
     name: string;
     birthDate: string;
@@ -12,7 +9,6 @@ export interface UserProfile {
     };
   }
   
-  // Función para obtener los datos del usuario desde la API
   export const fetchUserData = async (userId: string): Promise<UserProfile> => {
     try {
       const res = await fetch(`http://localhost:5001/users/${userId}`);
@@ -27,7 +23,6 @@ export interface UserProfile {
     }
   };
   
-  // Función para normalizar el valor de género (de la UI al backend)
   export const normalizeGender = (value: string): string => {
     const genderMap: { [key: string]: string } = {
       Male: 'masculino',
@@ -37,7 +32,7 @@ export interface UserProfile {
     return genderMap[value] || 'otro';
   };
   
-  // Función para obtener el valor de género (del backend a la UI)
+
   export const getGenderValue = (gender: string): string => {
     return gender === 'masculino' ? 'Male' : gender === 'femenino' ? 'Female' : 'Other';
   };

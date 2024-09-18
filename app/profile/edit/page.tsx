@@ -20,7 +20,7 @@ const EditProfile: React.FC = () => {
   useEffect(() => {
     const loadUserProfile = async () => {
       try {
-        const data = await fetchUserData('50662446780');
+        const data = await fetchUserData('50686134777');
         setProfileData(data);
         
         if (data?.number) {
@@ -52,11 +52,13 @@ const EditProfile: React.FC = () => {
   };
 
   if (!profileData) {
-    return <div>Loading...</div>;
+    return <div className="m-auto my-auto text-center min-h-screen bg-white p-6 pb-40">
+      <p className='py-80'>We are currently having issues... please try again later.</p>
+      </div>;
   }
 
   return (
-    <div className="min-h-screen bg-white p-6 pb-32">
+    <div className="min-h-screen bg-white p-6 pb-40">
       {/* Header */}
       <header className="flex justify-between items-center mb-6">
         <button onClick={() => router.back()} className="text-gray-700">
@@ -69,7 +71,7 @@ const EditProfile: React.FC = () => {
       <form className="space-y-6">
         {/* Name */}
         <div className="pl-2 py-3">
-          <label className="block text-black mb-1">Name</label>
+          <label className="block text-gray-500 text-base mb-1">Name</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm">
             <input
               type="text"
@@ -84,7 +86,7 @@ const EditProfile: React.FC = () => {
 
         {/* Birth Date */}
         <div className="pl-2 py-3">
-          <label className="block text-black mb-1">Birth Date</label>
+          <label className="block text-gray-500 text-base mb-1">Birth Date</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <input
               type="text"
@@ -100,7 +102,7 @@ const EditProfile: React.FC = () => {
 
         {/* Email */}
         <div className="pl-2 py-3">
-          <label className="block text-black mb-1">Email</label>
+          <label className="block text-gray-500 text-base mb-1">Email</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <input
               type="email"
@@ -116,7 +118,7 @@ const EditProfile: React.FC = () => {
 
         {/* Country */}
         <div className="pl-2 py-3">
-          <label className="block text-black mb-1">Country</label>
+          <label className="block text-gray-500 text-base mb-1">Country</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <select
               name="country"
@@ -136,7 +138,7 @@ const EditProfile: React.FC = () => {
 
         {/* Phone Number */}
         <div className="pl-2 py-3">
-          <label className="block text-black mb-1">Phone Number</label>
+          <label className="block text-gray-500 text-base mb-1">Phone Number</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <FaPhoneAlt className="text-black mr-2" />
 
@@ -171,7 +173,7 @@ const EditProfile: React.FC = () => {
 
         {/* Gender */}
         <div className="pl-2 py-3">
-          <label className="block text-black mb-1">Gender</label>
+          <label className="block text-gray-500 text-base mb-1">Gender</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <select
               name="gender"

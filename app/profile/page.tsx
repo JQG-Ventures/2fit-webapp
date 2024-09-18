@@ -15,11 +15,12 @@ const ProfilePage: React.FC = () => {
   const router = useRouter();
   
   const [userData, setUserData] = useState<UserProfile | undefined>(undefined);
+  const [pressedIndex, setPressedIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const loadUserData = async () => {
       try {
-        const data = await fetchUserData('50662446780'); 
+        const data = await fetchUserData('50686134777'); 
         setUserData(data);
       } catch (error) {
         console.error('Error loading user data:', error);
@@ -29,12 +30,20 @@ const ProfilePage: React.FC = () => {
     loadUserData();
   }, []);
 
+  const handleClick = (index: number, path: string) => {
+    setPressedIndex(index);
+    setTimeout(() => {
+      router.push(path);
+      setPressedIndex(null);
+    }, 150);
+  };
+
   return (
-    <div className="bg-gray-50 min-h-screen px-6 py-10 pb-32">  {/* pb-24 asegura suficiente espacio inferior */}
+    <div className="bg-gray-50 min-h-screen px-6 py-10 pb-32">
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold pl-4">Profile</h1>
-        <div className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-400">
-          <SlOptionsVertical className="text-gray-700 w-5 h-5" /> 
+        <div className="flex items-center justify-center w-10 h-10">
+          <SlOptionsVertical className="text-gray-700 w-7 h-7" /> 
         </div>
       </header>
 
@@ -77,25 +86,45 @@ const ProfilePage: React.FC = () => {
 
       <div className="space-y-6 w-full">
         {/* Edit Profile */}
-        <div className="flex items-center space-x-4 cursor-pointer w-full py-6 pl-4" onClick={() => router.push('/profile/edit')}>
+        <div 
+          className={`flex items-center space-x-4 cursor-pointer w-full py-6 pl-4 hover:bg-gray-200 transition duration-200 ${pressedIndex === 0 ? 'transform scale-95 shadow-inner' : ''}`} 
+          onClick={() => handleClick(0, '/profile/edit')}
+          onMouseDown={() => setPressedIndex(0)}
+          onMouseUp={() => setPressedIndex(null)}
+        >
           <CiUser className="text-gray-500 w-12 h-12" />
           <span className="text-3xl font-medium w-full">Edit Profile</span>
         </div>
 
         {/* Notifications */}
-        <div className="flex items-center space-x-4 cursor-pointer w-full py-6 pl-4">
+        <div 
+          className={`flex items-center space-x-4 cursor-pointer w-full py-6 pl-4 hover:bg-gray-200 transition duration-200 ${pressedIndex === 1 ? 'transform scale-95 shadow-inner' : ''}`} 
+          onClick={() => handleClick(1, '/profile/notifications')}
+          onMouseDown={() => setPressedIndex(1)}
+          onMouseUp={() => setPressedIndex(null)}
+        >
           <CiBellOn className="text-gray-500 w-12 h-12" />
           <span className="text-3xl font-medium w-full">Notifications</span>
         </div>
 
         {/* Security */}
-        <div className="flex items-center space-x-4 cursor-pointer w-full py-6 pl-4">
+        <div 
+          className={`flex items-center space-x-4 cursor-pointer w-full py-6 pl-4 hover:bg-gray-200 transition duration-200 ${pressedIndex === 2 ? 'transform scale-95 shadow-inner' : ''}`} 
+          onClick={() => handleClick(2, '/profile/security')}
+          onMouseDown={() => setPressedIndex(2)}
+          onMouseUp={() => setPressedIndex(null)}
+        >
           <CiLock className="text-gray-500 w-12 h-12" />
           <span className="text-3xl font-medium w-full">Security</span>
         </div>
 
         {/* Help */}
-        <div className="flex items-center space-x-4 cursor-pointer w-full py-6 pl-4">
+        <div 
+          className={`flex items-center space-x-4 cursor-pointer w-full py-6 pl-4 hover:bg-gray-200 transition duration-200 ${pressedIndex === 3 ? 'transform scale-95 shadow-inner' : ''}`} 
+          onClick={() => handleClick(3, '/profile/help')}
+          onMouseDown={() => setPressedIndex(3)}
+          onMouseUp={() => setPressedIndex(null)}
+        >
           <CiCircleQuestion className="text-gray-500 w-12 h-12" />
           <span className="text-3xl font-medium w-full">Help</span>
         </div>
@@ -109,7 +138,12 @@ const ProfilePage: React.FC = () => {
         </div>
 
         {/* Logout */}
-        <div className="flex items-center space-x-4 text-red-500 cursor-pointer w-full py-6 pl-4">
+        <div 
+          className={`flex items-center space-x-4 text-red-500 cursor-pointer w-full py-6 pl-4 hover:bg-gray-200 transition duration-200 ${pressedIndex === 4 ? 'transform scale-95 shadow-inner' : ''}`} 
+          onClick={() => handleClick(4, '/profile/logout')}
+          onMouseDown={() => setPressedIndex(4)}
+          onMouseUp={() => setPressedIndex(null)}
+        >
           <IoIosLogOut className="text-red-500 w-9 h-9" />
           <span className="text-3xl font-medium w-full">Logout</span>
         </div>
