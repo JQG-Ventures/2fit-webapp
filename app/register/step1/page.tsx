@@ -57,17 +57,18 @@ export default function RegisterStep1() {
 
         if (Object.keys(validationErrors).length === 0) {
             updateData(formData);
-            const response_code = await sendCode(formData.number)
+            router.push('/register/step2');
+            // const response_code = await sendCode(formData.number)
 
-            if (response_code == 200) {
-                router.push('/register/step2');
-            } else {
-                if (response_code == 400) {
-                    setError('The number entered is not valid. Please try another one.');
-                } else {
-                    setError('There was a problem sending the code. Please try again later.');
-                }
-            }
+            // if (response_code == 200) {
+            //     router.push('/register/step2');
+            // } else {
+            //     if (response_code == 400) {
+            //         setError('The number entered is not valid. Please try another one.');
+            //     } else {
+            //         setError('There was a problem sending the code. Please try again later.');
+            //     }
+            // }
         }
     };
 
