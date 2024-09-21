@@ -41,7 +41,7 @@ export default function RegisterStep10() {
                     router.push('/home');
                 }, 3000);
             } catch (error) {
-                setErrorMessage('There was an error creating your training plan. Please try again.');
+                setErrorMessage('There was an error creating your training plan:( Please try again.');
                 setIsLoading(false);
             }
         };
@@ -73,7 +73,7 @@ export default function RegisterStep10() {
                         <h2 className="text-3xl font-bold text-red-600 mb-6">{errorMessage}</h2>
                         <button
                             onClick={handleRetry}
-                            className="mt-4 px-6 py-3 bg-red-500 text-white text-lg rounded-md"
+                            className="mt-4 px-6 py-4 bg-red-500 text-white text-2xl rounded-lg"
                         >
                             Go to Home
                         </button>
