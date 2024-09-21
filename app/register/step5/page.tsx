@@ -2,21 +2,21 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { IoChevronBack } from "react-icons/io5";
 import { useRegister } from '../../_components/register/RegisterProvider';
+import RegistrationHeader from '../../_components/header/registrationHeader';
 
 export default function RegisterStep5() {
+    const { data, updateData } = useRegister();
     const [unit, setUnit] = useState('cm');
-    const [height, setHeight] = useState(175);
+    const [height, setHeight] = useState(data.height || 175);
     const router = useRouter();
-    const { updateData } = useRegister();
 
     const units = [
         { id: 'cm', label: 'Centimetre' },
         { id: 'ft', label: 'Feet' },
     ];
 
-    const toggleUnit = (selectedUnit) => {
+    const toggleUnit = (selectedUnit: string) => {
         if (selectedUnit !== unit) {
             const convertedHeight = selectedUnit === 'cm'
                 ? Math.round(height * 30.48)
@@ -27,31 +27,25 @@ export default function RegisterStep5() {
     };
 
     const handleNextStep = () => {
-        // Convert the height to centimeters if the unit is feet
         const heightInCm = unit === 'ft' ? Math.round(height * 30.48) : height;
 
-        // Update the registration data with the height in cm
         updateData({ height: heightInCm });
-
-        // Navigate to the next step
         router.push('/register/step6');
     };
 
-    const handlePrevStep = () => router.push('/register/step4');
+    const handlePrevStep = () => {
+        router.push('/register/step4')
+    };
 
     return (
-        <div className="flex flex-col min-h-screen bg-white p-4">
-            <div className="flex items-center justify-between px-4 mb-10 pt-16 sm:pt-24 md:pt-32">
-                <button onClick={handlePrevStep} className="text-4xl">
-                    <IoChevronBack />
-                </button>
-                <p className="text-2xl font-medium">Step 3 of 8</p>
-                <button onClick={() => router.push('/next-step')} className="text-blue-500 text-2xl">Skip</button>
+        <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
+            <div className='h-[10%] w-full lg:max-w-3xl'>
+                <RegistrationHeader stepNumber={3} handlePrevStep={handlePrevStep}/>
             </div>
 
-            <div id="content" className="flex-grow flex flex-col items-center justify-center mt-[-100px]">
+            <div className="h-[85%] content-center w-full lg:max-w-3xl">
                 <h2 className="text-4xl font-bold text-center mb-20">Select Height</h2>
-                <div className="space-y-6 w-full px-8">
+                <div className="w-full px-8">
                     <div className="flex items-center bg-gray-100 rounded-full p-1 w-full max-w-xs mb-8 mx-auto justify-center">
                         {units.map(({ id, label }) => (
                             <button
@@ -63,7 +57,7 @@ export default function RegisterStep5() {
                             </button>
                         ))}
                     </div>
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-center my-28">
                         <input
                             type="number"
                             value={height}
@@ -72,7 +66,7 @@ export default function RegisterStep5() {
                         />
                         <span className="ml-2 text-2xl text-gray-700">{unit}</span>
                     </div>
-                    <div className="flex justify-center items-center pt-10">
+                    <div className="flex justify-center items-center">
                         <button
                             onClick={handleNextStep}
                             className="w-full max-w-xs sm:max-w-md py-3 bg-black text-white rounded-md font-semibold mt-10 flex justify-center items-center"

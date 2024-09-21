@@ -131,3 +131,19 @@
 .appear-center {
   animation: appearCenter 1s forwards, fadeIn 1s forwards;
 }
+
+.navbar-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8); /* White with some transparency */
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
+  z-index: -1; /* Positioned behind the navbar */
+}
+
+/* Ensure the navbar is placed correctly */
+.navbar-container {
+  position: relative;
+}

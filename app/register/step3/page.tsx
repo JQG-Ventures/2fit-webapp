@@ -2,42 +2,39 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { IoChevronBack } from "react-icons/io5";
 import { useRegister } from '../../_components/register/RegisterProvider';
+import RegistrationHeader from '../../_components/header/registrationHeader';
 
 export default function RegisterStep3() {
-    const [selectedGender, setSelectedGender] = useState(null);
+    const { data, updateData } = useRegister();
     const router = useRouter();
-    const { updateData } = useRegister();
-
+    const [selectedGender, setSelectedGender] = useState(data.gender);   
     const genders = [
         { id: 0, label: 'Woman', icon: '👩' },
         { id: 1, label: 'Man', icon: '👨' },
         { id: 2, label: 'Gender neutral', icon: '🧑' },
     ];
 
-    const handleGenderSelection = (genderId) => {
-        setSelectedGender(genderId); // Update the selected gender ID
-        updateData({ gender: genderId }); // Save the gender ID in the context
+    const handleGenderSelection = (genderId: number) => {
+        setSelectedGender(genderId);
+        updateData({ gender: genderId });
+        console.log(data);
         setTimeout(() => {
             router.push('/register/step4');
         }, 300);
     };
 
-    const handlePrevStep = () => router.push('/register/step2');
+    const handlePrevStep = () => {
+        router.push('/register/step2')
+    };
 
     return (
-        <div className="flex flex-col min-h-screen bg-white p-4">
-            <div className="flex items-center justify-between px-4 mb-10 pt-16 sm:pt-24 md:pt-32">
-                <button onClick={handlePrevStep} className="text-4xl">
-                    <IoChevronBack />
-                </button>
-                <p className="text-2xl font-medium">Step 1 of 8</p>
-                <button onClick={() => router.push('/next-step')} className="text-blue-500 text-2xl">Skip</button>
+        <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
+            <div className='h-[10%] w-full lg:max-w-3xl'>
+                <RegistrationHeader stepNumber={1} handlePrevStep={handlePrevStep}/>
             </div>
 
-            {/* Main content */}
-            <div className="flex-grow flex flex-col items-center justify-center">
+            <div className="h-[85%] content-center w-full lg:max-w-3xl">
                 <h2 className="text-4xl font-bold text-center mb-20">Choose gender</h2>
                 <div className="space-y-6 w-full px-8">
                     {genders.map(({ id, label, icon }) => (

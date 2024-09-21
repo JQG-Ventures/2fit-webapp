@@ -2,13 +2,14 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { IoChevronBack } from "react-icons/io5";
 import { useRegister } from '../../_components/register/RegisterProvider';
+import RegistrationHeader from '../../_components/header/registrationHeader';
+
 
 export default function RegisterStep4() {
-    const [selectedGoal, setSelectedGoal] = useState(null);
+    const { data, updateData } = useRegister();
+    const [selectedGoal, setSelectedGoal] = useState(data.fitness_goal);
     const router = useRouter();
-    const { updateData } = useRegister();
 
     const goals = [
         { id: 1, label: 'Lose Weight', icon: '⚖️' },
@@ -17,29 +18,25 @@ export default function RegisterStep4() {
         { id: 4, label: 'Gain Muscle Mass', icon: '🚀' },
     ];
 
-    const handleGoalSelection = (goal) => {
-        setSelectedGoal(goal); // Set the selected goal first for immediate UI feedback
-        updateData({ fitness_goal: goal }); // Then update the context
+    const handleGoalSelection = (goal: number) => {
+        setSelectedGoal(goal);
+        updateData({ fitness_goal: goal });
         setTimeout(() => {
             router.push('/register/step5');
         }, 300);
     };
 
     const handlePrevStep = () => {
-        router.push('/register/step3');
+        router.push('/register/step3')
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-white p-4">
-            <div className="flex items-center justify-between px-4 mb-10 pt-16 sm:pt-24 md:pt-32">
-                <button onClick={handlePrevStep} className="text-4xl">
-                    <IoChevronBack />
-                </button>
-                <p className="text-2xl font-medium">Step 2 of 8</p>
-                <button onClick={() => router.push('/next-step')} className="text-blue-500 text-2xl">Skip</button>
+        <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
+            <div className='h-[10%] w-full lg:max-w-3xl'>
+                <RegistrationHeader stepNumber={2} handlePrevStep={handlePrevStep}/>
             </div>
 
-            <div className="flex-grow flex flex-col items-center justify-center">
+            <div className="h-[85%] content-center w-full lg:max-w-3xl">
                 <h2 className="text-4xl font-bold text-center mb-20">Choose main goal</h2>
                 <div className="space-y-6 w-full px-8">
                     {goals.map((goal) => (
