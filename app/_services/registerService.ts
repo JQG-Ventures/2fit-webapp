@@ -1,6 +1,5 @@
 export const registerUser = async (data: any) => {
     try {
-        console.log(data);
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/register`, {
             method: 'POST',
             headers: {
@@ -15,7 +14,6 @@ export const registerUser = async (data: any) => {
 
         return await response.json();
     } catch (error) {
-        console.error('Error registering user:', error);
         throw error;
     }
 };
