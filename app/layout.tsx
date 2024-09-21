@@ -3,7 +3,7 @@ import "./_css/base.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { RegisterProvider } from "./_components/register/RegisterProvider";
-import { default as AuthProvider } from "./providers/AuthProvider";
+import { default as AuthProvider } from "./_providers/AuthProvider";
 import NavBar from "./_components/navbar/NavBar";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -24,9 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body id="test" className={inter.className}>
         <RegisterProvider>
           <AuthProvider>
-            <div>
               {children}
-            </div>  
           </AuthProvider>
           <NavBar />
         </RegisterProvider>

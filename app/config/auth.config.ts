@@ -4,7 +4,7 @@ var jwt = require("jsonwebtoken");
 
 async function refreshAccessToken(accessToken: any) {
   try {
-    const response = await fetch(process.env.AUTH_API + "/refresh-token", {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/auth/refresh-token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -20,7 +20,6 @@ async function refreshAccessToken(accessToken: any) {
         responseData.response.refresh_token ?? accessToken.refreshToken,
     };
   } catch (error) {
-    console.log(error);
     return {
       ...accessToken,
       error: "RefreshAccessTokenError",
@@ -37,7 +36,7 @@ export const authConfig = {
       },
       async authorize(credentials) {
         try {
-          const res = await fetch(process.env.AUTH_API + "/login", {
+          const res = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -76,7 +75,6 @@ export const authConfig = {
         if (user) session.user = { ...user, token: userToken };
         return session;
       } catch (error) {
-        console.log("Session Error", error);
         throw error;
       }
     },

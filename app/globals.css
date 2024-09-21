@@ -26,6 +26,7 @@ body {
     )
     rgb(var(--background-start-rgb));
     font-family: 'Urbanist', sans-serif;
+    color: black;
 }
 
 @layer utilities {
