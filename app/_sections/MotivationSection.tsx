@@ -2,32 +2,33 @@
 
 import React, { useState, useEffect } from 'react';
 import { FaRobot, FaTimes } from 'react-icons/fa';
-
-// Example motivational messages
-const motivationalMessages = [
-    "Stay consistent and results will follow!",
-    "Every workout is progress, no matter how small.",
-    "Your only limit is the one you set yourself!",
-    "Make today your best workout yet!",
-    "Stay focused, stay fit!"
-];
+import { useTranslation } from 'react-i18next';
 
 // Helper function to get the message of the day
-const getMotivationalMessage = () => {
+const getMotivationalMessage = (messages: string[]) => {
     const dayOfWeek = new Date().getDay(); // Get current day of the week (0 - Sunday, 6 - Saturday)
-    return motivationalMessages[dayOfWeek % motivationalMessages.length];
+    return messages[dayOfWeek % messages.length];
 };
 
 const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
+    const { t } = useTranslation('global');
+    const motivationalMessages = [
+        t('mtvnphrase1'),
+        t('mtvnphrase2'),
+        t('mtvnphrase3'),
+        t('mtvnphrase4'),
+        t('mtvnphrase5')
+    ];
+
     const [dailyMessage, setDailyMessage] = useState("");
     const [isHovered, setIsHovered] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
         // Set the daily motivational message based on the day of the week
-        const message = getMotivationalMessage();
+        const message = getMotivationalMessage(motivationalMessages);
         setDailyMessage(message);
-    }, []);
+    }, [motivationalMessages]);
 
     const handleIconClick = () => {
         // Toggle visibility on icon click
@@ -40,12 +41,12 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
                 <div className="flex justify-between items-start w-full mb-6">
                     <div className="flex flex-col w-[80%]">
                         <h2 className="text-3xl font-bold mb-4">
-                            {isBotUser ? `Keep up the great work!` : "Get Fit with 2Fit AI"}
+                            {isBotUser ? t('mtvnphrasemain') : "Get Fit with 2Fit AI"}
                         </h2>
                         <p className="text-lg text-gray-600">
                             {isBotUser
                                 ? dailyMessage
-                                : "Achieve your fitness goals with a personal AI trainer designed just for you."
+                                : t('mtvnphrasebase')
                             }
                         </p>                        
                     </div>
@@ -71,15 +72,15 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
                 <div className="w-full border-t border-gray-300 my-4"></div>
 
                 <div className="flex justify-between items-center w-full mt-4">
-                    <p className="text-gray-700 text-lg">Talk to your trainer</p>
+                    <p className="text-gray-700 text-lg">{t('talktrainer')}</p>
                     <div className="button-container">
                         {isBotUser ? (
                             <button className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition-colors">
-                                Let's Chat
+                                {t('letschat')}
                             </button>
                         ) : (
                             <button className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition-colors">
-                                Get your plan
+                                {t('getyourplan')}
                             </button>
                         )}
                     </div>

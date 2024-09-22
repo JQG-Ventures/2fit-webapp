@@ -9,10 +9,12 @@ import countries from '@/app/data/countries.json';
 import countryCodes from '@/app/data/countryCodes.json';  
 import { detectCountryCode } from '@/app/utils/phoneUtils';  
 import { fetchUserData, UserProfile } from '../../_services/userService';
+import { useTranslation } from 'react-i18next';
 
 const EditProfile: React.FC = () => {
   const router = useRouter();
-  
+  const { t } = useTranslation('global');
+
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [countryCode, setCountryCode] = useState<string>("");  
   const [phoneNumber, setPhoneNumber] = useState<string>("");  
@@ -52,26 +54,26 @@ const EditProfile: React.FC = () => {
   };
 
   if (!profileData) {
-    return <div className="m-auto my-auto text-center min-h-screen bg-white p-6 pb-40">
-      <p className='py-80'>We are currently having issues... please try again later.</p>
+    return <div className="m-auto my-auto text-center min-h-screen bg-white p-6 pb-40 md:pt-32">
+      <p className='py-80'>{t('loadissue')}</p>
       </div>;
   }
 
   return (
-    <div className="min-h-screen bg-white p-6 pb-40">
+    <div className="min-h-screen bg-white p-6 pb-40 md:pt-32">
       {/* Header */}
       <header className="flex justify-between items-center mb-6">
         <button onClick={() => router.back()} className="text-gray-700">
           <FaArrowLeft className="w-8 h-8" />
         </button>
-        <h1 className="text-3xl font-bold">Edit Profile</h1>
+        <h1 className="text-3xl font-bold">{t('editprofile')}</h1>
         <div></div> 
       </header>
       
       <form className="space-y-6">
         {/* Name */}
         <div className="pl-2 py-3">
-          <label className="block text-gray-500 text-base mb-1">Name</label>
+          <label className="block text-gray-500 text-base mb-1">{t('name')}</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm">
             <input
               type="text"
@@ -86,7 +88,7 @@ const EditProfile: React.FC = () => {
 
         {/* Birth Date */}
         <div className="pl-2 py-3">
-          <label className="block text-gray-500 text-base mb-1">Birth Date</label>
+          <label className="block text-gray-500 text-base mb-1">{t('birthdate')}</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <input
               type="text"
@@ -102,7 +104,7 @@ const EditProfile: React.FC = () => {
 
         {/* Email */}
         <div className="pl-2 py-3">
-          <label className="block text-gray-500 text-base mb-1">Email</label>
+          <label className="block text-gray-500 text-base mb-1">{t('email')}</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <input
               type="email"
@@ -118,7 +120,7 @@ const EditProfile: React.FC = () => {
 
         {/* Country */}
         <div className="pl-2 py-3">
-          <label className="block text-gray-500 text-base mb-1">Country</label>
+          <label className="block text-gray-500 text-base mb-1">{t('country')}</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <select
               name="country"
@@ -138,7 +140,7 @@ const EditProfile: React.FC = () => {
 
         {/* Phone Number */}
         <div className="pl-2 py-3">
-          <label className="block text-gray-500 text-base mb-1">Phone Number</label>
+          <label className="block text-gray-500 text-base mb-1">{t('phonenumber')}</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <FaPhoneAlt className="text-black mr-2" />
 
@@ -173,7 +175,7 @@ const EditProfile: React.FC = () => {
 
         {/* Gender */}
         <div className="pl-2 py-3">
-          <label className="block text-gray-500 text-base mb-1">Gender</label>
+          <label className="block text-gray-500 text-base mb-1">{t('gender')}</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <select
               name="gender"
@@ -181,9 +183,9 @@ const EditProfile: React.FC = () => {
               onChange={handleInputChange}
               className="w-full border-none focus:ring-0 bg-transparent"
             >
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
+              <option value="Male">{t('male')}</option>
+              <option value="Female">{t('female')}</option>
+              <option value="Other">{t('other')}</option>
             </select>
           </div>
         </div>
@@ -192,7 +194,7 @@ const EditProfile: React.FC = () => {
           type="submit"
           className="w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-4 rounded-full text-2xl font-semibold shadow-lg py-8"
         >
-          Update
+          {t('update')}
         </button>
       </form>
     </div>

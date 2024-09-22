@@ -2,17 +2,19 @@
 
 import React from 'react';
 import { FaSun, FaMoon, FaCloudSun } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 const GreetingSection = ({ userName }: { userName: string }) => {
     const currentHour = new Date().getHours();
-    let greeting = 'Good Morning';
+    const { t } = useTranslation('global'); // Asegúrate de usar el namespace correcto
+    let greeting = t('greetingmorning');
     let icon = <FaSun size={24} aria-label="Sun icon" />;
 
     if (currentHour >= 12 && currentHour < 18) {
-        greeting = 'Good Afternoon';
+        greeting = t('greetingafternoon');
         icon = <FaCloudSun size={24} aria-label="Cloud Sun icon" />;
     } else if (currentHour >= 18) {
-        greeting = 'Good Evening';
+        greeting = t('greetingevening');
         icon = <FaMoon size={24} aria-label="Moon icon" />;
     }
 

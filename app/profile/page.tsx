@@ -10,9 +10,11 @@ import { fetchUserData, UserProfile } from '../_services/userService';
 import { MdModeEditOutline } from "react-icons/md";
 import { CiUser, CiBellOn, CiLock, CiCircleQuestion } from "react-icons/ci";
 import { BsMoon } from "react-icons/bs";
+import { useTranslation } from 'react-i18next';
 
 const ProfilePage: React.FC = () => {
   const router = useRouter();
+  const { t } = useTranslation('global');
   
   const [userData, setUserData] = useState<UserProfile | undefined>(undefined);
   const [pressedIndex, setPressedIndex] = useState<number | null>(null);
@@ -39,10 +41,10 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen px-6 py-10 pb-32">
+    <div className="bg-gray-50 min-h-screen px-6 py-10 pb-32 lg:pt-32">
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold pl-4">Profile</h1>
-        <div className="flex items-center justify-center w-10 h-10">
+        <h1 className="text-4xl font-bold pl-4">{t('profile')}</h1>
+        <div className="flex items-center justify-center w-10 h-10 cursor-pointer" onClick={() => router.push('/profile/settings')}>
           <SlOptionsVertical className="text-gray-700 w-7 h-7" /> 
         </div>
       </header>
@@ -75,11 +77,11 @@ const ProfilePage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4 pl-4">
             <span className="bg-gradient-to-b from-yellow-300 to-yellow-700 text-white rounded-full px-4 py-2 text-2xl pl-4 pr-4">PRO</span>
-            <h3 className="font-semibold text-3xl">Upgrade to Premium</h3>
+            <h3 className="font-semibold text-3xl">{t('upgradepremium')}</h3>
           </div>
           <IoIosArrowDropright className="text-white w-10 h-10" />
         </div>
-        <p className="text-2xl mt-2 text-gray-200 pl-4">Enjoy workout access without ads and restrictions</p>
+        <p className="text-2xl mt-2 text-gray-200 pl-4">{t('upgradepremiumdescription')}</p>
       </div>
 
       <div className="border-t border-gray-300 my-4"></div> 
@@ -93,7 +95,7 @@ const ProfilePage: React.FC = () => {
           onMouseUp={() => setPressedIndex(null)}
         >
           <CiUser className="text-gray-500 w-12 h-12" />
-          <span className="text-3xl font-medium w-full">Edit Profile</span>
+          <span className="text-3xl font-medium w-full">{t('editprofile')}</span>
         </div>
 
         {/* Notifications */}
@@ -104,7 +106,7 @@ const ProfilePage: React.FC = () => {
           onMouseUp={() => setPressedIndex(null)}
         >
           <CiBellOn className="text-gray-500 w-12 h-12" />
-          <span className="text-3xl font-medium w-full">Notifications</span>
+          <span className="text-3xl font-medium w-full">{t('notifications')}</span>
         </div>
 
         {/* Security */}
@@ -115,7 +117,7 @@ const ProfilePage: React.FC = () => {
           onMouseUp={() => setPressedIndex(null)}
         >
           <CiLock className="text-gray-500 w-12 h-12" />
-          <span className="text-3xl font-medium w-full">Security</span>
+          <span className="text-3xl font-medium w-full">{t('security')}</span>
         </div>
 
         {/* Help */}
@@ -126,13 +128,13 @@ const ProfilePage: React.FC = () => {
           onMouseUp={() => setPressedIndex(null)}
         >
           <CiCircleQuestion className="text-gray-500 w-12 h-12" />
-          <span className="text-3xl font-medium w-full">Help</span>
+          <span className="text-3xl font-medium w-full">{t('help')}</span>
         </div>
 
         <div className="flex items-center justify-between w-full py-6 pl-4">
           <div className="flex items-center space-x-4">
             <BsMoon className="text-gray-500 w-8 h-8" />
-            <span className="text-3xl font-medium">Dark Theme</span>
+            <span className="text-3xl font-medium">{t('darktheme')}</span>
           </div>
           <ToggleButton /> 
         </div>
@@ -145,7 +147,7 @@ const ProfilePage: React.FC = () => {
           onMouseUp={() => setPressedIndex(null)}
         >
           <IoIosLogOut className="text-red-500 w-9 h-9" />
-          <span className="text-3xl font-medium w-full">Logout</span>
+          <span className="text-3xl font-medium w-full">{t('logout')}</span>
         </div>
       </div>
     </div>
