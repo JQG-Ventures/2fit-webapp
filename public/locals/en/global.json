@@ -1,0 +1,45 @@
+{
+  "settings": {
+    "title": "Settings",
+    "accountSettings": "Account Settings",
+    "language": "Language:",
+    "save": "Save"
+  },
+  "profile": {
+    "title": "Profile",
+    "edit": "Edit Profile",
+    "notifications": "Notifications",
+    "security": "Security",
+    "name": "Name",
+    "birthdate": "Birth Date",
+    "email": "Email",
+    "country": "Country",
+    "phonenumber": "Phone Number",
+    "gender": "Gender",
+    "update": "Update",
+    "female": "Female",
+    "male": "Male"
+  },
+  "upgrade": {
+    "title": "Upgrade to Premium",
+    "description": "Enjoy workout access without ads and restrictions"
+  },
+  "home": {
+    "motivation": {
+      "main": "Keep up the great work!",
+      "base": "Achieve your fitness goals with a personal AI trainer designed just for you.",
+      "phrases": [
+        "Stay consistent and results will follow!",
+        "Every workout is progress, no matter how small.",
+        "Your only limit is the one you set yourself!",
+        "Make today your best workout yet!",
+        "Stay focused, stay fit!"
+      ]
+    },
+    "trainer": {
+      "talk": "Talk to your trainer",
+      "letschat": "Let's Chat!",
+      "getyourplan": "Get your plan"
+    }
+  }
+}
