@@ -10,12 +10,26 @@ import countryCodes from '@/app/data/countryCodes.json';
 import { detectCountryCode } from '@/app/utils/phoneUtils';  
 import { fetchUserData, UserProfile } from '../../_services/userService';
 
+const Modal: React.FC<{ message: string; onClose: () => void }> = ({ message, onClose }) => {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <p>{message}</p>
+        <button onClick={onClose} className="mt-4 bg-blue-500 text-white p-2 rounded">
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const EditProfile: React.FC = () => {
   const router = useRouter();
   
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [countryCode, setCountryCode] = useState<string>("");  
   const [phoneNumber, setPhoneNumber] = useState<string>("");  
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -30,6 +44,7 @@ const EditProfile: React.FC = () => {
         }
       } catch (error) {
         console.error('Error loading user profile:', error);
+        setErrorMessage('Error loading user profile. Please try again later.');
       }
     };
 
@@ -54,13 +69,19 @@ const EditProfile: React.FC = () => {
   if (!profileData) {
     return <div className="m-auto my-auto text-center min-h-screen bg-white p-6 pb-40">
       <p className='py-80'>We are currently having issues... please try again later.</p>
-      </div>;
+    </div>;
   }
 
   return (
     <div className="min-h-screen bg-white p-6 pb-40">
+      {errorMessage && (
+        <Modal
+          message={errorMessage}
+          onClose={() => setErrorMessage(null)}
+        />
+      )}
       {/* Header */}
-      <header className="flex justify-between items-center mb-6">
+      <header className="flex justify-between items-center mb-6 md:pt-24">
         <button onClick={() => router.back()} className="text-gray-700">
           <FaArrowLeft className="w-8 h-8" />
         </button>
@@ -141,7 +162,6 @@ const EditProfile: React.FC = () => {
           <label className="block text-gray-500 text-base mb-1">Phone Number</label>
           <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
             <FaPhoneAlt className="text-black mr-2" />
-
             {/* Dropdown list for country codes */}
             <div className="mr-2">
               <select
@@ -158,7 +178,6 @@ const EditProfile: React.FC = () => {
                 ))}
               </select>
             </div>
-
             {/* Phone number input */}
             <input
               type="tel"
