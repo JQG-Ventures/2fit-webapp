@@ -11,7 +11,7 @@ export interface UserProfile {
   
   export const fetchUserData = async (userId: string): Promise<UserProfile> => {
     try {
-      const res = await fetch(`http://localhost:5001/users/${userId}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userId}`);
       if (!res.ok) {
         throw new Error('Error fetching user profile');
       }
