@@ -111,7 +111,7 @@ export default function RegisterStep1() {
             </div>
 
             <div className="h-[15%] flex flex-col justify-start text-center">
-                <p className="text-gray-500 mb-10">Or sign in with</p>
+                <p className="text-gray-500 mb-10">Or sign up with</p>
                 <div className="flex flex-row justify-evenly space-x-8">
                     {[FaApple, FaFacebook, FaGoogle].map((Icon, idx) => (
                         <button key={idx} className="text-5xl">
