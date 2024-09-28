@@ -1,4 +1,136 @@
 {
+  "WelcomPage":{
+    "title1": "Welcome to 2Fit-AI",
+    "description1": "Improve your fitness with the help of the latest artificial intelligence technology.",
+    "title2": "Workout Categories",
+    "description2": "Workout categories will help you gain strength, get in better shape and embrace a healthy lifestyle.",
+    "title3": "Custom Workouts",
+    "description3": "With AI assistance, you can access a variety of different workout routines and save them in your app.",
+    "startbtn": "Start Training",
+    "questiontxt": "Already have an account",
+    "signin": "Sign in"
+  },
+  "RegisterPage":{
+    "create": [
+      "Create your",
+      "Account"
+    ],
+    "email": "Email",
+    "policy": [
+      "By continuing you accept our ",
+      "Privacy Policy"
+    ],
+    "nextbtn": "Next",
+    "signuptxt": "Or sign up with",
+    "signupquestion": "Do you have an account?",
+    "signin": "Sign in"
+  },
+  "RegisterPagestep1":{
+    "create": [
+      "Create your",
+      "Account"
+    ],
+    "name": "Name",
+    "last": "Last",
+    "age": "Age",
+    "phone": "Phone",
+    "nextbtn": "Next",
+    "signuptxt": "Or sign up with",
+    "signupquestion": "Do you have an account?",
+    "signin": "Sign in"
+  },
+  "RegistrationHeader":{
+    "stepof": [
+      "Step",
+      "of"
+    ],
+    "skip" : "Skip"
+  },
+  "RegisterPagestep3":{
+    "gender": "Choose gender",
+    "woman": "Woman",
+    "man": "Man",
+    "neutral": "Gender Neutral"
+  },
+  "RegisterPagestep4":{
+    "goal": "Choose main goal",
+    "weight": "Lose Weight",
+    "fit": "Keep Fit",
+    "stronger": "Get Stronger",
+    "muscle": "Gain Muscle Mass"
+  },
+  "RegisterPagestep5":{
+    "Height": "Select Height",
+    "centimetre": "Centimetre",
+    "feet": "Feet",
+    "nextbtn": "Next"
+  },
+  "RegisterPagestep6":{
+    "weight": "Select Weight",
+    "lbs": "Lbs",
+    "kilograms": "Kilograms",
+    "nextbtn": "Next"
+  },
+  "RegisterPagestep7":{
+    "weight": "Select Target Weight",
+    "lbs": "Lbs",
+    "kilograms": "Kilograms",
+    "nextbtn": "Next"
+  },
+  "RegisterPagestep8":{
+    "level": [
+      "Choose tranining",
+      "level"
+    ],
+    "beginner": [
+      "Beginner",
+      "I want to start training"
+    ],
+    "irregular": [
+      "Irregular training",
+      "I train 1-2 times a week"
+    ],
+    "medium": [
+      "Medium",
+      "I train 3-5 a week"
+    ],
+    "advanced": [
+      "Advanced",
+      "I train more than 5 times a week"
+    ]
+  },
+  "RegisterPagestep9":{
+    "activities": [
+      "Choose activities",
+      "that you prefer"
+    ],  
+    "stretch": "Stretch",
+    "cardio": "Cardio",
+    "yoga": "Yoga",
+    "powertraining": "Power training",
+    "dancing": "Dancing"
+  },
+  "RegisterPagestep10":{
+    "texts": [
+        "We create your training plan",
+        "Analyzing your demographic profile",
+        "Considering your activity level",
+        "Taking your interests into account",
+        "Almost there! Finalizing your plan"
+    ],  
+    "errormsg": "There was an error creating your training plan:( Please try again.",
+    "creating": [
+        "We are creating your",
+        "training plan"
+    ],
+    "homebtn" : "Go to Home"
+  },
+  "Navbar": {
+    "home": "Home",
+    "workouts": "Workouts",
+    "bot": "Bot",
+    "profile": "Profile"
+  },
   "settings": {
     "title": "Settings",
     "accountSettings": "Account Settings",
@@ -25,6 +157,35 @@
     "description": "Enjoy workout access without ads and restrictions"
   },
   "home": {
+    "excercisebannersection": {
+        "planfortoday": "What's the plan for today?",
+        "planfortoday2": "Explore Workouts",
+        "noexercisemessage": "Soon you will have access to a variety of workouts to get you fit, stay tuned!"
+      },
+      "GuidedWorkoutsSection": {
+        "guidedworkoutstitle": "Guided Workouts",
+        "guidedworkoutsdescription": "Choose your favorite workout from guided plans.",
+        "viewall":"View All",
+        "noworkoutmessage": "No workouts available at the moment. Please check back later!"
+      },
+      "WorkoutLibrarySection": {
+        "WorkoutLibrarySectiontitle": "Explore Our Workout Library",
+        "WorkoutLibrarySectiondescription": "Soon you will have tons of workouts to get you fit, stay tuned!",
+        "viewall":"View All",
+        "WorkoutLibrarySectiondescription2": "Discover more workouts tailored to your fitness goals in our extensive library.",
+        "openlibrary": "Open Workout Library"
+      },
+      "SavedWorkoutsSection": {
+        "SavedWorkoutsSectiontitle":"Saved Workouts",
+        "SavedWorkoutsSectiondescription":"View All",
+        "viewall":"View All",
+        "SavedWorkoutsSectionquestion": "Do you want to remove this workout from your saved list?",
+        "SavedWorkoutsSectionconfirmText": "Yes, Remove",
+        "SavedWorkoutsSectioncancelText": "Cancel",
+        "SavedWorkoutsSectionrenderLoading": "Loading workout plans and saved workouts..."
+
+
+      },
     "motivation": {
       "main": "Keep up the great work!",
       "base": "Achieve your fitness goals with a personal AI trainer designed just for you.",
@@ -35,6 +196,11 @@
         "Make today your best workout yet!",
         "Stay focused, stay fit!"
       ]
+    },
+    "greeting": {
+      "morning": "Good Morning",
+      "afternoon": "Good Afternoon",
+      "evening": "Good Night"
     },
     "trainer": {
       "talk": "Talk to your trainer",

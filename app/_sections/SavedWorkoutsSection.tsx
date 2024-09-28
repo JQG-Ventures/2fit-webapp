@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { AiFillHeart, AiOutlineClose } from 'react-icons/ai';
 import ConfirmationModal from '../_components/modals/confirmationModal';
+import { useTranslation } from 'react-i18next';
 
 interface Workout {
     _id: string;
@@ -27,6 +28,7 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
     const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
     const [savedWorkouts, setSavedWorkouts] = useState<Workout[]>(workouts);
     const userId = "user_50662633238";
+    const { t } = useTranslation('global');
 
     const handleHeartClick = (workout: Workout) => {
         setSelectedWorkout(workout);
@@ -86,7 +88,7 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
         <div className="bg-white p-4 rounded-lg">
             <div className="flex justify-between items-center mb-8 px-2">
                 <h2 className="text-4xl font-bold text-gray-800">{sectionTitle}</h2>
-                <a href="#" className="text-blue-600 hover:underline text-lg lg:text-2xl">View All</a>
+                <a href="#" className="text-blue-600 hover:underline text-lg lg:text-2xl">{t('home.SavedWorkoutsSection.viewall')}</a>
             </div>
 
             {savedWorkouts.length === 0 ? (
@@ -103,9 +105,9 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
                 isOpen={modalOpen}
                 onClose={handleCancel}
                 onConfirm={handleConfirm}
-                question={"Do you want to remove this workout from your saved list?"}
-                confirmText={"Yes, Remove"}
-                cancelText={"Cancel"}
+                question={t('home.SavedWorkoutsSection.SavedWorkoutsSectionquestion')}
+                confirmText={t('home.SavedWorkoutsSection.SavedWorkoutsSectionconfirmText')}
+                cancelText={t('home.SavedWorkoutsSection.SavedWorkoutsSectioncancelText')}
             />
         </div>
     );
