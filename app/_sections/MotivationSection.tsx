@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { FaRobot, FaTimes } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 // Example motivational messages
 const motivationalMessages = [
@@ -19,6 +20,7 @@ const getMotivationalMessage = () => {
 };
 
 const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
+    const { t } = useTranslation('global');
     const [dailyMessage, setDailyMessage] = useState("");
     const [isHovered, setIsHovered] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
@@ -40,7 +42,7 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
                 <div className="flex justify-between items-start w-full mb-6">
                     <div className="flex flex-col w-[80%]">
                         <h2 className="text-3xl font-bold mb-4">
-                            {isBotUser ? `Keep up the great work!` : "Get Fit with 2Fit AI"}
+                            {isBotUser ? t('home.motivation.main') : "Get Fit with 2Fit AI"}
                         </h2>
                         <p className="text-lg text-gray-600">
                             {isBotUser
@@ -71,15 +73,15 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
                 <div className="w-full border-t border-gray-300 my-4"></div>
 
                 <div className="flex justify-between items-center w-full mt-4">
-                    <p className="text-gray-700 text-lg">Talk to your trainer</p>
+                    <p className="text-gray-700 text-lg">{t('home.trainer.talk')}</p>
                     <div className="button-container">
                         {isBotUser ? (
                             <button className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition-colors">
-                                Let's Chat
+                                {t('home.trainer.letschat')}
                             </button>
                         ) : (
                             <button className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition-colors">
-                                Get your plan
+                                 {t('home.trainer.getyourplan')}
                             </button>
                         )}
                     </div>

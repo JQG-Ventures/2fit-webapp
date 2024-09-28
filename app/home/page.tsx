@@ -16,6 +16,7 @@ import {
     getLibraryWorkoutCount, 
     deleteUserSavedWorkout 
 } from '../_services/workoutService';
+import { useTranslation } from 'react-i18next';
 
 interface WorkoutPlan {
     _id: string;
@@ -32,6 +33,7 @@ const HomePage: React.FC = () => {
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [navbarHeight, setNavbarHeight] = useState<number>(100); // State for navbar height
+    const { t } = useTranslation('global');
 
     useEffect(() => {
         const handleResize = () => {
@@ -104,7 +106,7 @@ const HomePage: React.FC = () => {
             {!isDesktopOrLaptop && <SearchBar />}
             <div className="space-y-12">
                 {loading ? (
-                    renderLoading('Loading workout plans and saved workouts...')
+                    renderLoading(t('home.SavedWorkoutsSection.SavedWorkoutsSectionrenderLoading'))
                 ) : error ? (
                     renderLoading(error)
                 ) : (
@@ -116,8 +118,8 @@ const HomePage: React.FC = () => {
                         <SavedWorkoutsSection
                             workouts={savedWorkoutPlans}
                             deleteWorkout={deleteUserSavedWorkout}
-                            emptyMessage='Exercises that you like will appear here'
-                            sectionTitle='Saved Workouts'
+                            emptyMessage={t('home.SavedWorkoutsSection.SavedWorkoutsSectiondescription')}
+                            sectionTitle={t('home.SavedWorkoutsSection.SavedWorkoutsSectiontitle')}
                         />
                     </>
                 )}

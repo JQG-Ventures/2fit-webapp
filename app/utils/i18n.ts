@@ -6,8 +6,8 @@ import es from '../../public/locals/es/global.json';
 i18n
   .use(initReactI18next)
   .init({
-    fallbackLng: 'en',
-    lng: 'en',
+    fallbackLng: 'es',
+    lng: 'es',
     resources: {
       en: { global: en },
       es: { global: es },
