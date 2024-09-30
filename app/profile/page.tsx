@@ -20,7 +20,7 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     const loadUserData = async () => {
       try {
-        const data = await fetchUserData('50686134777'); 
+        const data = await fetchUserData('user_50662633238'); 
         setUserData(data);
       } catch (error) {
         console.error('Error loading user data:', error);
@@ -39,7 +39,7 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen px-6 py-10 pb-32">
+    <div className="text-black bg-gray-50 min-h-screen px-6 py-10 pb-32">
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold pl-4">Profile</h1>
         <div className="flex items-center justify-center w-10 h-10">
