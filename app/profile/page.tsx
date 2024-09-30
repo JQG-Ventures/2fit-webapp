@@ -10,12 +10,14 @@ import { fetchUserData, UserProfile } from '../_services/userService';
 import { MdModeEditOutline } from "react-icons/md";
 import { CiUser, CiBellOn, CiLock, CiCircleQuestion } from "react-icons/ci";
 import { BsMoon } from "react-icons/bs";
+import Modal from '../_components/profile/modal'; // Ajusta la ruta según tu estructura de carpetas
 
 const ProfilePage: React.FC = () => {
   const router = useRouter();
   
   const [userData, setUserData] = useState<UserProfile | undefined>(undefined);
   const [pressedIndex, setPressedIndex] = useState<number | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Estado para el mensaje de error
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -24,6 +26,7 @@ const ProfilePage: React.FC = () => {
         setUserData(data);
       } catch (error) {
         console.error('Error loading user data:', error);
+        setErrorMessage('Error loading user data. Please try again later.'); // Establece el mensaje de error
       }
     };
 
@@ -39,7 +42,13 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="text-black bg-gray-50 min-h-screen px-6 py-10 pb-32">
+    <div className="bg-gray-50 min-h-screen px-6 py-10 pb-32">
+      {errorMessage && (
+        <Modal
+          message={errorMessage}
+          onClose={() => setErrorMessage(null)} // Función para cerrar el modal
+        />
+      )}
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold pl-4">Profile</h1>
         <div className="flex items-center justify-center w-10 h-10">
