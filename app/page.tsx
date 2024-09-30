@@ -32,7 +32,7 @@ export default function RegisterStart() {
     const router = useRouter();
 
     const handleStartTraining = () => {
-        router.push('/register/step1');
+        router.push('/register');
     };
 
     return (
