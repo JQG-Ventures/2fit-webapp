@@ -9,6 +9,7 @@ import MotivationSection from '../_sections/MotivationSection';
 import WorkoutLibrarySection from '../_sections/WorkoutLibraryWidgetSection';
 import SavedWorkoutsSection from '../_sections/SavedWorkoutsSection';
 import Footer from '../_sections/Footer';
+import LoadingScreen from '../_components/animations/LoadingScreen';
 import { 
     getSavedWorkoutPlansByUser, 
     getWorkoutPlans, 
@@ -17,21 +18,11 @@ import {
     deleteUserSavedWorkout 
 } from '../_services/workoutService';
 
-interface WorkoutPlan {
-    _id: string;
-    name: string;
-    image_url: string;
-}
-
-interface User {
-    name: string;
-    hasRoutine: boolean;
-}
 
 const HomePage: React.FC = () => {
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const [navbarHeight, setNavbarHeight] = useState<number>(100); // State for navbar height
+    const [navbarHeight, setNavbarHeight] = useState<number>(100);
 
     useEffect(() => {
         const handleResize = () => {
@@ -39,7 +30,7 @@ const HomePage: React.FC = () => {
             setIsMobile(window.innerWidth < 1224);
         };
 
-        handleResize(); // Initial check
+        handleResize();
         window.addEventListener('resize', handleResize);
 
         return () => window.removeEventListener('resize', handleResize);
@@ -88,6 +79,8 @@ const HomePage: React.FC = () => {
 
     const mobilePaddingBottom = isMobile ? (navbarHeight + navbarHeight * 0.1) : 0;
 
+    if (loading) return <LoadingScreen />;
+
     return (
         <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom: mobilePaddingBottom }}>
             <div className="flex flex-col lg:flex-row lg:space-x-8">
@@ -103,9 +96,7 @@ const HomePage: React.FC = () => {
             </div>
             {!isDesktopOrLaptop && <SearchBar />}
             <div className="space-y-12">
-                {loading ? (
-                    renderLoading('Loading workout plans and saved workouts...')
-                ) : error ? (
+                {error ? (
                     renderLoading(error)
                 ) : (
                     <>

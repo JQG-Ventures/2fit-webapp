@@ -20,7 +20,7 @@ const EditProfile: React.FC = () => {
   useEffect(() => {
     const loadUserProfile = async () => {
       try {
-        const data = await fetchUserData('50686134777');
+        const data = await fetchUserData('user_50662633238');
         setProfileData(data);
         
         if (data?.number) {
@@ -58,7 +58,7 @@ const EditProfile: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white p-6 pb-40">
+    <div className="text-black min-h-screen bg-white p-6 pb-40">
       {/* Header */}
       <header className="flex justify-between items-center mb-6">
         <button onClick={() => router.back()} className="text-gray-700">

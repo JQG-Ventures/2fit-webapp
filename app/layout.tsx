@@ -10,7 +10,6 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "2Fit App",
   description: "Embark on your new fitness journey",
-  // Additional meta tags can be added here
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -20,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta charSet="UTF-8" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600&display=swap"></link>
       </head>
-      <body id="test" className={inter.className}>
+      <body className={inter.className}>
         <RegisterProvider>
           <div>
             {children}

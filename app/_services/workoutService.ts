@@ -24,7 +24,7 @@ export const saveWorkout = async (userId: string, workoutId: string) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({"workouts": [workoutId]})
+            body: JSON.stringify({ "workouts": [workoutId] })
         });
 
         return response;
@@ -109,3 +109,41 @@ export const getLibraryWorkoutCount = async () => {
         return {};
     }
 };
+
+export const getWorkoutPlanById = async (planId: string) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans/${planId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch workout details');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        console.error('Error fetching workout data:', error);
+        throw new Error(error.message || 'Something went wrong');
+    }
+};
+
+// export const getWorkoutPlanById = async (planId: string) => {
+//     try {
+//         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans/${planId}`, {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             }
+//         });
+//         if (!response.ok) {
+//             return {};
+//         }
+//         return await response.json();
+//     } catch (error) {
+//         return {};
+//     }
+// };
