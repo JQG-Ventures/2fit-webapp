@@ -77,3 +77,18 @@ nav {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+@keyframes slide-up {
+  0% {
+    transform: translateY(20px); /* Comienza 20px abajo */
+    opacity: 0; /* Comienza invisible */
+  }
+  100% {
+    transform: translateY(0); /* Termina en su posición original */
+    opacity: 1; /* Termina visible */
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s forwards; /* Duración de 0.3 segundos */
+}

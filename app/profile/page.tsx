@@ -17,7 +17,7 @@ const ProfilePage: React.FC = () => {
   
   const [userData, setUserData] = useState<UserProfile | undefined>(undefined);
   const [pressedIndex, setPressedIndex] = useState<number | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Estado para el mensaje de error
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); 
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -26,7 +26,7 @@ const ProfilePage: React.FC = () => {
         setUserData(data);
       } catch (error) {
         console.error('Error loading user data:', error);
-        setErrorMessage('Error loading user data. Please try again later.'); // Establece el mensaje de error
+        setErrorMessage('Error loading user data. Please try again later.');
       }
     };
 
@@ -41,12 +41,17 @@ const ProfilePage: React.FC = () => {
     }, 150);
   };
 
+  const handleCloseModal = () => {
+    setErrorMessage(null);
+    router.push('/home');
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen px-6 py-10 pb-32">
       {errorMessage && (
         <Modal
           message={errorMessage}
-          onClose={() => setErrorMessage(null)} // Función para cerrar el modal
+          onClose={handleCloseModal}
         />
       )}
       <header className="flex justify-between items-center mb-8">
