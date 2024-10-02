@@ -58,7 +58,7 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
                             onMouseEnter={() => setIsHovered(true)}
                             onMouseLeave={() => setIsHovered(false)}
                             onClick={handleIconClick}
-                            aria-label={isHovered ? "Close motivational section" : "Open chatbot"}
+                            aria-label={isHovered ? t('home.motivation.mtvnlsection') : t('home.motivation.mtvnlchatbot')}
                             role="button"
                         >
                             {isHovered ? (

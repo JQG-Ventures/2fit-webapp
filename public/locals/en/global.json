@@ -195,7 +195,9 @@
         "Your only limit is the one you set yourself!",
         "Make today your best workout yet!",
         "Stay focused, stay fit!"
-      ]
+      ],
+      "mtvnlsection": "Close motivational section",
+      "mtvnlchatbot": "Open chatbot"
     },
     "greeting": {
       "morning": "Good Morning",

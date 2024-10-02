@@ -92,7 +92,7 @@
     ],
     "medium": [
       "Medio",
-      "Entreno de 3 a 5 a la semana"
+      "Entreno de 3-5 a la semana"
     ],
     "advanced": [
       "Avanzada",
@@ -200,7 +200,9 @@
             "¡Tu único límite es el que te pones a ti mismo!",
             "¡Haz de hoy tu mejor entrenamiento hasta ahora!",
             "¡Mantente enfocado, mantente en forma!"
-          ]
+          ],
+          "mtvnlsection": "Cerrar sección motivacional",
+          "mtvnlchatbot": "Abrir chatbot"
         },
           "greeting": {
             "morning": "Buenos Días",
