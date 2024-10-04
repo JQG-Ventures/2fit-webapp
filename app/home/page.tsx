@@ -9,6 +9,7 @@ import MotivationSection from '../_sections/MotivationSection';
 import WorkoutLibrarySection from '../_sections/WorkoutLibraryWidgetSection';
 import SavedWorkoutsSection from '../_sections/SavedWorkoutsSection';
 import Footer from '../_sections/Footer';
+import WorkoutSlider from '../_components/workoutslider/WorkoutSlider';
 import { 
     getSavedWorkoutPlansByUser, 
     getWorkoutPlans, 
