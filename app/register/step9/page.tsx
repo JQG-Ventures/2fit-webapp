@@ -67,7 +67,7 @@ export default function RegisterStep9() {
                         onClick={handleNextStep}
                         className="w-full py-3 bg-black text-white rounded-md font-semibold  my-6 p-6"
                     >
-                        Next
+                        {t('RegisterPagestep9.next')}
                     </button>
                 </div>
             </div>
