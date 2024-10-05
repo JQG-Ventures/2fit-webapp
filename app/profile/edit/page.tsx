@@ -192,8 +192,6 @@ const EditProfile: React.FC = () => {
 		);
 	}
 
-	console.log(profileData);
-
 	return (
 		<div className="flex flex-col justify-between items-center bg-white h-screen p-14 lg:pt-[10vh]">
 			{(errorMessage || successMessage) && (
