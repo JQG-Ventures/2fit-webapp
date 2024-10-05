@@ -10,6 +10,7 @@ import MotivationSection from '../_sections/MotivationSection';
 import WorkoutLibrarySection from '../_sections/WorkoutLibraryWidgetSection';
 import SavedWorkoutsSection from '../_sections/SavedWorkoutsSection';
 import Footer from '../_sections/Footer';
+import LoadingScreen from '../_components/animations/LoadingScreen';
 import { 
     getSavedWorkoutPlansByUser, 
     getWorkoutPlans, 
@@ -19,17 +20,6 @@ import {
 } from '../_services/workoutService';
 import { useTranslation } from 'react-i18next';
 
-interface WorkoutPlan {
-    _id: string;
-    name: string;
-    image_url: string;
-}
-
-interface User {
-    userId: string;
-    userName: string;
-    hasRoutine: boolean;
-}
 
 const HomePage: React.FC = () => {
     const { data: session, status } = useSession();
@@ -45,13 +35,12 @@ const HomePage: React.FC = () => {
             setIsMobile(window.innerWidth < 1224);
         };
 
-        handleResize(); // Initial check
+        handleResize();
         window.addEventListener('resize', handleResize);
 
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const [navbarHeight] = useState<number>(100);
     const [workoutPlans, setWorkoutPlans] = useState<WorkoutPlan[]>([]);
     const [savedWorkoutPlans, setSavedWorkoutPlans] = useState<WorkoutPlan[]>([]);
     const [libraryWorkouts, setLibraryWorkouts] = useState<any[]>([]);
@@ -115,13 +104,15 @@ const HomePage: React.FC = () => {
 
     const paddingBottom = isDesktopOrLaptop ? 0 : navbarHeight * 1.1;
 
+    if (loading) return <LoadingScreen />;
+
     return (
         <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom }}>
             <div className="flex flex-col lg:flex-row lg:space-x-8">
                 <div className="flex-1">
                     <GreetingSection userName={user.userName} />
                 </div>
-                {!isDesktopOrLaptop && (
+                {isDesktopOrLaptop && (
                     <div className="flex flex-col flex-1 mt-16 pt-10">
                         <div className="flex-grow" />
                         <MotivationSection isBotUser={user.hasRoutine} />
@@ -130,9 +121,7 @@ const HomePage: React.FC = () => {
             </div>
             {!isDesktopOrLaptop && <SearchBar />}
             <div className="space-y-12">
-                {loading ? (
-                    renderLoading(t('home.SavedWorkoutsSection.SavedWorkoutsSectionrenderLoading'))
-                ) : error ? (
+                {error ? (
                     renderMessage(error)
                 ) : (
                     <>
