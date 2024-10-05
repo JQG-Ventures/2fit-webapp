@@ -38,7 +38,7 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
 
     return (
         isVisible && (
-            <div className="flex flex-col items-center w-[95%] max-w-4xl mx-auto p-8 rounded-2xl shadow-lg border border-gray-200 my-16 hover:shadow-2xl transition-shadow duration-300 ease-in-out"> 
+            <div className="flex flex-col items-center w-[95%] max-w-4xl mx-auto p-8 rounded-2xl shadow-lg border border-gray-200 lg:my-16 hover:shadow-2xl transition-shadow duration-300 ease-in-out"> 
                 <div className="flex justify-between items-start w-full mb-6">
                     <div className="flex flex-col w-[80%]">
                         <h2 className="text-3xl font-bold mb-4">

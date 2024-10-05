@@ -124,7 +124,7 @@ export default function RegisterStep1() {
 
             <div className="h-[5%] text-center content-center">
                 <p className="text-gray-500">
-                {t('RegisterPage.signupquestion')} <a href="#" className="text-indigo-600 underline">{t('RegisterPage.signin')}</a>
+                {t('RegisterPage.signupquestion')} <a href="/login" className="text-indigo-600 underline">{t('RegisterPage.signin')}</a>
                 </p>
             </div>
         </div>
