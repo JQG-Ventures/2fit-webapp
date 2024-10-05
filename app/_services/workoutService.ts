@@ -130,20 +130,3 @@ export const getWorkoutPlanById = async (planId: string) => {
         throw new Error(error.message || 'Something went wrong');
     }
 };
-
-// export const getWorkoutPlanById = async (planId: string) => {
-//     try {
-//         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans/${planId}`, {
-//             method: 'GET',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             }
-//         });
-//         if (!response.ok) {
-//             return {};
-//         }
-//         return await response.json();
-//     } catch (error) {
-//         return {};
-//     }
-// };

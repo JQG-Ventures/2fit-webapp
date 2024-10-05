@@ -8,7 +8,6 @@ import { FiMail, FiLock } from "react-icons/fi";
 import { useSession, signIn } from 'next-auth/react';
 import ButtonWithSpinner from '../_components/others/ButtonWithSpinner';
 import InputWithIcon from '../_components/form/InputWithIcon';
-// import Modal from '../_components/profile/Modal'; // Ensure Modal is imported
 import { IconType } from 'react-icons';
 
 interface FormData {
@@ -101,12 +100,6 @@ export default function Login() {
 
 	return (
 		<div className="flex flex-col h-screen bg-white p-10 items-center">
-			{/* {showModal && error && (
-				<Modal
-					message={error}
-					onClose={() => { setError(null); setShowModal(false); }}
-				/>
-			)} */}
 
 			<div className='h-[15%] pt-20 w-full lg:max-w-3xl'>
 				<button onClick={handlePrevStep} className="text-4xl lg:hidden">
