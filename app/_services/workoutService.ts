@@ -109,3 +109,23 @@ export const getLibraryWorkoutCount = async () => {
         return {};
     }
 };
+
+export const getExercisesByLevel = async (level: string) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/library/level/${level}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            return {};
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching exercises:', error);
+        return {};
+    }
+};
