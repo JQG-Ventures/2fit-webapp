@@ -5,32 +5,47 @@ import { CiBookmarkMinus } from "react-icons/ci";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { ImSpinner8 } from 'react-icons/im';
 import { useRouter } from 'next/navigation';
-import { getExercisesByLevel } from '../_services/workoutService';
+import { getExercisesByLevel } from '../../_services/workoutService';
+import Modal from '../../_components/profile/modal'; // Importar el modal
 
 const levels = ['beginner', 'intermediate', 'advanced'];
-const WorkoutSliderPage = () => {
+
+const WorkoutLibrarySection = () => {
     const [activeLevel, setActiveLevel] = useState<string>('beginner');
     const [workouts, setWorkouts] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string | null>(null);
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
     const router = useRouter();
+
+    const handleCloseModal = () => {
+        setIsErrorModalOpen(false);
+        router.push('/home');
+    };
 
     const handleLevelChange = async (level: string) => {
         const lowercaseLevel = level.toLowerCase();
         setActiveLevel(lowercaseLevel);
         
-        // Fetch exercises for the selected level
         setLoading(true);
         const fetchedExercises = await getExercisesByLevel(lowercaseLevel);
         console.log('Fetched Exercises:', fetchedExercises); 
 
-        // Check if the array is empty
+        if (fetchedExercises.error) {
+            setErrorMessage(fetchedExercises.error);
+            setIsErrorModalOpen(true);
+            setLoading(false);
+            return;
+        }
+
+        
         if (fetchedExercises.message && fetchedExercises.message.length === 0) {
-            setMessage("We are creating more challenges for you, stay tuned! :)"); // Set the message
-            setWorkouts([]); // Clear workouts to avoid displaying old data
+            setMessage("We are creating more challenges for you, stay tuned! :)");
+            setWorkouts([]);
         } else {
             setWorkouts(fetchedExercises.message || []);
-            setMessage(null); // Clear the message if data is available
+            setMessage(null); 
         }
         setLoading(false);
     };
@@ -41,13 +56,21 @@ const WorkoutSliderPage = () => {
             const fetchedExercises = await getExercisesByLevel(activeLevel);
             console.log('Fetched Initial Exercises:', fetchedExercises);
 
-            // Check if the array is empty
+            
+            if (fetchedExercises.error) {
+                setErrorMessage(fetchedExercises.error);
+                setIsErrorModalOpen(true);
+                setLoading(false);
+                return;
+            }
+
+            
             if (fetchedExercises.message && fetchedExercises.message.length === 0) {
-                setMessage("We are creating more challenges for you. stay tuned! :)"); // Set the message
-                setWorkouts([]); // Clear workouts to avoid displaying old data
+                setMessage("We are creating more challenges for you. Stay tuned! :)"); 
+                setWorkouts([]);
             } else {
                 setWorkouts(fetchedExercises.message || []);
-                setMessage(null); // Clear the message if data is available
+                setMessage(null);
             }
             setLoading(false);
         };
@@ -56,7 +79,7 @@ const WorkoutSliderPage = () => {
     }, [activeLevel]);
 
     return (
-        <div className="flex flex-col h-screen bg-white p-10 items-center">
+        <div className="flex flex-col h-screen bg-white p-10 lg:pt-20 items-center">
             <div className="flex items-center justify-between h-[10%] w-full lg:max-w-3xl">
                 <div className='w-[90%] flex flex-row'>
                     <button
@@ -95,7 +118,7 @@ const WorkoutSliderPage = () => {
                     <p className="text-gray-500 text-xl">{message}</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 h-[80%] w-full lg:max-w-3xl pt-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-6 h-[80%] w-full lg:max-w-3xl pt-8">
                     {workouts.map(workout => (
                         <div key={workout._id} className="relative bg-white rounded-lg shadow-lg overflow-hidden">
                             <img src={workout.image_url} alt={workout.name} className="w-full h-48 object-cover" />
@@ -113,8 +136,15 @@ const WorkoutSliderPage = () => {
                     ))}
                 </div>
             )}
+            {isErrorModalOpen && (
+                <Modal 
+                    title="Error" 
+                    message={errorMessage} 
+                    onClose={handleCloseModal} 
+                />
+            )}
         </div>
     );
 };
 
-export default WorkoutSliderPage;
+export default WorkoutLibrarySection;

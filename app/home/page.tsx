@@ -20,7 +20,9 @@ import {
 } from '../_services/workoutService';
 
 
+
 const HomePage: React.FC = () => {
+    
     const { data: session, status } = useSession();
     const [user, setUser] = useState<User>({ userId: '', userName: 'Loading', hasRoutine: false });
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);

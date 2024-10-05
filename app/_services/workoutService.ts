@@ -126,6 +126,6 @@ export const getExercisesByLevel = async (level: string) => {
         return await response.json();
     } catch (error) {
         console.error('Error fetching exercises:', error);
-        return {};
+        return { error: 'An error occurred getting exercises, please try later.' }; // Cambiar a propiedad 'error'
     }
 };
