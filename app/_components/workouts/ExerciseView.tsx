@@ -29,8 +29,8 @@ const ExerciseView: React.FC<ExerciseViewProps> = ({ exercise, onNext, onBack })
     }
 
     return (
-        <div className='flex flex-col items-center justify-center h-full w-full bg-white rounded-lg shadow-lg'>            
-            <div className='relative h-[50%] w-full overflow-hidden'>
+        <div className='flex flex-col items-center justify-center h-full w-full bg-white rounded-lg shadow-lg lg:pt-[8vh]'>            
+            <div className='relative h-[50%] lg:h-[35%] w-full overflow-hidden'>
                 <img 
                     src={exercise?.image_url} 
                     alt={exercise?.name} 

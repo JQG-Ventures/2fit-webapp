@@ -123,7 +123,7 @@ export default function RegisterStep1() {
 
             <div className="h-[5%] text-center content-center">
                 <p className="text-gray-500">
-                    Do you have an account? <a href="#" className="text-indigo-600 underline">Sign In</a>
+                    Do you have an account? <a href="/login" className="text-indigo-600 underline">Sign In</a>
                 </p>
             </div>
         </div>

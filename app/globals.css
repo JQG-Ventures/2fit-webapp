@@ -52,21 +52,19 @@ body.fade {
   scrollbar-width: none;
 }
 
-/* Add this to your global or module CSS */
-
 nav {
-  z-index: 1000; /* Ensure navbar is on top of other content */
+  z-index: 1000;
 }
 
 @media (min-width: 1224px) {
   .mobile-nav {
-      display: none; /* Hide mobile nav on larger screens */
+      display: none;
   }
 }
 
 @media (max-width: 1224px) {
   .desktop-nav {
-      display: none; /* Hide desktop nav on smaller screens */
+      display: none;
   }
 }
 
@@ -74,21 +72,32 @@ nav {
   display: none;
 }
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 @keyframes slide-up {
   0% {
-    transform: translateY(20px); /* Comienza 20px abajo */
-    opacity: 0; /* Comienza invisible */
+    transform: translateY(20px);
+    opacity: 0;
   }
   100% {
-    transform: translateY(0); /* Termina en su posición original */
-    opacity: 1; /* Termina visible */
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
 .animate-slide-up {
-  animation: slide-up 0.3s forwards; /* Duración de 0.3 segundos */
+  animation: slide-up 0.4s forwards;
+}
+
+.loader {
+	border-top-color: #3498db;
+	animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
 }

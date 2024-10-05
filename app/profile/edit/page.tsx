@@ -1,221 +1,281 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaArrowLeft, FaRegEnvelope, FaPhoneAlt } from 'react-icons/fa';
-import { IoCalendarOutline } from "react-icons/io5";
-import { CiGlobe } from "react-icons/ci";
-import countries from '@/app/data/countries.json';  
-import countryCodes from '@/app/data/countryCodes.json';  
-import { detectCountryCode } from '@/app/utils/phoneUtils';  
-import { fetchUserData, UserProfile } from '../../_services/userService';
+import { FaArrowLeft, FaRegEnvelope } from 'react-icons/fa';
+import { IoCalendarOutline } from 'react-icons/io5';
+import { detectCountryCode } from '@/app/utils/phoneUtils';
+import { fetchUserData, UserProfile, UpdateUserProfile } from '../../_services/userService';
+import Modal from '../../_components/profile/modal';
+import InputWithIcon from '../../_components/form/InputWithIcon';
+import SelectInput from '../../_components/form/SelectInput';
+import PhoneInput from '../../_components/form/PhoneInput';
+import countries from '@/app/data/countries.json';
+import countryCodes from '@/app/data/countryCodes.json';
+import { useSession } from 'next-auth/react';
 
-const Modal: React.FC<{ message: string; onClose: () => void }> = ({ message, onClose }) => {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <p>{message}</p>
-        <button onClick={onClose} className="mt-4 bg-blue-500 text-white p-2 rounded">
-          Close
-        </button>
-      </div>
-    </div>
-  );
-};
+interface FormField {
+	label: string;
+	name: string;
+	type: string;
+	placeholder?: string;
+	icon?: React.ComponentType<any>;
+	options?: { value: string | number; label: string }[];
+}
+
+const formFields: FormField[] = [
+	{
+		label: 'Name',
+		name: 'name',
+		type: 'text',
+		placeholder: 'Username',
+	},
+	{
+		label: 'Birth Date',
+		name: 'birthdate',
+		type: 'date',
+		placeholder: 'mm/dd/yyyy',
+		icon: IoCalendarOutline,
+	},
+	{
+		label: 'Email',
+		name: 'email',
+		type: 'email',
+		placeholder: 'user@yourdomain.com',
+		icon: FaRegEnvelope,
+	},
+	{
+		label: 'Country',
+		name: 'country',
+		type: 'select',
+		options: countries.map((country) => ({ value: country, label: country })),
+	},
+	{
+		label: 'Gender',
+		name: 'gender',
+		type: 'select',
+		options: [
+			{ value: 0, label: 'Male' },
+			{ value: 1, label: 'Female' },
+			{ value: 2, label: 'Other' },
+		],
+	},
+];
 
 const EditProfile: React.FC = () => {
-  const router = useRouter();
-  
-  const [profileData, setProfileData] = useState<UserProfile | null>(null);
-  const [countryCode, setCountryCode] = useState<string>("");  
-  const [phoneNumber, setPhoneNumber] = useState<string>("");  
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const router = useRouter();
+	const { data: session, status } = useSession();
 
-  useEffect(() => {
-    const loadUserProfile = async () => {
-      try {
-        const data = await fetchUserData('user_50662633238');
-        setProfileData(data);
-        
-        if (data?.number) {
-          const detectedCountryCode = detectCountryCode(data.number);  
-          setCountryCode(detectedCountryCode.code);
-          setPhoneNumber(detectedCountryCode.number);
-        }
-      } catch (error) {
-        console.error('Error loading user profile:', error);
-        setErrorMessage('Error loading user profile. Please try again later.');
-      }
-    };
+	const [userId, setUserId] = useState<string>('');
+	const [profileData, setProfileData] = useState<UserProfile | null>(null);
+	const [countryCode, setCountryCode] = useState<string>('');
+	const [phoneNumber, setPhoneNumber] = useState<string>('');
+	const [errorMessage, setErrorMessage] = useState<React.ReactNode | null>(null);
+	const [successMessage, setSuccessMessage] = useState<React.ReactNode | null>(null);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-    loadUserProfile();
-  }, []);
+	useEffect(() => {
+		if (status === 'authenticated' && session?.user?.userId) {
+			setUserId(session.user.userId);
+		} else if (status === 'unauthenticated') {
+			router.back();
+		}
+	}, [session, status, router]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+	useEffect(() => {
+		const loadUserProfile = async () => {
+			if (!userId) return;
+			try {
+				const data = await fetchUserData(userId);
+				setProfileData({
+					_id: data._id,
+					name: data.name,
+					email: data.email,
+					birthdate: data.birthdate,
+					country: data.country,
+					gender: data.profile.gender,
+					number: data.number,
+				});
+	
+				if (data.number) {
+					const detectedCountryCode = detectCountryCode(data.number);
+					setCountryCode(detectedCountryCode.code);
+					setPhoneNumber(detectedCountryCode.number);
+				}
+			} catch {
+				setErrorMessage(
+					<>
+						Error loading user profile.<br />
+						Please try again later.
+					</>
+				);
+			} finally {
+				setLoading(false);
+			}
+		};
+		loadUserProfile();
+	}, [userId]);
 
-    if (name === "countryCode") {
-      setCountryCode(value);  
-    } else if (name === "number") {
-      setPhoneNumber(value);  
-    } else if (profileData) {
-      setProfileData((prevData) => ({
-        ...prevData!,
-        [name]: value,
-      }));
-    }
-  };
+	const handleInputChange = (
+		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+	) => {
+		const { name, value } = e.target;
+		if (name === 'countryCode') {
+			setCountryCode(value);
+		} else if (name === 'number') {
+			setPhoneNumber(value);
+		} else if (profileData) {
+			if (name === 'gender') {
+				setProfileData((prevData) => ({
+					...prevData!,
+					profile: { ...prevData.profile, gender: Number(value) },
+				}));
+			} else if (name === 'birthdate') {
+				setProfileData((prevData) => ({
+					...prevData!,
+					birthdate: value,
+				}));
+			} else {
+				setProfileData((prevData) => ({
+					...prevData!,
+					[name]: value,
+				}));
+			}
+		}
+	};
 
-  if (!profileData) {
-    return <div className="m-auto my-auto text-center min-h-screen bg-white p-6 pb-40">
-      <p className='py-80'>We are currently having issues... please try again later.</p>
-    </div>;
-  }
+	const handleCloseModal = () => {
+		setErrorMessage(null);
+		setSuccessMessage(null);
+		router.push('/home');
+	};
 
-  return (
-    <div className="min-h-screen bg-white p-6 pb-40">
-      {errorMessage && (
-        <Modal
-          message={errorMessage}
-          onClose={() => setErrorMessage(null)}
-        />
-      )}
-      {/* Header */}
-      <header className="flex justify-between items-center mb-6 md:pt-24">
-        <button onClick={() => router.back()} className="text-gray-700">
-          <FaArrowLeft className="w-8 h-8" />
-        </button>
-        <h1 className="text-3xl font-bold">Edit Profile</h1>
-        <div></div> 
-      </header>
-      
-      <form className="space-y-6">
-        {/* Name */}
-        <div className="pl-2 py-3">
-          <label className="block text-gray-500 text-base mb-1">Name</label>
-          <div className="bg-gray-50 p-4 rounded-xl shadow-sm">
-            <input
-              type="text"
-              name="name"
-              value={profileData.name}
-              onChange={handleInputChange}
-              placeholder="Username"
-              className="w-full border-none focus:ring-0 placeholder-gray-500 bg-transparent"
-            />
-          </div>
-        </div>
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setIsSubmitting(true);
+		try {
+			const { _id, ...rest } = profileData!;
+			const updatedProfile = {
+				...rest,
+				number: `${countryCode}${phoneNumber}`.replace("+", ""),
+			};
+			await UpdateUserProfile(userId, updatedProfile);
+			setSuccessMessage("Profile updated successfully.");
+		} catch {
+			setErrorMessage(
+				<>
+					Error updating profile.<br />
+					Please try again later.
+				</>
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
 
-        {/* Birth Date */}
-        <div className="pl-2 py-3">
-          <label className="block text-gray-500 text-base mb-1">Birth Date</label>
-          <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
-            <input
-              type="text"
-              name="birthDate"
-              value={profileData.birthDate}
-              onChange={handleInputChange}
-              placeholder="mm/dd/yyyy"
-              className="w-full border-none focus:ring-0 placeholder-gray-500 bg-transparent"
-            />
-            <IoCalendarOutline className="text-black w-8 h-8" />
-          </div>
-        </div>
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center min-h-screen bg-white">
+				<div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-64 w-64"></div>
+			</div>
+		);
+	}
 
-        {/* Email */}
-        <div className="pl-2 py-3">
-          <label className="block text-gray-500 text-base mb-1">Email</label>
-          <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
-            <input
-              type="email"
-              name="email"
-              value={profileData.email}
-              onChange={handleInputChange}
-              placeholder="user@yourdomain.com"
-              className="w-full border-none focus:ring-0 placeholder-gray-500 bg-transparent"
-            />
-            <FaRegEnvelope className="text-black" />
-          </div>
-        </div>
+	if (!profileData) {
+		return (
+			<div className="flex items-center justify-center min-h-screen bg-white p-6">
+				<p className="text-center text-gray-500">
+					We are currently having issues... please try again later.
+				</p>
+			</div>
+		);
+	}
 
-        {/* Country */}
-        <div className="pl-2 py-3">
-          <label className="block text-gray-500 text-base mb-1">Country</label>
-          <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
-            <select
-              name="country"
-              value={profileData.country || ""}
-              onChange={handleInputChange}
-              className="w-full border-none focus:ring-0 bg-transparent "
-            >
-              <option value="">Select your country</option> {/* Placeholder */}
-              {countries.map((country, index) => (
-                <option key={index} value={country}>
-                  {country}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+	console.log(profileData);
 
-        {/* Phone Number */}
-        <div className="pl-2 py-3">
-          <label className="block text-gray-500 text-base mb-1">Phone Number</label>
-          <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
-            <FaPhoneAlt className="text-black mr-2" />
-            {/* Dropdown list for country codes */}
-            <div className="mr-2">
-              <select
-                name="countryCode"
-                value={countryCode}  
-                onChange={handleInputChange}
-                className="bg-transparent text-black focus:ring-0 border-none"
-              >
-                <option value="">Select Code</option> {/* Placeholder */}
-                {countryCodes.map((country, index) => (
-                  <option key={index} value={country.code}>
-                    {country.code} <span className="text-gray-500">({country.abbreviation})</span>
-                  </option>
-                ))}
-              </select>
-            </div>
-            {/* Phone number input */}
-            <input
-              type="tel"
-              name="number"
-              value={phoneNumber}
-              onChange={handleInputChange}
-              placeholder="111 467 378 399"
-              className="w-full border-none focus:ring-0 placeholder-gray-500 bg-transparent"
-            />
-          </div>
-        </div>
-
-        {/* Gender */}
-        <div className="pl-2 py-3">
-          <label className="block text-gray-500 text-base mb-1">Gender</label>
-          <div className="bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between">
-            <select
-              name="gender"
-              value={profileData.profile.gender}
-              onChange={handleInputChange}
-              className="w-full border-none focus:ring-0 bg-transparent"
-            >
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          className="w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-4 rounded-full text-2xl font-semibold shadow-lg py-8"
-        >
-          Update
-        </button>
-      </form>
-    </div>
-  );
+	return (
+		<div className="flex flex-col justify-between items-center bg-white h-screen p-14 lg:pt-[10vh]">
+			{(errorMessage || successMessage) && (
+				<Modal
+					message={errorMessage || successMessage}
+					onClose={handleCloseModal}
+				/>
+			)}
+			<div className="h-[10%] flex flex-row justify-left space-x-8 items-center w-full lg:max-w-3xl">
+				<button onClick={() => router.back()} className="text-gray-700">
+					<FaArrowLeft className="w-8 h-8" />
+				</button>
+				<h1 className="text-5xl font-semibold">Edit Profile</h1>
+			</div>
+			<form
+				className="h-[90%] flex flex-col justify-between items-center w-full"
+				onSubmit={handleSubmit}
+			>
+				<div className="h-[90%] flex flex-col justify-start py-6 w-full max-w-3xl space-y-6 overflow-y-auto">
+					{formFields.map((field, index) => {
+						if (field.type === 'select') {
+							return (
+								<SelectInput
+									key={index}
+									label={field.label}
+									name={field.name}
+									value={profileData[field.name] || ''}
+									onChange={handleInputChange}
+									options={field.options || []}
+								/>
+							);
+						} else if (field.name === 'birthdate') {
+							return (
+								<InputWithIcon
+									key={index}
+									label={field.label}
+									name={field.name}
+									type={field.type}
+									placeholder={field.placeholder || ''}
+									value={profileData.birthdate || ''}
+									onChange={handleInputChange}
+									icon={field.icon}
+								/>
+							);
+						} else {
+							return (
+								<InputWithIcon
+									key={index}
+									label={field.label}
+									name={field.name}
+									type={field.type}
+									placeholder={field.placeholder || ''}
+									value={profileData[field.name]}
+									onChange={handleInputChange}
+									icon={field.icon}
+								/>
+							);
+						}
+					})}
+					<PhoneInput
+						label="Phone Number"
+						countryCode={countryCode}
+						phoneNumber={phoneNumber}
+						onChange={handleInputChange}
+						countryCodes={countryCodes}
+					/>
+				</div>
+				<div className="h-[10%] flex flex-col w-full max-w-xl">
+					<button
+						type="submit"
+						className="w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-4 rounded-full text-2xl font-semibold shadow-lg py-8 flex items-center justify-center"
+						disabled={isSubmitting}
+					>
+						{isSubmitting && (
+							<div className="loader ease-linear rounded-full border-4 border-t-4 border-white h-6 w-6 mr-2 animate-spin"></div>
+						)}
+						Update
+					</button>
+				</div>
+			</form>
+		</div>
+	);
 };
 
 export default EditProfile;
