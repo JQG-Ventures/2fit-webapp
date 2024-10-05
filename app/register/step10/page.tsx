@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import { registerUser } from '../../_services/registerService';
 import { useTranslation } from 'react-i18next';
+import { signIn } from 'next-auth/react';
+
 
 export default function RegisterStep10() {
     const { t } = useTranslation('global');
@@ -37,7 +39,22 @@ export default function RegisterStep10() {
         const handleRegistration = async () => {
             try {
                 const result = await registerUser(data);
-                console.log('User registered successfully:', result);
+                const password = data.password
+                const email = data.email
+                const response = await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false,
+                });
+
+                if (!response?.ok) {
+                    setErrorMessage(t('RegisterPagestep10.errormsg'));
+                    setIsLoading(false);
+                    setTimeout(() => {
+                        router.push('/');
+                    }, 1000);
+                    router.push("/");
+                }
 
                 setTimeout(() => {
                     router.push('/home');
