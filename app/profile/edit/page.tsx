@@ -97,7 +97,7 @@ const EditProfile: React.FC = () => {
 					gender: data.profile.gender,
 					number: data.number,
 				});
-	
+
 				if (data.number) {
 					const detectedCountryCode = detectCountryCode(data.number);
 					setCountryCode(detectedCountryCode.code);

@@ -2,7 +2,7 @@
 
 const ExerciseList: React.FC<{ exercises: Exercise[], isMobile: boolean }> = ({ exercises, isMobile }) => (
     <div className={isMobile ? 'pb-[13vh]' : ''}>
-        <div className="no-scrollbar p-8 lg:max-w-screen-lg mx-auto"> {/* Added mx-auto for centering */}
+        <div className="no-scrollbar p-8 lg:max-w-screen-lg mx-auto">
             {exercises.map((exercise) => (
                 <div key={exercise._id} className="flex items-center justify-between my-5 bg-white rounded-3xl shadow-lg h-[13vh]">
                     <div className="w-[30%] h-full overflow-hidden rounded-tl-lg rounded-bl-lg">

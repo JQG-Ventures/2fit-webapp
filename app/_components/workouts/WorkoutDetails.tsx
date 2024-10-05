@@ -12,8 +12,8 @@ import WorkoutFooter from '../../_components/workouts/WorkoutFooterStart';
 const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan }) => {
     const exercises = workoutPlan.exercises || [];
     const isMobile = useIsMobile();
-    const [isFullScreen, setIsFullScreen] = useState(false);  // Full-screen for mobile
-    const [isModalOpen, setIsModalOpen] = useState(false);  // Modal for desktop
+    const [isFullScreen, setIsFullScreen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleSeeAllClick = () => {
         if (isMobile) {
