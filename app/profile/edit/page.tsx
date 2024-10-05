@@ -148,16 +148,19 @@ const EditProfile: React.FC = () => {
 	const handleCloseModal = () => {
 		setErrorMessage(null);
 		setSuccessMessage(null);
-		router.push('/home');
+		router.back();
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsSubmitting(true);
 		try {
-			const { _id, ...rest } = profileData!;
 			const updatedProfile = {
-				...rest,
+				name: profileData?.name,
+				email: profileData?.email,
+				birthdate: profileData?.birthdate,
+				country: profileData?.country,
+				'profile.gender': profileData?.profile?.gender,
 				number: `${countryCode}${phoneNumber}`.replace("+", ""),
 			};
 			await UpdateUserProfile(userId, updatedProfile);

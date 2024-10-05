@@ -14,6 +14,7 @@ import LoadingScreen from '../_components/animations/LoadingScreen';
 import SettingItem from '../_components/others/SettingItem';
 import { CiUser, CiBellOn, CiLock, CiCircleQuestion } from 'react-icons/ci';
 import { IconType } from 'react-icons';
+import { useSession } from 'next-auth/react';
 
 interface Setting {
 	label: string;
@@ -24,10 +25,12 @@ interface Setting {
 
 const ProfilePage: React.FC = () => {
 	const router = useRouter();
+	const { data: session, status } = useSession();
 	const [userData, setUserData] = useState<UserProfile | undefined>(undefined);
 	const [errorMessage, setErrorMessage] = useState<React.ReactNode | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
+	const [userId, setUserId] = useState<string>('');
 
 	const settings: Setting[] = [
 		{ label: 'Edit Profile', icon: CiUser, path: '/profile/edit' },
@@ -46,9 +49,17 @@ const ProfilePage: React.FC = () => {
 	};
 
 	useEffect(() => {
+		if (status === 'authenticated' && session?.user?.userId) {
+			setUserId(session.user.userId);
+		} else if (status === 'unauthenticated') {
+			router.back();
+		}
+
 		const loadUserData = async () => {
+			if (!userId) return;
+
 			try {
-				const data = await fetchUserData('user_50662633238');
+				const data = await fetchUserData(userId);
 				setUserData(data);
 			} catch (error) {
 				setErrorMessage(
@@ -63,7 +74,7 @@ const ProfilePage: React.FC = () => {
 		};
 
 		loadUserData();
-	}, []);
+	}, [session, status, router]);
 
 	const handleCloseModal = () => {
 		setErrorMessage(null);
