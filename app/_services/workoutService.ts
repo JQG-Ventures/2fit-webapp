@@ -120,12 +120,12 @@ export const getExercisesByLevel = async (level: string) => {
         });
 
         if (!response.ok) {
-            return {};
+            return { error: 'Failed to get exercises.' };
         }
 
         return await response.json();
     } catch (error) {
         console.error('Error fetching exercises:', error);
-        return { error: 'An error occurred getting exercises, please try later.' }; // Cambiar a propiedad 'error'
+        return { error: 'An error occurred getting exercises, please try later.' };
     }
 };
