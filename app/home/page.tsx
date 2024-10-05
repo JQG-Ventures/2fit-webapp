@@ -110,7 +110,7 @@ const HomePage: React.FC = () => {
                 <div className="flex-1">
                     <GreetingSection userName={user.userName} />
                 </div>
-                {!isDesktopOrLaptop && (
+                {isDesktopOrLaptop && (
                     <div className="flex flex-col flex-1 mt-16 pt-10">
                         <div className="flex-grow" />
                         <MotivationSection isBotUser={user.hasRoutine} />

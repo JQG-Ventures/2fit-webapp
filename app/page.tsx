@@ -36,7 +36,7 @@ export default function RegisterStart() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-white">
+        <div className="min-h-screen flex flex-col bg-black">
             <div className="flex-grow h-3/4 flex flex-col justify-center items-center">
                 <div className="flex justify-center items-center h-full w-full">
                     <EmblaCarousel slides={SLIDES} image_data={IMAGES_DATA} options={OPTIONS} />

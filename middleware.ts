@@ -6,7 +6,7 @@ export async function middleware(req: any) {
 
 	const { pathname } = req.nextUrl;
 
-	const publicRoutes = ['/register', '/login', '/register/*'];
+	const publicRoutes = ['/register', '/login', '/register/*', '/'];
 
 	if (!token && !publicRoutes.some((route) => pathname.startsWith(route))) {
 		return NextResponse.redirect(new URL('/login', req.url));
