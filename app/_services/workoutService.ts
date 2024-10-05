@@ -24,7 +24,7 @@ export const saveWorkout = async (userId: string, workoutId: string) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({"workouts": [workoutId]})
+            body: JSON.stringify({ "workouts": [workoutId] })
         });
 
         return response;
