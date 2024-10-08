@@ -54,10 +54,13 @@ const ProfilePage: React.FC = () => {
 		} else if (status === 'unauthenticated') {
 			router.back();
 		}
+	}, [session, status, router]);
 
+	useEffect(() => {
 		const loadUserData = async () => {
 			if (!userId) return;
 
+			setLoading(true); // Set loading to true when fetching starts
 			try {
 				const data = await fetchUserData(userId);
 				setUserData(data);
@@ -69,12 +72,12 @@ const ProfilePage: React.FC = () => {
 					</>
 				);
 			} finally {
-				setLoading(false);
+				setLoading(false); // Set loading to false after fetching completes
 			}
 		};
 
 		loadUserData();
-	}, [session, status, router]);
+	}, [userId]); // Only run when userId changes
 
 	const handleCloseModal = () => {
 		setErrorMessage(null);
