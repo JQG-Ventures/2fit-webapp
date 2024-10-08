@@ -39,15 +39,6 @@ const WorkoutLibrarySection = () => {
             return;
         }
 
-        
-        if (fetchedExercises.message && fetchedExercises.message.length === 0) {
-            setMessage("We are creating more challenges for you, stay tuned! :)");
-            setWorkouts([]);
-        } else {
-            setWorkouts(fetchedExercises.message || []);
-            setMessage(null); 
-        }
-        setLoading(false);
     };
 
     useEffect(() => {
