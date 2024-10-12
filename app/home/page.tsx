@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import GreetingSection from '../_sections/GreetingSection';
+import GreetingSection from '../_components/_sections/GreetingSection';
 import SearchBar from '../_components/searchbar/SearchBarComponent';
-import ExerciseBannerSection from '../_sections/ExerciseBannerSection';
-import GuidedWorkoutsSection from '../_sections/GuidedWorkoutsSection';
-import MotivationSection from '../_sections/MotivationSection';
-import WorkoutLibrarySection from '../_sections/WorkoutLibraryWidgetSection';
-import SavedWorkoutsSection from '../_sections/SavedWorkoutsSection';
-import Footer from '../_sections/Footer';
+import ExerciseBannerSection from '../_components/_sections/ExerciseBannerSection';
+import GuidedWorkoutsSection from '../_components/_sections/GuidedWorkoutsSection';
+import MotivationSection from '../_components/_sections/MotivationSection';
+import WorkoutLibrarySection from '../_components/_sections/WorkoutLibraryWidgetSection';
+import SavedWorkoutsSection from '../_components/_sections/SavedWorkoutsSection';
+import Footer from '../_components/_sections/Footer';
 import LoadingScreen from '../_components/animations/LoadingScreen';
 import { 
     getSavedWorkoutPlansByUser, 

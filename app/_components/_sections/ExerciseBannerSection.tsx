@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AiFillHeart, AiOutlineReload } from 'react-icons/ai';
-import { saveWorkout } from '../_services/workoutService';
-import SavedMessage from '../_components/others/SavedMessage';
+import { saveWorkout } from '../../_services/workoutService';
+import SavedMessage from '../others/SavedMessage';
 
 
 const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutine, exercises, savedWorkoutPlans }) => {

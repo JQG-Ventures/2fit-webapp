@@ -3,51 +3,71 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
-import RegistrationHeader from '../../_components/header/registrationHeader';
+import RegistrationHeader from '../../_components/register/RegistrationHeader';
+import RegistrationButtons from '@/app/_components/register/RegisterButtons';
+import { CgGenderFemale, CgGenderMale } from "react-icons/cg";
 
 export default function RegisterStep3() {
     const { data, updateData } = useRegister();
     const router = useRouter();
-    const [selectedGender, setSelectedGender] = useState(data.gender);   
+    const [isSubmittingNext, setIsSubmittingNext] = useState(false);
+    const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
+    const [selectedGender, setSelectedGender] = useState(data.gender);
+
     const genders = [
-        { id: 0, label: 'Woman', icon: '👩' },
-        { id: 1, label: 'Man', icon: '👨' },
-        { id: 2, label: 'Gender neutral', icon: '🧑' },
+        { id: 0, label: 'Woman', Icon: CgGenderFemale },
+        { id: 1, label: 'Man', Icon: CgGenderMale }
     ];
 
-    const handleGenderSelection = (genderId: number) => {
+    const handleGenderSelection = (genderId) => {
         setSelectedGender(genderId);
         updateData({ gender: genderId });
-        console.log(data);
-        setTimeout(() => {
-            router.push('/register/step4');
-        }, 300);
+    };
+
+    const handleNextStep = () => {
+        setIsSubmittingNext(true);
+        router.push('/register/step4');
     };
 
     const handlePrevStep = () => {
-        router.push('/register/step2')
+        setIsSubmittingPrev(true);
+        router.push('/register/step1');
     };
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
-            <div className='h-[10%] w-full lg:max-w-3xl'>
-                <RegistrationHeader stepNumber={1} handlePrevStep={handlePrevStep}/>
+            <div className='h-[20%] w-full lg:max-w-3xl'>
+                <RegistrationHeader
+                    title={'Tell Us About Yourself'}
+                    description={'To give you a better experience and results we need to know your gender'}
+                />
             </div>
 
-            <div className="h-[85%] content-center w-full lg:max-w-3xl">
-                <h2 className="text-4xl font-bold text-center mb-20">Choose gender</h2>
-                <div className="space-y-6 w-full px-8">
-                    {genders.map(({ id, label, icon }) => (
+            <div className="flex flex-col items-center justify-center h-[70%] w-full lg:max-w-3xl space-y-8">
+                <div className="flex flex-col items-center justify-center space-y-8 w-full">
+                    {genders.map(({ id, label, Icon }) => (
                         <button
                             key={id}
-                            className={`w-full p-8 flex text-left items-center border rounded-lg text-3xl ${selectedGender === id ? 'border-black bg-gray-100' : 'border-gray-300'}`}
+                            className={`w-60 h-60 lg:w-80 lg:h-80 flex flex-col items-center justify-center border rounded-full text-3xl 
+                            ${selectedGender === id ? 'bg-black text-white border-black' : 'bg-gray-300 text-gray-700 border-gray-300'}`}
                             onClick={() => handleGenderSelection(id)}
                         >
-                            <span role="img" aria-label={label} className="mr-4">{icon}</span> {label}
+                            <Icon className='text-8xl' />
+                            <span className="mt-2 text-2xl">{label}</span>
                         </button>
                     ))}
                 </div>
             </div>
+
+            <RegistrationButtons
+                handleNext={handleNextStep}
+                handlePrev={handlePrevStep}
+                isSubmittingNext={isSubmittingNext}
+                isSubmittingPrev={isSubmittingPrev}
+                prevText={'Back'}
+                nextText={'Continue'}
+                isNextDisabled={selectedGender === null || selectedGender === undefined}
+            />
         </div>
     );
 }

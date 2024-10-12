@@ -10,7 +10,7 @@ import { useMediaQuery } from 'react-responsive';
 const navItems = [
     { href: '/home', label: 'Home', icon: <FaHome /> },
     { href: '/workouts', label: 'Workouts', icon: <FaDumbbell /> },
-    { href: '/bot', label: 'Bot', icon: <FaRobot /> },
+    { href: '/chat', label: 'Bot', icon: <FaRobot /> },
     { href: '/profile', label: 'Profile', icon: <FaUser /> },
 ];
 
