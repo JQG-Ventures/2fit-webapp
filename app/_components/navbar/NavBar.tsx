@@ -6,21 +6,23 @@ import MobileNavBar from './MobileNavBar';
 import { usePathname } from 'next/navigation';
 import { FaHome, FaDumbbell, FaRobot, FaUser } from 'react-icons/fa';
 import { useMediaQuery } from 'react-responsive';
-
-const navItems = [
-    { href: '/home', label: 'Home', icon: <FaHome /> },
-    { href: '/workouts', label: 'Workouts', icon: <FaDumbbell /> },
-    { href: '/bot', label: 'Bot', icon: <FaRobot /> },
-    { href: '/profile', label: 'Profile', icon: <FaUser /> },
-];
+import { useTranslation } from 'react-i18next';
 
 
 const NavBar: React.FC = () => {
+    const { t } = useTranslation('global');
     const pathname = usePathname();
     const [isClient, setIsClient] = useState(false);
     const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
     const showNavBarPaths = ['/home', '/workouts', '/bot', '/profile'];
     const shouldShowNavBar = showNavBarPaths.some(path => pathname.startsWith(path));
+
+    const navItems = [
+        { href: '/home', label: t('Navbar.home'), icon: <FaHome /> },
+        { href: '/workouts', label: t('Navbar.workouts'), icon: <FaDumbbell /> },
+        { href: '/bot', label: t('Navbar.bot'), icon: <FaRobot /> },
+        { href: '/profile', label: t('Navbar.profile'), icon: <FaUser /> },
+    ];
 
     useEffect(() => {
         setIsClient(true);

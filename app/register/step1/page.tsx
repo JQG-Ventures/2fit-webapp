@@ -6,6 +6,7 @@ import { IoChevronBack } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import { sendCode } from '../../_services/registerService';
+import { useTranslation } from 'react-i18next';
 
 interface FormData {
     number: string;
@@ -19,6 +20,7 @@ interface ValidationErrors {
 }
 
 export default function RegisterStep1() {
+    const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
     const [error, setError] = useState('');
     const [formData, setFormData] = useState<FormData>({
@@ -31,10 +33,10 @@ export default function RegisterStep1() {
     const router = useRouter();
 
     const user_data_fields = [
-        { name: 'name', label: 'Name', placeholder: 'Name' },
-        { name: 'last', label: 'Last', placeholder: 'Last' },
-        { name: 'age', label: 'Age', placeholder: 'Age' },
-        { name: 'number', label: 'Phone', placeholder: 'Phone' }
+        { name: 'name', label: 'Name', placeholder: t('RegisterPagestep1.name') },
+        { name: 'last', label: 'Last', placeholder: t('RegisterPagestep1.last') },
+        { name: 'age', label: 'Age', placeholder: t('RegisterPagestep1.age') },
+        { name: 'number', label: 'Phone', placeholder: t('RegisterPagestep1.phone') }
     ];
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +88,7 @@ export default function RegisterStep1() {
                 <button onClick={handlePrevStep} className="hidden text-4xl lg:flex mr-14 mt-5 text-center">
                     <IoChevronBack />
                 </button>
-                <h1 className='text-6xl font-semibold'>Create your <br />Account</h1>
+                <h1 className='text-6xl font-semibold'>{t('RegisterPagestep1.create.0')} <br />{t('RegisterPagestep1.create.1')}</h1>
             </div>
 
             <div className='h-[50%] flex w-full items-center justify-center'>
@@ -113,13 +115,13 @@ export default function RegisterStep1() {
                         onClick={handleNextStep}
                         className={`w-full py-3 bg-black text-white rounded-full font-semibold mt-4`}
                     >
-                        Next
+                        {t('RegisterPagestep1.nextbtn')}
                     </button>
                 </form>
             </div>
 
             <div className="h-[15%] flex flex-col justify-start text-center">
-                <p className="text-gray-500 mb-10">Or sign in with</p>
+                <p className="text-gray-500 mb-10">{t('RegisterPagestep1.signuptxt')}</p>
                 <div className="flex flex-row justify-evenly space-x-8">
                     {[FaApple, FaFacebook, FaGoogle].map((Icon, idx) => (
                         <button key={idx} className="text-5xl">
@@ -131,7 +133,7 @@ export default function RegisterStep1() {
 
             <div className="h-[5%] text-center">
                 <p className="text-gray-500">
-                    Do you have an account? <a href="#" className="text-indigo-600 underline">Sign In</a>
+                {t('RegisterPagestep1.signupquestion')} <a href="#" className="text-indigo-600 underline">{t('RegisterPagestep1.signin')}</a>
                 </p>
             </div>
         </div>
