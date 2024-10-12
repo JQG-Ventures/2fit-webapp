@@ -22,7 +22,7 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     const loadUserData = async () => {
       try {
-        const data = await fetchUserData('50686134777'); 
+        const data = await fetchUserData('user_50686134777'); 
         setUserData(data);
       } catch (error) {
         console.error('Error loading user data:', error);

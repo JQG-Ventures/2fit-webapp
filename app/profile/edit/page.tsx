@@ -34,7 +34,7 @@ const EditProfile: React.FC = () => {
   useEffect(() => {
     const loadUserProfile = async () => {
       try {
-        const data = await fetchUserData('50686134777');
+        const data = await fetchUserData('user_50686134777');
         setProfileData(data);
         
         if (data?.number) {
