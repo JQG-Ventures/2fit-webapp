@@ -4,32 +4,36 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import EmblaCarousel from './_components/carousel/EmblaCarousel';
 import { EmblaOptionsType } from 'embla-carousel';
+import { useTranslation } from 'react-i18next';
 
 const OPTIONS: EmblaOptionsType = { dragFree: true, loop: true };
-const IMAGES_DATA = [
+
+
+export default function RegisterStart() {
+    const router = useRouter();
+    const { t } = useTranslation('global');
+
+    const IMAGES_DATA = [
     {
         id: 1,
         src: '/images/onboarding-1.jpg',
-        title: 'Welcome to 2Fit-AI',
-        caption: 'Improve your fitness with the help of the latest artificial intelligence technology.',
+        title: t('WelcomPage.title1'),
+        caption: t('WelcomPage.description1'),
     },
     {
         id: 2,
         src: '/images/onboarding-2.jpg',
-        title: 'Workout Categories',
-        caption: 'Workout categories will help you gain strength, get in better shape and embrace a healthy lifestyle.',
+        title: t('WelcomPage.title2'),
+        caption: t('WelcomPage.description2'),
     },
     {
         id: 3,
         src: '/images/onboarding-3.jpg',
-        title: 'Custom Workouts',
-        caption: 'With AI assistance, you can access a variety of different workout routines and save them in your app.',
+        title: t('WelcomPage.title3'),
+        caption: t('WelcomPage.description3'),
     },
 ];
 const SLIDES = Array.from(Array(IMAGES_DATA.length).keys());
-
-export default function RegisterStart() {
-    const router = useRouter();
 
     const handleStartTraining = () => {
         router.push('/register');
@@ -47,12 +51,12 @@ export default function RegisterStart() {
                         className="bg-white text-black py-3 px-6 rounded font-semibold my-6 focus:outline-none focus:ring-2 focus:ring-green-500"
                         aria-label="Start training process"
                     >
-                        Start Training
+                        {t('WelcomPage.startbtn')}
                     </button>
                     <p className="w-full text-center text-white">
-                        Already have an account?{" "}
+                    {t('WelcomPage.questiontxt')}?{" "}
                         <a href="/login" className="underline text-green-500">
-                            Sign in
+                        {t('WelcomPage.signin')}
                         </a>
                     </p>
                 </div>
