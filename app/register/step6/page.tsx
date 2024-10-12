@@ -4,9 +4,10 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import RegistrationHeader from '../../_components/header/registrationHeader';
-
+import { useTranslation } from 'react-i18next';
 
 export default function RegisterStep6() {
+    const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
     const [unit, setUnit] = useState('kg');
     const [weight, setWeight] = useState(data.weight || 70);
@@ -41,20 +42,20 @@ export default function RegisterStep6() {
             </div>
             
             <div className="h-[85%] content-center w-full lg:max-w-3xl">
-                <h2 className="text-4xl font-bold text-center mb-20">Select Weight</h2>
+                <h2 className="text-4xl font-bold text-center mb-20">{t('RegisterPagestep6.weight')}</h2>
                 <div className="w-full px-8">
                     <div className="flex items-center bg-gray-100 rounded-full p-1 w-full max-w-xs mb-8 mx-auto justify-center">
                         <button
                             onClick={() => toggleUnit()}
                             className={`w-1/2 text-center py-2 rounded-full ${unit === 'lbs' ? 'bg-white text-black' : 'text-gray-500'}`}
                         >
-                            Lbs
+                            {t('RegisterPagestep6.lbs')}
                         </button>
                         <button
                             onClick={() => toggleUnit()}
                             className={`w-1/2 text-center py-2 rounded-full ${unit === 'kg' ? 'bg-white text-black' : 'text-gray-500'}`}
                         >
-                            Kilograms
+                            {t('RegisterPagestep6.kilograms')}
                         </button>
                     </div>
                     <div className="flex items-center justify-center my-28">
@@ -71,7 +72,7 @@ export default function RegisterStep6() {
                             onClick={handleNextStep}
                             className="w-full max-w-xs sm:max-w-md py-3 bg-black text-white rounded-md font-semibold mt-10 flex justify-center items-center"
                         >
-                            Next
+                            {t('RegisterPagestep6.nextbtn')}
                         </button>
                     </div>
                 </div>

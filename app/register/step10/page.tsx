@@ -4,8 +4,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import { registerUser } from '../../_services/registerService';
+import { useTranslation } from 'react-i18next';
+import { signIn } from 'next-auth/react';
+
 
 export default function RegisterStep10() {
+    const { t } = useTranslation('global');
     const [textIndex, setTextIndex] = useState(0);
     const [showText, setShowText] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
@@ -14,11 +18,11 @@ export default function RegisterStep10() {
     const { data } = useRegister();
 
     const texts = [
-        "We create your training plan",
-        "Analyzing your demographic profile",
-        "Considering your activity level",
-        "Taking your interests into account",
-        "Almost there! Finalizing your plan"
+        t('RegisterPagestep10.texts.0'),
+        t('RegisterPagestep10.texts.1'),
+        t('RegisterPagestep10.texts.2'),
+        t('RegisterPagestep10.texts.3'),
+        t('RegisterPagestep10.texts.4')
     ];
 
     const changeText = useCallback(() => {
@@ -35,13 +39,28 @@ export default function RegisterStep10() {
         const handleRegistration = async () => {
             try {
                 const result = await registerUser(data);
-                console.log('User registered successfully:', result);
+                const password = data.password
+                const email = data.email
+                const response = await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false,
+                });
+
+                if (!response?.ok) {
+                    setErrorMessage(t('RegisterPagestep10.errormsg'));
+                    setIsLoading(false);
+                    setTimeout(() => {
+                        router.push('/');
+                    }, 1000);
+                    router.push("/");
+                }
 
                 setTimeout(() => {
                     router.push('/home');
                 }, 3000);
             } catch (error) {
-                setErrorMessage('There was an error creating your training plan:( Please try again.');
+                setErrorMessage(t('RegisterPagestep10.errormsg'));
                 setIsLoading(false);
             }
         };
@@ -62,7 +81,7 @@ export default function RegisterStep10() {
             <div className="w-full max-w-lg flex flex-col items-center justify-evenly h-[60vh] text-center">
                 {isLoading ? (
                     <>
-                        <h2 className="text-5xl font-bold mb-10">We are creating your <br /> training plan</h2>
+                        <h2 className="text-5xl font-bold mb-10">{t('RegisterPagestep10.creating.0')} <br /> {t('RegisterPagestep10.creating.1')}</h2>
                         <div className="w-16 h-16 border-4 border-gray-300 border-t-black rounded-full animate-spin mb-10"></div>
                         <div className={`transition-opacity duration-500 ${showText ? 'opacity-100' : 'opacity-0'}`}>
                             <p className="text-2xl">{texts[textIndex]}</p>
@@ -75,7 +94,7 @@ export default function RegisterStep10() {
                             onClick={handleRetry}
                             className="mt-4 px-6 py-4 bg-red-500 text-white text-2xl rounded-lg"
                         >
-                            Go to Home
+                            {t('RegisterPagestep10.homebtn')}
                         </button>
                     </div>
                 )}

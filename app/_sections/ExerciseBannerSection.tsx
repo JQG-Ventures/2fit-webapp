@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { AiFillHeart, AiOutlineReload } from 'react-icons/ai';
 import { saveWorkout } from '../_services/workoutService';
+import { useTranslation } from 'react-i18next';
 import SavedMessage from '../_components/others/SavedMessage';
 
 
 const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutine, exercises, savedWorkoutPlans }) => {
+    const { t } = useTranslation('global');
     const userId = "user_50662633238"; // TODO: REMOVE THIS
     const [savedMessage, setSavedMessage] = useState<string | null>(null);
     const [savedExerciseIds, setSavedExerciseIds] = useState<string[]>(
@@ -28,7 +30,7 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
     return (
         <div className="exercise-banner-section px-6 pt-10 md:px-12 lg:px-20">
             <h2 className="text-2xl font-bold mb-6 lg:text-3xl">
-                {hasRoutine ? "What's the plan for today?" : "Explore Workouts"}
+                {hasRoutine ? t('home.excercisebannersection.planfortoday') : t('home.excercisebannersection.planfortoday2')}
             </h2>
 
             {exercises.length > 0 ? (
@@ -45,7 +47,7 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
             ) : (
                 <div className="text-center py-10">
                     <p className="text-gray-500 text-lg">
-                        Soon you will have access to a variety of workouts to get you fit, stay tuned!
+                        {t('home.excercisebannersection.noexercisemessage')}
                     </p>
                 </div>
             )}
