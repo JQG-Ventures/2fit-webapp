@@ -26,8 +26,8 @@ const ButtonWithSpinner: React.FC<ButtonWithSpinnerProps> = ({
             className={`${className} flex items-center justify-center ${loading ? 'cursor-not-allowed opacity-50' : ''
                 }`}
         >
-            {loading && <FaSpinner className="mr-2 animate-spin" />}
             {children}
+            {loading && <FaSpinner className="ml-4 animate-spin" />}
         </button>
     );
 };

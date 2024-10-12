@@ -210,7 +210,7 @@ const EditProfile: React.FC = () => {
 				className="h-[90%] flex flex-col justify-between items-center w-full"
 				onSubmit={handleSubmit}
 			>
-				<div className="h-[90%] flex flex-col justify-start py-6 w-full max-w-3xl space-y-6 overflow-y-auto">
+				<div className="h-[90%] flex flex-col justify-start py-6 w-full max-w-3xl space-y-8 overflow-y-auto">
 					{formFields.map((field, index) => {
 						if (field.type === 'select') {
 							return (

@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { AiFillHeart, AiOutlineClose } from 'react-icons/ai';
-import ConfirmationModal from '../_components/modals/confirmationModal';
+import ConfirmationModal from '../modals/confirmationModal';
 
 interface Workout {
     _id: string;

@@ -42,7 +42,6 @@ const ProfilePage: React.FC = () => {
 			callbackUrl: '/',
 			redirect: true,
 		});
-		setIsLoggingOut(false);
 	};
 
 	useEffect(() => {

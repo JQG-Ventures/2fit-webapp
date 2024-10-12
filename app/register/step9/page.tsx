@@ -3,13 +3,16 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
-import RegistrationHeader from '../../_components/header/registrationHeader';
+import RegistrationHeader from '../../_components/register/RegistrationHeader';
+import RegistrationButtons from '@/app/_components/register/RegisterButtons';
+
 
 export default function RegisterStep9() {
     const [selectedActivities, setSelectedActivities] = useState<number[]>([]);
+    const [isSubmittingNext, setIsSubmittingNext] = useState(false);
+    const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
     const router = useRouter();
     const { data, updateData } = useRegister();
-    console.log(data);
 
     const activities = [
         { id: 1, label: 'Stretch', icon: '🧘' },
@@ -28,47 +31,73 @@ export default function RegisterStep9() {
     };
 
     const handleNextStep = () => {
+        setIsSubmittingNext(true);
         updateData({ workout_type: selectedActivities });
+        console.log(data);
         router.push('/register/step10');
     };
 
     const handlePrevStep = () => {
+        setIsSubmittingPrev(true);
         router.push('/register/step8');
     };
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
-            <div className='h-[10%] w-full lg:max-w-3xl'>
-                <RegistrationHeader stepNumber={7} handlePrevStep={handlePrevStep}/>
+            <div className='h-[20%] w-full lg:max-w-3xl'>
+                <RegistrationHeader
+                    title={'Your phyisical activities'}
+                    description={'Which activities do you practice. This will enhance our results for you.'}
+                />
             </div>
             
-            <div className="h-[85%] content-center w-full lg:max-w-3xl">
-            <h2 className="text-5xl font-bold text-center mb-20">Choose activities <br/>that you prefer</h2>
-                <div className="w-full px-8 py">
-                    {activities.map((activity) => (
-                        <button
-                            key={activity.id}
-                            onClick={() => handleActivitySelection(activity.id)}
-                            className={`flex items-center justify-between w-full my-6 p-6 border rounded-lg ${selectedActivities.includes(activity.id) ? 'border-black bg-gray-100' : 'border-gray-200'} ${activity.bgColor || 'bg-white'}`}
-                        >
-                            <div className="flex items-center">
-                                <span className="text-3xl mr-4">{activity.icon}</span>
-                                <span className="text-2xl font-medium">{activity.label}</span>
-                            </div>
-                            <span className={`w-6 h-6 border-2 rounded-full ${selectedActivities.includes(activity.id) ? 'bg-green-600 border-green-600' : 'border-gray-400'}`}></span>
-                        </button>
-                    ))}
+            <div className="flex flex-col items-center justify-center h-[70%] w-full lg:max-w-3xl space-y-8">
+    <div className="w-full px-8 py">
+        {activities.map((activity) => (
+            <button
+                key={activity.id}
+                onClick={() => handleActivitySelection(activity.id)}
+                className={`
+                    flex items-center justify-between w-full my-6 p-8 border border-grey-200 rounded-lg transform
+                    transition duration-200 ease-in-out
+                    bg-white
+                    ${
+                        selectedActivities.includes(activity.id)
+                            ? 'shadow-lg border border-black rounded-lg scale-105'
+                            : 'shadow-none hover:shadow-md'
+                    }
+                    ${activity.bgColor || ''}
+                `}
+            >
+                <div className="flex items-center">
+                    <span className="text-3xl mr-4">{activity.icon}</span>
+                    <span className="text-2xl font-medium">{activity.label}</span>
                 </div>
-                <div className='w-full px-8'>
-                    <button
-                        type="button"
-                        onClick={handleNextStep}
-                        className="w-full py-3 bg-black text-white rounded-md font-semibold  my-6 p-6"
-                    >
-                        Next
-                    </button>
-                </div>
-            </div>
+                <span
+                    className={`
+                        w-6 h-6 border-2 rounded-full transition duration-200 ease-in-out
+                        ${
+                            selectedActivities.includes(activity.id)
+                                ? 'bg-green-600 border-green-600'
+                                : 'border-gray-400'
+                        }
+                    `}
+                ></span>
+            </button>
+        ))}
+    </div>
+</div>
+
+
+            <RegistrationButtons
+                handleNext={handleNextStep}
+                handlePrev={handlePrevStep}
+                isSubmittingNext={isSubmittingNext}
+                isSubmittingPrev={isSubmittingPrev}
+                prevText={'Back'}
+                nextText={'Continue'}
+                isNextDisabled={selectedActivities.length === 0 || selectedActivities === undefined }
+            />
         </div>
     );
 }
