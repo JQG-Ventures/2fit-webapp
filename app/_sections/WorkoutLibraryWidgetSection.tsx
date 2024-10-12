@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface WorkoutCardProps {
     title: string;
@@ -34,11 +35,12 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({ title, workoutCount, descript
 const WorkoutLibrarySection: React.FC<WorkoutLibrarySectionProps> = ({ workouts }) => {
     const displayedWorkoutsCol = workouts.slice(0, 3);
     const displayedWorkoutsGrid = workouts.slice(0, 6);
+    const { t } = useTranslation('global');
 
     return (
         <div className="relative bg-gray-100 p-8 rounded-xl my-16 md:px-12 lg:px-20">
             <div className="relative z-5 p-6 lg:p-12">
-                <h2 className="text-2xl font-bold mb-8 lg:text-3xl">Explore Our Workout Library</h2>
+                <h2 className="text-2xl font-bold mb-8 lg:text-3xl">{t('home.WorkoutLibrarySection.WorkoutLibrarySectiontitle')}</h2>
 
                 {/* For mobile view */}
                 <div className="block lg:hidden mb-12">
@@ -71,15 +73,15 @@ const WorkoutLibrarySection: React.FC<WorkoutLibrarySectionProps> = ({ workouts 
                 {/* Conditionally display this section based on the number of workouts */}
                 {workouts.length > 0 ? (
                     <div className="text-center pt-10">
-                        <p className="text-gray-700 text-lg mb-4">Discover more workouts tailored to your fitness goals in our extensive library.</p>
+                        <p className="text-gray-700 text-lg mb-4">{t('home.WorkoutLibrarySection.WorkoutLibrarySectiondescription2')}</p>
                         <button className="bg-green-500 text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-green-700 transition-colors">
-                            Open Workout Library
+                        {t('home.WorkoutLibrarySection.openlibrary')}
                         </button>
                     </div>
                 ) : (
                     <div className="text-center pt-4">
                         <p className="text-gray-500 text-1xl mb-4">
-                            Soon you will have tons of workouts to get you fit, stay tuned!
+                        {t('home.WorkoutLibrarySection.WorkoutLibrarySectiondescription')}
                         </p>
                     </div>
                 )}
