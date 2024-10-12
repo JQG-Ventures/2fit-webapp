@@ -9,24 +9,22 @@ const Premium: React.FC = () => {
     const router = useRouter();
 
     return (
-        <div className="relative min-h-screen bg-white pt-40 md:pt-24">
-            {/* Fondo de la imagen */}
+        <div className='flex items-center justify-center bg-gray-50 h-screen px-6'>
             <div
                 className="absolute inset-0 bg-cover bg-center opacity-70"
                 style={{ backgroundImage: "url('/images/onboarding-3.jpg')" }}
             />
-            {/* Gradiente ajustado para un difuminado menos pronunciado en la parte superior */}
             <div className="absolute inset-0 bg-gradient-to-t from-white/40 to-transparent" style={{ height: '100%' }} />
 
-            {/* Contenido */}
-            <div className="relative z-10 flex flex-col items-start p-6 pb-40"> {/* Cambiar items-center a items-start */}
-                <h6 className="text-6xl font-semibold mb-4 text-green-500 text-lef pb-4">Be Premium</h6>
-                <h2 className="text-6xl font-semibold mb-4 text-green-500 text-left pb-4">Get Unlimited Access</h2>
-                <p className="text-4xl  font-semibold mb-8 text-left pb-6">Enjoy workout access without ads and restrictions.</p>
+            <div className="relative lg:max-w-2xl pt-10">
 
-                {/* Plan Selection */}
-                <div className="flex flex-col w-full"> {/* Elimina max-w-md aquí */}
-                    {/* 1 Month Plan */}
+                <div className='w-full h-[30%] lg:max-w-6xl lg:mb-0 pt-10 md:pt-24'>
+                    <h6 className="text-6xl md:text-6xl font-semibold mb-4 text-green-500 text-left pb-4">Be Premium</h6>
+                    <h2 className="text-6xl md:text-6xl font-semibold mb-4 text-green-500 text-left pb-4">Get Unlimited Access</h2>
+                    <p className="text-4xl md:text-4xl font-semibold mb-8 text-left">Enjoy workout access without ads and restrictions.</p>
+                </div>
+
+                <div className="flex flex-col w-full h-[40%] lg:max-w-6xl lg:mb-0">
                     <div
                         className={`border-2 ${selectedPlan === '1' ? 'border-green-700 bg-green-300/50' : 'border-white bg-white'} rounded-[25px] p-5 mb-8 shadow-lg w-full py-10 flex items-center`}
                     >
@@ -51,7 +49,6 @@ const Premium: React.FC = () => {
                         </label>
                     </div>
 
-                    {/* 6 Months Plan */}
                     <div
                         className={`border-2 ${selectedPlan === '2' ? 'border-green-700 bg-green-300/50' : 'border-white bg-white'} rounded-[25px] p-5 mb-8 shadow-lg w-full py-10 flex items-center`}
                     >
@@ -76,7 +73,6 @@ const Premium: React.FC = () => {
                         </label>
                     </div>
 
-                    {/* 12 Months Plan */}
                     <div
                         className={`border-2 ${selectedPlan === '3' ? 'border-green-700 bg-green-300/50' : 'border-white bg-white'} rounded-[25px] p-5 mb-8 shadow-lg w-full py-10 flex items-center`}
                     >
@@ -102,17 +98,15 @@ const Premium: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Subscribe Button */}
-                <div className='pt-8 w-full'>
+                <div className='w-full h-[30%] lg:max-w-6xl lg:mb-0'>
                     <button
                         type="submit"
-                        className="w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-4 rounded-full text-2xl font-semibold shadow-lg py-8 transition-transform"
+                        className="w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-2 rounded-full text-3xl md:text-3xl font-semibold shadow-lg py-4 transition-transform"
                     >
                         Subscribe
                     </button>
                 </div>
 
-                <form className="space-y-6"></form>
             </div>
         </div>
     );
