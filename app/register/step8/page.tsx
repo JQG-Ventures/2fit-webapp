@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import RegistrationHeader from '../../_components/register/RegistrationHeader';
 import RegistrationButtons from '@/app/_components/register/RegisterButtons';
+import { useTranslation } from 'react-i18next';
+
 
 interface Level {
     id: number,
@@ -13,6 +15,7 @@ interface Level {
 }
 
 export default function RegisterStep7() {
+    const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
     const [isSubmittingNext, setIsSubmittingNext] = useState(false);
     const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
@@ -20,10 +23,10 @@ export default function RegisterStep7() {
     const router = useRouter();
 
     const levels = [
-        { id: 1, title: 'Beginner', description: 'I want to start training' },
-        { id: 2, title: 'Irregular training', description: 'I train 1-2 times a week' },
-        { id: 3, title: 'Medium', description: 'I train 3-5 times a week' },
-        { id: 4, title: 'Advanced', description: 'I train more than 5 times a week' },
+        { id: 1, title: t('RegisterPagestep8.beginner.0'), description: t('RegisterPagestep8.beginner.1') },
+        { id: 2, title: t('RegisterPagestep8.irregular.0'), description: t('RegisterPagestep8.irregular.1') },
+        { id: 3, title: t('RegisterPagestep8.medium.0'), description: t('RegisterPagestep8.medium.1') },
+        { id: 4, title: t('RegisterPagestep8.advanced.0'), description: t('RegisterPagestep8.advanced.1') },
     ];
 
     const handleTrainingLevel = (level: Level) => {
@@ -45,8 +48,8 @@ export default function RegisterStep7() {
         <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
             <div className='h-[20%] w-full lg:max-w-3xl'>
                 <RegistrationHeader 
-                    title={'What is your Training Level?'} 
-                    description={'Choose based on your current activity. This will help us to personalize plans for you.'} 
+                    title={t('RegisterPagestep8.title')}
+                    description={t('RegisterPagestep8.description')}
                 />
             </div>
 
@@ -72,8 +75,8 @@ export default function RegisterStep7() {
                 handlePrev={handlePrevStep}
                 isSubmittingNext={isSubmittingNext}
                 isSubmittingPrev={isSubmittingPrev}
-                prevText={'Back'}
-                nextText={'Continue'}
+                prevText={t('RegisterPage.back')}
+                nextText={t('RegisterPage.next')}
                 isNextDisabled={selectedLevel === null || selectedLevel === undefined}
             />
         </div>

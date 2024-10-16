@@ -13,6 +13,7 @@ import PhoneInput from '../../_components/form/PhoneInput';
 import countryCodes from '@/app/data/countryCodes.json';
 import { calculateAge } from '@/app/utils/formUtils';
 import { fetchUserDataByNumber } from '@/app/_services/userService';
+import { useTranslation } from 'react-i18next';
 
 interface FormData {
     number: string;
@@ -27,6 +28,7 @@ interface ValidationErrors {
 }
 
 export default function RegisterStep1() {
+    const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
     const [error, setError] = useState('');
     const [countryCode, setCountryCode] = useState<string>(data.countryCode || '');
@@ -43,9 +45,10 @@ export default function RegisterStep1() {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const user_data_fields = [
-        { name: 'name', label: 'Name', placeholder: 'Name', type: 'text' },
-        { name: 'last', label: 'Last', placeholder: 'Last', type: 'text' },
+        { name: 'name', label: 'Name', placeholder: t('RegisterPagestep1.name') },
+        { name: 'last', label: 'Last', placeholder: t('RegisterPagestep1.last') },
         { name: 'birthdate', label: 'Birthdate', placeholder: 'mm/dd/yyyy', type: 'date' }
+        { name: 'number', label: 'Phone', placeholder: t('RegisterPagestep1.phone') }
     ];
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -130,7 +133,7 @@ export default function RegisterStep1() {
                 <button onClick={handlePrevStep} className="hidden text-4xl lg:flex mr-14 mt-5 text-center">
                     <IoChevronBack />
                 </button>
-                <h1 className='text-6xl font-semibold'>Create your <br />Account</h1>
+                <h1 className='text-6xl font-semibold'>{t('RegisterPagestep1.create.0')} <br />{t('RegisterPagestep1.create.1')}</h1>
             </div>
 
             <div className='h-[50%] flex w-full items-center justify-center'>
@@ -161,13 +164,13 @@ export default function RegisterStep1() {
                         loading={isSubmitting}
                         className="w-full bg-black text-white py-4 rounded-full text-1xl font-semibold hover:bg-gray-800 transition duration-200 mt-4"
                     >
-                        Next
+                        {t('RegisterPagestep1.nextbtn')}
                     </ButtonWithSpinner>
                 </form>
             </div>
 
             <div className="h-[15%] flex flex-col justify-start text-center">
-                <p className="text-gray-500 mb-10">Or sign in with</p>
+                <p className="text-gray-500 mb-10">{t('RegisterPagestep1.signuptxt')}</p>
                 <div className="flex flex-row justify-evenly space-x-8">
                     {[FaApple, FaFacebook, FaGoogle].map((Icon, idx) => (
                         <button key={idx} className="text-5xl">
@@ -179,7 +182,7 @@ export default function RegisterStep1() {
 
             <div className="h-[5%] text-center">
                 <p className="text-gray-500">
-                    Do you have an account? <a href="#" className="text-indigo-600 underline">Sign In</a>
+                {t('RegisterPagestep1.signupquestion')} <a href="#" className="text-indigo-600 underline">{t('RegisterPagestep1.signin')}</a>
                 </p>
             </div>
         </div>

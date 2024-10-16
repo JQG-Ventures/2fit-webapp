@@ -3,7 +3,18 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface RegisterData {
-    [key: string]: any;
+    email: string,
+    fitness_goal: 0,
+    fitness_level: number,
+    gender: number,
+    height: number,
+    last: string,
+    name: string,
+    number: string,
+    password: string,
+    target_weight: 0,
+    weight: number,
+    workout_type: []
 }
 
 interface RegisterContextType {

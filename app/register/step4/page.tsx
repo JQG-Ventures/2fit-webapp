@@ -5,8 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import RegistrationHeader from '../../_components/register/RegistrationHeader';
 import RegistrationButtons from '@/app/_components/register/RegisterButtons';
+import { useTranslation } from 'react-i18next';
+
 
 export default function RegisterStep4() {
+    const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
     const [isSubmittingNext, setIsSubmittingNext] = useState(false);
     const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
@@ -14,10 +17,10 @@ export default function RegisterStep4() {
     const router = useRouter();
 
     const goals = [
-        { id: 1, label: 'Lose Weight', icon: '⚖️' },
-        { id: 2, label: 'Keep Fit', icon: '🍀' },
-        { id: 3, label: 'Get Stronger', icon: '💪🏻' },
-        { id: 4, label: 'Gain Muscle Mass', icon: '🚀' },
+        { id: 1, label: t('RegisterPagestep4.weight'), icon: '⚖️' },
+        { id: 2, label: t('RegisterPagestep4.fit'), icon: '🍀' },
+        { id: 3, label: t('RegisterPagestep4.stronger'), icon: '💪🏻' },
+        { id: 4, label: t('RegisterPagestep4.muscle'), icon: '🚀' },
     ];
 
     const handleGoalSelection = (goal) => {
@@ -39,8 +42,8 @@ export default function RegisterStep4() {
         <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
             <div className='h-[20%] w-full lg:max-w-3xl'>
                 <RegistrationHeader 
-                    title={'What is your goal'} 
-                    description={'Choose your main objective. Don\'t worry you can always change it later.'} 
+                    title={t('RegisterPagestep4.title')}
+                    description={t('RegisterPagestep4.description')}
                 />
             </div>
 
@@ -64,8 +67,8 @@ export default function RegisterStep4() {
                 handlePrev={handlePrevStep}
                 isSubmittingNext={isSubmittingNext}
                 isSubmittingPrev={isSubmittingPrev}
-                prevText={'Back'}
-                nextText={'Continue'}
+                prevText={t('RegisterPage.back')}
+                nextText={t('RegisterPage.next')}
                 isNextDisabled={selectedGoal === null || selectedGoal === undefined}
             />
         </div>

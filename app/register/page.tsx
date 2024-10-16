@@ -7,9 +7,12 @@ import { useRouter } from 'next/navigation';
 import { useRegister } from '../_components/register/RegisterProvider';
 import ButtonWithSpinner from '../_components/others/ButtonWithSpinner';
 import { fetchUserDataByEmail } from '../_services/userService';
+import { useTranslation } from 'react-i18next';
+
 
 export default function RegisterStep1() {
     const { data, updateData } = useRegister();
+    const { t } = useTranslation('global');
     const [formData, setFormData] = useState({
         email: data.email || '',
         password: data.password || '',
@@ -20,7 +23,7 @@ export default function RegisterStep1() {
     const router = useRouter();
 
     const user_data_fields = [
-        { name: 'email', label: 'Email', placeholder: 'Email' },
+        { name: 'email', label: 'Email', placeholder: t('RegisterPage.email') },
         { name: 'password', label: 'Password', placeholder: '******************', type: 'password' }
     ];
 
@@ -83,7 +86,7 @@ export default function RegisterStep1() {
                 <button onClick={handlePrevStep} className="hidden text-4xl lg:flex mr-14 mt-5 text-center">
                     <IoChevronBack />
                 </button>
-                <h1 className='text-6xl font-semibold'>Create your <br />Account</h1>
+                <h1 className='text-6xl font-semibold'>{t('RegisterPage.create.0')}<br />{t('RegisterPage.create.1')}</h1>
             </div>
 
             <div className='h-[50%] flex w-full items-center justify-center'>
@@ -113,7 +116,7 @@ export default function RegisterStep1() {
                             onChange={() => setIsChecked(!isChecked)}
                         />
                         <label htmlFor="terms" className="ml-2 text-lg text-gray-500">
-                            By continuing you accept our <a href="#" className="text-indigo-600 underline">Privacy Policy</a>
+                            {t('RegisterPage.policy.0')} <a href="#" className="text-indigo-600 underline">{t('RegisterPage.policy.1')}</a>
                         </label>
                     </div>
                     <ButtonWithSpinner
@@ -123,13 +126,13 @@ export default function RegisterStep1() {
 						className={`w-full bg-black text-white py-4 rounded-full text-1xl font-semibold hover:bg-gray-800 transition duration-200 mt-4 ${!isChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={!isChecked}
 					>
-						Next
+						{t('RegisterPage.nextbtn')}
 					</ButtonWithSpinner>
                 </form>
             </div>
 
             <div className="h-[15%] flex flex-col justify-start text-center">
-                <p className="text-gray-500 mb-10">Or sign up with</p>
+                <p className="text-gray-500 mb-10">{t('RegisterPage.signuptxt')}</p>
                 <div className="flex flex-row justify-evenly space-x-8">
                     {[FaApple, FaFacebook, FaGoogle].map((Icon, idx) => (
                         <button key={idx} className="text-5xl">
@@ -141,7 +144,7 @@ export default function RegisterStep1() {
 
             <div className="h-[5%] text-center content-center">
                 <p className="text-gray-500">
-                    Do you have an account? <a href="/login" className="text-indigo-600 underline">Sign In</a>
+                {t('RegisterPage.signupquestion')} <a href="/login" className="text-indigo-600 underline">{t('RegisterPage.signin')}</a>
                 </p>
             </div>
         </div>

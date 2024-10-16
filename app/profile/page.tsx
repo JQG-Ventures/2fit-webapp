@@ -14,6 +14,7 @@ import LoadingScreen from '../_components/animations/LoadingScreen';
 import SettingItem from '../_components/others/SettingItem';
 import { CiUser, CiBellOn, CiLock, CiCircleQuestion } from 'react-icons/ci';
 import { IconType } from 'react-icons';
+import { useSession } from 'next-auth/react';
 
 interface Setting {
 	label: string;
@@ -24,10 +25,12 @@ interface Setting {
 
 const ProfilePage: React.FC = () => {
 	const router = useRouter();
+	const { data: session, status } = useSession();
 	const [userData, setUserData] = useState<UserProfile | undefined>(undefined);
 	const [errorMessage, setErrorMessage] = useState<React.ReactNode | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
+	const [userId, setUserId] = useState<string>('');
 
 	const settings: Setting[] = [
 		{ label: 'Edit Profile', icon: CiUser, path: '/profile/edit' },
@@ -45,9 +48,20 @@ const ProfilePage: React.FC = () => {
 	};
 
 	useEffect(() => {
+		if (status === 'authenticated' && session?.user?.userId) {
+			setUserId(session.user.userId);
+		} else if (status === 'unauthenticated') {
+			router.back();
+		}
+	}, [session, status, router]);
+
+	useEffect(() => {
 		const loadUserData = async () => {
+			if (!userId) return;
+
+			setLoading(true); // Set loading to true when fetching starts
 			try {
-				const data = await fetchUserData('user_50662633238');
+				const data = await fetchUserData(userId);
 				setUserData(data);
 			} catch (error) {
 				setErrorMessage(
@@ -57,12 +71,12 @@ const ProfilePage: React.FC = () => {
 					</>
 				);
 			} finally {
-				setLoading(false);
+				setLoading(false); // Set loading to false after fetching completes
 			}
 		};
 
 		loadUserData();
-	}, []);
+	}, [userId]); // Only run when userId changes
 
 	const handleCloseModal = () => {
 		setErrorMessage(null);
