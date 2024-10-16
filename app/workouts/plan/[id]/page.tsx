@@ -9,13 +9,27 @@ import WorkoutFooter from '../../../_components/workouts/WorkoutFooterStart';
 import ExerciseList from '../../../_components/workouts/WorkoutList';
 import LoadingScreen from '../../../_components/animations/LoadingScreen';
 import SavedMessage from '../../../_components/others/SavedMessage';
+import { useTranslation } from 'react-i18next';
+import { useSession } from 'next-auth/react';
+
 
 const WorkoutPlanPage = () => {
     const router = useRouter();
     const { id } = useParams();
+    const { t } = useTranslation('global');
     const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [savedMessage, setSavedMessage] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string>('');
+    const { data: session, status } = useSession();
+
+    useEffect(() => {
+		if (status === 'authenticated' && session?.user?.userId) {
+			setUserId(session.user.userId);
+		} else if (status === 'unauthenticated') {
+			router.back();
+		}
+	}, [session, status, router]);
 
     useEffect(() => {
         if (!id) return;
@@ -23,7 +37,7 @@ const WorkoutPlanPage = () => {
         const getWorkout = async () => {
             try {
                 setLoading(true);
-                const data = await getWorkoutPlanById(id as string);
+                const data = await getWorkoutPlanById(id as string, session?.user?.token);
                 setWorkoutPlan(data.message);
             } finally {
                 setLoading(false);
@@ -33,14 +47,14 @@ const WorkoutPlanPage = () => {
     }, [id]);
 
     const handleSaveClick = async (id: string) => {
-        const result = await saveWorkout("user_50662633238", id);
+        const result = await saveWorkout(userId, id, session?.user?.token);
 
         if (result.status === 400) {
-            setSavedMessage('Workout already saved!');
+            setSavedMessage(t("workouts.plan.workoutAlreadySaved"));
         } else if (result.status === 200) {
-            setSavedMessage("Workout saved!");
+            setSavedMessage(t("workouts.plan.workoutSaved"));
         } else {
-            setSavedMessage('There was an error saving the workout, try again.');
+            setSavedMessage(t("workouts.plan.savingError"));
         }
         setTimeout(() => setSavedMessage(null), 2000);
     };

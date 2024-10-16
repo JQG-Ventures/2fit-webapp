@@ -5,6 +5,8 @@ import { useRouter, useParams } from 'next/navigation';
 import { getWorkoutPlanById } from '../../../../_services/workoutService';
 import ExerciseView from '../../../../_components/workouts/ExerciseView';
 import RestView from '../../../../_components/workouts/RestView';
+import { useSession } from 'next-auth/react';
+
 
 const ExercisePage = () => {
     const router = useRouter();
@@ -14,13 +16,23 @@ const ExercisePage = () => {
     const [isRest, setIsRest] = useState(false);
     const [remainingRestTime, setRemainingRestTime] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [userId, setUserId] = useState<string>('');
+    const { data: session, status } = useSession();
+
+    useEffect(() => {
+		if (status === 'authenticated' && session?.user?.userId) {
+			setUserId(session.user.userId);
+		} else if (status === 'unauthenticated') {
+			router.back();
+		}
+	}, [session, status, router]);
 
     useEffect(() => {
         if (!id) return;
 
         const getWorkout = async () => {
             try {
-                const data = await getWorkoutPlanById(id as string);
+                const data = await getWorkoutPlanById(id as string, session?.user?.token);
                 setExercises(data.message.exercises);
             } catch (error) {
                 console.error(error);

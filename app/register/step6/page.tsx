@@ -32,8 +32,8 @@ export default function RegisterStep6() {
         <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
             <div className='h-[20%] w-full lg:max-w-3xl'>
                 <RegistrationHeader
-                    title={t('RegisterPagestep5.title')}
-                    description={t('RegisterPagestep5.description')}
+                    title={t('RegisterPagestep6.title')}
+                    description={t('RegisterPagestep6.description')}
                 />
             </div>
             

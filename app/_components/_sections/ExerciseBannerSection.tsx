@@ -1,20 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiFillHeart, AiOutlineReload } from 'react-icons/ai';
 import { saveWorkout } from '../../_services/workoutService';
 import SavedMessage from '../others/SavedMessage';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 
 const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutine, exercises, savedWorkoutPlans }) => {
     const { t } = useTranslation('global');
-    const userId = "user_50662633238"; // TODO: REMOVE THIS
     const [savedMessage, setSavedMessage] = useState<string | null>(null);
     const [savedExerciseIds, setSavedExerciseIds] = useState<string[]>(
         savedWorkoutPlans.map(workout => workout._id)
     );
+    const [userId, setUserId] = useState<string>('');
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    useEffect(() => {
+		if (status === 'authenticated' && session?.user?.userId) {
+			setUserId(session.user.userId);
+		} else if (status === 'unauthenticated') {
+			router.back();
+		}
+	}, [session, status, router]);
 
     const handleSaveClick = async (id: string, name: string) => {
-        const result = await saveWorkout(userId, id);
+        const result = await saveWorkout(userId, id, session?.user?.token);
 
         if (result.status === 400) {
             setSavedMessage('Workout already saved!');

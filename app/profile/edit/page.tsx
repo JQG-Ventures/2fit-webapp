@@ -87,7 +87,7 @@ const EditProfile: React.FC = () => {
 		const loadUserProfile = async () => {
 			if (!userId) return;
 			try {
-				const data = await fetchUserData(userId);
+				const data = await fetchUserData(userId, session?.user?.token);
 				setProfileData({
 					_id: data._id,
 					name: data.name,
@@ -163,7 +163,7 @@ const EditProfile: React.FC = () => {
 				'profile.gender': profileData?.profile?.gender,
 				number: `${countryCode}${phoneNumber}`.replace("+", ""),
 			};
-			await UpdateUserProfile(userId, updatedProfile);
+			await UpdateUserProfile(userId, updatedProfile, session?.user?.token);
 			setSuccessMessage("Profile updated successfully.");
 		} catch {
 			setErrorMessage(

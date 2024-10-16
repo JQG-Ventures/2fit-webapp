@@ -26,7 +26,7 @@ const HomePage: React.FC = () => {
     const [user, setUser] = useState<User>({ userId: '', userName: 'Loading', hasRoutine: false });
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const [navbarHeight, setNavbarHeight] = useState<number>(100); // State for navbar height
+    const [navbarHeight, setNavbarHeight] = useState<number>(100);
     const { t } = useTranslation('global');
 
     useEffect(() => {
@@ -76,10 +76,10 @@ const HomePage: React.FC = () => {
             try {
                 setLoading(true);
                 const [workoutPlansData, savedWorkoutsData, libraryWorkoutsData, guidedWorkoutsData] = await Promise.all([
-                    getWorkoutPlans(),
-                    getSavedWorkoutPlansByUser(user.userId), 
-                    getLibraryWorkoutCount(),
-                    getGuidedWorkouts()
+                    getWorkoutPlans(session?.user?.token),
+                    getSavedWorkoutPlansByUser(user.userId, session?.user?.token), 
+                    getLibraryWorkoutCount(session?.user?.token),
+                    getGuidedWorkouts(session?.user?.token)
                 ]);
 
                 setWorkoutPlans(workoutPlansData.message || []);

@@ -22,7 +22,7 @@ const Chat: React.FC = () => {
         const fetchConversation = async () => {
             if (session?.user?.userId) {
                 try {
-                    const messages = await fetchUserConversation(session.user.userId);
+                    const messages = await fetchUserConversation(session.user.userId, session?.user?.token);
                     setConversationData({ message: messages });
                     setIsPremium(true);
                 } catch (error) {

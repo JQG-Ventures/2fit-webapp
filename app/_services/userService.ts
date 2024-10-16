@@ -8,9 +8,15 @@ export interface UserProfile {
 	gender: string;
 }
 
-export const fetchUserData = async (userId: string) => {
+export const fetchUserData = async (userId: string, token: string) => {
 	try {
-		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}`);
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+			}
+		});
 		if (!res.ok) {
 			throw new Error('Error fetching user profile');
 		}
@@ -56,12 +62,13 @@ export const fetchUserDataByEmail = async (email: string) => {
 	}
 };
 
-export const UpdateUserProfile = async (userId: string, data: object) => {
+export const UpdateUserProfile = async (userId: string, data: object, token: string) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
 			body: JSON.stringify(data)
         });
@@ -85,14 +92,19 @@ export const normalizeGender = (value: string): string => {
 	return genderMap[value] || 'otro';
 };
 
-
 export const getGenderValue = (gender: string): string => {
 	return gender === 'masculino' ? 'Male' : gender === 'femenino' ? 'Female' : 'Other';
 };
 
-export const fetchUserConversation = async (userId: string) => {
+export const fetchUserConversation = async (userId: string, token: string) => {
 	try {
-		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/conversation/${userId}`);
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/conversation/${userId}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+			}
+		});
 
 		if (!res.ok) {
 			if (res.status == 404) {
