@@ -42,11 +42,11 @@ export default function RegisterStep1() {
         const validationErrors: Record<string, string> = {};
 
         if (!formData.email || !validateEmail(formData.email)) {
-            validationErrors.email = 'Please enter a valid email address.';
+            validationErrors.email = t('RegisterPage.emailValidationError');
         }
 
         if (!formData.password || !validatePassword(formData.password)) {
-            validationErrors.password = 'Password must contain uppercase, lowercase, number, special character, and be at least 8 characters long without spaces.';
+            validationErrors.password = t('RegisterPage.passwordValidationError');
         }
 
         if (Object.keys(validationErrors).length > 0) {
@@ -58,12 +58,12 @@ export default function RegisterStep1() {
         try {
             const existingUser = await fetchUserDataByEmail(formData.email);
             if (existingUser) {
-                setErrors({ email: 'This email is already registered. Please use a different email.' });
+                setErrors({ email: t('RegisterPage.emailRegisteredError') });
                 setIsSubmitting(false);
                 return;
             }
         } catch (error) {
-            setErrors({ email: 'There was an error checking the email. Please try again later.' });
+            setErrors({ email: t('RegisterPage.emailRegistrationError') });
             setIsSubmitting(false);
             return;
         }

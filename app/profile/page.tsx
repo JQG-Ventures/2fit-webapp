@@ -59,9 +59,9 @@ const ProfilePage: React.FC = () => {
 		const loadUserData = async () => {
 			if (!userId) return;
 
-			setLoading(true); // Set loading to true when fetching starts
+			setLoading(true);
 			try {
-				const data = await fetchUserData(userId);
+				const data = await fetchUserData(userId, session?.user?.token);
 				setUserData(data);
 			} catch (error) {
 				setErrorMessage(
@@ -71,7 +71,7 @@ const ProfilePage: React.FC = () => {
 					</>
 				);
 			} finally {
-				setLoading(false); // Set loading to false after fetching completes
+				setLoading(false);
 			}
 		};
 

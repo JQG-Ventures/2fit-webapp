@@ -1,9 +1,10 @@
-export const getSavedWorkoutPlansByUser = async (userId: String) => {
+export const getSavedWorkoutPlansByUser = async (userId: string, token: string) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/saved/${userId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
         });
 
@@ -17,12 +18,13 @@ export const getSavedWorkoutPlansByUser = async (userId: String) => {
     }
 };
 
-export const saveWorkout = async (userId: string, workoutId: string) => {
+export const saveWorkout = async (userId: string, workoutId: string, token: string) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/saved/${userId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({ "workouts": [workoutId] })
         });
@@ -33,12 +35,13 @@ export const saveWorkout = async (userId: string, workoutId: string) => {
     }
 };
 
-export const deleteUserSavedWorkout = async (userId: string, workoutId: string) => {
+export const deleteUserSavedWorkout = async (userId: string, workoutId: string, token: string) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/saved/${userId}/${workoutId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
         });
 
@@ -53,12 +56,13 @@ export const deleteUserSavedWorkout = async (userId: string, workoutId: string) 
     }
 };
 
-export const getGuidedWorkouts = async () => {
+export const getGuidedWorkouts = async (token: string) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/guided`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
         });
 
@@ -72,12 +76,13 @@ export const getGuidedWorkouts = async () => {
     }
 };
 
-export const getWorkoutPlans = async () => {
+export const getWorkoutPlans = async (token: string) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
         });
 
@@ -91,12 +96,13 @@ export const getWorkoutPlans = async () => {
     }
 };
 
-export const getLibraryWorkoutCount = async () => {
+export const getLibraryWorkoutCount = async (token: string) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/library`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
         });
 
@@ -110,12 +116,13 @@ export const getLibraryWorkoutCount = async () => {
     }
 };
 
-export const getWorkoutPlanById = async (planId: string) => {
+export const getWorkoutPlanById = async (planId: string, token: string) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans/${planId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
         });
 

@@ -94,8 +94,8 @@ export default function RegisterStep9() {
                 handlePrev={handlePrevStep}
                 isSubmittingNext={isSubmittingNext}
                 isSubmittingPrev={isSubmittingPrev}
-                prevText={t('RegisterPagestep9.back')}
-                nextText={t('RegisterPagestep9.next')}
+                prevText={t('RegisterPage.back')}
+                nextText={t('RegisterPage.next')}
                 isNextDisabled={selectedActivities.length === 0 || selectedActivities === undefined}
             />
         </div>

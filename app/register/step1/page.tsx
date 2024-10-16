@@ -15,6 +15,7 @@ import { calculateAge } from '@/app/utils/formUtils';
 import { fetchUserDataByNumber } from '@/app/_services/userService';
 import { useTranslation } from 'react-i18next';
 
+
 interface FormData {
     number: string;
     name: string;
@@ -48,7 +49,6 @@ export default function RegisterStep1() {
         { name: 'name', label: 'Name', placeholder: t('RegisterPagestep1.name') },
         { name: 'last', label: 'Last', placeholder: t('RegisterPagestep1.last') },
         { name: 'birthdate', label: 'Birthdate', placeholder: 'mm/dd/yyyy', type: 'date' }
-        { name: 'number', label: 'Phone', placeholder: t('RegisterPagestep1.phone') }
     ];
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -70,13 +70,13 @@ export default function RegisterStep1() {
         const validationErrors: ValidationErrors = {};
 
         if (!formData.name) {
-            validationErrors.name = 'Please fill out this field.';
+            validationErrors.name = t("RegisterPagestep1.nameValidationFill");
         }
         if (!formData.last) {
-            validationErrors.last = 'Please fill out this field.';
+            validationErrors.last = t("RegisterPagestep1.nameValidationFill");
         }
         if (!phoneNumber || !validatePhone(phoneNumber)) {
-            validationErrors.number = 'Please enter a valid phone number.';
+            validationErrors.number = t("RegisterPagestep1.phoneValidationFill");
         }
 
         setErrors(validationErrors);
@@ -89,12 +89,12 @@ export default function RegisterStep1() {
             try {
                 const existingUser = await fetchUserDataByNumber(formattedPhoneNumber);
                 if (existingUser) {
-                    setErrors({ number: 'Number is already registered. Please use a different one.' });
+                    setErrors({ number: t("RegisterPagestep1.numberRegisteredError") });
                     setIsSubmitting(false);
                     return;
                 }
             } catch (error) {
-                setErrors({ number: 'There was an error checking the number. Please try again later.' });
+                setErrors({ number: t("RegisterPagestep1.numberServerError") });
                 setIsSubmitting(false);
                 return;
             }

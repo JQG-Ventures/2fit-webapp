@@ -3,9 +3,18 @@
 import React from 'react';
 import ButtonWithSpinner from '../../_components/others/ButtonWithSpinner';
 
-export default function RegistrationButtons({ handleNext, handlePrev, isSubmittingNext, isSubmittingPrev, prevText, nextText, isNextDisabled }) {
+
+export default function RegistrationButtons({
+    handleNext,
+    handlePrev,
+    isSubmittingNext,
+    isSubmittingPrev,
+    prevText,
+    nextText,
+    isNextDisabled
+}: RegistrationButtonsProps) {
     return (
-        <div className="flex flex-row items-center space-x-4 justify-between">
+        <div className="flex flex-row items-center space-x-4 justify-between w-full max-w-3xl">
             <ButtonWithSpinner
                 type="button"
                 onClick={handlePrev}

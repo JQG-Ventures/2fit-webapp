@@ -23,6 +23,8 @@ export const authConfig: NextAuthConfig = {
                         }),
                     });
                     const user = await res.json();
+                    console.log("Logged in")
+                    console.log(user);
 
                     if (res.ok && user?.response?.access_token) {
                         return {

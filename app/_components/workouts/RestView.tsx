@@ -1,5 +1,6 @@
 import { IoChevronBack } from "react-icons/io5";
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 
 interface RestViewProps {
@@ -11,6 +12,7 @@ interface RestViewProps {
 
 const RestView: React.FC<RestViewProps> = ({ restDuration, onNext, onBack, nextExercise }) => {
     const [remainingTime, setRemainingTime] = useState(restDuration);
+    const { t } = useTranslation('global');
     
     useEffect(() => {
         setRemainingTime(restDuration);
@@ -41,7 +43,7 @@ const RestView: React.FC<RestViewProps> = ({ restDuration, onNext, onBack, nextE
                 </button>
             </div>
             <div className="h-[15%] flex flex-col justify-evenly">
-                <h2 className="text-center text-5xl font-semibold bg-gradient-to-r from-green-400 to-green-600 text-transparent bg-clip-text">TAKE A REST</h2>
+                <h2 className="text-center text-5xl font-semibold bg-gradient-to-r from-green-400 to-green-600 text-transparent bg-clip-text">{t("workouts.plan.takeRest")}</h2>
                 <h2 className="text-center text-5xl font-semibold">{formatTime(remainingTime)}</h2>
             </div>
 
@@ -51,7 +53,7 @@ const RestView: React.FC<RestViewProps> = ({ restDuration, onNext, onBack, nextE
                 {nextExercise && (
                     <>
                         <div className="text-left w-full">
-                            <h3 className="text-2xl">Next Exercise:</h3>
+                            <h3 className="text-2xl">{t("workouts.plan.nextExercise")}</h3>
                             <p className="text-3xl font-semibold my-8">{nextExercise.name}</p>
                         </div>
                         <div className="overflow-hidden">
@@ -68,7 +70,7 @@ const RestView: React.FC<RestViewProps> = ({ restDuration, onNext, onBack, nextE
                     onClick={onNext}
                     className="bg-gradient-to-r from-emerald-400 to-emerald-600 w-full text-white py-6 rounded-full text-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out"
                 >
-                    Skip Rest
+                    {t("workouts.plan.skipRest")}
                 </button>
             </div>
         </div>
