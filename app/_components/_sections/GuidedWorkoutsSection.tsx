@@ -2,10 +2,12 @@
 
 import React, { useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 const GuidedWorkoutsSection = ({ workouts }: { workouts: any[] }) => {
     const sliderRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
+    const { t } = useTranslation('global');
 
     useEffect(() => {
         const slider = sliderRef.current;
@@ -33,19 +35,19 @@ const GuidedWorkoutsSection = ({ workouts }: { workouts: any[] }) => {
         <div className="guided-workouts-section pt-6 px-4 md:px-12 lg:px-20">
             <div className="flex justify-between items-center">
                 <div className='ml-2 flex-1'>
-                    <h2 className="text-2xl mb-2 font-bold lg:text-3xl">Guided Workouts</h2>
-                    <p className="text-lg text-gray-600 mb-6 lg:text-xl">Choose your favorite workout from guided plans.</p>
+                    <h2 className="text-2xl mb-2 font-bold lg:text-3xl">{t('home.GuidedWorkoutsSection.guidedworkoutstitle')}</h2>
+                    <p className="text-lg text-gray-600 mb-6 lg:text-xl">{t('home.GuidedWorkoutsSection.guidedworkoutsdescription')}</p>
                 </div>
                 <div className='flex-none'>
                     <button onClick={handleViewAll} className="text-blue-600 hover:underline lg:text-lg">
-                        View All
+                    {t('home.GuidedWorkoutsSection.viewall')}
                     </button>
                 </div>
             </div>
 
             {workouts.length === 0 ? (
                 <div className="flex justify-center items-center h-48 bg-gray-100 rounded-lg">
-                    <p className="text-gray-500 text-lg lg:text-xl">No workouts available at the moment. Please check back later!</p>
+                    <p className="text-gray-500 text-lg lg:text-xl">{t('home.GuidedWorkoutsSection.noworkoutmessage')}</p>
                 </div>
             ) : (
                 <div
