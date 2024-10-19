@@ -7,11 +7,13 @@ import Modal from '../modals/ViewModal';
 import { FaArrowLeft, FaUserAlt, FaClock, FaDumbbell } from 'react-icons/fa';
 import useIsMobile from '../../_hooks/useIsMobile';
 import WorkoutFooter from '../../_components/workouts/WorkoutFooterStart';
+import { useTranslation } from 'react-i18next';
 
 
-const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan }) => {
+const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan}> = ({ workoutPlan }) => {
     const exercises = workoutPlan.exercises || [];
     const isMobile = useIsMobile();
+    const { t } = useTranslation('global');
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -47,11 +49,11 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
             <div className="w-full border-t border-gray-300 mx-auto my-10"></div>
 
             <div className='flex flex-row justify-between w-full px-2'>
-                <h2 className="text-black text-3xl font-semibold">Workout Activity</h2>
+                <h2 className="text-black text-3xl font-semibold">{t("workouts.plan.workoutActivity")}</h2>
                 <button 
                     className='text-emerald-600 text-md hover:text-emerald-800'
                     onClick={handleSeeAllClick}>
-                    See All
+                    {t("workouts.plan.seeAll")}
                 </button>
             </div>
 
@@ -61,7 +63,7 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
                         <button onClick={closeFullScreen} className="text-3xl">
                             <FaArrowLeft />
                         </button>
-                        <h2 className="text-4xl font-semibold ml-8">Workout Activity</h2>
+                        <h2 className="text-4xl font-semibold ml-8">{t("workouts.plan.workoutActivity")}</h2>
                     </div>
                     <div className="no-scrollbar overflow-y-auto flex-grow">
                         <ExerciseList exercises={exercises} isMobile={true} />
@@ -73,7 +75,7 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
             )}
 
             {!isMobile && (
-                <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={"Workout Activity"}>
+                <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={t("workouts.plan.workoutActivity")}>
                     <ExerciseList exercises={exercises} isMobile={false} />
                 </Modal>
             )}

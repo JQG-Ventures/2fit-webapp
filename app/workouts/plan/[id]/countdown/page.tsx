@@ -4,6 +4,7 @@ import CountdownTimer from "../../../../_components/animations/CountdownTimer";
 import { useRouter, useParams } from 'next/navigation';
 import { useState } from 'react';
 import { IoChevronBack } from "react-icons/io5";
+import { useTranslation } from 'react-i18next';
 
 
 const CountdownPage = () => {
@@ -11,6 +12,7 @@ const CountdownPage = () => {
     const totalTime = 7;
     const router = useRouter();
     const [resetTrigger, setResetTrigger] = useState(0);
+    const { t } = useTranslation('global');
 
     const handlePrevStep = () => router.back(); 
     const handleComplete = () => router.push(`/workouts/plan/${id}/exercise`); 
@@ -26,14 +28,14 @@ const CountdownPage = () => {
                 </button>
             </div>
             <div className="h-[60%] flex w-full items-center justify-center">
-                <CountdownTimer title="Get Ready!" duration={totalTime} resetTrigger={resetTrigger} size={240} strockWidth={28} onComplete={handleComplete} />
+                <CountdownTimer title={t("workouts.plan.getReady")} duration={totalTime} resetTrigger={resetTrigger} size={240} strockWidth={28} onComplete={handleComplete} />
             </div>
             <div className="h-[25%] flex w-full items-center justify-center">
                 <button
                     onClick={handleReset}
                     className="bg-gradient-to-r from-emerald-400 to-emerald-600 w-[90%] text-white px-6 py-8 rounded-full text-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out"
                 >
-                    Start Over
+                    {t("workouts.plan.startOver")}
                 </button>
             </div>
         </div>
