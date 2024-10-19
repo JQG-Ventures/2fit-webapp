@@ -4,16 +4,18 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import RegistrationHeader from '../../_components/header/registrationHeader';
+import { useTranslation } from 'react-i18next';
 
 export default function RegisterStep5() {
+    const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
     const [unit, setUnit] = useState('cm');
     const [height, setHeight] = useState(data.height || 175);
     const router = useRouter();
 
     const units = [
-        { id: 'cm', label: 'Centimetre' },
-        { id: 'ft', label: 'Feet' },
+        { id: 'cm', label: t('RegisterPagestep5.centimetre') },
+        { id: 'ft', label: t('RegisterPagestep5.feet') },
     ];
 
     const toggleUnit = (selectedUnit: string) => {
@@ -44,7 +46,7 @@ export default function RegisterStep5() {
             </div>
 
             <div className="h-[85%] content-center w-full lg:max-w-3xl">
-                <h2 className="text-4xl font-bold text-center mb-20">Select Height</h2>
+                <h2 className="text-4xl font-bold text-center mb-20">{t('RegisterPagestep5.Height')}</h2>
                 <div className="w-full px-8">
                     <div className="flex items-center bg-gray-100 rounded-full p-1 w-full max-w-xs mb-8 mx-auto justify-center">
                         {units.map(({ id, label }) => (
@@ -71,7 +73,7 @@ export default function RegisterStep5() {
                             onClick={handleNextStep}
                             className="w-full max-w-xs sm:max-w-md py-3 bg-black text-white rounded-md font-semibold mt-10 flex justify-center items-center"
                         >
-                            Next
+                            {t('RegisterPagestep5.nextbtn')}
                         </button>
                     </div>
                 </div>

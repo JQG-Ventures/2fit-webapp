@@ -4,19 +4,21 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import RegistrationHeader from '../../_components/header/registrationHeader';
+import { useTranslation } from 'react-i18next';
 
 export default function RegisterStep9() {
+    const { t } = useTranslation('global');
     const [selectedActivities, setSelectedActivities] = useState<number[]>([]);
     const router = useRouter();
     const { data, updateData } = useRegister();
     console.log(data);
 
     const activities = [
-        { id: 1, label: 'Stretch', icon: '🧘' },
-        { id: 2, label: 'Cardio', icon: '🏃' },
-        { id: 3, label: 'Yoga', icon: '🧘' },
-        { id: 4, label: 'Power training', icon: '🏋️' },
-        { id: 5, label: 'Dancing', icon: '💃' },
+        { id: 1, label: t('RegisterPagestep9.stretch'), icon: '🧘' },
+        { id: 2, label: t('RegisterPagestep9.cardio'), icon: '🏃' },
+        { id: 3, label: t('RegisterPagestep9.yoga'), icon: '🧘' },
+        { id: 4, label: t('RegisterPagestep9.powertraining'), icon: '🏋️' },
+        { id: 5, label: t('RegisterPagestep9.dancing'), icon: '💃' },
     ];
 
     const handleActivitySelection = (id: number) => {
@@ -43,7 +45,7 @@ export default function RegisterStep9() {
             </div>
             
             <div className="h-[85%] content-center w-full lg:max-w-3xl">
-            <h2 className="text-5xl font-bold text-center mb-20">Choose activities <br/>that you prefer</h2>
+            <h2 className="text-5xl font-bold text-center mb-20">{t('RegisterPagestep9.activities.0')} <br/>{t('RegisterPagestep9.activities.1')}</h2>
                 <div className="w-full px-8 py">
                     {activities.map((activity) => (
                         <button
@@ -65,7 +67,7 @@ export default function RegisterStep9() {
                         onClick={handleNextStep}
                         className="w-full py-3 bg-black text-white rounded-md font-semibold  my-6 p-6"
                     >
-                        Next
+                        {t('RegisterPagestep9.next')}
                     </button>
                 </div>
             </div>

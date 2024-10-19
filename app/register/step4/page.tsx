@@ -4,18 +4,19 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import RegistrationHeader from '../../_components/header/registrationHeader';
-
+import { useTranslation } from 'react-i18next';
 
 export default function RegisterStep4() {
+    const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
     const [selectedGoal, setSelectedGoal] = useState(data.fitness_goal);
     const router = useRouter();
 
     const goals = [
-        { id: 1, label: 'Lose Weight', icon: '⚖️' },
-        { id: 2, label: 'Keep Fit', icon: '🍀' },
-        { id: 3, label: 'Get Stronger', icon: '💪🏻' },
-        { id: 4, label: 'Gain Muscle Mass', icon: '🚀' },
+        { id: 1, label: t('RegisterPagestep4.weight'), icon: '⚖️' },
+        { id: 2, label: t('RegisterPagestep4.fit'), icon: '🍀' },
+        { id: 3, label: t('RegisterPagestep4.stronger'), icon: '💪🏻' },
+        { id: 4, label: t('RegisterPagestep4.muscle'), icon: '🚀' },
     ];
 
     const handleGoalSelection = (goal: number) => {
@@ -37,7 +38,7 @@ export default function RegisterStep4() {
             </div>
 
             <div className="h-[85%] content-center w-full lg:max-w-3xl">
-                <h2 className="text-4xl font-bold text-center mb-20">Choose main goal</h2>
+                <h2 className="text-4xl font-bold text-center mb-20">{t('RegisterPagestep4.goal')}</h2>
                 <div className="space-y-6 w-full px-8">
                     {goals.map((goal) => (
                         <button
