@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { getWorkoutPlanById } from '../../../../_services/workoutService';
 import ExerciseView from '../../../../_components/workouts/ExerciseView';
 import RestView from '../../../../_components/workouts/RestView';
-import { useSession } from 'next-auth/react';
-
+import LoadingScreen from '../../../../_components/animations/LoadingScreen';
+import Modal from '../../../../_components/profile/modal';
+import { useFetch } from '../../../../_hooks/useFetch';
 
 const ExercisePage = () => {
     const router = useRouter();
@@ -16,30 +16,17 @@ const ExercisePage = () => {
     const [isRest, setIsRest] = useState(false);
     const [remainingRestTime, setRemainingRestTime] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [userId, setUserId] = useState<string>('');
-    const { data: session, status } = useSession();
+
+    const options = useMemo(() => ({
+		method: 'GET',
+	}), []);
+    const { data: workoutData, loading, error } = useFetch(id ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans/${id}` : '', options);
 
     useEffect(() => {
-		if (status === 'authenticated' && session?.user?.userId) {
-			setUserId(session.user.userId);
-		} else if (status === 'unauthenticated') {
-			router.back();
-		}
-	}, [session, status, router]);
-
-    useEffect(() => {
-        if (!id) return;
-
-        const getWorkout = async () => {
-            try {
-                const data = await getWorkoutPlanById(id as string, session?.user?.token);
-                setExercises(data.message.exercises);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-        getWorkout();
-    }, [id]);
+        if (workoutData) {
+            setExercises(workoutData.exercises);
+        }
+    }, [workoutData]);
 
     const handleNextExercise = () => {
         setIsTransitioning(true);
@@ -80,6 +67,17 @@ const ExercisePage = () => {
 
     const currentExercise = exercises[currentExerciseIndex];
     const nextExercise = exercises[currentExerciseIndex + 1] || null;
+
+    if (loading) return <LoadingScreen />;
+	if (error) {
+		return (
+			<Modal
+				title="Error"
+				message={error}
+				onClose={() => router.push('/home')}
+			/>
+		);
+	}
 
     return (
         <div className={`flex flex-col h-screen bg-white items-center transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>

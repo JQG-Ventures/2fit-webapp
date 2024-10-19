@@ -1,50 +1,39 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft, FaTrash, FaPaperPlane } from 'react-icons/fa';
-import { useSession } from 'next-auth/react';
 import LoadingScreen from '../_components/animations/LoadingScreen';
 import ChatComponent from '../_components/chat/Conversation';
 import LockScreen from '../_components/others/LockScreen';
-import { fetchUserConversation } from '../_services/userService';
+import { useSessionContext } from '../_providers/SessionProvider';
+import { useFetch } from '../_hooks/useFetch';
+import Modal from '../_components/profile/modal';
+
 
 const Chat: React.FC = () => {
-    const [isPremium, setIsPremium] = useState(false);
-    const [conversationData, setConversationData] = useState({ message: [] });
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-
     const router = useRouter();
-    const { data: session } = useSession();
+	const { userId, loading: sessionLoading } = useSessionContext();
+	const options = useMemo(() => ({
+		method: 'GET',
+	}), []);
+    const { data: conversationData, loading, error, statusCode } = useFetch(
+		userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/conversation/${userId}` : '',
+		options
+	);
 
-    useEffect(() => {
-        const fetchConversation = async () => {
-            if (session?.user?.userId) {
-                try {
-                    const messages = await fetchUserConversation(session.user.userId, session?.user?.token);
-                    setConversationData({ message: messages });
-                    setIsPremium(true);
-                } catch (error) {
-                    setError('Failed to load conversation. Please try again later.');
-                } finally {
-                    setLoading(false);
-                }
-            }
-        };
-
-        fetchConversation();
-    }, [session]);
+    const [isPremium, setIsPremium] = useState(true);
 
     if (loading) return <LoadingScreen />;
-
     if (error) {
-        return (
-            <div className="flex flex-col justify-center items-center h-screen bg-[#1A1A1A] text-white">
-                <p>{error}</p>
-            </div>
-        );
-    }
+		return (
+			<Modal
+				title="Error"
+				message={error}
+				onClose={() => router.push('/home')}
+			/>
+		);
+	}
 
     return (
         <div className="flex flex-col justify-between items-center bg-[#1A1A1A] h-screen p-14 lg:pt-[10vh] relative">

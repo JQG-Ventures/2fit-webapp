@@ -27,7 +27,6 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
 
     const handleSaveClick = async (id: string, name: string) => {
         const result = await saveWorkout(userId, id, session?.user?.token);
-
         if (result.status === 400) {
             setSavedMessage('Workout already saved!');
         } else if (result.status === 200) {
@@ -36,7 +35,7 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
         } else {
             setSavedMessage('There was an error saving the workout, try again.');
         }
-        setTimeout(() => setSavedMessage(null), 2000);
+        setTimeout(() => setSavedMessage(null), 550000);
     };
 
     return (
@@ -52,7 +51,7 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
                             key={index}
                             exercise={exercise}
                             onSaveClick={handleSaveClick}
-                            isSaved={savedExerciseIds.includes(exercise._id)} // Check if the exercise is already saved
+                            isSaved={savedExerciseIds.includes(exercise._id)}
                         />
                     ))}
                 </div>
@@ -82,13 +81,23 @@ const ExerciseCard: React.FC<{ exercise: WorkoutPlan, onSaveClick: (id: string, 
                 </p>
                 <div className="flex space-x-4">
                     <button
-                        onClick={() => onSaveClick(exercise._id, exercise.name)}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onSaveClick(exercise._id, exercise.name);
+                        }}
                         className={`p-2 ${isSaved ? 'bg-red-500' : 'bg-gray-700'} rounded-full transition-transform transform hover:scale-110 active:scale-90`}
                         disabled={isSaved}
                     >
                         <AiFillHeart size={24} />
                     </button>
-                    <button className="p-2 bg-green-500 rounded-full">
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}
+                        className="p-2 bg-green-500 rounded-full"
+                    >
                         <AiOutlineReload size={24} />
                     </button>
                 </div>
@@ -96,5 +105,4 @@ const ExerciseCard: React.FC<{ exercise: WorkoutPlan, onSaveClick: (id: string, 
         </div>
     </a>
 );
-
 export default ExerciseBannerSection;

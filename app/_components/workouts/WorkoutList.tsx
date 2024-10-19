@@ -9,8 +9,8 @@ const ExerciseList: React.FC<{ exercises: Exercise[], isMobile: boolean }> = ({ 
     return (    
         <div className={isMobile ? 'pb-[13vh]' : ''}>
             <div className="no-scrollbar p-8 lg:max-w-screen-lg mx-auto">
-                {exercises.map((exercise) => (
-                    <div key={exercise._id} className="flex items-center justify-between my-5 bg-white rounded-3xl shadow-lg h-[13vh]">
+                {exercises.map((exercise, index) => (
+                    <div key={index} className="flex items-center justify-between my-5 bg-white rounded-3xl shadow-lg h-[13vh]">
                         <div className="w-[30%] h-full overflow-hidden rounded-tl-lg rounded-bl-lg">
                             <img
                                 src={exercise.image_url}
