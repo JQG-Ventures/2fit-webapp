@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { deleteUserSavedWorkout } from '../_services/workoutService';
+import React, { useState, useEffect, useMemo } from 'react';
 import GreetingSection from '../_components/_sections/GreetingSection';
 import SearchBar from '../_components/searchbar/SearchBarComponent';
 import ExerciseBannerSection from '../_components/_sections/ExerciseBannerSection';
@@ -11,106 +11,65 @@ import WorkoutLibrarySection from '../_components/_sections/WorkoutLibraryWidget
 import SavedWorkoutsSection from '../_components/_sections/SavedWorkoutsSection';
 import Footer from '../_components/_sections/Footer';
 import LoadingScreen from '../_components/animations/LoadingScreen';
-import { 
-    getSavedWorkoutPlansByUser, 
-    getWorkoutPlans, 
-    getGuidedWorkouts,
-    getLibraryWorkoutCount, 
-    deleteUserSavedWorkout 
-} from '../_services/workoutService';
+import { useSessionContext } from '../_providers/SessionProvider';
+import { useFetch } from '../_hooks/useFetch';
 import { useTranslation } from 'react-i18next';
 
-
 const HomePage: React.FC = () => {
-    const { data: session, status } = useSession();
-    const [user, setUser] = useState<User>({ userId: '', userName: 'Loading', hasRoutine: false });
+    const { userId, token, userName, loading: sessionLoading } = useSessionContext();
+    const [user, setUser] = useState<User>({ userId: '', userName: 'Loading...', hasRoutine: false });
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
     const [navbarHeight, setNavbarHeight] = useState<number>(100);
     const { t } = useTranslation('global');
 
     useEffect(() => {
         const handleResize = () => {
             setIsDesktopOrLaptop(window.innerWidth >= 1224);
-            setIsMobile(window.innerWidth < 1224);
         };
-
         handleResize();
         window.addEventListener('resize', handleResize);
-
+        
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const [workoutPlans, setWorkoutPlans] = useState<WorkoutPlan[]>([]);
-    const [savedWorkoutPlans, setSavedWorkoutPlans] = useState<WorkoutPlan[]>([]);
-    const [libraryWorkouts, setLibraryWorkouts] = useState<any[]>([]);
-    const [guidedWorkouts, setGuidedWorkouts] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
     useEffect(() => {
-        if (status === 'loading') {
-            setUser({ userId: 'gues_id', userName: 'Loading', hasRoutine: false });
-        } else if (status === 'authenticated' && session?.user?.userName && session?.user?.userId) {
-            setUser({ userId: session.user.userId, userName: session.user.userName, hasRoutine: true });
-        } else {
-            setUser({ userId: 'gues_id', userName: 'Guest', hasRoutine: false });
+        if (!sessionLoading) {
+            setUser(userId ? { userId, userName: userName, hasRoutine: true } : { userId: 'guest_id', userName: 'Guest', hasRoutine: false });
         }
-    }, [session, status]);
+    }, [userId, sessionLoading]);
 
-    useEffect(() => {
-        const handleResize = () => {
-            const isDesktop = window.innerWidth >= 1224;
-            setIsDesktopOrLaptop(isDesktop);
-        };
+    const options = useMemo(() => ({
+        method: 'GET',
+    }), []);
+    const workoutPlansUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans`;
+    const savedWorkoutPlansUrl = userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/saved/${userId}` : '';
+    const libraryWorkoutCountUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/library`;
+    const guidedWorkoutsUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/guided`;
 
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            if (user.userName === 'Loading') return;
-
-            try {
-                setLoading(true);
-                const [workoutPlansData, savedWorkoutsData, libraryWorkoutsData, guidedWorkoutsData] = await Promise.all([
-                    getWorkoutPlans(session?.user?.token),
-                    getSavedWorkoutPlansByUser(user.userId, session?.user?.token), 
-                    getLibraryWorkoutCount(session?.user?.token),
-                    getGuidedWorkouts(session?.user?.token)
-                ]);
-
-                setWorkoutPlans(workoutPlansData.message || []);
-                setSavedWorkoutPlans(savedWorkoutsData.message || []);
-                setLibraryWorkouts(libraryWorkoutsData.message || []);
-                setGuidedWorkouts(guidedWorkoutsData.message || []);
-            } catch {
-                setError('Failed to load data');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [user]);
-
-    const renderMessage = (message: string) => (
-        <div className="flex justify-center items-center h-48">
-            <p>{message}</p>
-        </div>
-    );
+    const { data: workoutPlans, loading: loadingWorkoutPlans, error: workoutPlansError } = useFetch(workoutPlansUrl, options);
+    const { data: savedWorkoutPlans, loading: loadingSavedWorkoutPlans, error: savedWorkoutPlansError } = useFetch(savedWorkoutPlansUrl, options);
+    const { data: libraryWorkouts, loading: loadingLibraryWorkouts, error: libraryWorkoutsError } = useFetch(libraryWorkoutCountUrl, options);
+    const { data: guidedWorkouts, loading: loadingGuidedWorkouts, error: guidedWorkoutsError } = useFetch(guidedWorkoutsUrl, options);
+    const loading = loadingWorkoutPlans || loadingSavedWorkoutPlans || loadingLibraryWorkouts || loadingGuidedWorkouts;
+    const error = workoutPlansError || savedWorkoutPlansError || libraryWorkoutsError || guidedWorkoutsError;
 
     const paddingBottom = isDesktopOrLaptop ? 0 : navbarHeight * 1.1;
 
     if (loading) return <LoadingScreen />;
 
+    if (error) {
+        return (
+            <div className="flex justify-center items-center h-48">
+                <p>{error}</p>
+            </div>
+        );
+    }
+
     return (
         <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom }}>
             <div className="flex flex-col lg:flex-row lg:space-x-8">
                 <div className="flex-1">
-                    <GreetingSection userName={user.userName} />
+                    <GreetingSection userName={user?.userName} />
                 </div>
                 {isDesktopOrLaptop && (
                     <div className="flex flex-col flex-1 mt-16 pt-10">
@@ -121,26 +80,20 @@ const HomePage: React.FC = () => {
             </div>
             {!isDesktopOrLaptop && <SearchBar />}
             <div className="space-y-12">
-                {error ? (
-                    renderMessage(error)
-                ) : (
-                    <>
-                        <ExerciseBannerSection 
-                            hasRoutine={user.hasRoutine} 
-                            exercises={workoutPlans} 
-                            savedWorkoutPlans={savedWorkoutPlans} 
-                        />
-                        {!isDesktopOrLaptop && <MotivationSection isBotUser={user.hasRoutine} />}
-                        <GuidedWorkoutsSection workouts={guidedWorkouts} />
-                        <WorkoutLibrarySection workouts={libraryWorkouts} />
-                        <SavedWorkoutsSection
-                            workouts={savedWorkoutPlans}
-                            deleteWorkout={deleteUserSavedWorkout}
-                            emptyMessage={t('home.SavedWorkoutsSection.SavedWorkoutsSectiondescription')}
-                            sectionTitle={t('home.SavedWorkoutsSection.SavedWorkoutsSectiontitle')}
-                        />
-                    </>
-                )}
+                <ExerciseBannerSection 
+                    hasRoutine={user.hasRoutine} 
+                    exercises={workoutPlans || []} 
+                    savedWorkoutPlans={savedWorkoutPlans || []} 
+                />
+                {!isDesktopOrLaptop && <MotivationSection isBotUser={user.hasRoutine} />}
+                <GuidedWorkoutsSection workouts={guidedWorkouts || []} />
+                <WorkoutLibrarySection workouts={libraryWorkouts || []} />
+                <SavedWorkoutsSection
+                    workouts={savedWorkoutPlans || []}
+                    deleteWorkout={deleteUserSavedWorkout}
+                    emptyMessage={t('home.SavedWorkoutsSection.SavedWorkoutsSectiondescription')}
+                    sectionTitle={t('home.SavedWorkoutsSection.SavedWorkoutsSectiontitle')}
+                />
                 {isDesktopOrLaptop && <Footer />}
             </div>
         </div>

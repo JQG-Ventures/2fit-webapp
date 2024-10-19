@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaApple, FaFacebook, FaGoogle } from "react-icons/fa";
 import { IoChevronBack } from "react-icons/io5";
@@ -71,11 +71,12 @@ export default function Login() {
 			redirect: false,
 		});
 
-		if (response?.error) {
+		if (response?.ok) {
+			router.push("/home");
+		}
+		else if (response?.error) {
 			setError(t("LoginPage.credsError"));
 			setIsSubmitting(false);
-		} else if (response?.ok) {
-			router.push("/home");
 		} else {
 			setError(t("LoginPage.unexpectedError"));
 			setIsSubmitting(false);

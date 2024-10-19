@@ -31,7 +31,6 @@ interface ValidationErrors {
 export default function RegisterStep1() {
     const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
-    const [error, setError] = useState('');
     const [countryCode, setCountryCode] = useState<string>(data.countryCode || '');
     const [phoneNumber, setPhoneNumber] = useState<string>(data.number || '');
     const [formData, setFormData] = useState<FormData>({
