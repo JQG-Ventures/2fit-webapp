@@ -5,7 +5,10 @@ import { FaApple, FaFacebook, FaGoogle } from 'react-icons/fa';
 import { IoChevronBack } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../_components/register/RegisterProvider';
+import ButtonWithSpinner from '../_components/others/ButtonWithSpinner';
+import { fetchUserDataByEmail } from '../_services/userService';
 import { useTranslation } from 'react-i18next';
+
 
 export default function RegisterStep1() {
     const { data, updateData } = useRegister();
@@ -14,8 +17,9 @@ export default function RegisterStep1() {
         email: data.email || '',
         password: data.password || '',
     });
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isChecked, setIsChecked] = useState(false);
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const router = useRouter();
 
     const user_data_fields = [
@@ -23,34 +27,49 @@ export default function RegisterStep1() {
         { name: 'password', label: 'Password', placeholder: '******************', type: 'password' }
     ];
 
-    const handleChange = (e: any) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase());
+    const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.toLowerCase());
 
     const validatePassword = (password: string) =>
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s])[A-Za-z\d\W]{8,}$/.test(password);
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s])[^ ]{8,}$/.test(password);
 
-    const validatePhone = (phone: string) => /^\d{8,15}$/.test(phone);
-
-    const handleNextStep = () => {
-        const validationErrors: any = {};
+    const handleSubmit = async () => {
+        setIsSubmitting(true);
+        const validationErrors: Record<string, string> = {};
 
         if (!formData.email || !validateEmail(formData.email)) {
-            validationErrors.email = 'Please enter a valid email address.';
+            validationErrors.email = t('RegisterPage.emailValidationError');
         }
+
         if (!formData.password || !validatePassword(formData.password)) {
-            validationErrors.password = 'Password must contain uppercase, lowercase, number, and special character.';
+            validationErrors.password = t('RegisterPage.passwordValidationError');
         }
 
-        setErrors(validationErrors);
-
-        if (Object.keys(validationErrors).length === 0) {
-            updateData(formData);
-            router.push('/register/step1');
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            setIsSubmitting(false);
+            return;
         }
+
+        try {
+            const existingUser = await fetchUserDataByEmail(formData.email);
+            if (existingUser) {
+                setErrors({ email: t('RegisterPage.emailRegisteredError') });
+                setIsSubmitting(false);
+                return;
+            }
+        } catch (error) {
+            setErrors({ email: t('RegisterPage.emailRegistrationError') });
+            setIsSubmitting(false);
+            return;
+        }
+
+        updateData(formData);
+        router.push('/register/step1');
     };
 
     const handlePrevStep = () => router.push('/');
@@ -81,10 +100,10 @@ export default function RegisterStep1() {
                                     type={type}
                                     name={name}
                                     placeholder={placeholder}
-                                    value={formData.name}
+                                    value={formData[name]}
                                     onChange={handleChange}
                                 />
-                                {errors.name && <p className="text-red-500 text-xs italic">{errors[name]}</p>}
+                                {errors[name] && <p className="text-red-500 text-base italic">{errors[name]}</p>}
                             </div>
                         </div>
                     ))}
@@ -100,14 +119,15 @@ export default function RegisterStep1() {
                             {t('RegisterPage.policy.0')} <a href="#" className="text-indigo-600 underline">{t('RegisterPage.policy.1')}</a>
                         </label>
                     </div>
-                    <button
-                        type="button"
-                        onClick={handleNextStep}
-                        className={`w-full py-3 bg-black text-white rounded-full font-semibold mt-4 ${!isChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    <ButtonWithSpinner
+						type="button"
+                        onClick={handleSubmit}
+						loading={isSubmitting}
+						className={`w-full bg-black text-white py-4 rounded-full text-1xl font-semibold hover:bg-gray-800 transition duration-200 mt-4 ${!isChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={!isChecked}
-                    >
-                        {t('RegisterPage.nextbtn')}
-                    </button>
+					>
+						{t('RegisterPage.nextbtn')}
+					</ButtonWithSpinner>
                 </form>
             </div>
 

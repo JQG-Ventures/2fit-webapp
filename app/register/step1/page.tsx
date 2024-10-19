@@ -5,13 +5,22 @@ import { FaApple, FaFacebook, FaGoogle } from 'react-icons/fa';
 import { IoChevronBack } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
+import ButtonWithSpinner from '../../_components/others/ButtonWithSpinner';
+import InputWithIcon from '../../_components/form/InputWithIcon';
+import { IoCalendarOutline } from 'react-icons/io5';
 import { sendCode } from '../../_services/registerService';
+import PhoneInput from '../../_components/form/PhoneInput';
+import countryCodes from '@/app/data/countryCodes.json';
+import { calculateAge } from '@/app/utils/formUtils';
+import { fetchUserDataByNumber } from '@/app/_services/userService';
 import { useTranslation } from 'react-i18next';
+
 
 interface FormData {
     number: string;
     name: string;
     age: string;
+    birthdate: string;
     last: string;
 }
 
@@ -22,55 +31,90 @@ interface ValidationErrors {
 export default function RegisterStep1() {
     const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
-    const [error, setError] = useState('');
+    const [countryCode, setCountryCode] = useState<string>(data.countryCode || '');
+    const [phoneNumber, setPhoneNumber] = useState<string>(data.number || '');
     const [formData, setFormData] = useState<FormData>({
         number: data.number || '',
         name: data.name || '',
         age: data.age || '',
+        birthdate: data.birthdate || '',
         last: data.last || ''
     });
     const [errors, setErrors] = useState<ValidationErrors>({});
     const router = useRouter();
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const user_data_fields = [
         { name: 'name', label: 'Name', placeholder: t('RegisterPagestep1.name') },
         { name: 'last', label: 'Last', placeholder: t('RegisterPagestep1.last') },
-        { name: 'age', label: 'Age', placeholder: t('RegisterPagestep1.age') },
-        { name: 'number', label: 'Phone', placeholder: t('RegisterPagestep1.phone') }
+        { name: 'birthdate', label: 'Birthdate', placeholder: 'mm/dd/yyyy', type: 'date' }
     ];
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+
+        if (name === 'countryCode') {
+            setCountryCode(value);
+        } else if (name === 'number') {
+            setPhoneNumber(value);
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
     };
 
     const validatePhone = (phone: string) => /^\d{8,15}$/.test(phone);
 
     const handleNextStep = async () => {
+        setIsSubmitting(true);
         const validationErrors: ValidationErrors = {};
 
-        if (!formData.name) validationErrors.name = 'Please fill out this field.';
-        if (!formData.last) validationErrors.last = 'Please fill out this field.';
-        if (!formData.number || !validatePhone(formData.number)) {
-            validationErrors.number = 'Please enter a valid phone number.';
+        if (!formData.name) {
+            validationErrors.name = t("RegisterPagestep1.nameValidationFill");
+        }
+        if (!formData.last) {
+            validationErrors.last = t("RegisterPagestep1.nameValidationFill");
+        }
+        if (!phoneNumber || !validatePhone(phoneNumber)) {
+            validationErrors.number = t("RegisterPagestep1.phoneValidationFill");
         }
 
         setErrors(validationErrors);
 
         if (Object.keys(validationErrors).length === 0) {
-            updateData(formData);
-            router.push('/register/step2');
-            // const response_code = await sendCode(formData.number)
+            const extractedAge = calculateAge(formData.birthdate);
+            const formattedPhoneNumber = `${countryCode}${phoneNumber}`.replace('+', '');
+            const formattedData = { ...formData, age: extractedAge, number: formattedPhoneNumber };
 
-            // if (response_code == 200) {
+            try {
+                const existingUser = await fetchUserDataByNumber(formattedPhoneNumber);
+                if (existingUser) {
+                    setErrors({ number: t("RegisterPagestep1.numberRegisteredError") });
+                    setIsSubmitting(false);
+                    return;
+                }
+            } catch (error) {
+                setErrors({ number: t("RegisterPagestep1.numberServerError") });
+                setIsSubmitting(false);
+                return;
+            }
+
+            setFormData(formattedData);
+            updateData(formattedData);
+
+            // Uncomment these lines to handle sending the code and proceeding to the next step
+            // const response_code = await sendCode(formattedData.number);
+            // if (response_code === 200) {
             //     router.push('/register/step2');
             // } else {
-            //     if (response_code == 400) {
-            //         setError('The number entered is not valid. Please try another one.');
-            //     } else {
-            //         setError('There was a problem sending the code. Please try again later.');
-            //     }
+            //     setError(response_code === 400 ? 
+            //         'The number entered is not valid. Please try another one.' :
+            //         'There was a problem sending the code. Please try again later.'
+            //     );
             // }
+
+            router.push('/register/step2');
+        } else {
+            setIsSubmitting(false);
         }
     };
 
@@ -79,7 +123,7 @@ export default function RegisterStep1() {
     return (
         <div className="flex flex-col h-screen bg-white p-10 items-center">
             <div className='h-[15%] pt-20 w-full lg:max-w-3xl'>
-            <button onClick={handlePrevStep} className="text-4xl lg:hidden">
+                <button onClick={handlePrevStep} className="text-4xl lg:hidden">
                     <IoChevronBack />
                 </button>
             </div>
@@ -92,31 +136,35 @@ export default function RegisterStep1() {
             </div>
 
             <div className='h-[50%] flex w-full items-center justify-center'>
-                <form className="w-full lg:max-w-3xl">
-                    {user_data_fields.map(({ name, label, placeholder, type = 'text' }) => (
-                        <div key={name} className="flex flex-wrap -mx-3 mb-6">
-                            <div className="w-full px-3">
-                                <input
-                                    className={`appearance-none py-6 text-2xl block w-full bg-gray-200 text-gray-700 border ${errors[name] ? 'border-red-500' : 'border-gray-200'} rounded-lg py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                                    id={`grid-${name}`}
-                                    type={type}
-                                    name={name}
-                                    placeholder={placeholder}
-                                    value={formData[name]}
-                                    onChange={handleChange}
-                                />
-                                {errors[name] && <p className="text-red-500 text-xs italic">{errors[name]}</p>}
-                            </div>
-                        </div>
+                <form className="w-full lg:max-w-3xl space-y-8">
+                    {user_data_fields.map(({ name, label, placeholder, type }) => (
+                        <InputWithIcon
+                            key={name}
+                            label={label}
+                            name={name}
+                            type={type}
+                            placeholder={placeholder}
+                            value={formData[name]}
+                            onChange={handleChange}
+                            icon={name === 'birthdate' ? IoCalendarOutline : undefined}
+                        />
                     ))}
-                    {error && <p className="text-red-500 text-center">{error}</p>}
-                    <button
+                    <PhoneInput
+                        label="Phone Number"
+                        countryCode={countryCode}
+                        phoneNumber={phoneNumber}
+                        onChange={handleChange}
+                        countryCodes={countryCodes}
+                    />
+                    {errors.number && <p className="text-red-500 text-center">{errors.number}</p>}
+                    <ButtonWithSpinner
                         type="button"
                         onClick={handleNextStep}
-                        className={`w-full py-3 bg-black text-white rounded-full font-semibold mt-4`}
+                        loading={isSubmitting}
+                        className="w-full bg-black text-white py-4 rounded-full text-1xl font-semibold hover:bg-gray-800 transition duration-200 mt-4"
                     >
                         {t('RegisterPagestep1.nextbtn')}
-                    </button>
+                    </ButtonWithSpinner>
                 </form>
             </div>
 

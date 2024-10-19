@@ -1,21 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiFillHeart, AiOutlineReload } from 'react-icons/ai';
-import { saveWorkout } from '../_services/workoutService';
+import { saveWorkout } from '../../_services/workoutService';
+import SavedMessage from '../others/SavedMessage';
 import { useTranslation } from 'react-i18next';
-import SavedMessage from '../_components/others/SavedMessage';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 
 const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutine, exercises, savedWorkoutPlans }) => {
     const { t } = useTranslation('global');
-    const userId = "user_50662633238"; // TODO: REMOVE THIS
     const [savedMessage, setSavedMessage] = useState<string | null>(null);
     const [savedExerciseIds, setSavedExerciseIds] = useState<string[]>(
         savedWorkoutPlans.map(workout => workout._id)
     );
+    const [userId, setUserId] = useState<string>('');
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    useEffect(() => {
+		if (status === 'authenticated' && session?.user?.userId) {
+			setUserId(session.user.userId);
+		} else if (status === 'unauthenticated') {
+			router.back();
+		}
+	}, [session, status, router]);
 
     const handleSaveClick = async (id: string, name: string) => {
-        const result = await saveWorkout(userId, id);
-
+        const result = await saveWorkout(userId, id, session?.user?.token);
         if (result.status === 400) {
             setSavedMessage('Workout already saved!');
         } else if (result.status === 200) {
@@ -24,7 +35,7 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
         } else {
             setSavedMessage('There was an error saving the workout, try again.');
         }
-        setTimeout(() => setSavedMessage(null), 2000);
+        setTimeout(() => setSavedMessage(null), 550000);
     };
 
     return (
@@ -40,7 +51,7 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
                             key={index}
                             exercise={exercise}
                             onSaveClick={handleSaveClick}
-                            isSaved={savedExerciseIds.includes(exercise._id)} // Check if the exercise is already saved
+                            isSaved={savedExerciseIds.includes(exercise._id)}
                         />
                     ))}
                 </div>
@@ -70,13 +81,23 @@ const ExerciseCard: React.FC<{ exercise: WorkoutPlan, onSaveClick: (id: string, 
                 </p>
                 <div className="flex space-x-4">
                     <button
-                        onClick={() => onSaveClick(exercise._id, exercise.name)}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onSaveClick(exercise._id, exercise.name);
+                        }}
                         className={`p-2 ${isSaved ? 'bg-red-500' : 'bg-gray-700'} rounded-full transition-transform transform hover:scale-110 active:scale-90`}
                         disabled={isSaved}
                     >
                         <AiFillHeart size={24} />
                     </button>
-                    <button className="p-2 bg-green-500 rounded-full">
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}
+                        className="p-2 bg-green-500 rounded-full"
+                    >
                         <AiOutlineReload size={24} />
                     </button>
                 </div>
@@ -84,5 +105,4 @@ const ExerciseCard: React.FC<{ exercise: WorkoutPlan, onSaveClick: (id: string, 
         </div>
     </a>
 );
-
 export default ExerciseBannerSection;

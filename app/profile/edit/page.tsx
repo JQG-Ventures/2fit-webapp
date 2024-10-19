@@ -1,27 +1,19 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft, FaRegEnvelope } from 'react-icons/fa';
 import { IoCalendarOutline } from 'react-icons/io5';
-import { detectCountryCode } from '@/app/utils/phoneUtils';
-import { fetchUserData, UserProfile, UpdateUserProfile } from '../../_services/userService';
 import Modal from '../../_components/profile/modal';
 import InputWithIcon from '../../_components/form/InputWithIcon';
 import SelectInput from '../../_components/form/SelectInput';
+import LoadingScreen from '../../_components/animations/LoadingScreen';
 import PhoneInput from '../../_components/form/PhoneInput';
 import countries from '@/app/data/countries.json';
 import countryCodes from '@/app/data/countryCodes.json';
-import { useSession } from 'next-auth/react';
-
-interface FormField {
-	label: string;
-	name: string;
-	type: string;
-	placeholder?: string;
-	icon?: React.ComponentType<any>;
-	options?: { value: string | number; label: string }[];
-}
+import { useSessionContext } from '../../_providers/SessionProvider';
+import { useFetch } from '../../_hooks/useFetch';
+import { useUpdateProfile } from '@/app/_hooks/useUpdateProfile';
 
 const formFields: FormField[] = [
 	{
@@ -64,58 +56,29 @@ const formFields: FormField[] = [
 
 const EditProfile: React.FC = () => {
 	const router = useRouter();
-	const { data: session, status } = useSession();
+	const { userId, token, loading: sessionLoading } = useSessionContext();
+	const getOptions = useMemo(() => ({
+		method: 'GET',
+	}), []);
 
-	const [userId, setUserId] = useState<string>('');
+	const { data: userData, loading, error } = useFetch(
+		userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}` : '',
+		getOptions
+	);
+	const { updateProfile, loading: updating, error: updateError, success: updateSuccess } = useUpdateProfile();
 	const [profileData, setProfileData] = useState<UserProfile | null>(null);
 	const [countryCode, setCountryCode] = useState<string>('');
 	const [phoneNumber, setPhoneNumber] = useState<string>('');
 	const [errorMessage, setErrorMessage] = useState<React.ReactNode | null>(null);
 	const [successMessage, setSuccessMessage] = useState<React.ReactNode | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
 	useEffect(() => {
-		if (status === 'authenticated' && session?.user?.userId) {
-			setUserId(session.user.userId);
-		} else if (status === 'unauthenticated') {
-			router.back();
+		if (userData) {
+			setProfileData(userData);
 		}
-	}, [session, status, router]);
 
-	useEffect(() => {
-		const loadUserProfile = async () => {
-			if (!userId) return;
-			try {
-				const data = await fetchUserData(userId);
-				setProfileData({
-					_id: data._id,
-					name: data.name,
-					email: data.email,
-					birthdate: data.birthdate,
-					country: data.country,
-					gender: data.profile.gender,
-					number: data.number,
-				});
-
-				if (data.number) {
-					const detectedCountryCode = detectCountryCode(data.number);
-					setCountryCode(detectedCountryCode.code);
-					setPhoneNumber(detectedCountryCode.number);
-				}
-			} catch {
-				setErrorMessage(
-					<>
-						Error loading user profile.<br />
-						Please try again later.
-					</>
-				);
-			} finally {
-				setLoading(false);
-			}
-		};
-		loadUserProfile();
-	}, [userId]);
+	}, [userData]);
 
 	const handleInputChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -145,15 +108,10 @@ const EditProfile: React.FC = () => {
 		}
 	};
 
-	const handleCloseModal = () => {
-		setErrorMessage(null);
-		setSuccessMessage(null);
-		router.back();
-	};
-
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsSubmitting(true);
+
 		try {
 			const updatedProfile = {
 				name: profileData?.name,
@@ -163,35 +121,24 @@ const EditProfile: React.FC = () => {
 				'profile.gender': profileData?.profile?.gender,
 				number: `${countryCode}${phoneNumber}`.replace("+", ""),
 			};
-			await UpdateUserProfile(userId, updatedProfile);
+	
+			await updateProfile(userId, updatedProfile, token?.accessToken);
 			setSuccessMessage("Profile updated successfully.");
 		} catch {
-			setErrorMessage(
-				<>
-					Error updating profile.<br />
-					Please try again later.
-				</>
-			);
+			setErrorMessage("There was an error updating the profile")
 		} finally {
 			setIsSubmitting(false);
 		}
 	};
 
-	if (loading) {
+	if (loading) return <LoadingScreen />;
+	if (error) {
 		return (
-			<div className="flex items-center justify-center min-h-screen bg-white">
-				<div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-64 w-64"></div>
-			</div>
-		);
-	}
-
-	if (!profileData) {
-		return (
-			<div className="flex items-center justify-center min-h-screen bg-white p-6">
-				<p className="text-center text-gray-500">
-					We are currently having issues... please try again later.
-				</p>
-			</div>
+			<Modal
+				title="Error"
+				message={error}
+				onClose={() => router.push('/home')}
+			/>
 		);
 	}
 
@@ -200,7 +147,7 @@ const EditProfile: React.FC = () => {
 			{(errorMessage || successMessage) && (
 				<Modal
 					message={errorMessage || successMessage}
-					onClose={handleCloseModal}
+					onClose={() => router.back()}
 				/>
 			)}
 			<div className="h-[10%] flex flex-row justify-left space-x-8 items-center w-full lg:max-w-3xl">
@@ -213,7 +160,7 @@ const EditProfile: React.FC = () => {
 				className="h-[90%] flex flex-col justify-between items-center w-full"
 				onSubmit={handleSubmit}
 			>
-				<div className="h-[90%] flex flex-col justify-start py-6 w-full max-w-3xl space-y-6 overflow-y-auto">
+				<div className="h-[90%] flex flex-col justify-start py-6 w-full max-w-3xl space-y-8 overflow-y-auto">
 					{formFields.map((field, index) => {
 						if (field.type === 'select') {
 							return (
@@ -221,7 +168,7 @@ const EditProfile: React.FC = () => {
 									key={index}
 									label={field.label}
 									name={field.name}
-									value={profileData[field.name] || ''}
+									value={profileData?.[field.name] || ''}
 									onChange={handleInputChange}
 									options={field.options || []}
 								/>
@@ -234,7 +181,7 @@ const EditProfile: React.FC = () => {
 									name={field.name}
 									type={field.type}
 									placeholder={field.placeholder || ''}
-									value={profileData.birthdate || ''}
+									value={profileData?.birthdate || ''}
 									onChange={handleInputChange}
 									icon={field.icon}
 								/>
@@ -247,7 +194,7 @@ const EditProfile: React.FC = () => {
 									name={field.name}
 									type={field.type}
 									placeholder={field.placeholder || ''}
-									value={profileData[field.name]}
+									value={profileData?.[field.name] || ''}
 									onChange={handleInputChange}
 									icon={field.icon}
 								/>

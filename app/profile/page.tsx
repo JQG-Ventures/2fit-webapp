@@ -1,37 +1,35 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { IoIosArrowDroprightCircle, IoIosLogOut } from 'react-icons/io';
 import { signOut } from 'next-auth/react';
+import { IoIosArrowDroprightCircle, IoIosLogOut } from 'react-icons/io';
+import Image from 'next/image';
 import ToggleButton from '../_components/profile/togglebutton';
-import { fetchUserData, UserProfile } from '../_services/userService';
 import { MdModeEditOutline } from 'react-icons/md';
 import { BsMoon } from 'react-icons/bs';
 import Modal from '../_components/profile/modal';
 import LoadingScreen from '../_components/animations/LoadingScreen';
 import SettingItem from '../_components/others/SettingItem';
 import { CiUser, CiBellOn, CiLock, CiCircleQuestion } from 'react-icons/ci';
-import { IconType } from 'react-icons';
-import { useSession } from 'next-auth/react';
+import { useFetch } from '../_hooks/useFetch';
+import { useSessionContext } from '../_providers/SessionProvider';
 
-interface Setting {
-	label: string;
-	icon: IconType;
-	path?: string;
-	isRed?: boolean;
-}
 
 const ProfilePage: React.FC = () => {
 	const router = useRouter();
-	const { data: session, status } = useSession();
-	const [userData, setUserData] = useState<UserProfile | undefined>(undefined);
-	const [errorMessage, setErrorMessage] = useState<React.ReactNode | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
-	const [userId, setUserId] = useState<string>('');
+	const { userId, loading: sessionLoading } = useSessionContext();
+	const options = useMemo(() => ({
+		method: 'GET',
+	}), []);
 
+	const { data: userData, loading, error } = useFetch(
+		userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}` : '',
+		options
+	);
+
+	const [isLoggingOut, setIsLoggingOut] = React.useState<boolean>(false);
+	const [isLoading, setIsLoading] = React.useState<boolean>(false);
 	const settings: Setting[] = [
 		{ label: 'Edit Profile', icon: CiUser, path: '/profile/edit' },
 		{ label: 'Notifications', icon: CiBellOn, path: '/profile/notifications' },
@@ -45,56 +43,34 @@ const ProfilePage: React.FC = () => {
 			callbackUrl: '/',
 			redirect: true,
 		});
-		setIsLoggingOut(false);
 	};
 
+	const handleSetting = async (setting) => {
+		setIsLoading(true);
+		router.push(setting.path!);
+	}
+
 	useEffect(() => {
-		if (status === 'authenticated' && session?.user?.userId) {
-			setUserId(session.user.userId);
-		} else if (status === 'unauthenticated') {
-			router.back();
+		if (!sessionLoading && !userId) {
+			router.push('/login');
 		}
-	}, [session, status, router]);
+	}, [userId, sessionLoading, router]);
 
-	useEffect(() => {
-		const loadUserData = async () => {
-			if (!userId) return;
-
-			setLoading(true); // Set loading to true when fetching starts
-			try {
-				const data = await fetchUserData(userId);
-				setUserData(data);
-			} catch (error) {
-				setErrorMessage(
-					<>
-						Error loading user data.<br />
-						Please try again later.
-					</>
-				);
-			} finally {
-				setLoading(false); // Set loading to false after fetching completes
-			}
-		};
-
-		loadUserData();
-	}, [userId]); // Only run when userId changes
-
-	const handleCloseModal = () => {
-		setErrorMessage(null);
-		router.push('/home');
-	};
+	if (loading || sessionLoading) return <LoadingScreen />;
 
 	if (loading) return <LoadingScreen />;
+	if (error) {
+		return (
+			<Modal
+				title="Error"
+				message={error}
+				onClose={() => router.push('/home')}
+			/>
+		);
+	}
 
 	return (
 		<div className="flex flex-col justify-between items-center bg-gray-50 h-screen p-10 lg:pt-[10vh]">
-			{errorMessage && (
-				<Modal
-					title={"Error"}
-					message={errorMessage}
-					onClose={handleCloseModal}
-				/>
-			)}
 			<div className="h-[10%] flex justify-left items-center w-full lg:hidden">
 				<h1 className="text-5xl font-semibold pl-4">Profile</h1>
 			</div>
@@ -126,12 +102,16 @@ const ProfilePage: React.FC = () => {
 			<div className="h-[12%] w-full lg:max-w-6xl bg-gradient-to-r from-green-400 to-green-700 flex flex-col justify-center text-white rounded-[25px] px-8 shadow-lg w-full">
 				<div className="flex flex-row items-center justify-between">
 					<div className="flex justify-left space-x-6 w-[80%] items-center pb-4">
-						<span className="bg-gradient-to-b from-yellow-300 to-yellow-700 text-white rounded-full px-4 py-2 text-2xl">PRO</span>
+						<span className="bg-gradient-to-b from-yellow-300 to-yellow-700 text-white rounded-full px-4 py-2 text-2xl">
+							PRO
+						</span>
 						<h3 className="font-semibold text-3xl">Upgrade to Premium</h3>
 					</div>
 					<IoIosArrowDroprightCircle className="text-white w-10 h-10" />
 				</div>
-				<p className="text-xl">Enjoy workout access without ads and restrictions</p>
+				<p className="text-xl">
+					Enjoy workout access without ads and restrictions
+				</p>
 			</div>
 
 			<div className="border-t border-gray-300 w-full my-14 lg:my-0 lg:max-w-6xl"></div>
@@ -142,8 +122,8 @@ const ProfilePage: React.FC = () => {
 						key={index}
 						label={setting.label}
 						icon={setting.icon}
-						isRed={setting.isRed}
-						onClick={() => router.push(setting.path!)}
+						onClick={() => handleSetting(setting)}
+						isLoading={isLoading}
 					/>
 				))}
 

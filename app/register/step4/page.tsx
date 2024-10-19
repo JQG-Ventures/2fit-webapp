@@ -3,12 +3,16 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
-import RegistrationHeader from '../../_components/header/registrationHeader';
+import RegistrationHeader from '../../_components/register/RegistrationHeader';
+import RegistrationButtons from '@/app/_components/register/RegisterButtons';
 import { useTranslation } from 'react-i18next';
+
 
 export default function RegisterStep4() {
     const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
+    const [isSubmittingNext, setIsSubmittingNext] = useState(false);
+    const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
     const [selectedGoal, setSelectedGoal] = useState(data.fitness_goal);
     const router = useRouter();
 
@@ -19,38 +23,54 @@ export default function RegisterStep4() {
         { id: 4, label: t('RegisterPagestep4.muscle'), icon: '🚀' },
     ];
 
-    const handleGoalSelection = (goal: number) => {
+    const handleGoalSelection = (goal) => {
         setSelectedGoal(goal);
         updateData({ fitness_goal: goal });
-        setTimeout(() => {
-            router.push('/register/step5');
-        }, 300);
+    };
+
+    const handleNextStep = () => {
+        setIsSubmittingNext(true);
+        router.push('/register/step5');
     };
 
     const handlePrevStep = () => {
-        router.push('/register/step3')
+        setIsSubmittingPrev(true);
+        router.push('/register/step3');
     };
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
-            <div className='h-[10%] w-full lg:max-w-3xl'>
-                <RegistrationHeader stepNumber={2} handlePrevStep={handlePrevStep}/>
+            <div className='h-[20%] w-full lg:max-w-3xl'>
+                <RegistrationHeader 
+                    title={t('RegisterPagestep4.title')}
+                    description={t('RegisterPagestep4.description')}
+                />
             </div>
 
-            <div className="h-[85%] content-center w-full lg:max-w-3xl">
-                <h2 className="text-4xl font-bold text-center mb-20">{t('RegisterPagestep4.goal')}</h2>
-                <div className="space-y-6 w-full px-8">
+            <div className="flex items-center justify-center h-[70%] w-full lg:max-w-3xl">
+                <div className="flex flex-col items-center justify-center space-y-8 w-full">
                     {goals.map((goal) => (
                         <button
                             key={goal.id}
-                            className={`w-full p-8 flex text-left items-center border rounded-lg text-3xl ${selectedGoal === goal.id ? 'border-black bg-gray-100' : 'border-gray-300'}`}
-                            onClick={() => handleGoalSelection(goal.id)}  // Passing the goal id directly
+                            className={`w-full p-8 flex text-left items-center border rounded-lg text-3xl transition-all duration-300 transform 
+                                ${selectedGoal === goal.id ? 'bg-black text-white scale-105 shadow-lg' : 'bg-white text-black hover:scale-105 hover:shadow-md border-gray-300'}`}
+                            onClick={() => handleGoalSelection(goal.id)}
                         >
                             <span role="img" aria-label={goal.label} className="mr-4">{goal.icon}</span> {goal.label}
                         </button>
                     ))}
                 </div>
             </div>
+
+            <RegistrationButtons
+                handleNext={handleNextStep}
+                handlePrev={handlePrevStep}
+                isSubmittingNext={isSubmittingNext}
+                isSubmittingPrev={isSubmittingPrev}
+                prevText={t('RegisterPage.back')}
+                nextText={t('RegisterPage.next')}
+                isNextDisabled={selectedGoal === null || selectedGoal === undefined}
+            />
         </div>
     );
 }

@@ -20,7 +20,7 @@ const NavBar: React.FC = () => {
     const navItems = [
         { href: '/home', label: t('Navbar.home'), icon: <FaHome /> },
         { href: '/workouts', label: t('Navbar.workouts'), icon: <FaDumbbell /> },
-        { href: '/bot', label: t('Navbar.bot'), icon: <FaRobot /> },
+        { href: '/chat', label: t('Navbar.bot'), icon: <FaRobot /> },
         { href: '/profile', label: t('Navbar.profile'), icon: <FaUser /> },
     ];
 
