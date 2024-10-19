@@ -110,6 +110,27 @@ export const getLibraryWorkoutCount = async () => {
     }
 };
 
+export const getWorkoutPlanById = async (planId: string) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans/${planId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch workout details');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        console.error('Error fetching workout data:', error);
+        throw new Error(error.message || 'Something went wrong');
+    }
+};
+
 export const getExercisesByLevel = async (level: string) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/library/level/${level}`, {
@@ -125,7 +146,6 @@ export const getExercisesByLevel = async (level: string) => {
 
         return await response.json();
     } catch (error) {
-        console.error('Error fetching exercises:', error);
         return { error: 'An error occurred getting exercises, please try later.' };
     }
 };

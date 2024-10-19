@@ -6,7 +6,7 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import { ImSpinner8 } from 'react-icons/im';
 import { useRouter } from 'next/navigation';
 import { getExercisesByLevel } from '../../_services/workoutService';
-import Modal from '../../_components/profile/modal'; // Importar el modal
+import Modal from '../../_components/profile/modal';
 
 const levels = ['beginner', 'intermediate', 'advanced'];
 
@@ -29,45 +29,48 @@ const WorkoutLibrarySection = () => {
         setActiveLevel(lowercaseLevel);
         
         setLoading(true);
-        const fetchedExercises = await getExercisesByLevel(lowercaseLevel);
-        console.log('Fetched Exercises:', fetchedExercises); 
-
-        if (fetchedExercises.error) {
-            setErrorMessage(fetchedExercises.error);
-            setIsErrorModalOpen(true);
-            setLoading(false);
-            return;
-        }
-
-    };
-
-    useEffect(() => {
-        const fetchInitialExercises = async () => {
-            setLoading(true);
-            const fetchedExercises = await getExercisesByLevel(activeLevel);
-            console.log('Fetched Initial Exercises:', fetchedExercises);
-
-            
-            if (fetchedExercises.error) {
-                setErrorMessage(fetchedExercises.error);
-                setIsErrorModalOpen(true);
-                setLoading(false);
-                return;
-            }
-
+        try {
+            const fetchedExercises = await getExercisesByLevel(lowercaseLevel);
             
             if (fetchedExercises.message && fetchedExercises.message.length === 0) {
-                setMessage("We are creating more challenges for you. Stay tuned! :)"); 
+                setMessage("We are creating more challenges for you. Stay tuned! :)");
                 setWorkouts([]);
             } else {
                 setWorkouts(fetchedExercises.message || []);
                 setMessage(null);
             }
+        } catch (error) {
+            setErrorMessage(error.message || 'An unexpected error occurred.');
+            setIsErrorModalOpen(true);
+        } finally {
             setLoading(false);
-        };
+        }
+    };
 
+    useEffect(() => {
+        const fetchInitialExercises = async () => {
+            setLoading(true);
+            try {
+                const fetchedExercises = await getExercisesByLevel(activeLevel);
+                
+                // Verificamos si hay ejercicios y manejamos los mensajes
+                if (!fetchedExercises.message || fetchedExercises.message.length === 0) {
+                    setMessage("We are creating more challenges for you. Stay tuned! :)");
+                    setWorkouts([]);
+                } else {
+                    setWorkouts(fetchedExercises.message);
+                    setMessage(null);
+                }
+            } catch (error) {
+                setErrorMessage(error.message || 'An unexpected error occurred.');
+                setIsErrorModalOpen(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+    
         fetchInitialExercises();
-    }, [activeLevel]);
+    }, [activeLevel]);    
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 lg:pt-20 items-center">
