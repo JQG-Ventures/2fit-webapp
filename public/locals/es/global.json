@@ -10,7 +10,26 @@
     "questiontxt": "Ya tienes una cuenta",
     "signin": "Iniciar Sesión"
   },
+  "LoginPage": {
+    "OrSignIn": "O ingresa con",
+    "emailOrPhone": "Correo electrónico o número",
+    "emailRequired": "Correo electrónico requerido",
+    "passwordRequired": "Contraseña requerida",
+    "credsError": "Email o contraseña inválidos.",
+    "unexpectedError": "Ha ocurrido un error insperado. Inténtalo de nuevo.",
+    "socialSignInError": "Inicio de sesión fallido. Inténtalo de nuevo.",
+    "loginTitle": [
+      "Ingresa a",
+      "tu cuenta"
+    ],
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "signIn": "Loguearte",
+    "dontHaveAcc": "¿No tienes cuenta?",
+    "signUp": "Registro"
+  },
   "RegisterPage":{
+    "next": "Siguiente",
+    "back": "Atras",
     "create": [
       "Crea tu",
       "Cuenta"
@@ -23,7 +42,9 @@
     "nextbtn": "Siguiente",
     "signuptxt": "O regístrese con",
     "signupquestion": "¿Tienes una cuenta?",
-    "signin": "Inicia sesión"
+    "signin": "Inicia sesión",
+    "passwordValidationError": "La contraseña debe contener mayúscula, minúscula, número, carácteres especiales, y debe ser de mínimo 8 caracteres sin espacios.",
+    "emailValidationError": "Ingresa una dirección de correo electrónico válida."
   },
   "RegisterPagestep1":{
     "create": [
@@ -37,47 +58,41 @@
     "nextbtn": "Siguiente",
     "signuptxt": "O regístrese con",
     "signupquestion": "¿Tienes una cuenta?",
-    "signin": "Inicia sesión"
-  },
-  "RegistrationHeader":{
-    "stepof": [
-      "Paso",
-      "de"
-    ],
-    "skip" : "Saltar"
+    "signin": "Inicia sesión",
+    "numberRegisteredError": "El numero ya fue registrado. Por favor ingresa otro.",
+    "numberServerError": "Hubo un error validando el numero. Intentalo mas tarde.",
+    "nameValidationFill": "Por favor llena este campo.",
+    "phoneValidationFill": "Ingresa un numero valido."
   },
   "RegisterPagestep3":{
-    "gender": "Selecciona tu género",
     "woman": "Mujer",
     "man": "Hombre",
-    "neutral": "Género Neutro"
+    "title": "Cuentanos de ti",
+    "description": "Para darte una mejor experiencia necesitamos saber tu genero"
   },
   "RegisterPagestep4":{
-    "goal": "Escoge tu objetivo principal",
     "weight": "Perder peso",
     "fit": "Mantenerte en forma",
     "stronger": "Hacerte mas fuerte",
-    "muscle": "Ganar masa muscular"
+    "muscle": "Ganar masa muscular",
+    "title": "Cual es tu meta?",
+    "description": "Elige tu principal objetivo. No te preocupes, lo podras cambiar luego"
   },
   "RegisterPagestep5":{
-    "Height": "Ingresa tu estatura",
-    "centimetre": "Centímetros",
-    "feet": "Pies",
-    "nextbtn": "Siguiente"
+    "title": "Cual es tu altura?",
+    "description": "Actual altura en cm. No te preoucpes, podras cambiarlo luego."
   },
   "RegisterPagestep6":{
-    "weight": "Ingresa tu peso",
-    "lbs": "Lbs",
-    "kilograms": "Kilogramos",
-    "nextbtn": "Siguiente"
+    "title": "Cual es tu peso?",
+    "description": "Actual peso en kg. No te preoucpes, podras cambiarlo luego."
   },
   "RegisterPagestep7":{
-    "weight": "Seleccione el peso que deseas alcanzar",
-    "lbs": "Lbs",
-    "kilograms": "Kilogramos",
-    "nextbtn": "Siguiente"
+    "title": "Cual es tu peso deseado?",
+    "description": "Peso deseado en kg. No te preoucpes, esto es solo una estimacion."
   },
   "RegisterPagestep8":{
+    "title": "Cual es tu nivel actual?",
+    "description": "Elige basado en tu actividad fisica actual. Esto nos ayudara a personalizar los planes para ti.",
     "level": [
       "Escoge tu nivel de",
       "entrenamiento"
@@ -100,6 +115,8 @@
     ]
   },
   "RegisterPagestep9":{
+    "title": "Actividades fisicas",
+    "description": "Cuales actividades practicas. Esto ayudara a mejorar nuestros resultados",
     "activities": [
       "Elige tus actividades",
       "preferidas"
@@ -108,8 +125,7 @@
     "cardio": "Cardio",
     "yoga": "Yoga",
     "powertraining": "Entrenamiento de fuerza",
-    "dancing": "Baile",
-    "next": "Siguiente"
+    "dancing": "Baile"
   },
   "RegisterPagestep10":{
     "texts": [
@@ -215,5 +231,32 @@
               "letschat": "¡Charlemos!",
               "getyourplan": "Obtén tu plan!"
             }
+  },
+  "workouts": {
+    "plan": {
+      "workoutAlreadySaved": "El plan ya ha sido guardado!",
+      "workoutSaved": "Plan guardado!",
+      "savingError": "Hubo un error guardando el plan, intente mas tarde.",
+      "workoutActivity": "Actividad del Plan",
+      "seeAll": "Ver todo",
+      "secs": "Segundos",
+      "start": "INICIO",
+      "rest": "Descanso",
+      "getReady": "Alistate!",
+      "startOver": "Iniciar de nuevo",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "pause": "Pausar",
+      "resume": "Resumir",
+      "skipRest": "Saltar descanso",
+      "nextExercise": "Siguiente ejercicio:",
+      "takeRest": "TOMA UN DESCANSO",
+      "congrats": "Felicidades!",
+      "completedSentence": "Haz completado esta rutina!",
+      "workouts": "Rutinas",
+      "minutes": "Minutos",
+      "goto": "Buscar otra rutina",
+      "home": "Inicio"
+    }
   }
 }

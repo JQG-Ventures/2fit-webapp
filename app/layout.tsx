@@ -9,6 +9,9 @@ import NavBar from "./_components/navbar/NavBar";
 import { LanguageProvider } from './utils/LanguageContext';
 import { ReactNode } from "react";
 import '@/app/utils/i18n';
+import { SessionProvider as CustomSessionProvider } from './_providers/SessionProvider';
+
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +26,9 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
 				<LanguageProvider>
 					<RegisterProvider>
 						<AuthProvider>
-							{children}
+							<CustomSessionProvider>
+								{children}
+							</CustomSessionProvider>
 						</AuthProvider>
 						<NavBar />
 					</RegisterProvider>

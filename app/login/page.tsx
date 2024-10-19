@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaApple, FaFacebook, FaGoogle } from "react-icons/fa";
 import { IoChevronBack } from "react-icons/io5";
@@ -9,6 +9,8 @@ import { useSession, signIn } from 'next-auth/react';
 import ButtonWithSpinner from '../_components/others/ButtonWithSpinner';
 import InputWithIcon from '../_components/form/InputWithIcon';
 import { IconType } from 'react-icons';
+import { useTranslation } from 'react-i18next';
+
 
 interface FormData {
 	email: string;
@@ -23,12 +25,9 @@ interface FormField {
 	Icon?: IconType;
 }
 
-const formFields: FormField[] = [
-	{ name: 'email', label: 'Email or Number', placeholder: 'Email or number', type: 'text', Icon: FiMail },
-	{ name: 'password', label: 'Password', placeholder: '******************', type: 'password', Icon: FiLock }
-];
 
 export default function Login() {
+	const { t } = useTranslation('global');
 	const [errors, setErrors] = useState<{ [key in keyof FormData]?: string }>({});
 	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
@@ -44,6 +43,10 @@ export default function Login() {
 		apple: false,
 	});
 	const [showModal, setShowModal] = useState<boolean>(false);
+	const formFields: FormField[] = [
+		{ name: 'email', label: 'Email or Number', placeholder: t("LoginPage.emailOrPhone"), type: 'text', Icon: FiMail },
+		{ name: 'password', label: 'Password', placeholder: '******************', type: 'password', Icon: FiLock }
+	];
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -55,8 +58,8 @@ export default function Login() {
 
 		if (!email || !password) {
 			setErrors({
-				email: !email ? 'Email is required' : undefined,
-				password: !password ? 'Password is required' : undefined
+				email: !email ? t("LoginPage.emailRequired") : undefined,
+				password: !password ? t("LoginPage.PasswordRequired") : undefined
 			});
 			setIsSubmitting(false);
 			return;
@@ -68,13 +71,14 @@ export default function Login() {
 			redirect: false,
 		});
 
-		if (response?.error) {
-			setError("Invalid email or password.");
-			setIsSubmitting(false);
-		} else if (response?.ok) {
+		if (response?.ok) {
 			router.push("/home");
+		}
+		else if (response?.error) {
+			setError(t("LoginPage.credsError"));
+			setIsSubmitting(false);
 		} else {
-			setError("An unexpected error occurred. Please try again.");
+			setError(t("LoginPage.unexpectedError"));
 			setIsSubmitting(false);
 		}
 	};
@@ -91,7 +95,7 @@ export default function Login() {
 		try {
 			await signIn(provider, { callbackUrl: '/home' });
 		} catch (err) {
-			setError("Social sign-in failed. Please try again.");
+			setError(t("LoginPage.socialSignInError"));
 			setShowModal(true);
 		} finally {
 			setIsSocialLoading(prev => ({ ...prev, [provider]: false }));
@@ -111,7 +115,7 @@ export default function Login() {
 				<button onClick={handlePrevStep} className="hidden text-4xl lg:flex mr-14 mt-5 text-center">
 					<IoChevronBack />
 				</button>
-				<h1 className='text-6xl font-semibold'>Login to <br />your Account</h1>
+				<h1 className='text-6xl font-semibold'>{t('LoginPage.loginTitle.0')}<br />{t('LoginPage.loginTitle.1')}</h1>
 			</div>
 
 			<div className='h-[50%] flex w-full items-center justify-center'>
@@ -137,7 +141,7 @@ export default function Login() {
 					<div className="flex justify-end mb-10">
 						<p className="mt-4 text-[12px]">
 							<a href="/forgot-password" className="text-blue-900 font-medium hover:text-blue-500">
-								Forgot Password?
+							{t('LoginPage.forgotPassword')}
 							</a>
 						</p>
 					</div>
@@ -147,13 +151,13 @@ export default function Login() {
 						loading={isSubmitting}
 						className="w-full bg-black text-white py-4 rounded-full text-1xl font-semibold hover:bg-gray-800 transition duration-200"
 					>
-						Sign In
+						{t('LoginPage.signIn')}
 					</ButtonWithSpinner>
 				</form>
 			</div>
 
 			<div className="h-[15%] flex flex-col justify-start text-center">
-				<p className="text-gray-500 mb-10">Or sign in with</p>
+				<p className="text-gray-500 mb-10">{t("LoginPage.OrSignIn")}</p>
 				<div className="flex flex-row justify-evenly space-x-8">
 					{[
 						{ icon: FaApple, name: 'apple' },
@@ -178,7 +182,7 @@ export default function Login() {
 
 			<div className="h-[5%] text-center content-center">
 				<p className="text-gray-500">
-					Don't have an account? <a href="/register" className="text-indigo-600 underline">Sign Up</a>
+					{t('LoginPage.dontHaveAcc')} <a href="/register" className="text-indigo-600 underline">{t('LoginPage.signUp')}</a>
 				</p>
 			</div>
 		</div>

@@ -47,6 +47,8 @@ export default function RegisterStep10() {
                     redirect: false,
                 });
 
+                console.log(response)
+
                 if (!response?.ok) {
                     setErrorMessage(t('RegisterPagestep10.errormsg'));
                     setIsLoading(false);

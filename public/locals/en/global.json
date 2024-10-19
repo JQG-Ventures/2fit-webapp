@@ -10,7 +10,26 @@
     "questiontxt": "Already have an account",
     "signin": "Sign in"
   },
+  "LoginPage": {
+    "OrSignIn": "Or sign in with",
+    "emailOrPhone": "Email or number",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required",
+    "credsError": "Invalid email or password.",
+    "unexpectedError": "An unexpected error occurred. Please try again.",
+    "socialSignInError": "Social sign-in failed. Please try again.",
+    "loginTitle": [
+      "Login to",
+      "your Account"
+    ],
+    "forgotPassword": "Forgot Password?",
+    "signIn": "Sign In",
+    "dontHaveAcc": "Don't have an account?",
+    "signUp": "Sign Up"
+  },
   "RegisterPage":{
+    "next": "Continue",
+    "back": "Back",
     "create": [
       "Create your",
       "Account"
@@ -23,7 +42,11 @@
     "nextbtn": "Next",
     "signuptxt": "Or sign up with",
     "signupquestion": "Do you have an account?",
-    "signin": "Sign in"
+    "signin": "Sign in",
+    "passwordValidationError": "Password must contain uppercase, lowercase, number, special character, and be at least 8 characters long without spaces.",
+    "emailValidationError": "Please enter a valid email address.",
+    "emailRegisteredError": "This email is already registered. Please use a different email.",
+    "emailRegistrationError": "There was an error checking the email. Please try again later."
   },
   "RegisterPagestep1":{
     "create": [
@@ -37,47 +60,41 @@
     "nextbtn": "Next",
     "signuptxt": "Or sign up with",
     "signupquestion": "Do you have an account?",
-    "signin": "Sign in"
-  },
-  "RegistrationHeader":{
-    "stepof": [
-      "Step",
-      "of"
-    ],
-    "skip" : "Skip"
+    "signin": "Sign in",
+    "numberRegisteredError": "Number is already registered. Please use a different one.",
+    "numberServerError": "There was an error checking the number. Please try again later.",
+    "nameValidationFill": "Please fill out this field.",
+    "phoneValidationFill": "Please enter a valid phone number."
   },
   "RegisterPagestep3":{
-    "gender": "Choose gender",
     "woman": "Woman",
     "man": "Man",
-    "neutral": "Gender Neutral"
+    "title": "Tell Us About Yourself",
+    "description": "To give you a better experience and results we need to know your gender"
   },
   "RegisterPagestep4":{
-    "goal": "Choose main goal",
     "weight": "Lose Weight",
     "fit": "Keep Fit",
     "stronger": "Get Stronger",
-    "muscle": "Gain Muscle Mass"
+    "muscle": "Gain Muscle Mass",
+    "title": "What is your goal",
+    "description": "Choose your main objective. Don't worry you can always change it later."
   },
   "RegisterPagestep5":{
-    "Height": "Select Height",
-    "centimetre": "Centimetre",
-    "feet": "Feet",
-    "nextbtn": "Next"
+    "title": "What is Your Height",
+    "description": "Current height in cm. Don't worry you can always change it later."
   },
   "RegisterPagestep6":{
-    "weight": "Select Weight",
-    "lbs": "Lbs",
-    "kilograms": "Kilograms",
-    "nextbtn": "Next"
+    "title": "What is Your Weight",
+    "description": "Current weight in kg. Don't worry you can always change it later."
   },
   "RegisterPagestep7":{
-    "weight": "Select Target Weight",
-    "lbs": "Lbs",
-    "kilograms": "Kilograms",
-    "nextbtn": "Next"
+    "title": "What is Your Desired Weight",
+    "description": "Target weight in kg. Don't worry this is just and estimation."
   },
   "RegisterPagestep8":{
+    "title": "What is your Training Level?",
+    "description": "Choose based on your current activity. This will help us to personalize plans for you.",
     "level": [
       "Choose tranining",
       "level"
@@ -100,16 +117,13 @@
     ]
   },
   "RegisterPagestep9":{
-    "activities": [
-      "Choose activities",
-      "that you prefer"
-    ],  
+    "title": "Your phyisical activities",
+    "description": "Which activities do you practice. This will enhance our results for you.",
     "stretch": "Stretch",
     "cardio": "Cardio",
     "yoga": "Yoga",
     "powertraining": "Power training",
-    "dancing": "Dancing",
-    "next": "Next"
+    "dancing": "Dancing"
   },
   "RegisterPagestep10":{
     "texts": [
@@ -209,6 +223,33 @@
       "talk": "Talk to your trainer",
       "letschat": "Let's Chat!",
       "getyourplan": "Get your plan"
+    }
+  },
+  "workouts": {
+    "plan": {
+      "workoutAlreadySaved": "Workout already saved!",
+      "workoutSaved": "Workout Saved!",
+      "savingError": "There was an error saving the workout, try again.",
+      "workoutActivity": "Workout Activity",
+      "seeAll": "See All",
+      "secs": "Seconds",
+      "start": "START",
+      "rest": "Rest",
+      "getReady": "Get Ready!",
+      "startOver": "Start Over",
+      "previous": "Previous",
+      "next": "Next",
+      "pause": "Pause",
+      "resume": "Resume",
+      "skipRest": "Skip Rest",
+      "nextExercise": "Next Exercise:",
+      "takeRest": "TAKE A REST",
+      "congrats": "Congratulations!",
+      "completedSentence": "You have completed this workout!",
+      "workouts": "Workouts",
+      "minutes": "Minutes",
+      "goto": "Go to Another Workout",
+      "home": "Home"
     }
   }
 }
