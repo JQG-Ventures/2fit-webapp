@@ -22,7 +22,7 @@ const Chat: React.FC = () => {
 		options
 	);
 
-    const [isPremium, setIsPremium] = useState(true);
+    const [isPremium, setIsPremium] = useState(false);
 
     if (loading) return <LoadingScreen />;
     if (error) {
