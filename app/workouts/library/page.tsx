@@ -1,76 +1,58 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useMemo, useEffect } from 'react';
 import { SlOptionsVertical } from "react-icons/sl";
 import { CiBookmarkMinus } from "react-icons/ci";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { ImSpinner8 } from 'react-icons/im';
 import { useRouter } from 'next/navigation';
-import { getExercisesByLevel } from '../../_services/workoutService';
-import Modal from '../../_components/profile/modal';
+import Modal from '../../_components/profile/modal'; 
+import { useFetch } from '../../_hooks/useFetch';
 
 const levels = ['beginner', 'intermediate', 'advanced'];
 
 const WorkoutLibrarySection = () => {
     const [activeLevel, setActiveLevel] = useState<string>('beginner');
-    const [workouts, setWorkouts] = useState<any[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string | null>(null);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
+    const [clickedStates, setClickedStates] = useState<{ [key: string]: boolean }>({});
     const router = useRouter();
+
+    const options = useMemo(() => ({
+        method: 'GET',
+    }), []);
+
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/library/level/${activeLevel}`;
+    const { data: fetchedExercises, loading, error } = useFetch(apiUrl, options);
+
+    useEffect(() => {
+        if (!loading && fetchedExercises) {
+            setMessage(null);
+        }
+    }, [fetchedExercises, loading]);
 
     const handleCloseModal = () => {
         setIsErrorModalOpen(false);
         router.push('/home');
     };
 
-    const handleLevelChange = async (level: string) => {
-        const lowercaseLevel = level.toLowerCase();
-        setActiveLevel(lowercaseLevel);
-        
-        setLoading(true);
-        try {
-            const fetchedExercises = await getExercisesByLevel(lowercaseLevel);
-            
-            if (fetchedExercises.message && fetchedExercises.message.length === 0) {
-                setMessage("We are creating more challenges for you. Stay tuned! :)");
-                setWorkouts([]);
-            } else {
-                setWorkouts(fetchedExercises.message || []);
-                setMessage(null);
-            }
-        } catch (error) {
-            setErrorMessage(error.message || 'An unexpected error occurred.');
-            setIsErrorModalOpen(true);
-        } finally {
-            setLoading(false);
-        }
+    const handleLevelChange = (level: string) => {
+        setActiveLevel(level.toLowerCase());
+        setMessage(null);
     };
 
-    useEffect(() => {
-        const fetchInitialExercises = async () => {
-            setLoading(true);
-            try {
-                const fetchedExercises = await getExercisesByLevel(activeLevel);
-                
-                // Verificamos si hay ejercicios y manejamos los mensajes
-                if (!fetchedExercises.message || fetchedExercises.message.length === 0) {
-                    setMessage("We are creating more challenges for you. Stay tuned! :)");
-                    setWorkouts([]);
-                } else {
-                    setWorkouts(fetchedExercises.message);
-                    setMessage(null);
-                }
-            } catch (error) {
-                setErrorMessage(error.message || 'An unexpected error occurred.');
-                setIsErrorModalOpen(true);
-            } finally {
-                setLoading(false);
-            }
-        };
-    
-        fetchInitialExercises();
-    }, [activeLevel]);    
+    const handleBookmarkClick = (workoutId: string) => {
+        setClickedStates(prevStates => ({
+            ...prevStates,
+            [workoutId]: !prevStates[workoutId],
+        }));
+    };
+
+    const workouts = fetchedExercises || [];
+    if (!loading && workouts.length === 0 && !message) {
+        setMessage("We are creating more challenges for you. Stay tuned! :)");
+    }
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 lg:pt-20 items-center">
@@ -122,18 +104,24 @@ const WorkoutLibrarySection = () => {
                                 <p className="text-base">{workout.duration} minutes | {workout.level}</p>
                             </div>
                             <button
-                                className="absolute bottom-4 right-4 rounded-full p-3" 
+                                className="absolute bottom-4 right-4 p-3"
+                                onClick={() => handleBookmarkClick(workout._id)}
                             >
-                                <CiBookmarkMinus className="h-8 w-8 text-white" />
+                                <div className={`h-12 w-12 flex items-center justify-center rounded-full ${clickedStates[workout._id] ? 'bg-white' : 'bg-transparent'}`}>
+                                    <CiBookmarkMinus 
+                                        className={`h-8 w-8 ${clickedStates[workout._id] ? 'text-black' : 'text-white'}`}
+                                    />
+                                </div>
                             </button>
                         </div>
                     ))}
                 </div>
             )}
-            {isErrorModalOpen && (
+
+            {error && (
                 <Modal 
                     title="Error" 
-                    message={errorMessage} 
+                    message={errorMessage || 'An unexpected error occurred.'} 
                     onClose={handleCloseModal} 
                 />
             )}
