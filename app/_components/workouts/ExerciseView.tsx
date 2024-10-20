@@ -2,6 +2,8 @@ import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import LoadingScreen from '../animations/LoadingScreen';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 
 interface ExerciseViewProps {
     exercise: Exercise | null;
@@ -14,6 +16,7 @@ const ExerciseView: React.FC<ExerciseViewProps> = ({ exercise, onNext, onBack })
         return <LoadingScreen />;
     }
 
+    const { t } = useTranslation('global');
     const darkerGreenGradientColors: [string, string, string, string] = ['#34D399', '#10B981', '#059669', '#047857'];
     const countdownSize = 180;
     const countdownStrokeWidth = 16;
@@ -62,7 +65,7 @@ const ExerciseView: React.FC<ExerciseViewProps> = ({ exercise, onNext, onBack })
                     className={`border border-green-500 w-full py-4 rounded-full font-semibold transition-all duration-300 ease-in-out 
                                 ${isPaused ? 'text-green-500 hover:bg-green-500 hover:text-white' : 'text-white bg-green-500 hover:bg-green-400'}`}
                 >
-                    {isPaused ? 'Resume' : 'Pause'}
+                    {isPaused ? t("workouts.plan.resume") : t("workouts.plan.pause")}
                 </button>
             </div>
 
@@ -72,13 +75,13 @@ const ExerciseView: React.FC<ExerciseViewProps> = ({ exercise, onNext, onBack })
                     onClick={onBack}
                 >
                     <FaArrowLeft className="text-xl mr-2" />
-                    <span className='text-xl'>Previous</span>
+                    <span className='text-xl'>{t("workouts.plan.previous")}</span>
                 </button>
                 <button
                     className="w-[40%] flex items-center justify-center bg-green-100 hover:bg-green-200 text-black font-bold px-12 py-4 rounded-full shadow-lg transition duration-300 ease-in-out"
                     onClick={onNext}
                 >
-                    <span className='text-xl'>Next</span>
+                    <span className='text-xl'>{t("workouts.plan.next")}</span>
                     <FaArrowRight className="text-xl ml-2" />
                 </button>
             </div>
