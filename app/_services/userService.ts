@@ -1,19 +1,10 @@
-export interface UserProfile {
-    name: string;
-    birthDate: string;
-    email: string;
-    country: string;
-    number: string;
-    profile: {
-      gender: string;
-    };
-  }
-  
-
-export const fetchUserData = async (userId: string) => {
+export const fetchUserDataByNumber = async (number: string) => {
 	try {
-		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}`);
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/by-number/${number}`);
 		if (!res.ok) {
+			if (res.status == 404) {
+				return null;
+			}
 			throw new Error('Error fetching user profile');
 		}
 		const data = await res.json();
@@ -24,24 +15,21 @@ export const fetchUserData = async (userId: string) => {
 	}
 };
 
-export const UpdateUserProfile = async (userId: string, data: object) => {
-    try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-			body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            return {};
-        }
-
-        return await response.json();
-    } catch (error) {
-        return {};
-    }
+export const fetchUserDataByEmail = async (email: string) => {
+	try {
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/by-email/${email}`);
+		if (!res.ok) {
+			if (res.status == 404) {
+				return null;
+			}
+			throw new Error('Error fetching user profile');
+		}
+		const data = await res.json();
+		return data.data;
+	} catch (error) {
+		console.error('Error fetching user profile:', error);
+		throw error;
+	}
 };
 
 export const normalizeGender = (value: string): string => {
@@ -52,7 +40,6 @@ export const normalizeGender = (value: string): string => {
 	};
 	return genderMap[value] || 'otro';
 };
-
 
 export const getGenderValue = (gender: string): string => {
 	return gender === 'masculino' ? 'Male' : gender === 'femenino' ? 'Female' : 'Other';
