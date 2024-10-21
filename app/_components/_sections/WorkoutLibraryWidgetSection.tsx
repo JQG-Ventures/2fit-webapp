@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/navigation';
 
 interface WorkoutCardProps {
     title: string;
@@ -36,11 +37,26 @@ const WorkoutLibrarySection: React.FC<WorkoutLibrarySectionProps> = ({ workouts 
     const displayedWorkoutsCol = workouts.slice(0, 3);
     const displayedWorkoutsGrid = workouts.slice(0, 6);
     const { t } = useTranslation('global');
+    const router = useRouter(); // Hook de router para manejar la redirección
+
+    const handleOpenLibrary = () => {
+        router.push('/workouts/library'); // Ruta a la que redirigir
+    };
 
     return (
         <div className="relative bg-gray-100 p-8 rounded-xl my-16 md:px-12 lg:px-20">
             <div className="relative z-5 p-6 lg:p-12">
-                <h2 className="text-2xl font-bold mb-8 lg:text-3xl">{t('home.WorkoutLibrarySection.WorkoutLibrarySectiontitle')}</h2>
+                <div className="flex justify-between items-center mb-8">
+                        <h2 className="text-2xl font-bold lg:text-3xl">
+                            {t('home.WorkoutLibrarySection.WorkoutLibrarySectiontitle')}
+                        </h2>
+                        <button 
+                            onClick={() => router.push('/workouts/library')} // Acción para el botón
+                            className="text-blue-600 hover:underline lg:text-lg"
+                        >
+                            {t('home.WorkoutLibrarySection.viewall')}
+                        </button>
+                </div>  
 
                 {/* For mobile view */}
                 <div className="block lg:hidden mb-12">
@@ -74,7 +90,7 @@ const WorkoutLibrarySection: React.FC<WorkoutLibrarySectionProps> = ({ workouts 
                 {workouts.length > 0 ? (
                     <div className="text-center pt-10">
                         <p className="text-gray-700 text-lg mb-4">{t('home.WorkoutLibrarySection.WorkoutLibrarySectiondescription2')}</p>
-                        <button className="bg-green-500 text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-green-700 transition-colors">
+                        <button onClick={handleOpenLibrary} className="bg-green-500 text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-green-700 transition-colors">
                         {t('home.WorkoutLibrarySection.openlibrary')}
                         </button>
                     </div>
