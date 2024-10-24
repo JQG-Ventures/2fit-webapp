@@ -233,6 +233,9 @@
             }
   },
   "workouts": {
+    "library": {
+      "errormsg" : "Ha ocurrido un error, por favor intenta de nuevo mas tarde."
+    },
     "plan": {
       "workoutAlreadySaved": "El plan ya ha sido guardado!",
       "workoutSaved": "Plan guardado!",
