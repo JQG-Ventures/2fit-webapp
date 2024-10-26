@@ -17,7 +17,7 @@ type MobileNavBarProps = {
 
 const MobileNavBar: React.FC<MobileNavBarProps> = ({ navItems }) => {
     const pathname = usePathname();
-    const hideMobileNavBarPaths = ['/workouts/plan', '/workouts/countdown', '/profile/edit'];
+    const hideMobileNavBarPaths = ['/workouts/plan', '/workouts/countdown', '/profile/edit', '/profile/notification', '/profile/security', '/profile/premium'];
 
     if (hideMobileNavBarPaths.some(path => pathname.startsWith(path))) {
         return null;
