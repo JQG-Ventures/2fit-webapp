@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { IoIosArrowDroprightCircle, IoIosLogOut } from 'react-icons/io';
@@ -14,11 +14,12 @@ import SettingItem from '../_components/others/SettingItem';
 import { CiUser, CiBellOn, CiLock, CiCircleQuestion } from 'react-icons/ci';
 import { useFetch } from '../_hooks/useFetch';
 import { useSessionContext } from '../_providers/SessionProvider';
-
+import Premium from '../_components/profile/PremiumContent';
 
 const ProfilePage: React.FC = () => {
 	const router = useRouter();
 	const { userId, loading: sessionLoading } = useSessionContext();
+	const [showPremium, setShowPremium] = useState(false);
 	const options = useMemo(() => ({
 		method: 'GET',
 	}), []);
@@ -28,25 +29,20 @@ const ProfilePage: React.FC = () => {
 		options
 	);
 
-	const [isLoggingOut, setIsLoggingOut] = React.useState<boolean>(false);
-	const [isLoading, setIsLoading] = React.useState<boolean>(false);
-	const settings: Setting[] = [
+	const [isLoggingOut, setIsLoggingOut] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+	const settings = [
 		{ label: 'Edit Profile', icon: CiUser, path: '/profile/edit' },
 		{ label: 'Notifications', icon: CiBellOn, path: '/profile/notifications' },
 		{ label: 'Security', icon: CiLock, path: '/profile/security' },
 		{ label: 'Help', icon: CiCircleQuestion, path: '/profile/help' },
 	];
 
-  useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        const data = await fetchUserData('user_50686134777'); 
-        setUserData(data);
-      } catch (error) {
-        console.error('Error loading user data:', error);
-        setErrorMessage('Error loading user data. Please try again later.');
-      }
-    }})
+	useEffect(() => {
+		if (!sessionLoading && !userId) {
+			router.push('/login');
+		}
+	}, [userId, sessionLoading, router]);
 
 	const handleLogout = async () => {
 		setIsLoggingOut(true);
@@ -58,18 +54,11 @@ const ProfilePage: React.FC = () => {
 
 	const handleSetting = async (setting) => {
 		setIsLoading(true);
-		router.push(setting.path!);
-	}
-
-	useEffect(() => {
-		if (!sessionLoading && !userId) {
-			router.push('/login');
-		}
-	}, [userId, sessionLoading, router]);
+		router.push(setting.path);
+	};
 
 	if (loading || sessionLoading) return <LoadingScreen />;
 
-	if (loading) return <LoadingScreen />;
 	if (error) {
 		return (
 			<Modal
@@ -82,6 +71,10 @@ const ProfilePage: React.FC = () => {
 
 	return (
 		<div className="flex flex-col justify-between items-center bg-gray-50 h-screen p-10 lg:pt-[10vh]">
+			{showPremium && (
+				<Premium onClose={() => setShowPremium(false)} />
+			)}
+
 			<div className="h-[10%] flex justify-left items-center w-full lg:hidden">
 				<h1 className="text-5xl font-semibold pl-4">Profile</h1>
 			</div>
@@ -110,7 +103,10 @@ const ProfilePage: React.FC = () => {
 				</p>
 			</div>
 
-			<div className="h-[12%] w-full lg:max-w-6xl bg-gradient-to-r from-green-400 to-green-700 flex flex-col justify-center text-white rounded-[25px] px-8 shadow-lg w-full">
+			<div
+				className="h-[12%] w-full lg:max-w-6xl bg-gradient-to-r from-green-400 to-green-700 flex flex-col justify-center text-white rounded-[25px] px-8 shadow-lg w-full cursor-pointer"
+				onClick={() => setShowPremium(true)}
+			>
 				<div className="flex flex-row items-center justify-between">
 					<div className="flex justify-left space-x-6 w-[80%] items-center pb-4">
 						<span className="bg-gradient-to-b from-yellow-300 to-yellow-700 text-white rounded-full px-4 py-2 text-2xl">
@@ -124,7 +120,7 @@ const ProfilePage: React.FC = () => {
 					Enjoy workout access without ads and restrictions
 				</p>
 			</div>
-
+ 
 			<div className="border-t border-gray-300 w-full my-14 lg:my-0 lg:max-w-6xl"></div>
 
 			<div className="w-full h-[45%] mb-24 overflow-y-auto lg:max-w-6xl lg:mb-0">
