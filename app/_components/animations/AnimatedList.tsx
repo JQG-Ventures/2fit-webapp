@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 interface AnimatedListProps<T> {
   items: T[];
+  renderItem: (item: T, index: number) => React.ReactNode;
   animationDuration?: number;
 }
 
-const AnimatedList = <T,>({ items, animationDuration = 500 }: AnimatedListProps<T>) => {
+const AnimatedList = <T,>({ items, renderItem, animationDuration = 500 }: AnimatedListProps<T>) => {
   const [visibleItems, setVisibleItems] = useState<number>(10);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -25,7 +26,7 @@ const AnimatedList = <T,>({ items, animationDuration = 500 }: AnimatedListProps<
     <div className="overflow-y-auto">
       {items.slice(0, visibleItems).map((item, index) => (
         <div key={index}>
-          <div>{item}</div>
+          {renderItem(item, index)}
         </div>
       ))}
 
