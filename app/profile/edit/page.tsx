@@ -15,6 +15,7 @@ import { useSessionContext } from '../../_providers/SessionProvider';
 import { useFetch } from '../../_hooks/useFetch';
 import { useUpdateProfile } from '@/app/_hooks/useUpdateProfile';
 
+
 const formFields: FormField[] = [
 	{
 		label: 'Name',
@@ -202,7 +203,6 @@ const EditProfile: React.FC = () => {
 						}
 					})}
 					<PhoneInput
-						label="Phone Number"
 						countryCode={countryCode}
 						phoneNumber={phoneNumber}
 						onChange={handleInputChange}

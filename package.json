@@ -28,6 +28,7 @@
     "react-native-picker-horizontal": "^0.1.2",
     "react-responsive": "^10.0.0",
     "react-router-dom": "^6.26.2",
+    "react-select": "^5.8.2",
     "react-slick": "^0.30.2",
     "slick-carousel": "^1.8.1"
   },
