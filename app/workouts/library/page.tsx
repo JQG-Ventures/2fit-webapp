@@ -30,7 +30,6 @@ const WorkoutLibrarySection = () => {
     useEffect(() => {
         if (!loading && fetchedExercises) {
             setMessage(null);
-            console.log(`API returned ${fetchedExercises.length} workouts`);
         }
     }, [fetchedExercises, loading]);
 
