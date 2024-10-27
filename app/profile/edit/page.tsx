@@ -80,6 +80,17 @@ const EditProfile: React.FC = () => {
 
 	}, [userData]);
 
+	const convertToInputDateFormat = (dateString) => {
+		if (!dateString) return '';
+		const [day, month, year] = dateString.split('/');
+		return `${year}-${month}-${day}`;
+	};
+
+	const convertDateToDisplayFormat = (dateString) => {
+		const [year, month, day] = dateString.split('-');
+		return `${day}/${month}/${year}`;
+	};
+
 	const handleInputChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
 	) => {
@@ -95,9 +106,10 @@ const EditProfile: React.FC = () => {
 					profile: { ...prevData.profile, gender: Number(value) },
 				}));
 			} else if (name === 'birthdate') {
+				const formattedDate = convertDateToDisplayFormat(value);
 				setProfileData((prevData) => ({
 					...prevData!,
-					birthdate: value,
+					birthdate: formattedDate,
 				}));
 			} else {
 				setProfileData((prevData) => ({
@@ -161,46 +173,57 @@ const EditProfile: React.FC = () => {
 				onSubmit={handleSubmit}
 			>
 				<div className="h-[90%] flex flex-col justify-start py-6 w-full max-w-3xl space-y-8 overflow-y-auto">
-					{formFields.map((field, index) => {
-						if (field.type === 'select') {
-							return (
-								<SelectInput
-									key={index}
-									label={field.label}
-									name={field.name}
-									value={profileData?.[field.name] || ''}
-									onChange={handleInputChange}
-									options={field.options || []}
-								/>
-							);
-						} else if (field.name === 'birthdate') {
-							return (
-								<InputWithIcon
-									key={index}
-									label={field.label}
-									name={field.name}
-									type={field.type}
-									placeholder={field.placeholder || ''}
-									value={profileData?.birthdate || ''}
-									onChange={handleInputChange}
-									icon={field.icon}
-								/>
-							);
-						} else {
-							return (
-								<InputWithIcon
-									key={index}
-									label={field.label}
-									name={field.name}
-									type={field.type}
-									placeholder={field.placeholder || ''}
-									value={profileData?.[field.name] || ''}
-									onChange={handleInputChange}
-									icon={field.icon}
-								/>
-							);
-						}
-					})}
+				{formFields.map((field, index) => {
+					if (field.name === 'gender') {
+						return (
+							<SelectInput
+								key={index}
+								label={field.label}
+								name={field.name}
+								value={profileData?.profile?.gender !== undefined ? String(profileData.profile.gender) : ''}
+								onChange={handleInputChange}
+								options={field.options || []}
+							/>
+						);
+					} else if (field.type === 'select') {
+						return (
+							<SelectInput
+								key={index}
+								label={field.label}
+								name={field.name}
+								value={profileData?.[field.name] || ''}
+								onChange={handleInputChange}
+								options={field.options || []}
+							/>
+						);
+					} else if (field.name === 'birthdate') {
+						return (
+							<InputWithIcon
+								key={index}
+								label={field.label}
+								name={field.name}
+								type={field.type}
+								placeholder={field.placeholder || ''}
+								value={profileData?.birthdate ? convertToInputDateFormat(profileData.birthdate) : ''}
+								onChange={handleInputChange}
+								icon={field.icon}
+							/>
+						);
+					} else {
+						return (
+							<InputWithIcon
+								key={index}
+								label={field.label}
+								name={field.name}
+								type={field.type}
+								placeholder={field.placeholder || ''}
+								value={profileData?.[field.name] || ''}
+								onChange={handleInputChange}
+								icon={field.icon}
+							/>
+						);
+					}
+				})}
 					<PhoneInput
 						label="Phone Number"
 						countryCode={countryCode}
