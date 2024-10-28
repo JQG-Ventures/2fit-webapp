@@ -7,31 +7,31 @@ import RegistrationHeader from '../../_components/register/RegistrationHeader';
 import RegistrationButtons from '@/app/_components/register/RegisterButtons';
 import { useTranslation } from 'react-i18next';
 
-
 interface Level {
-    id: number,
-    title: string,
-    description: string
+    id: number;
+    title: string;
+    description: string;
+    value: string;
 }
 
-export default function RegisterStep7() {
+export default function RegisterStep8() {
     const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
     const [isSubmittingNext, setIsSubmittingNext] = useState(false);
     const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
-    const [selectedLevel, setSelectedLevel] = useState(data.fitness_level);
+    const [selectedLevel, setSelectedLevel] = useState<string>(data.fitness_level || '');
     const router = useRouter();
 
-    const levels = [
-        { id: 1, title: t('RegisterPagestep8.beginner.0'), description: t('RegisterPagestep8.beginner.1') },
-        { id: 2, title: t('RegisterPagestep8.irregular.0'), description: t('RegisterPagestep8.irregular.1') },
-        { id: 3, title: t('RegisterPagestep8.medium.0'), description: t('RegisterPagestep8.medium.1') },
-        { id: 4, title: t('RegisterPagestep8.advanced.0'), description: t('RegisterPagestep8.advanced.1') },
+    const levels: Level[] = [
+        { id: 1, title: t('RegisterPagestep8.beginner.0'), description: t('RegisterPagestep8.beginner.1'), value: 'beginner' },
+        { id: 2, title: t('RegisterPagestep8.irregular.0'), description: t('RegisterPagestep8.irregular.1'), value: 'irregular' },
+        { id: 3, title: t('RegisterPagestep8.medium.0'), description: t('RegisterPagestep8.medium.1'), value: 'intermediate' },
+        { id: 4, title: t('RegisterPagestep8.advanced.0'), description: t('RegisterPagestep8.advanced.1'), value: 'advanced' },
     ];
 
-    const handleTrainingLevel = (level: Level) => {
-        setSelectedLevel(level.id);
-        updateData({ fitness_level: level.id });
+    const handleTrainingLevel = (levelValue: string) => {
+        setSelectedLevel(levelValue);
+        updateData({ fitness_level: levelValue });
     };
 
     const handlePrevStep = () => {
@@ -54,16 +54,16 @@ export default function RegisterStep7() {
             </div>
 
             <div className="flex items-center justify-center h-[70%] w-full lg:max-w-3xl">
-                <div className="flex flex-col items-center justify-center space-y-8 w-full py">
+                <div className="flex flex-col items-center justify-center space-y-8 w-full">
                     {levels.map(level => (
                         <button
                             key={level.id}
-                            onClick={() => handleTrainingLevel(level)}
+                            onClick={() => handleTrainingLevel(level.value)}
                             className={`w-full p-8 flex text-left items-center border rounded-lg text-3xl transition-all duration-300 transform font-semibold
-                                ${selectedLevel === level.id ? 'bg-black text-gray-50 scale-105 shadow-lg' : 'bg-white text-black hover:scale-105 hover:shadow-md border-gray-300'}`}>   
+                                ${selectedLevel === level.value ? 'bg-black text-gray-50 scale-105 shadow-lg' : 'bg-white text-black hover:scale-105 hover:shadow-md border-gray-300'}`}>
                             <div className="text-left">
                                 <span className="text-2xl font-medium">{level.title}</span>
-                                <p className={`text-xl ${selectedLevel === level.id ? 'text-white' : 'text-gray-500'}`}>{level.description}</p>
+                                <p className={`text-xl ${selectedLevel === level.value ? 'text-white' : 'text-gray-500'}`}>{level.description}</p>
                             </div>
                         </button>
                     ))}
@@ -77,7 +77,7 @@ export default function RegisterStep7() {
                 isSubmittingPrev={isSubmittingPrev}
                 prevText={t('RegisterPage.back')}
                 nextText={t('RegisterPage.next')}
-                isNextDisabled={selectedLevel === null || selectedLevel === undefined}
+                isNextDisabled={!selectedLevel}
             />
         </div>
     );

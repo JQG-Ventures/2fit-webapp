@@ -24,7 +24,7 @@ const ExercisePage = () => {
 
     useEffect(() => {
         if (workoutData) {
-            setExercises(workoutData.exercises);
+            setExercises(workoutData.workout_schedule?.[0]?.exercises);
         }
     }, [workoutData]);
 
@@ -43,7 +43,7 @@ const ExercisePage = () => {
                 const nextIndex = currentExerciseIndex + 1;
                 if (nextIndex < exercises.length) {
                     setIsRest(true);
-                    setRemainingRestTime(exercises[currentExerciseIndex].rest);
+                    setRemainingRestTime(exercises[currentExerciseIndex].rest_seconds);
                 } else {
                     router.push(`/workouts/plan/${id}/finish`);
                 }

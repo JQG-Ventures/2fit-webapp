@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSessionContext } from '../_providers/SessionProvider';
 import { fetchWithAuth } from '../utils/fetchWithAuth';
-import { useRouter } from 'next/router';
+
 
 export const useFetch = (url: string, options = {}) => {
     const { token, loading: sessionLoading } = useSessionContext();
@@ -38,16 +38,17 @@ export const useFetch = (url: string, options = {}) => {
                 });
 
                 setStatusCode(response.status);
+                const jsonData = await response.json();
 
-                if (response.ok || response.status === 404) {
-                    const jsonData = await response.json();
+                if (response.ok) {
                     setData(jsonData.message);
+                } else if (response.status === 404) {
+                    setData(null);
                 } else {
                     const errorMsg = await response.json();
                     setError(errorMsg.message || 'Unknown error occurred');
                 }
             } catch (err) {
-                console.log(err);
                 setError('Failed to fetch data');
             } finally {
                 setLoading(false);

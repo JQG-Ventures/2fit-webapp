@@ -1,106 +1,123 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
-import { registerUser } from '../../_services/registerService';
 import { useTranslation } from 'react-i18next';
-import { signIn } from 'next-auth/react';
+import RegistrationHeader from '@/app/_components/register/RegistrationHeader';
+import RegistrationButtons from '@/app/_components/register/RegisterButtons';
 
 
 export default function RegisterStep10() {
     const { t } = useTranslation('global');
-    const [textIndex, setTextIndex] = useState(0);
-    const [showText, setShowText] = useState(true);
-    const [isLoading, setIsLoading] = useState(true);
-    const [errorMessage, setErrorMessage] = useState('');
+    const { data, updateData } = useRegister();
+    const [isSubmittingNext, setIsSubmittingNext] = useState(false);
+    const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
+    const [selectedDays, setSelectedDays] = useState<string[]>(
+        data.training_preferences?.available_days || []
+    );
     const router = useRouter();
-    const { data } = useRegister();
 
-    const texts = [
-        t('RegisterPagestep10.texts.0'),
-        t('RegisterPagestep10.texts.1'),
-        t('RegisterPagestep10.texts.2'),
-        t('RegisterPagestep10.texts.3'),
-        t('RegisterPagestep10.texts.4')
+    const days = [
+        { id: 1, label: t('RegisterPagestep10.days.0'), value: 'monday' },
+        { id: 2, label: t('RegisterPagestep10.days.1'), value: 'tuesday' },
+        { id: 3, label: t('RegisterPagestep10.days.2'), value: 'wednesday' },
+        { id: 4, label: t('RegisterPagestep10.days.3'), value: 'thursday' },
+        { id: 5, label: t('RegisterPagestep10.days.4'), value: 'friday' },
+        { id: 6, label: t('RegisterPagestep10.days.5'), value: 'saturday' },
+        { id: 7, label: t('RegisterPagestep10.days.6'), value: 'sunday' },
     ];
 
-    const changeText = useCallback(() => {
-        setShowText(false);
-        setTimeout(() => {
-            setTextIndex((prevIndex) => (prevIndex + 1) % texts.length);
-            setShowText(true);
-        }, 500);
-    }, [texts.length]);
+    const handleDaySelection = (dayValue: string) => {
+        setSelectedDays((prevSelected) => {
+            const updatedSelectedDays = prevSelected.includes(dayValue)
+                ? prevSelected.filter((value) => value !== dayValue)
+                : [...prevSelected, dayValue];
 
-    useEffect(() => {
-        const changeTextInterval = setInterval(changeText, 2500);
+            updateData({
+                training_preferences: {
+                    ...data.training_preferences,
+                    available_days: updatedSelectedDays,
+                },
+            });
 
-        const handleRegistration = async () => {
-            try {
-                const result = await registerUser(data);
-                const password = data.password
-                const email = data.email
-                const response = await signIn("credentials", {
-                    email,
-                    password,
-                    redirect: false,
-                });
-
-                console.log(response)
-
-                if (!response?.ok) {
-                    setErrorMessage(t('RegisterPagestep10.errormsg'));
-                    setIsLoading(false);
-                    setTimeout(() => {
-                        router.push('/');
-                    }, 1000);
-                    router.push("/");
-                }
-
-                setTimeout(() => {
-                    router.push('/home');
-                }, 3000);
-            } catch (error) {
-                setErrorMessage(t('RegisterPagestep10.errormsg'));
-                setIsLoading(false);
-            }
-        };
-
-        handleRegistration();
-
-        return () => {
-            clearInterval(changeTextInterval);
-        };
-    }, [router, data, changeText]);
-
-    const handleRetry = () => {
-        router.push('/');
+            return updatedSelectedDays;
+        });
     };
 
+    const handlePrevStep = () => {
+        setIsSubmittingPrev(true);
+        router.push('/register/step9');
+    };
+
+    const handleNextStep = () => {
+        setIsSubmittingNext(true);
+
+        updateData({
+            training_preferences: {
+                ...data.training_preferences,
+                available_days: selectedDays,
+            },
+        });
+        router.push('/register/step11');
+        console.log(data);
+    };
+
+    useEffect(() => {
+        if (
+            data.training_preferences?.available_days &&
+            data.training_preferences.available_days.length > 0
+        ) {
+            setSelectedDays(data.training_preferences.available_days);
+        }
+    }, [data.training_preferences]);
+
     return (
-        <div className="flex items-center justify-center min-h-screen bg-white p-4">
-            <div className="w-full max-w-lg flex flex-col items-center justify-evenly h-[60vh] text-center">
-                {isLoading ? (
-                    <>
-                        <h2 className="text-5xl font-bold mb-10">{t('RegisterPagestep10.creating.0')} <br /> {t('RegisterPagestep10.creating.1')}</h2>
-                        <div className="w-16 h-16 border-4 border-gray-300 border-t-black rounded-full animate-spin mb-10"></div>
-                        <div className={`transition-opacity duration-500 ${showText ? 'opacity-100' : 'opacity-0'}`}>
-                            <p className="text-2xl">{texts[textIndex]}</p>
-                        </div>
-                    </>
-                ) : (
-                    <div>
-                        <h2 className="text-3xl font-bold text-red-600 mb-6">{errorMessage}</h2>
-                        <button
-                            onClick={handleRetry}
-                            className="mt-4 px-6 py-4 bg-red-500 text-white text-2xl rounded-lg"
-                        >
-                            {t('RegisterPagestep10.homebtn')}
-                        </button>
-                    </div>
-                )}
+        <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
+            <div className="h-[20%] w-full lg:max-w-3xl">
+                <RegistrationHeader
+                    title={t('RegisterPagestep10.title')}
+                    description={t('RegisterPagestep10.description')}
+                />
             </div>
+
+            <div
+                className="grid grid-cols-2 lg:grid-cols-3 h-[70%] w-full lg:max-w-3xl gap-8 py-12"
+                style={{ gridAutoRows: '1fr' }}
+            >
+                {days.map((day) => (
+                    <button
+                        key={day.id}
+                        onClick={() => handleDaySelection(day.value)}
+                        className={`flex items-center justify-center w-full my-6 p-8 border border-gray-300 rounded-lg text-3xl transition-all duration-300 transform font-semibold
+                            ${selectedDays.includes(day.value)
+                                ? 'bg-black text-gray-50 scale-105 shadow-lg'
+                                : 'bg-white text-black hover:scale-105 hover:shadow-md'
+                            }
+                            ${days.length % 2 !== 0 && day.id === days.length
+                                ? 'col-span-2 lg:col-span-1 lg:justify-self-center'
+                                : ''
+                            }
+                        `}
+                        aria-pressed={selectedDays.includes(day.value)}
+                        aria-label={day.label}
+                    >
+                        <div className="text-center">
+                            <span className="text-2xl font-medium">{day.label}</span>
+                        </div>
+                    </button>
+                ))}
+            </div>
+
+            <RegistrationButtons
+                handleNext={handleNextStep}
+                handlePrev={handlePrevStep}
+                isSubmittingNext={isSubmittingNext}
+                isSubmittingPrev={isSubmittingPrev}
+                prevText={t('RegisterPage.back')}
+                nextText={t('RegisterPage.next')}
+                isNextDisabled={selectedDays.length === 0}
+            />
         </div>
     );
 }
