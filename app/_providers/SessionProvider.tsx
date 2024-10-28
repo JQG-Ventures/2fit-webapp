@@ -22,8 +22,6 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  console.log("DEBUGGING", session)
-
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
       setUserId(session.user.userId);

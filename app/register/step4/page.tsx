@@ -7,25 +7,24 @@ import RegistrationHeader from '../../_components/register/RegistrationHeader';
 import RegistrationButtons from '@/app/_components/register/RegisterButtons';
 import { useTranslation } from 'react-i18next';
 
-
 export default function RegisterStep4() {
     const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
     const [isSubmittingNext, setIsSubmittingNext] = useState(false);
     const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
-    const [selectedGoal, setSelectedGoal] = useState(data.fitness_goal);
+    const [selectedGoal, setSelectedGoal] = useState(data.fitness_goal || null);
     const router = useRouter();
 
     const goals = [
-        { id: 1, label: t('RegisterPagestep4.weight'), icon: '⚖️' },
-        { id: 2, label: t('RegisterPagestep4.fit'), icon: '🍀' },
-        { id: 3, label: t('RegisterPagestep4.stronger'), icon: '💪🏻' },
-        { id: 4, label: t('RegisterPagestep4.muscle'), icon: '🚀' },
+        { id: 1, label: t('RegisterPagestep4.weight'), value: 'weight', icon: '⚖️' },
+        { id: 2, label: t('RegisterPagestep4.fit'), value: 'keep', icon: '🍀' },
+        { id: 3, label: t('RegisterPagestep4.stronger'), value: 'strength', icon: '💪🏻' },
+        { id: 4, label: t('RegisterPagestep4.muscle'), value: 'muscle', icon: '🚀' },
     ];
 
-    const handleGoalSelection = (goal) => {
-        setSelectedGoal(goal);
-        updateData({ fitness_goal: goal });
+    const handleGoalSelection = (goalValue) => {
+        setSelectedGoal(goalValue);
+        updateData({ fitness_goal: goalValue });
     };
 
     const handleNextStep = () => {
@@ -53,8 +52,8 @@ export default function RegisterStep4() {
                         <button
                             key={goal.id}
                             className={`w-full p-8 flex text-left items-center border rounded-lg text-3xl transition-all duration-300 transform 
-                                ${selectedGoal === goal.id ? 'bg-black text-white scale-105 shadow-lg' : 'bg-white text-black hover:scale-105 hover:shadow-md border-gray-300'}`}
-                            onClick={() => handleGoalSelection(goal.id)}
+                                ${selectedGoal === goal.value ? 'bg-black text-white scale-105 shadow-lg' : 'bg-white text-black hover:scale-105 hover:shadow-md border-gray-300'}`}
+                            onClick={() => handleGoalSelection(goal.value)}
                         >
                             <span role="img" aria-label={goal.label} className="mr-4">{goal.icon}</span> {goal.label}
                         </button>
@@ -69,7 +68,7 @@ export default function RegisterStep4() {
                 isSubmittingPrev={isSubmittingPrev}
                 prevText={t('RegisterPage.back')}
                 nextText={t('RegisterPage.next')}
-                isNextDisabled={selectedGoal === null || selectedGoal === undefined}
+                isNextDisabled={!selectedGoal}
             />
         </div>
     );

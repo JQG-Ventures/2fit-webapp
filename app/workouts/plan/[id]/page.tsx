@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import WorkoutHeader from '../../../_components/workouts/WorkoutHeader';
 import WorkoutDetails from '../../../_components/workouts/WorkoutDetails';
 import WorkoutFooter from '../../../_components/workouts/WorkoutFooterStart';
-import ExerciseList from '../../../_components/workouts/WorkoutList';
+import ExerciseList from '../../../_components/workouts/ExerciseList';
 import LoadingScreen from '../../../_components/animations/LoadingScreen';
 import SavedMessage from '../../../_components/others/SavedMessage';
 import { useTranslation } from 'react-i18next';
@@ -59,7 +59,7 @@ const WorkoutPlanPage = () => {
                 <WorkoutDetails workoutPlan={workoutPlan} />
             </div>            
     
-            <ExerciseList exercises={workoutPlan?.exercises || []} isMobile={true} />
+            <ExerciseList exercises={workoutPlan.workout_schedule?.[0]?.exercises || []} isMobile={true} />
 
             <WorkoutFooter 
                 onStartClick={handleSubmit}
