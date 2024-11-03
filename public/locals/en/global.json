@@ -165,7 +165,27 @@
     "gender": "Gender",
     "update": "Update",
     "female": "Female",
-    "male": "Male"
+    "male": "Male",
+    "other": "Other",
+    "Notifications": {
+        "Title": "Notifications",
+        "GeneralNotifications": "General Notification",
+        "Sound": "Sound",
+        "Vibrate": "Vibrate",
+        "AppUpdates": "App Updates",
+        "NewServicesAvailable": "New Services Available",
+        "NewTipsAvailable": "New Tips Available"
+      },
+      "Security": {
+        "Title": "Security",
+        "FaceID": "Face ID",
+        "RememberMe": "Remember Me",
+        "TouchID": "Touch ID",
+        "GoogleAuthenticator": "Google Authenticator",
+        "ChangePassword": "Change Password",
+        "Successfullchangepswd": "Password updated successfully.",
+        "Failedchangepswd": "Password update failed."
+      }
   },
   "upgrade": {
     "title": "Upgrade to Premium",
@@ -251,5 +271,17 @@
       "goto": "Go to Another Workout",
       "home": "Home"
     }
+  },
+  "ChangePasswordModal": {
+    "title": "Change Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "passwordRequired": "Password is required.",
+    "passwordValidationError": "Password must be at least 8 characters long, include uppercase and lowercase letters, a number, and a special character, and contain no spaces.",
+    "confirmPasswordRequired": "Please confirm your password.",
+    "passwordsDoNotMatch": "Passwords do not match.",
+    "cancel": "Cancel",
+    "update": "Update",
+    "updating": "Updating..."
   }
 }

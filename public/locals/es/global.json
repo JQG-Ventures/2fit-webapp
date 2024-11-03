@@ -173,7 +173,26 @@
     "update": "Actualizar",
     "female": "Femenino",
     "male": "Masculino",
-    "other": "Otro"
+    "other": "Otro",
+    "Notifications": {
+        "Title": "Notificaciones",
+        "GeneralNotifications": "Notificaciones Generales",
+        "Sound": "Sonido",
+        "Vibrate": "Vibración",
+        "AppUpdates": "Actualizaciones de la aplicación",
+        "NewServicesAvailable": "Nuevos servicios disponibles",
+        "NewTipsAvailable": "Nuevos consejos disponibles"
+      },
+      "Security": {
+        "Title": "Seguridad",
+        "FaceID": "Identificación Facial",
+        "RememberMe": "Recuerdame",
+        "TouchID": "Identificación táctil",
+        "GoogleAuthenticator": "Autenticador con Google",
+        "ChangePassword": "Cambiar contraseña",
+        "Successfullchangepswd": "Contraseña actualizada exitosamente.",
+        "Failedchangepswd": "Error al actualizar la contraseña."
+      }
   },
   "upgrade": {
     "title": "Actualizar a Premium",
@@ -258,5 +277,17 @@
       "goto": "Buscar otra rutina",
       "home": "Inicio"
     }
+  },
+  "ChangePasswordModal": {
+    "title": "Cambiar Contraseña",
+    "newPassword": "Nueva Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "passwordRequired": "La contraseña es obligatoria.",
+    "passwordValidationError": "La contraseña debe tener al menos 8 caracteres, incluir letras mayúsculas y minúsculas, un número y un carácter especial, y no debe contener espacios.",
+    "confirmPasswordRequired": "Por favor confirma tu contraseña.",
+    "passwordsDoNotMatch": "Las contraseñas no coinciden.",
+    "cancel": "Cancelar",
+    "update": "Actualizar",
+    "updating": "Actualizando..."
   }
 }

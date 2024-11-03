@@ -33,7 +33,7 @@ const ProfilePage: React.FC = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const settings = [
 		{ label: 'Edit Profile', icon: CiUser, path: '/profile/edit' },
-		{ label: 'Notifications', icon: CiBellOn, path: '/profile/notifications' },
+		{ label: 'Notifications', icon: CiBellOn, path: '/profile/notification' },
 		{ label: 'Security', icon: CiLock, path: '/profile/security' },
 		{ label: 'Help', icon: CiCircleQuestion, path: '/profile/help' },
 	];

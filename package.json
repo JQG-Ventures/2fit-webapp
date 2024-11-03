@@ -11,6 +11,7 @@
   "dependencies": {
     "@nextui-org/react": "^2.4.6",
     "@vseslav/react-native-horizontal-picker": "^0.1.1",
+    "buffer": "^6.0.3",
     "embla-carousel-react": "^8.2.0",
     "i18next": "^23.15.1",
     "jsonwebtoken": "^9.0.2",
@@ -29,6 +30,7 @@
     "react-responsive": "^10.0.0",
     "react-router-dom": "^6.26.2",
     "react-slick": "^0.30.2",
+    "scrypt-js": "^3.0.1",
     "slick-carousel": "^1.8.1"
   },
   "devDependencies": {
