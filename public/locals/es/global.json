@@ -44,7 +44,9 @@
     "signupquestion": "¿Tienes una cuenta?",
     "signin": "Inicia sesión",
     "passwordValidationError": "La contraseña debe contener mayúscula, minúscula, número, carácteres especiales, y debe ser de mínimo 8 caracteres sin espacios.",
-    "emailValidationError": "Ingresa una dirección de correo electrónico válida."
+    "emailValidationError": "Ingresa una dirección de correo electrónico válida.",
+    "emailRegisteredError": "Este correo ya se encuentra registrado. Utiliza un correo distinto.",
+    "emailRegistrationError": "Hubo un error validando el correo. Por favor intentalo de nuevo mas tarde."
   },
   "RegisterPagestep1":{
     "create": [
@@ -128,6 +130,11 @@
     "dancing": "Baile"
   },
   "RegisterPagestep10":{
+    "title": "Frecuencia Semanal",
+    "description": "¿Qué tan seguido quieres ejercitarte? Esto nos dará la receta perfecta para ti.",
+    "days": ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+  },
+  "RegisterPagestep11":{
     "texts": [
         "Creamos tu plan de entrenamiento",
         "Análizando tu perfil demográfico",
@@ -276,6 +283,13 @@
       "minutes": "Minutos",
       "goto": "Buscar otra rutina",
       "home": "Inicio"
+    },
+    "PopularExercisesSection": {
+      "popularExerciseTitle": "Ejercicios Populares",
+      "seeDetails": "Ver Detalles",
+      "PopularSectionEmpty": "Seguimos aprendiendo de ti para darte las mejores recomendaciones!",
+      "exercises": "ejercicios",
+      "start": "Iniciar ahora"
     }
   },
   "ChangePasswordModal": {

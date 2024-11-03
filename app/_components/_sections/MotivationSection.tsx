@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaRobot, FaTimes } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/navigation';
 
 // Example motivational messages
 const motivationalMessages = [
@@ -24,6 +25,7 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
     const [dailyMessage, setDailyMessage] = useState("");
     const [isHovered, setIsHovered] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
+    const router = useRouter()
 
     useEffect(() => {
         // Set the daily motivational message based on the day of the week
@@ -76,7 +78,9 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
                     <p className="text-gray-700 text-lg">{t('home.trainer.talk')}</p>
                     <div className="button-container">
                         {isBotUser ? (
-                            <button className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition-colors">
+                            <button 
+                                onClick={() => router.push('/chat')}
+                                className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition-colors">
                                 {t('home.trainer.letschat')}
                             </button>
                         ) : (

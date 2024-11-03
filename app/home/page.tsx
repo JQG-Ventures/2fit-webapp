@@ -41,17 +41,17 @@ const HomePage: React.FC = () => {
     const options = useMemo(() => ({
         method: 'GET',
     }), []);
-    const workoutPlansUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans`;
+    const workoutPlansUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans/one-day`;
     const savedWorkoutPlansUrl = userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/saved/${userId}` : '';
     const libraryWorkoutCountUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/library`;
-    const guidedWorkoutsUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/guided`;
+    // const guidedWorkoutsUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/guided`;
 
     const { data: workoutPlans, loading: loadingWorkoutPlans, error: workoutPlansError } = useFetch(workoutPlansUrl, options);
     const { data: savedWorkoutPlans, loading: loadingSavedWorkoutPlans, error: savedWorkoutPlansError } = useFetch(savedWorkoutPlansUrl, options);
     const { data: libraryWorkouts, loading: loadingLibraryWorkouts, error: libraryWorkoutsError } = useFetch(libraryWorkoutCountUrl, options);
-    const { data: guidedWorkouts, loading: loadingGuidedWorkouts, error: guidedWorkoutsError } = useFetch(guidedWorkoutsUrl, options);
-    const loading = loadingWorkoutPlans || loadingSavedWorkoutPlans || loadingLibraryWorkouts || loadingGuidedWorkouts;
-    const error = workoutPlansError || savedWorkoutPlansError || libraryWorkoutsError || guidedWorkoutsError;
+    // const { data: guidedWorkouts, loading: loadingGuidedWorkouts, error: guidedWorkoutsError } = useFetch(guidedWorkoutsUrl, options);
+    const loading = loadingWorkoutPlans || loadingSavedWorkoutPlans || loadingLibraryWorkouts; //|| loadingGuidedWorkouts;
+    const error = workoutPlansError || savedWorkoutPlansError || libraryWorkoutsError; //|| guidedWorkoutsError;
 
     const paddingBottom = isDesktopOrLaptop ? 0 : navbarHeight * 1.1;
 
@@ -64,6 +64,8 @@ const HomePage: React.FC = () => {
             </div>
         );
     }
+
+    
 
     return (
         <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom }}>
@@ -86,7 +88,7 @@ const HomePage: React.FC = () => {
                     savedWorkoutPlans={savedWorkoutPlans || []} 
                 />
                 {!isDesktopOrLaptop && <MotivationSection isBotUser={user.hasRoutine} />}
-                <GuidedWorkoutsSection workouts={guidedWorkouts || []} />
+                {/* <GuidedWorkoutsSection workouts={guidedWorkouts || []} /> */}
                 <WorkoutLibrarySection workouts={libraryWorkouts || []} />
                 <SavedWorkoutsSection
                     workouts={savedWorkoutPlans || []}

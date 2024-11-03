@@ -2,7 +2,6 @@ import { getSession } from "next-auth/react";
 
 export const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
     const session = await getSession();
-    console.log("Session: ", session)
 
     let response = await fetch(url, options);
 
@@ -19,8 +18,6 @@ export const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
                 "Authorization": `Bearer ${session?.refreshToken}`,
             },
         });
-
-        console.log("DEBUG ", `Bearer ${session?.refreshToken}`)
 
         if (refreshResponse.ok) {
             const refreshedTokens = await refreshResponse.json();

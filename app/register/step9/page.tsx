@@ -1,41 +1,46 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import RegistrationHeader from '../../_components/register/RegistrationHeader';
-import RegistrationButtons from '@/app/_components/register/RegisterButtons';
 import { useTranslation } from 'react-i18next';
-
+import { FaRunning, FaDumbbell, FaMusic } from 'react-icons/fa';
+import { FaRegHandPaper } from 'react-icons/fa';
+import RegistrationButtons from '@/app/_components/register/RegisterButtons';
+import { GrYoga } from "react-icons/gr";
 
 export default function RegisterStep9() {
     const { t } = useTranslation('global');
-    const [selectedActivities, setSelectedActivities] = useState<number[]>([]);
+    const { data, updateData } = useRegister();
+    const [selectedActivities, setSelectedActivities] = useState<string[]>(data.workout_type || []);
     const [isSubmittingNext, setIsSubmittingNext] = useState(false);
     const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
     const router = useRouter();
-    const { data, updateData } = useRegister();
 
     const activities = [
-        { id: 1, label: t('RegisterPagestep9.stretch'), icon: '🧘' },
-        { id: 2, label: t('RegisterPagestep9.cardio'), icon: '🏃' },
-        { id: 3, label: t('RegisterPagestep9.yoga'), icon: '🧘' },
-        { id: 4, label: t('RegisterPagestep9.powertraining'), icon: '🏋️' },
-        { id: 5, label: t('RegisterPagestep9.dancing'), icon: '💃' },
+        { id: 1, label: t('RegisterPagestep9.stretch'), value: 'stretch', icon: <FaRegHandPaper size={40} /> },
+        { id: 2, label: t('RegisterPagestep9.cardio'), value: 'cardio', icon: <FaRunning size={40} /> },
+        { id: 3, label: t('RegisterPagestep9.yoga'), value: 'yoga', icon: <GrYoga size={40} /> },
+        { id: 4, label: t('RegisterPagestep9.powertraining'), value: 'strength', icon: <FaDumbbell size={40} /> },
+        { id: 5, label: t('RegisterPagestep9.dancing'), value: 'dance', icon: <FaMusic size={40} /> },
     ];
 
-    const handleActivitySelection = (id: number) => {
-        setSelectedActivities((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((activityId) => activityId !== id)
-                : [...prevSelected, id]
-        );
+    const handleActivitySelection = (activityValue: string) => {
+        setSelectedActivities((prevSelected) => {
+            const updatedSelectedActivities = prevSelected.includes(activityValue)
+                ? prevSelected.filter((value) => value !== activityValue)
+                : [...prevSelected, activityValue];
+
+            updateData({ training_preferences: { workout_types: updatedSelectedActivities } });
+
+            return updatedSelectedActivities;
+        });
     };
 
     const handleNextStep = () => {
         setIsSubmittingNext(true);
-        updateData({ workout_type: selectedActivities });
-        console.log(data);
+        updateData({ training_preferences: { workout_types: selectedActivities } });
         router.push('/register/step10');
     };
 
@@ -43,6 +48,12 @@ export default function RegisterStep9() {
         setIsSubmittingPrev(true);
         router.push('/register/step8');
     };
+
+    useEffect(() => {
+        if (data.training_preferences?.workout_types && data.training_preferences.workout_types.length > 0) {
+            setSelectedActivities(data.training_preferences.workout_types);
+        }
+    }, [data.training_preferences]);
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
@@ -53,41 +64,32 @@ export default function RegisterStep9() {
                 />
             </div>
 
-            <div className="flex flex-col items-center justify-center h-[70%] w-full lg:max-w-3xl space-y-8">
-                <div className="w-full px-8 py">
+            <div className="flex justify-center h-[70%] w-full lg:max-w-3xl">
+                <div className="flex flex-col items-center justify-center space-y-6 w-full">
                     {activities.map((activity) => (
                         <button
                             key={activity.id}
-                            onClick={() => handleActivitySelection(activity.id)}
+                            onClick={() => handleActivitySelection(activity.value)}
                             className={`
-                    flex items-center justify-between w-full my-6 p-8 border border-grey-200 rounded-lg transform
-                    transition duration-200 ease-in-out
-                    bg-white
-                    ${selectedActivities.includes(activity.id)
-                                    ? 'shadow-lg border border-black rounded-lg scale-105'
-                                    : 'shadow-none hover:shadow-md'
+                                flex flex-col items-center justify-center w-full p-5 border rounded-lg text-center transition-all duration-300 transform font-semibold
+                                ${selectedActivities.includes(activity.value)
+                                    ? 'bg-black text-gray-50 scale-105 shadow-lg'
+                                    : 'bg-white text-black hover:scale-105 hover:shadow-md border-gray-300'
                                 }
-                    ${activity.bgColor || ''}
-                `}
+                            `}
+                            aria-pressed={selectedActivities.includes(activity.value)}
+                            aria-label={activity.label}
                         >
-                            <div className="flex items-center">
-                                <span className="text-3xl mr-4">{activity.icon}</span>
-                                <span className="text-2xl font-medium">{activity.label}</span>
+                            <div className="mb-4">
+                                {activity.icon}
                             </div>
-                            <span
-                                className={`
-                        w-6 h-6 border-2 rounded-full transition duration-200 ease-in-out
-                        ${selectedActivities.includes(activity.id)
-                                        ? 'bg-green-600 border-green-600'
-                                        : 'border-gray-400'
-                                    }
-                    `}
-                            ></span>
+                            <div className="text-lg font-medium">
+                                {activity.label}
+                            </div>
                         </button>
                     ))}
                 </div>
             </div>
-
 
             <RegistrationButtons
                 handleNext={handleNextStep}
@@ -96,7 +98,7 @@ export default function RegisterStep9() {
                 isSubmittingPrev={isSubmittingPrev}
                 prevText={t('RegisterPage.back')}
                 nextText={t('RegisterPage.next')}
-                isNextDisabled={selectedActivities.length === 0 || selectedActivities === undefined}
+                isNextDisabled={selectedActivities.length === 0}
             />
         </div>
     );
