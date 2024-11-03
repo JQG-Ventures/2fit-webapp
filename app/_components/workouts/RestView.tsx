@@ -58,8 +58,8 @@ const RestView: React.FC<RestViewProps> = ({ restDuration, onNext, onBack, nextE
                         </div>
                         <div className="overflow-hidden">
                             <img 
-                                src={nextExercise.image_url} 
-                                alt={nextExercise.name} 
+                                src={nextExercise.details.image_url} 
+                                alt={nextExercise.details.name} 
                                 className="mt-2 rounded-lg w-full max-w-lg object-contain"/>
                             </div>
                     </>

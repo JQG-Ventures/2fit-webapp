@@ -16,6 +16,7 @@ const ExerciseView: React.FC<ExerciseViewProps> = ({ exercise, onNext, onBack })
         return <LoadingScreen />;
     }
 
+    console.log(exercise);
     const { t } = useTranslation('global');
     const darkerGreenGradientColors: [string, string, string, string] = ['#34D399', '#10B981', '#059669', '#047857'];
     const countdownSize = 180;
@@ -23,29 +24,29 @@ const ExerciseView: React.FC<ExerciseViewProps> = ({ exercise, onNext, onBack })
     const [isPaused, setIsPaused] = useState(false);
 
     const splitColorsTime: [number, number, ...number[]] = [
-        Math.round((exercise.rest / darkerGreenGradientColors.length) * (darkerGreenGradientColors.length - 1)),
-        Math.round((exercise.rest / darkerGreenGradientColors.length) * (darkerGreenGradientColors.length - 2))
+        Math.round((exercise.rest_seconds / darkerGreenGradientColors.length) * (darkerGreenGradientColors.length - 1)),
+        Math.round((exercise.rest_seconds / darkerGreenGradientColors.length) * (darkerGreenGradientColors.length - 2))
     ];
 
     for (let i = 2; i < darkerGreenGradientColors.length; i++) {
-        splitColorsTime.push(Math.round((exercise.rest / darkerGreenGradientColors.length) * (darkerGreenGradientColors.length - i)));
+        splitColorsTime.push(Math.round((exercise.rest_seconds / darkerGreenGradientColors.length) * (darkerGreenGradientColors.length - i)));
     }
 
     return (
         <div className='flex flex-col items-center justify-center h-full w-full bg-white rounded-lg shadow-lg lg:pt-[8vh]'>            
             <div className='relative h-[50%] lg:h-[35%] w-full overflow-hidden'>
                 <img 
-                    src={exercise?.image_url} 
-                    alt={exercise?.name} 
+                    src={exercise?.details.image_url} 
+                    alt={exercise?.details.name} 
                     className="w-full h-full object-contain"
                 />
             </div>
 
             <div className="flex flex-col justify-evenly items-center h-[40%] my-6">
-                <h2 className='text-center text-5xl font-bold'>{exercise.name}</h2>
+                <h2 className='text-center text-5xl font-bold'>{exercise.details.name}</h2>
                 <CountdownCircleTimer
                     isPlaying={!isPaused}
-                    duration={exercise.rest}
+                    duration={exercise.rest_seconds}
                     size={countdownSize}
                     strokeWidth={countdownStrokeWidth}
                     colors={darkerGreenGradientColors}

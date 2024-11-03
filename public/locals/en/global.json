@@ -126,6 +126,11 @@
     "dancing": "Dancing"
   },
   "RegisterPagestep10":{
+    "title": "Weekly frequency",
+    "description": "Choose how often do you want to exercise. This will tune the perfect workout for you.",
+    "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+  },
+  "RegisterPagestep11":{
     "texts": [
         "We create your training plan",
         "Analyzing your demographic profile",
@@ -270,6 +275,13 @@
       "minutes": "Minutes",
       "goto": "Go to Another Workout",
       "home": "Home"
+    },
+    "PopularExercisesSection": {
+      "popularExerciseTitle": "Popular Exercises",
+      "seeDetails": "See Details",
+      "PopularSectionEmpty": "We are still learning to give you the bests workouts for you",
+      "exercises": "exercises",
+      "start": "Start Now"
     }
   },
   "ChangePasswordModal": {
