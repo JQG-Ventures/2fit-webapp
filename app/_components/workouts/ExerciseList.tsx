@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 
 const ExerciseList = ({ exercises, isMobile }) =>  {
-    console.log(exercises)
     const { t } = useTranslation('global');
     return (    
         <div className={isMobile ? 'pb-[13vh]' : ''}>
