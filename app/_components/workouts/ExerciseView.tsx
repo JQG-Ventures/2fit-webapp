@@ -3,30 +3,30 @@
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const ExerciseView = ({ exercise, onNext, onBack }) => {
   if (!exercise) {
     return null;
   }
 
-  const { t } = useTranslation('global');
   const [isPaused, setIsPaused] = useState(false);
 
   return (
     <div className="flex flex-col items-center justify-center h-full w-full bg-white">
       <div className="relative h-[50%] w-full overflow-hidden">
         <img
-          src={exercise.image_url}
-          alt={exercise.name}
+          src={exercise.image_url || exercise.details.image_url}
+          alt={exercise.name || exercise.details.name}
           className="w-full h-full object-contain"
         />
       </div>
-      <div className="flex flex-col justify-evenly items-center h-[40%] my-6">
-        <h2 className="text-center text-5xl font-bold">{exercise.name}</h2>
-        <p className="text-lg mt-2">
+      <div className="flex flex-col justify-between items-center h-[40%]">
+        <div>
+        <h2 className="text-center text-5xl font-bold">{exercise.details.name}</h2>
+        <p className="text-center text-lg mt-2">
           Set {exercise.currentSet} of {exercise.totalSets}
         </p>
+        </div>
         <CountdownCircleTimer
           isPlaying={!isPaused}
           duration={exercise.duration || 60}

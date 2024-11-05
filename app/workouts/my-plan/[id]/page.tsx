@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { FaArrowLeft, FaCheckCircle, FaFire } from 'react-icons/fa';
 import { FiPlayCircle } from 'react-icons/fi';
-import { GiWeightLiftingUp } from 'react-icons/gi';
 import LoadingScreen from '../../../_components/animations/LoadingScreen';
 import Modal from '../../../_components/profile/modal';
 import { useSessionContext } from '../../../_providers/SessionProvider';
@@ -136,11 +135,9 @@ export default function MyPlan() {
 
   const handleExerciseCardClick = (exercise, action) => {
     if (action === 'start') {
-      // Start the exercise flow
       setSelectedExercise(exercise);
       setShowExerciseFlow(true);
     } else {
-      // Show exercise details
       setSelectedExercise(exercise);
     }
   }
