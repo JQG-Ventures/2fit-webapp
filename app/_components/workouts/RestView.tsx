@@ -5,7 +5,6 @@ import { IoChevronBack } from 'react-icons/io5';
 
 const RestView = ({ restDuration, onNext, onBack, nextExercise }) => {
   const [remainingTime, setRemainingTime] = useState(restDuration);
-
   useEffect(() => {
     setRemainingTime(restDuration);
   }, [restDuration]);
@@ -46,11 +45,11 @@ const RestView = ({ restDuration, onNext, onBack, nextExercise }) => {
           <>
             <div className="text-left w-full">
               <h3 className="text-2xl">Next Exercise</h3>
-              <p className="text-3xl font-semibold my-8">{nextExercise.name}</p>
+              <p className="text-3xl font-semibold my-8">{nextExercise.name || nextExercise.details.name}</p>
             </div>
             <div className="overflow-hidden">
               <img
-                src={nextExercise.image_url}
+                src={nextExercise.image_url || nextExercise.details.image_url}
                 alt={nextExercise.name}
                 className="mt-2 rounded-lg w-full max-w-lg object-contain"
               />
