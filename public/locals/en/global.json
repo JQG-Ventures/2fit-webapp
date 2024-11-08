@@ -126,6 +126,11 @@
     "dancing": "Dancing"
   },
   "RegisterPagestep10":{
+    "title": "Weekly frequency",
+    "description": "Choose how often do you want to exercise. This will tune the perfect workout for you.",
+    "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+  },
+  "RegisterPagestep11":{
     "texts": [
         "We create your training plan",
         "Analyzing your demographic profile",
@@ -226,6 +231,12 @@
     }
   },
   "workouts": {
+    "exercise": "exercise",
+    "left": "left",
+    "challengeProgress": "Challenge progress",
+    "weeklyRoutine": "Weekly routine",
+    "workoutProgress": "Workout progress",
+    "fetchingError": "Error fetching progress",
     "plan": {
       "workoutAlreadySaved": "Workout already saved!",
       "workoutSaved": "Workout Saved!",
@@ -249,7 +260,28 @@
       "workouts": "Workouts",
       "minutes": "Minutes",
       "goto": "Go to Another Workout",
-      "home": "Home"
+      "home": "Home",
+      "of": "of"
+    },
+    "my-plan": {
+      "title": "My Workout Plan",
+      "noExercises": "No exercises for this day"
+    },
+    "PopularExercisesSection": {
+      "popularExerciseTitle": "Popular Exercises",
+      "seeDetails": "See Details",
+      "PopularSectionEmpty": "We are still learning to give you the bests workouts for you",
+      "exercises": "exercises",
+      "start": "Start Now"
     }
+  },
+  "ExerciseFlow": {
+    "ready": "Get Ready!",
+    "completed": "Exercise completed!"
+  },
+  "RestView": {
+    "rest": "Take a rest",
+    "nextEx": "Next Exercise",
+    "skip": "Skip rest"
   }
 }

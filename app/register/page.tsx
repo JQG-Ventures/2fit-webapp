@@ -42,7 +42,7 @@ export default function RegisterStep1() {
         const validationErrors: Record<string, string> = {};
 
         if (!formData.email || !validateEmail(formData.email)) {
-            validationErrors.email = t('RegisterPage.emailValidationError');
+            validationErrors.email = t('RegisterPage.emailRegisteredError');
         }
 
         if (!formData.password || !validatePassword(formData.password)) {
