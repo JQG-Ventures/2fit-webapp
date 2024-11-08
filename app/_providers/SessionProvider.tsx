@@ -23,10 +23,10 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (status === 'authenticated' && session?.user) {
-      setUserId(session.user.userId);
-      setToken(session.user.token);
-      setUserName(session.user.userName);
+    if (status === 'authenticated' && session?.user) { 
+      setUserId(session.user.userId || null); 
+      setToken(session.user.token || null); 
+      setUserName(session.user.userName || null);
     }
 
     setLoading(status === 'loading');

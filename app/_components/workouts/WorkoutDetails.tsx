@@ -58,7 +58,7 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
     };
 
     return (
-        <div className="my-10 px-10 text-center no-scrollbar flex flex-col items-center">
+        <div className="my-10 px-10 text-center no-scrollbar flex flex-col items-center mx-auto max-w-3xl">
             <h1 className="text-black text-5xl font-semibold mb-10">{workoutPlan.name}</h1>
             <div className="flex justify-center space-x-4">
                 <Tag icon={FaUserAlt} text={workoutPlan.level} />
