@@ -52,7 +52,7 @@ const WorkoutLibrarySection: React.FC<WorkoutLibrarySectionProps> = ({ workouts 
                         </h2>
                         <button 
                             onClick={() => router.push('/workouts/library')}
-                            className="text-blue-600 hover:underline lg:text-lg"
+                            className="text-blue-600 hover:underline text-lg lg:text-2xl"
                         >
                             {t('home.WorkoutLibrarySection.viewall')}
                         </button>
