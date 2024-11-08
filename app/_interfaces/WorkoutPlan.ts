@@ -20,9 +20,3 @@ interface WorkoutDay {
     exercises: Exercise[];
 }
 
-interface Exercise {
-    exercise_id: string;
-    sets: number;
-    reps: number;
-    rest_seconds: number;
-}
