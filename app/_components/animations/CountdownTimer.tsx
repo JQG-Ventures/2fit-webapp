@@ -4,7 +4,7 @@ import 'react-circular-progressbar/dist/styles.css';
 interface CountdownTimerProps {
     title: string;
     duration: number;
-    resetTrigger: number;
+    resetTrigger?: number;
     size: number;
     strockWidth: number;
     onComplete: () => void;
@@ -19,9 +19,11 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ title, duration, resetT
 
     return (
         <div className="flex flex-col h-[100%] justify-evenly items-center">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-green-400 to-green-600 text-transparent bg-clip-text">
-                {title}
-            </h2>
+            <div className='h-[5%] items-center'>
+                <h2 className="text-4xl h-[100%] font-bold bg-gradient-to-r from-green-400 to-green-600 text-transparent bg-clip-text">
+                    {title}
+                </h2>
+            </div>
             <div>
                 <CountdownCircleTimer
                     key={resetTrigger}
