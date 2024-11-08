@@ -1,20 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaApple, FaFacebook, FaGoogle } from 'react-icons/fa';
-import { IoChevronBack } from "react-icons/io5";
+import { IoChevronBack, IoCalendarOutline } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import ButtonWithSpinner from '../../_components/others/ButtonWithSpinner';
 import InputWithIcon from '../../_components/form/InputWithIcon';
-import { IoCalendarOutline } from 'react-icons/io5';
-import { sendCode } from '../../_services/registerService';
 import PhoneInput from '../../_components/form/PhoneInput';
 import countryCodes from '@/app/data/countryCodes.json';
 import { calculateAge } from '@/app/utils/formUtils';
+import { sendCode } from '../../_services/registerService';
 import { fetchUserDataByNumber } from '@/app/_services/userService';
 import { useTranslation } from 'react-i18next';
-
 
 interface FormData {
     number: string;
@@ -50,6 +48,11 @@ export default function RegisterStep1() {
         { name: 'birthdate', label: 'Birthdate', placeholder: 'mm/dd/yyyy', type: 'date' }
     ];
 
+    const validatePhone = (phone: string): boolean => {
+        const phoneRegex = /^\+?\d{8,15}$/;
+        return phoneRegex.test(phone);
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
 
@@ -62,20 +65,27 @@ export default function RegisterStep1() {
         }
     };
 
-    const validatePhone = (phone: string) => /^\d{8,15}$/.test(phone);
-
     const handleNextStep = async () => {
         setIsSubmitting(true);
         const validationErrors: ValidationErrors = {};
 
-        if (!formData.name) {
+        if (!formData.name.trim()) {
             validationErrors.name = t("RegisterPagestep1.nameValidationFill");
         }
-        if (!formData.last) {
-            validationErrors.last = t("RegisterPagestep1.nameValidationFill");
+
+        if (!formData.last.trim()) {
+            validationErrors.last = t("RegisterPagestep1.lastValidationFill");
         }
-        if (!phoneNumber || !validatePhone(phoneNumber)) {
+
+        // Validate Phone Number
+        if (!phoneNumber.trim()) {
             validationErrors.number = t("RegisterPagestep1.phoneValidationFill");
+        } else if (!validatePhone(phoneNumber)) {
+            validationErrors.number = t("RegisterPagestep1.phoneValidationInvalid");
+        }
+
+        if (!formData.birthdate) {
+            validationErrors.birthdate = t("RegisterPagestep1.birthdateValidationFill");
         }
 
         setErrors(validationErrors);
@@ -83,7 +93,15 @@ export default function RegisterStep1() {
         if (Object.keys(validationErrors).length === 0) {
             const extractedAge = calculateAge(formData.birthdate);
             const formattedPhoneNumber = `${countryCode}${phoneNumber}`.replace('+', '');
-            const formattedData = { ...formData, age: extractedAge, number: formattedPhoneNumber };
+            const birthdateDate = new Date(formData.birthdate);
+            const formattedBirthdate = birthdateDate.toISOString().replace('Z', '+00:00'); // e.g., "2024-10-23T00:00:00.000+00:00"
+
+            const formattedData = { 
+                ...formData, 
+                age: extractedAge.toString(), 
+                number: formattedPhoneNumber,
+                birthdate: formattedBirthdate 
+            };
 
             try {
                 const existingUser = await fetchUserDataByNumber(formattedPhoneNumber);
@@ -98,21 +116,32 @@ export default function RegisterStep1() {
                 return;
             }
 
+            // Update Form Data in Context
             setFormData(formattedData);
             updateData(formattedData);
 
-            // Uncomment these lines to handle sending the code and proceeding to the next step
-            // const response_code = await sendCode(formattedData.number);
-            // if (response_code === 200) {
-            //     router.push('/register/step2');
-            // } else {
-            //     setError(response_code === 400 ? 
-            //         'The number entered is not valid. Please try another one.' :
-            //         'There was a problem sending the code. Please try again later.'
-            //     );
-            // }
+            // Optionally send code and navigate
+            // Uncomment the following lines when ready to handle sending the code
+            /*
+            try {
+                const response_code = await sendCode(formattedData.number);
+                if (response_code === 200) {
+                    router.push('/register/step2');
+                } else {
+                    setErrors({ server: response_code === 400 ? 
+                        'The number entered is not valid. Please try another one.' :
+                        'There was a problem sending the code. Please try again later.'
+                    });
+                    setIsSubmitting(false);
+                }
+            } catch (error) {
+                setErrors({ server: 'There was a problem sending the code. Please try again later.' });
+                setIsSubmitting(false);
+            }
+            */
 
-            router.push('/register/step2');
+            // For now, navigate to next step without sending code
+            router.push('/register/step3');
         } else {
             setIsSubmitting(false);
         }
@@ -128,11 +157,14 @@ export default function RegisterStep1() {
                 </button>
             </div>
 
-            <div className='h-[15%] flex flex-row w-full lg:max-w-3xl'>
+            <div className='h-[15%] flex flex-row w-full lg:max-w-3xl mb-4'>
                 <button onClick={handlePrevStep} className="hidden text-4xl lg:flex mr-14 mt-5 text-center">
                     <IoChevronBack />
                 </button>
-                <h1 className='text-6xl font-semibold'>{t('RegisterPagestep1.create.0')} <br />{t('RegisterPagestep1.create.1')}</h1>
+                <h1 className='text-6xl font-semibold'>
+                    {t('RegisterPagestep1.create.0')} <br />
+                    {t('RegisterPagestep1.create.1')}
+                </h1>
             </div>
 
             <div className='h-[50%] flex w-full items-center justify-center'>
@@ -142,26 +174,31 @@ export default function RegisterStep1() {
                             key={name}
                             label={label}
                             name={name}
-                            type={type}
+                            type={type || 'text'}
                             placeholder={placeholder}
                             value={formData[name]}
                             onChange={handleChange}
-                            icon={name === 'birthdate' ? IoCalendarOutline : undefined}
+                            icon={name === 'birthdate' ? <IoCalendarOutline /> : undefined}
                         />
                     ))}
                     <PhoneInput
-                        label="Phone Number"
+                        label={t('RegisterPagestep1.phone')}
                         countryCode={countryCode}
                         phoneNumber={phoneNumber}
                         onChange={handleChange}
                         countryCodes={countryCodes}
+                        error={errors.number}
                     />
+                    {errors.birthdate && <p className="text-red-500 text-center">{errors.birthdate}</p>}
+                    {errors.name && <p className="text-red-500 text-center">{errors.name}</p>}
+                    {errors.last && <p className="text-red-500 text-center">{errors.last}</p>}
                     {errors.number && <p className="text-red-500 text-center">{errors.number}</p>}
+                    {errors.server && <p className="text-red-500 text-center">{errors.server}</p>}
                     <ButtonWithSpinner
                         type="button"
                         onClick={handleNextStep}
                         loading={isSubmitting}
-                        className="w-full bg-black text-white py-4 rounded-full text-1xl font-semibold hover:bg-gray-800 transition duration-200 mt-4"
+                        className="w-full bg-black text-white py-4 rounded-full text-xl font-semibold hover:bg-gray-800 transition duration-200 mt-4"
                     >
                         {t('RegisterPagestep1.nextbtn')}
                     </ButtonWithSpinner>
@@ -173,7 +210,7 @@ export default function RegisterStep1() {
                 <div className="flex flex-row justify-evenly space-x-8">
                     {[FaApple, FaFacebook, FaGoogle].map((Icon, idx) => (
                         <button key={idx} className="text-5xl">
-                            <Icon className={idx === 1 ? 'text-blue-600' : idx === 2 ? 'text-red-600' : ''} />
+                            <Icon className={idx === 1 ? 'text-blue-600' : idx === 2 ? 'text-red-600' : 'text-gray-800'} />
                         </button>
                     ))}
                 </div>
@@ -181,9 +218,9 @@ export default function RegisterStep1() {
 
             <div className="h-[5%] text-center">
                 <p className="text-gray-500">
-                {t('RegisterPagestep1.signupquestion')} <a href="#" className="text-indigo-600 underline">{t('RegisterPagestep1.signin')}</a>
+                    {t('RegisterPagestep1.signupquestion')} <a href="#" className="text-indigo-600 underline">{t('RegisterPagestep1.signin')}</a>
                 </p>
             </div>
         </div>
-    );
+    )
 }
