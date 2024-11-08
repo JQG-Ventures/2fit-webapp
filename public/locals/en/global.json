@@ -64,7 +64,8 @@
     "numberRegisteredError": "Number is already registered. Please use a different one.",
     "numberServerError": "There was an error checking the number. Please try again later.",
     "nameValidationFill": "Please fill out this field.",
-    "phoneValidationFill": "Please enter a valid phone number."
+    "phoneValidationFill": "Please enter a valid phone number.",
+    "countryValidationFill": "Please fill out this field."
   },
   "RegisterPagestep3":{
     "woman": "Woman",

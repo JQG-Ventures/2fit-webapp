@@ -8,6 +8,7 @@ import { useRegister } from '../../_components/register/RegisterProvider';
 import ButtonWithSpinner from '../../_components/others/ButtonWithSpinner';
 import InputWithIcon from '../../_components/form/InputWithIcon';
 import PhoneInput from '../../_components/form/PhoneInput';
+import CountryInputForm from '../../_components/form/CountryInputForm';
 import countryCodes from '@/app/data/countryCodes.json';
 import { calculateAge } from '@/app/utils/formUtils';
 import { sendCode } from '../../_services/registerService';
@@ -18,6 +19,7 @@ interface FormData {
     number: string;
     name: string;
     age: string;
+    country: string;
     birthdate: string;
     last: string;
 }
@@ -35,6 +37,7 @@ export default function RegisterStep1() {
         number: data.number || '',
         name: data.name || '',
         age: data.age || '',
+        country: data.country || '',
         birthdate: data.birthdate || '',
         last: data.last || ''
     });
@@ -65,6 +68,11 @@ export default function RegisterStep1() {
         }
     };
 
+    const handleCountryChange = (countryName: string) => {
+        setFormData((prevFormData) => ({ ...prevFormData, country: countryName }));
+        updateData({ ...formData, country: countryName });
+    };
+
     const handleNextStep = async () => {
         setIsSubmitting(true);
         const validationErrors: ValidationErrors = {};
@@ -77,7 +85,6 @@ export default function RegisterStep1() {
             validationErrors.last = t("RegisterPagestep1.lastValidationFill");
         }
 
-        // Validate Phone Number
         if (!phoneNumber.trim()) {
             validationErrors.number = t("RegisterPagestep1.phoneValidationFill");
         } else if (!validatePhone(phoneNumber)) {
@@ -88,13 +95,17 @@ export default function RegisterStep1() {
             validationErrors.birthdate = t("RegisterPagestep1.birthdateValidationFill");
         }
 
+        if (!formData.country) {
+            validationErrors.country = t("RegisterPagestep1.countryValidationFill");
+        }
+
         setErrors(validationErrors);
 
         if (Object.keys(validationErrors).length === 0) {
             const extractedAge = calculateAge(formData.birthdate);
             const formattedPhoneNumber = `${countryCode}${phoneNumber}`.replace('+', '');
             const birthdateDate = new Date(formData.birthdate);
-            const formattedBirthdate = birthdateDate.toISOString().replace('Z', '+00:00'); // e.g., "2024-10-23T00:00:00.000+00:00"
+            const formattedBirthdate = birthdateDate.toISOString().replace('Z', '+00:00');
 
             const formattedData = { 
                 ...formData, 
@@ -116,31 +127,8 @@ export default function RegisterStep1() {
                 return;
             }
 
-            // Update Form Data in Context
             setFormData(formattedData);
             updateData(formattedData);
-
-            // Optionally send code and navigate
-            // Uncomment the following lines when ready to handle sending the code
-            /*
-            try {
-                const response_code = await sendCode(formattedData.number);
-                if (response_code === 200) {
-                    router.push('/register/step2');
-                } else {
-                    setErrors({ server: response_code === 400 ? 
-                        'The number entered is not valid. Please try another one.' :
-                        'There was a problem sending the code. Please try again later.'
-                    });
-                    setIsSubmitting(false);
-                }
-            } catch (error) {
-                setErrors({ server: 'There was a problem sending the code. Please try again later.' });
-                setIsSubmitting(false);
-            }
-            */
-
-            // For now, navigate to next step without sending code
             router.push('/register/step3');
         } else {
             setIsSubmitting(false);
@@ -151,7 +139,7 @@ export default function RegisterStep1() {
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 items-center">
-            <div className='h-[15%] pt-20 w-full lg:max-w-3xl'>
+            <div className='h-[10%] pt-20 w-full lg:max-w-3xl'>
                 <button onClick={handlePrevStep} className="text-4xl lg:hidden">
                     <IoChevronBack />
                 </button>
@@ -167,7 +155,7 @@ export default function RegisterStep1() {
                 </h1>
             </div>
 
-            <div className='h-[50%] flex w-full items-center justify-center'>
+            <div className='h-[60%] flex w-full items-center justify-center'>
                 <form className="w-full lg:max-w-3xl space-y-8">
                     {user_data_fields.map(({ name, label, placeholder, type }) => (
                         <InputWithIcon
@@ -181,6 +169,11 @@ export default function RegisterStep1() {
                             icon={name === 'birthdate' ? <IoCalendarOutline /> : undefined}
                         />
                     ))}
+                    <CountryInputForm
+                        selectedCountry={formData.country}
+                        onChange={handleCountryChange}
+                        countryList={countryCodes}
+                    />
                     <PhoneInput
                         label={t('RegisterPagestep1.phone')}
                         countryCode={countryCode}
@@ -193,6 +186,7 @@ export default function RegisterStep1() {
                     {errors.name && <p className="text-red-500 text-center">{errors.name}</p>}
                     {errors.last && <p className="text-red-500 text-center">{errors.last}</p>}
                     {errors.number && <p className="text-red-500 text-center">{errors.number}</p>}
+                    {errors.country && <p className="text-red-500 text-center">{errors.country}</p>}
                     {errors.server && <p className="text-red-500 text-center">{errors.server}</p>}
                     <ButtonWithSpinner
                         type="button"
@@ -205,8 +199,8 @@ export default function RegisterStep1() {
                 </form>
             </div>
 
-            <div className="h-[15%] flex flex-col justify-start text-center">
-                <p className="text-gray-500 mb-10">{t('RegisterPagestep1.signuptxt')}</p>
+            <div className="h-[12%] flex flex-col justify-start text-center">
+                <p className="text-gray-500 mb-6">{t('RegisterPagestep1.signuptxt')}</p>
                 <div className="flex flex-row justify-evenly space-x-8">
                     {[FaApple, FaFacebook, FaGoogle].map((Icon, idx) => (
                         <button key={idx} className="text-5xl">
@@ -216,11 +210,11 @@ export default function RegisterStep1() {
                 </div>
             </div>
 
-            <div className="h-[5%] text-center">
+            <div className="h-[3%] text-center">
                 <p className="text-gray-500">
                     {t('RegisterPagestep1.signupquestion')} <a href="#" className="text-indigo-600 underline">{t('RegisterPagestep1.signin')}</a>
                 </p>
             </div>
         </div>
-    )
+    );
 }
