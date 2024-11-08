@@ -1,4 +1,4 @@
-export const saveWorkout = async (userId: string, workoutId: string, token: string) => {
+export const saveWorkout = async (userId: string, workoutId: string, token: string): Promise<Response | Record<string, any>> => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/saved/${userId}`, {
             method: 'POST',
