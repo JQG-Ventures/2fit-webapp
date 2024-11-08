@@ -3,13 +3,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface WorkoutCardProps {
-    title: string;
-    workoutCount: number;
-    image: string;
-    exercises: string;
-    startText: string;
-}
 
 interface PopularExercisesSectionProps {
     workouts: WorkoutCardProps[];
@@ -45,7 +38,6 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({ title, workoutCount, image, e
 
 const PopularExercisesSection: React.FC<PopularExercisesSectionProps> = ({ workouts }) => {
     const displayedWorkoutsCol = workouts.slice(0, 3);
-    const displayedWorkoutsGrid = workouts.slice(0, 6);
     const { t } = useTranslation('global');
 
     return (

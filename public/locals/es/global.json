@@ -240,6 +240,12 @@
             }
   },
   "workouts": {
+    "exercise": "ejercicio",
+    "left": "restante",
+    "challengeProgress": "Progreso del Challenge",
+    "weeklyRoutine": "Rutina Semanal",
+    "workoutProgress": "Progreso del plan",
+    "fetchingError": "Error trayendo la informacion",
     "plan": {
       "workoutAlreadySaved": "El plan ya ha sido guardado!",
       "workoutSaved": "Plan guardado!",
@@ -263,7 +269,12 @@
       "workouts": "Rutinas",
       "minutes": "Minutos",
       "goto": "Buscar otra rutina",
-      "home": "Inicio"
+      "home": "Inicio",
+      "of": "de"
+    },
+    "my-plan": {
+      "title": "Mi plan de entrenamiento",
+      "noExercises": "No ejercicios en este día"
     },
     "PopularExercisesSection": {
       "popularExerciseTitle": "Ejercicios Populares",
@@ -272,5 +283,14 @@
       "exercises": "ejercicios",
       "start": "Iniciar ahora"
     }
+  },
+  "ExerciseFlow": {
+    "ready": "¡Alístate!",
+    "completed": "¡Ejercicio completado!"
+  },
+  "RestView": {
+    "rest": "Tómate un descanso",
+    "nextEx": "Siguiente Ejercicio",
+    "skip": "Saltar descanso"
   }
 }

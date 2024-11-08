@@ -24,20 +24,12 @@ export default function Workouts() {
   const router = useRouter();
   const [isClicked, setIsClicked] = useState(false);
   const { userId, token, loading: sessionLoading } = useSessionContext();
-  const options = useMemo(() => ({
-      method: 'GET',
-    }), []);
+  const options = useMemo(() => ({method: 'GET'}), []);
 
-  const {
-    data: activePlansData,
-    loading: loadingActivePlans,
-    error: errorActivePlans,
-  } = useFetch(
-    userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/active-plans/${userId}` : '',
-    options
-  );
-
-  const [progressData, setProgressData] = useState([]);
+  const {data: activePlansData, loading: loadingActivePlans, error: errorActivePlans} = useFetch(
+    userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/active-plans/${userId}` : '', options);
+  
+    const [progressData, setProgressData] = useState([]);
   const [loadingProgressData, setLoadingProgressData] = useState(false);
   const [errorProgressData, setErrorProgressData] = useState(null);
 
@@ -46,17 +38,17 @@ export default function Workouts() {
       if (activePlansData && activePlansData.length > 0) {
         setLoadingProgressData(true);
         try {
-          const progressPromises = activePlansData.map(async (plan) => {
+          const progressPromises = activePlansData.map(async (plan: any) => {
             const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/workouts/progress?workout_plan_id=${plan.workout_plan_id}&user_id=${userId}`;
             const response = await fetchWithAuth(url, options);
             const jsonData = await response.json();
             if (!response.ok) {
-              throw new Error(jsonData.message || 'Error fetching progress');
+              throw new Error(jsonData.message || t("workouts.fetchingError"));
             }
             return { planId: plan.workout_plan_id, progressData: jsonData.message };
           });
           const progressResults = await Promise.all(progressPromises);
-          const plansWithProgress = activePlansData.map((plan) => {
+          const plansWithProgress = activePlansData.map((plan: any) => {
             const progress = progressResults.find((p) => p.planId === plan.workout_plan_id);
             return {
               ...plan,
@@ -64,7 +56,7 @@ export default function Workouts() {
             };
           });
           setProgressData(plansWithProgress);
-        } catch (error) {
+        } catch (error: any) {
           console.error(error);
           setErrorProgressData(error.message);
         } finally {
@@ -74,9 +66,9 @@ export default function Workouts() {
     };
 
     fetchProgressData();
-  }, [activePlansData, userId, options]);
+  }, [activePlansData, userId, t, options]);
 
-  const handleClick = (planId) => {
+  const handleClick = (planId: string) => {
     if (isClicked) return;
     setIsClicked(true);
     setTimeout(() => {
@@ -84,7 +76,7 @@ export default function Workouts() {
     }, 300);
   };
 
-  const workouts = [
+  const workouts: WorkoutCardProps[] = [
     {
       title: 'Testing 1',
       workoutCount: 20,
@@ -109,7 +101,7 @@ export default function Workouts() {
     return (
       <Modal
         title="Error"
-        message={errorActivePlans || errorProgressData}
+        message={errorActivePlans! || errorProgressData!}
         onClose={() => router.push('/home')}
       />
     );
@@ -131,7 +123,7 @@ export default function Workouts() {
         pagination={{ clickable: true }}
         className="h-[15%] w-full lg:max-w-3xl"
       >
-        {progressData.map((plan) => (
+        {progressData.map((plan: any) => (
           <SwiperSlide key={plan.workout_plan_id}>
             <div
               className={`cursor-pointer flex flex-row justify-center items-center w-full h-full rounded-3xl bg-black p-10 ${
@@ -142,14 +134,14 @@ export default function Workouts() {
               <div className="w-1/2 flex flex-col justify-evenly align-start pr-4">
                 <h2 className="text-white text-3xl font-semibold">
                   {plan.plan_type === 'personalized'
-                    ? 'Weekly routine'
+                    ? t("workouts.weeklyRoutine")
                     : plan.plan_type === 'challenge'
-                    ? 'Challenge progress'
-                    : 'Workout Progress'}
+                    ? t("workouts.challengeProgress")
+                    : t("workouts.workoutProgress")}
                 </h2>
                 <span className="text-gray-200 text-2xl">
-                  {plan.progressData?.exercises_left?.length || 0} exercise
-                  {plan.progressData?.exercises_left?.length !== 1 ? 's' : ''} left
+                  {plan.progressData?.exercises_left?.length || 0} {t("workouts.exercise")}
+                  {plan.progressData?.exercises_left?.length !== 1 ? 's' : ''} {t("workouts.left")}
                 </span>
               </div>
               <div className="w-1/2 flex flex-col justify-center align-center text-white">
