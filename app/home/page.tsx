@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 
 const HomePage: React.FC = () => {
     const { userId, token, userName, loading: sessionLoading } = useSessionContext();
-    const [user, setUser] = useState<User>({ userId: '', userName: 'Loading...', hasRoutine: false });
+    const [user, setUser] = useState({ userId: '', userName: 'Loading...', hasRoutine: false });
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
     const [navbarHeight, setNavbarHeight] = useState<number>(100);
     const { t } = useTranslation('global');
@@ -28,15 +28,15 @@ const HomePage: React.FC = () => {
         };
         handleResize();
         window.addEventListener('resize', handleResize);
-        
+
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
     useEffect(() => {
         if (!sessionLoading) {
-            setUser(userId ? { userId, userName: userName, hasRoutine: true } : { userId: 'guest_id', userName: 'Guest', hasRoutine: false });
+            setUser(userId ? { userId, userName: userName ?? '', hasRoutine: true } : { userId: 'guest_id', userName: 'Guest', hasRoutine: false });
         }
-    }, [userId, sessionLoading]);
+    }, [userId, userName, sessionLoading]);
 
     const options = useMemo(() => ({
         method: 'GET',
@@ -65,8 +65,6 @@ const HomePage: React.FC = () => {
         );
     }
 
-    
-
     return (
         <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom }}>
             <div className="flex flex-col lg:flex-row lg:space-x-8">
@@ -82,10 +80,10 @@ const HomePage: React.FC = () => {
             </div>
             {!isDesktopOrLaptop && <SearchBar />}
             <div className="space-y-12">
-                <ExerciseBannerSection 
-                    hasRoutine={user.hasRoutine} 
-                    exercises={workoutPlans || []} 
-                    savedWorkoutPlans={savedWorkoutPlans || []} 
+                <ExerciseBannerSection
+                    hasRoutine={user.hasRoutine}
+                    exercises={workoutPlans || []}
+                    savedWorkoutPlans={savedWorkoutPlans || []}
                 />
                 {!isDesktopOrLaptop && <MotivationSection isBotUser={user.hasRoutine} />}
                 {/* <GuidedWorkoutsSection workouts={guidedWorkouts || []} /> */}
