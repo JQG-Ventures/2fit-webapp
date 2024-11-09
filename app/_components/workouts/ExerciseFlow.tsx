@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import React, { useState, useEffect } from 'react';
 import CountdownTimer from '../animations/CountdownTimer';
 import ExerciseView from '../workouts/ExerciseView';
@@ -10,9 +11,11 @@ interface ExerciseFlowProp {
 	exercises: Exercise[];
 	onClose: () => void;
 	workoutType: string;
+	userId: string;
+	workoutPlanId: string;
 }
 
-const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, workoutType }) => {
+const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, workoutType, userId, workoutPlanId }) => {
 	const { t } = useTranslation('global');
 	const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
 	const [currentSet, setCurrentSet] = useState(1);
@@ -22,6 +25,9 @@ const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, workoutT
 	const [restDuration, setRestDuration] = useState(0);
 	const [nextExerciseDetails, setNextExerciseDetails] = useState<Exercise | null>(null);
 	const [completeMessage, setCompleteMessage] = useState<string | null>(null);
+	const [exercisesProgress, setExercisesProgress] = useState<any>([]);
+  	const [exerciseStartTime, setExerciseStartTime] = useState<number | null>(null);
+  	const [workoutId] = useState(`session_${Date.now()}`);
 
 	const totalExercises = exercises.length;
 	const currentExercise = exercises[currentExerciseIndex];
@@ -52,6 +58,44 @@ const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, workoutT
 					setNextExerciseDetails(exercises[currentExerciseIndex + 1]);
 				}
 			} else {
+				const exerciseDuration = Math.floor((Date.now() - exerciseStartTime!) / 1000); // Duration in seconds
+    			const repsCompleted = Array(totalSets).fill(currentExercise.reps);
+
+				const exerciseProgress = {
+					exercise_id: currentExercise.exercise_id,
+					sets_completed: totalSets,
+					reps_completed: repsCompleted,
+					duration_seconds: exerciseDuration,
+					calories_burned: 0, // TODO Calculate if possible
+					is_completed: true,
+				  };
+				
+				setExercisesProgress((prevProgress: any) => [...prevProgress, exerciseProgress]);
+
+				const payload = {
+					workout_plan_id: workoutPlanId,
+					workout_id: workoutId,
+					exercises: [exerciseProgress],
+					day_of_week: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase(),
+				};
+
+				console.log("Sending API request", payload)
+
+				try {
+					fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/workouts/progress?user_id=${userId}`, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify(payload)
+					});
+					// Handle response if needed
+				  } catch (error) {
+					console.error('Error sending exercise progress:', error);
+					// Optionally handle the error (e.g., retry logic)
+				  }
+
+				  setExerciseStartTime(null);
 				setIsCompleted(true);
 			}
 		}
@@ -89,6 +133,12 @@ const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, workoutT
 			}
 		}
 	};
+
+	useEffect(() => {
+		if (!isRest && !isCountdown) {
+		  setExerciseStartTime(Date.now());
+		}
+	  }, [isRest, isCountdown]);
 
 	useEffect(() => {
 		if (isCompleted && workoutType === 'myPlan') {
