@@ -9,10 +9,15 @@ import { useRouter } from 'next/navigation';
 import Modal from '../../_components/profile/modal'; 
 import { useFetch } from '../../_hooks/useFetch';
 import AnimatedList from '../../_components/animations/AnimatedList';
-
-const levels = ['beginner', 'intermediate', 'advanced'];
+import { useTranslation } from 'react-i18next';
 
 const WorkoutLibrarySection = () => {
+    const { t } = useTranslation('global');
+    const levels = ['beginner', 'intermediate', 'advanced'];
+    
+    // Traducción de los niveles
+    const translatedLevels = t('WorkoutLibrary.levels', { returnObjects: true });
+
     const [activeLevel, setActiveLevel] = useState<string>('beginner');
     const [message, setMessage] = useState<string | null>(null);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
@@ -24,7 +29,7 @@ const WorkoutLibrarySection = () => {
         method: 'GET',
     }), []);
 
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/library/level/${activeLevel}`;
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/library/difficulty/${activeLevel}`;
     const { data: fetchedExercises, loading, error } = useFetch(apiUrl, options);
 
     useEffect(() => {
@@ -56,7 +61,7 @@ const WorkoutLibrarySection = () => {
     }
 
     return (
-        <div className="flex flex-col h-screen bg-white p-10 lg:pt-20 items-center">
+        <div className="flex flex-col h-screen bg-white p-10 lg:pt-[10vh] items-center">
             <div className="flex items-center justify-between h-[10%] w-full lg:max-w-3xl">
                 <div className='w-[90%] flex flex-row'>
                     <button
@@ -65,14 +70,14 @@ const WorkoutLibrarySection = () => {
                     >
                         <FaArrowLeftLong className="h-8 w-8" />
                     </button>
-                    <h2 className="text-4xl font-semibold ml-8">Workout Levels</h2>
+                    <h2 className="text-4xl font-semibold ml-8">{t("WorkoutLibrary.title")}</h2>
                 </div>
                 <button className="flex items-center justify-center">
                     <SlOptionsVertical className="h-6 w-6" />
                 </button>
             </div>
             <div className="flex flex-wrap justify-center space-x-4 mb-6">
-                {levels.map((level) => (
+                {levels.map((level, index) => (
                     <button
                         key={level}
                         className={`py-3 px-5 rounded-full transition-all duration-300 
@@ -81,7 +86,7 @@ const WorkoutLibrarySection = () => {
                                 'border border-green-400 text-green-700 bg-transparent shadow-lg'}`}
                         onClick={() => handleLevelChange(level)}
                     >
-                        {level.charAt(0).toUpperCase() + level.slice(1)}
+                        {translatedLevels[index]} {/* Mostrar la traducción del nivel */}
                     </button>
                 ))}
             </div>
@@ -95,7 +100,7 @@ const WorkoutLibrarySection = () => {
                     <p className="text-gray-500 text-xl">{message}</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-8 h-[80%] w-full lg:max-w-3xl pt-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-8 h-[80%] w-full lg:max-w-3xl pt-8 pb-20">
                     <AnimatedList
                         items={workouts}
                         animationDuration={500}

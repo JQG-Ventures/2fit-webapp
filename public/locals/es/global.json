@@ -292,5 +292,13 @@
     "rest": "Tómate un descanso",
     "nextEx": "Siguiente Ejercicio",
     "skip": "Saltar descanso"
+  },
+  "WorkoutLibrary":{
+    "title" : "Niveles de entrenamiento",
+    "levels": [
+        "Principiante",
+        "Intermedio",
+        "Avanzado"
+    ]
   }
 }

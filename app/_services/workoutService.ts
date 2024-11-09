@@ -35,22 +35,3 @@ export const deleteUserSavedWorkout = async (userId: string, workoutId: string, 
         return {};
     }
 };
-
-export const getExercisesByLevel = async (level: string) => {
-    try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/library/level/${level}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-
-        if (!response.ok) {
-            return { error: 'Failed to get exercises.' };
-        }
-
-        return await response.json();
-    } catch (error) {
-        return { error: 'An error occurred getting exercises, please try later.' };
-    }
-};

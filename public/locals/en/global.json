@@ -283,5 +283,13 @@
     "rest": "Take a rest",
     "nextEx": "Next Exercise",
     "skip": "Skip rest"
+  },
+  "WorkoutLibrary":{
+    "title" : "Workout Levels",
+    "levels": [
+        "Beginner",
+        "Intermediate",
+        "Advanced"
+    ]
   }
 }
