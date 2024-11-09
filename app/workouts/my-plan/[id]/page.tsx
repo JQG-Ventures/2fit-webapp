@@ -90,6 +90,7 @@ export default function MyPlan() {
 	const { t } = useTranslation('global');
 	const router = useRouter();
 	const { userId, loading: sessionLoading } = useSessionContext();
+  	const { id } = useParams();
 	const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
     const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
     const [showExerciseFlow, setShowExerciseFlow] = useState<boolean>(false);
@@ -190,6 +191,8 @@ export default function MyPlan() {
 						setSelectedExercise(null);
 					}}
 					workoutType='myPlan'
+					userId={userId!}
+					workoutPlanId={id}
 				/>
 			)}
 		</div>
