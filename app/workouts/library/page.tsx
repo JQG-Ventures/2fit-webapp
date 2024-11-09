@@ -8,6 +8,7 @@ import { ImSpinner8 } from 'react-icons/im';
 import { useRouter } from 'next/navigation';
 import Modal from '../../_components/profile/modal'; 
 import { useFetch } from '../../_hooks/useFetch';
+import AnimatedList from '../../_components/animations/AnimatedList';
 
 const levels = ['beginner', 'intermediate', 'advanced'];
 
@@ -94,27 +95,31 @@ const WorkoutLibrarySection = () => {
                     <p className="text-gray-500 text-xl">{message}</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-6 h-[80%] w-full lg:max-w-3xl pt-8">
-                    {workouts.map(workout => (
-                        <div key={workout._id} className="relative bg-white rounded-lg shadow-lg overflow-hidden">
-                            <img src={workout.image_url} alt={workout.name} className="w-full h-48 object-cover" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-50"></div>
-                            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                                <h3 className="text-3xl font-semibold">{workout.name}</h3>
-                                <p className="text-base">{workout.duration} minutes | {workout.level}</p>
-                            </div>
-                            <button
-                                className="absolute bottom-4 right-4 p-3"
-                                onClick={() => handleBookmarkClick(workout._id)}
-                            >
-                                <div className={`h-12 w-12 flex items-center justify-center rounded-full ${clickedStates[workout._id] ? 'bg-white' : 'bg-transparent'}`}>
-                                    <CiBookmarkMinus 
-                                        className={`h-8 w-8 ${clickedStates[workout._id] ? 'text-black' : 'text-white'}`}
-                                    />
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-8 h-[80%] w-full lg:max-w-3xl pt-8">
+                    <AnimatedList
+                        items={workouts}
+                        animationDuration={500}
+                        renderItem={(workout, index) => (
+                            <div key={workout._id || index} className="relative bg-white rounded-lg shadow-lg overflow-hidden mb-6 h-36">
+                                <img src={workout.image_url} alt={workout.name} className="w-full h-48 object-cover" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-50"></div>
+                                <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                                    <h3 className="text-3xl font-semibold">{workout.name}</h3>
+                                    <p className="text-base">{workout.duration} minutes | {workout.level}</p>
                                 </div>
-                            </button>
-                        </div>
-                    ))}
+                                <button
+                                    className="absolute bottom-4 right-4 p-3"
+                                    onClick={() => handleBookmarkClick(workout._id)}
+                                >
+                                    <div className={`h-12 w-12 flex items-center justify-center rounded-full ${clickedStates[workout._id] ? 'bg-white' : 'bg-transparent'}`}>
+                                        <CiBookmarkMinus 
+                                            className={`h-8 w-8 ${clickedStates[workout._id] ? 'text-black' : 'text-white'}`}
+                                        />
+                                    </div>
+                                </button>
+                            </div>
+                        )}
+                    />
                 </div>
             )}
 
