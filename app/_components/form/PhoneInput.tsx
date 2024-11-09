@@ -1,19 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaChevronDown, FaGlobe } from 'react-icons/fa';
-
-interface CountryCode {
-    name: string;
-    code: string;
-    abbreviation: string;
-    flag: string;
-}
-
-interface PhoneInputProps {
-    countryCode: string;
-    phoneNumber: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-    countryCodes: CountryCode[];
-}
+import { CountryCode, PhoneInputProps } from '../../_interfaces/props/PhoneInputProps';
+import Image from 'next/image';
 
 const PhoneInput: React.FC<PhoneInputProps> = ({
     countryCode,
@@ -76,7 +64,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                 className="flex items-center justify-between w-[15%] bg-gray-200 text-gray-700 rounded-l-lg py-6 px-4 mb-3 leading-tight cursor-pointer focus:outline-none focus:bg-white"
             >
                 {selectedCountry && selectedCountry.flag ? (
-                    <img src={selectedCountry.flag} alt={selectedCountry.name} className="w-6 h-4 mr-2 rounded-sm" />
+                    <Image src={selectedCountry.flag} alt={selectedCountry.name} className="w-6 h-4 mr-2 rounded-sm" />
                 ) : (
                     <FaGlobe className="w-6 h-6 text-gray-500" />
                 )}
@@ -107,7 +95,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                             onClick={() => handleCountrySelect(country)}
                             className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
                         >
-                            <img src={country.flag} alt={country.name} className="w-6 h-4 mr-2 rounded-sm" />
+                            <Image src={country.flag} alt={country.name} className="w-6 h-4 mr-2 rounded-sm" />
                             <span className="text-gray-700">{country.name}</span>
                             <span className="ml-2 text-gray-500">({country.code})</span>
                         </div>
