@@ -14,8 +14,6 @@ import { useTranslation } from 'react-i18next';
 const WorkoutLibrarySection = () => {
     const { t } = useTranslation('global');
     const levels = ['beginner', 'intermediate', 'advanced'];
-    
-    // Traducción de los niveles
     const translatedLevels = t('WorkoutLibrary.levels', { returnObjects: true });
 
     const [activeLevel, setActiveLevel] = useState<string>('beginner');
@@ -86,7 +84,7 @@ const WorkoutLibrarySection = () => {
                                 'border border-green-400 text-green-700 bg-transparent shadow-lg'}`}
                         onClick={() => handleLevelChange(level)}
                     >
-                        {translatedLevels[index]} {/* Mostrar la traducción del nivel */}
+                        {translatedLevels[index]}
                     </button>
                 ))}
             </div>
