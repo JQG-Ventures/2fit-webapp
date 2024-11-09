@@ -2,9 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 
-
-const FinishPage = () => {
+const CompleteView: React.FC<{goToPlan: string}> = ({ goToPlan }) => {
     const router = useRouter();
     const { t } = useTranslation('global');
 
@@ -13,15 +13,18 @@ const FinishPage = () => {
     };
 
     return (
-        <div className="bg-white h-screen p-10 flex flex-col justify-between">
-            <div className="flex flex-col items-center h-[80%] py-14">
-                <img 
-                    className="h-[75%] object-contain" 
-                    src="/images/congrats.png" 
-                    alt="Congratulations" 
-                />
+        <div className="bg-white h-screen p-10 flex flex-col w-full justify-between">
+            <div className="flex flex-col items-center max-w-3xl mx-auto h-[80%] py-14">
+                <div className="relative w-full h-[70%]"> 
+                    <Image 
+                        src="/images/congrats.png" 
+                        alt="Congratulations" 
+                        layout="fill" 
+                        objectFit="contain" 
+                    /> 
+                </div>
                 <h2 className="text-5xl my-5 text-center font-semibold bg-gradient-to-r from-green-400 to-green-600 text-transparent bg-clip-text">
-                {t("workouts.plan.congrats")}
+                    {t("workouts.plan.congrats")}
                 </h2>
                 <h2 className="text-center">{t("workouts.plan.completedSentence")}</h2>
 
@@ -52,7 +55,7 @@ const FinishPage = () => {
             <div className="flex flex-col justify-evenly items-center h-[20%]">
                 <button 
                     className="w-full lg:max-w-3xl bg-gradient-to-r from-emerald-400 to-emerald-600 text-white py-6 rounded-full text-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out"
-                    onClick={() => handleNavigation('/workouts')}
+                    onClick={() => handleNavigation(goToPlan)}
                 >
                     {t("workouts.plan.goto")}
                 </button>
@@ -67,6 +70,4 @@ const FinishPage = () => {
     );
 };
 
-export default FinishPage;
-
-
+export default CompleteView;

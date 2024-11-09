@@ -251,6 +251,12 @@
     }
   },
   "workouts": {
+    "exercise": "exercise",
+    "left": "left",
+    "challengeProgress": "Challenge progress",
+    "weeklyRoutine": "Weekly routine",
+    "workoutProgress": "Workout progress",
+    "fetchingError": "Error fetching progress",
     "plan": {
       "workoutAlreadySaved": "Workout already saved!",
       "workoutSaved": "Workout Saved!",
@@ -274,7 +280,12 @@
       "workouts": "Workouts",
       "minutes": "Minutes",
       "goto": "Go to Another Workout",
-      "home": "Home"
+      "home": "Home",
+      "of": "of"
+    },
+    "my-plan": {
+      "title": "My Workout Plan",
+      "noExercises": "No exercises for this day"
     },
     "PopularExercisesSection": {
       "popularExerciseTitle": "Popular Exercises",
@@ -295,5 +306,14 @@
     "cancel": "Cancel",
     "update": "Update",
     "updating": "Updating..."
+  },
+  "ExerciseFlow": {
+    "ready": "Get Ready!",
+    "completed": "Exercise completed!"
+  },
+  "RestView": {
+    "rest": "Take a rest",
+    "nextEx": "Next Exercise",
+    "skip": "Skip rest"
   }
 }
