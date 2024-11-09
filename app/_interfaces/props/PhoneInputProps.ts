@@ -1,7 +1,13 @@
-interface PhoneInputProps {
-    label: string;
+export interface CountryCode {
+    name: string;
+    code: string;
+    abbreviation: string;
+    flag: string;
+}
+
+export interface PhoneInputProps {
     countryCode: string;
     phoneNumber: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-    countryCodes: { code: string; abbreviation: string }[];
+    countryCodes: CountryCode[];
 }
