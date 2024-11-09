@@ -315,5 +315,26 @@
     "rest": "Take a rest",
     "nextEx": "Next Exercise",
     "skip": "Skip rest"
+  },
+  "BePremium": {
+  "title": "Be Premium",
+  "subtitle": "Get Unlimited Access",
+  "description": "Enjoy workout access without ads and restrictions.",
+          "plans": {
+              "1": {
+                  "name": "1 Month",
+                  "price": "$16.99/m"
+              },
+              "2": {
+                  "name": "6 Months",
+                  "price": "$66.99/m"
+              },
+              "3": {
+                  "name": "12 Months",
+                  "price": "$116.99/m"
+              }
+          },
+  "note": "Pay once, cancel any time.",
+  "subscribeButton": "Subscribe"
   }
 }
