@@ -7,7 +7,7 @@ export async function middleware(req: NextRequest) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const { pathname } = req.nextUrl;
 
-    const publicRoutes = ['/login', '/register'];
+    const publicRoutes = ['/login', '/register', '/options/forgotpassword/step0'];
     const isRootRoute = pathname === '/';
     const isPublicRoute = isRootRoute || publicRoutes.some((route) => pathname.startsWith(route));
     const isAuthenticated = Boolean(token);
