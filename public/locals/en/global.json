@@ -283,5 +283,71 @@
     "rest": "Take a rest",
     "nextEx": "Next Exercise",
     "skip": "Skip rest"
+  },
+  "ForgotPassword": {
+    "forgotPassword": "Forgot Password",
+    "step0": {
+      "enterEmailPrompt": "Enter the email associated with your account to reset your password.",
+      "emailPlaceholder": "Enter your email",
+      "userNotFound": "User not found with this email.",
+      "errorOccurred": "An error occurred. Please try again.",
+      "submitting": "Submitting...",
+      "continue": "Continue"
+    },
+    "step1": {
+      "headerTitle": "Forgot Password",
+      "illustrationAlt": "Forgot Password Illustration",
+      "prompt": "Select which contact details should we use to reset your password.",
+      "viaSms": "via SMS:",
+      "viaEmail": "via Email:",
+      "defaultPhoneNumber": "+1 111 ******99",
+      "defaultEmail": "and***ey@yourdomain.com",
+      "errorModalTitle": "Error",
+      "errorModalMessage": "An error occurred. Please try again.",
+      "continueButton": {
+        "defaultText": "Continue",
+        "loadingText": "Submitting..."
+      }
+    },
+    "step2": {
+      "verificationScreen": {
+        "headerTitle": "Code Verification",
+        "codeSentInfo": "Code has been sent to {displayedContact}",
+        "resendCode": {
+          "prompt": "Resend code in",
+          "resendButton": "Resend"
+        },
+        "verifyButton": {
+          "defaultText": "Verify",
+          "loadingText": "Verifying..."
+        },
+        "incorrectCodeAlert": "Incorrect code"
+      }
+    },
+    "step3": {
+          "createPasswordScreen": {
+        "headerTitle": "Create New Password",
+        "imageAlt": "Create New Password Illustration",
+        "instruction": "Create Your New Password",
+        "newPasswordPlaceholder": "New Password",
+        "confirmPasswordPlaceholder": "Confirm Password",
+        "errorMessages": {
+          "passwordRequired": "Password is required.",
+          "passwordInvalid": "Password must be at least 8 characters, include uppercase, lowercase, a number, and a special character.",
+          "confirmPasswordRequired": "Please confirm your password.",
+          "passwordsDoNotMatch": "Passwords do not match.",
+          "apiError": "An error occurred. Please try again."
+        },
+        "continueButton": {
+          "defaultText": "Continue",
+          "loadingText": "Updating..."
+        },
+        "modal": {
+          "successTitle": "Congratulations!",
+          "successMessage": "Your account is ready to use.",
+          "goToHomepage": "Go to Homepage"
+        }
+      }
+    }
   }
 }

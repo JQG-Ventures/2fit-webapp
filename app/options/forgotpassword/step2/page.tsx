@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 interface VerificationCodeInputProps {
   value: string;
@@ -11,7 +12,12 @@ interface VerificationCodeInputProps {
   id: string;
 }
 
-const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({ value, onChange, onBackspace, id }) => (
+const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
+  value,
+  onChange,
+  onBackspace,
+  id,
+}) => (
   <input
     type="text"
     maxLength={1}
@@ -30,28 +36,36 @@ interface ResendCodeProps {
   onResend: () => void;
 }
 
-const ResendCode: React.FC<ResendCodeProps> = ({ timeLeft, onResend }) => (
-  <p className="text-xl text-center mt-4">
-    Resend code in{" "}
-    <span className="text-green-500 font-semibold">
-      {timeLeft > 0 ? (
-        `${timeLeft} s`
-      ) : (
-        <button onClick={onResend} className="text-green-500 underline">
-          Resend
-        </button>
-      )}
-    </span>
-  </p>
-);
+const ResendCode: React.FC<ResendCodeProps> = ({ timeLeft, onResend }) => {
+  const { t } = useTranslation("global");
+
+  return (
+    <p className="text-xl text-center mt-4">
+      {t("ForgotPassword.step2.verificationScreen.resendCode.prompt")}{" "}
+      <span className="text-green-500 font-semibold">
+        {timeLeft > 0 ? (
+          `${timeLeft} s`
+        ) : (
+          <button onClick={onResend} className="text-green-500 underline">
+            {t(
+              "ForgotPassword.step2.verificationScreen.resendCode.resendButton"
+            )}
+          </button>
+        )}
+      </span>
+    </p>
+  );
+};
 
 const VerificationScreen: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const contact = searchParams.get("contact") || "+1 111 ******99";
-  
+  const { t } = useTranslation("global");
+
   const [code, setCode] = useState(["", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState(60);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const obfuscateContact = (contact: string): string => {
     return /^\+?\d{7,}$/.test(contact)
@@ -87,36 +101,41 @@ const VerificationScreen: React.FC = () => {
 
   const handleResend = () => {
     setTimeLeft(60);
-    // Aquí puedes agregar la lógica para reenviar el código
   };
 
   const handleVerify = () => {
+    setIsSubmitting(true);
     const enteredCode = code.join("");
-    if (enteredCode === "1234") {  // Verificar si el código es correcto
-      router.push(`/options/forgotpassword/step3?code=${enteredCode}&contact=${encodeURIComponent(contact)}`);  // Redirigir a step 3 con el código y el contacto en la URL
+    if (enteredCode === "1234") {
+      router.push(
+        `/options/forgotpassword/step3?code=${enteredCode}&contact=${encodeURIComponent(
+          contact
+        )}`
+      );
     } else {
-      alert("Incorrect code"); // Mostrar un mensaje de error si el código no es correcto
+      alert(t("ForgotPassword.step2.verificationScreen.incorrectCodeAlert"));
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="flex flex-col justify-between items-center bg-white h-screen p-14">
-      {/* Header */}
       <div className="h-[10%] flex flex-row justify-left space-x-8 items-center w-full max-w-3xl">
         <button onClick={() => router.back()} className="text-gray-700">
           <IoIosArrowBack className="text-3xl cursor-pointer" />
         </button>
-        <h1 className="text-4xl font-semibold">Code Verification</h1>
+        <h1 className="text-4xl font-semibold">
+          {t("ForgotPassword.step2.verificationScreen.headerTitle")}
+        </h1>
       </div>
 
-      {/* Code Sent Info */}
       <div className="h-[41%] flex flex-col items-center justify-end w-full max-w-lg pb-10">
         <p className="text-2xl text-gray-900 text-center px-4">
-          Code has been sent to {displayedContact}
+          {t("ForgotPassword.step2.verificationScreen.codeSentInfo")}{" "}
+          {displayedContact}
         </p>
       </div>
 
-      {/* Verification Code Input */}
       <div className="h-[41%] flex flex-col items-center space-y-4">
         <div className="flex justify-center space-x-6">
           {code.map((digit, index) => (
@@ -130,18 +149,24 @@ const VerificationScreen: React.FC = () => {
           ))}
         </div>
         <div className="pt-4">
-            <ResendCode timeLeft={timeLeft} onResend={handleResend} />
+          <ResendCode timeLeft={timeLeft} onResend={handleResend} />
         </div>
       </div>
 
-      {/* Verify Button */}
       <div className="h-[7%] flex w-full max-w-3xl">
         <button
           type="button"
-          onClick={handleVerify}  // Cambiar aquí para llamar a handleVerify
+          onClick={handleVerify}
           className="w-full bg-black text-white rounded-full text-2xl font-semibold shadow-lg flex items-center justify-center"
+          disabled={isSubmitting}
         >
-          Verify
+          {isSubmitting
+            ? t(
+                "ForgotPassword.step2.verificationScreen.verifyButton.loadingText"
+              )
+            : t(
+                "ForgotPassword.step2.verificationScreen.verifyButton.defaultText"
+              )}
         </button>
       </div>
     </div>
