@@ -8,6 +8,7 @@ import Image from "next/image";
 import LoadingScreen from "../../../_components/animations/LoadingScreen";
 import { useFetch } from "../../../_hooks/useFetch";
 import Modal from "../../../_components/profile/modal";
+import { useTranslation } from 'react-i18next';
 
 interface OptionItemProps {
   icon: React.ComponentType<{ className?: string }>;
@@ -36,26 +37,29 @@ const OptionItem: React.FC<OptionItemProps> = ({ icon: Icon, label, detail, isSe
 );
 
 const ForgotPassword: React.FC = () => {
+  const { t } = useTranslation('global');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const userId = searchParams.get("userId"); // Obtener userId de la URL
-  
+  const userId = searchParams.get("userId");
+
   const getOptions = useMemo(() => ({ method: "GET" }), []);
   const { data: userData, loading, error } = useFetch(
     userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}` : "",
     getOptions
   );
-  
+
   const [selectedOption, setSelectedOption] = useState<"sms" | "email" | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!userId) {
-      router.push("/options/forgotpassword/step0"); // Redirigir a Step0 si no hay userId
+      router.push("/options/forgotpassword/step0");
     }
   }, [userId, router]);
 
   const handleContinue = () => {
     if (selectedOption) {
+      setIsSubmitting(true);
       const contactValue = selectedOption === "sms" ? userData?.number : userData?.email;
       router.push(`/options/forgotpassword/step2?contact=${encodeURIComponent(contactValue || "")}`);
     }
@@ -65,64 +69,61 @@ const ForgotPassword: React.FC = () => {
   if (error) {
     return (
       <Modal
-        title="Error"
+        title={t("ForgotPassword.step1.errorModalTitle")}
         message={error}
-        onClose={() => router.push("/home")}
+        onClose={() => router.push("/options/forgotpassword/step0")}
       />
     );
   }
 
   return (
     <div className="flex flex-col justify-between items-center bg-white h-screen p-14">
-      {/* Header */}
       <div className="h-[12%] flex flex-row justify-left space-x-8 items-center w-full max-w-3xl">
         <button onClick={() => router.push("/login")} className="text-gray-700">
           <IoIosArrowBack className="text-3xl cursor-pointer" />
         </button>
-        <h1 className="text-4xl font-semibold">Forgot Password</h1>
+        <h1 className="text-4xl font-semibold">{t("ForgotPassword.forgotPassword")}</h1>
       </div>
 
-      {/* Image Section */}
       <div className="h-[51%] flex flex-col items-center w-full max-w-lg justify-end pb-12">
         <Image
           src="/images/options/forgot-password-illustration.png"
-          alt="Forgot Password Illustration"
+          alt={t("ForgotPassword.step1.illustrationAlt")}
           width={250}
           height={250}
           className="w-2/3 h-auto"
         />
         <p className="text-2xl text-gray-900 mt-4 text-center px-4">
-          Select which contact details should we use to reset your password.
+          {t("ForgotPassword.step1.prompt")}
         </p>
       </div>
 
-      {/* Options Section */}
       <div className="h-[30%] flex flex-col justify-start py-6 w-full max-w-3xl space-y-4 overflow-y-auto pt-6">
         <OptionItem
           icon={MdSms}
-          label="via SMS:"
-          detail={userData?.number || "+1 111 ******99"}
+          label={t("ForgotPassword.step1.viaSms")}
+          detail={userData?.number || t("ForgotPassword.step1.defaultPhoneNumber")}
           isSelected={selectedOption === "sms"}
           onClick={() => setSelectedOption("sms")}
         />
 
         <OptionItem
           icon={MdEmail}
-          label="via Email:"
-          detail={userData?.email || "and***ey@yourdomain.com"}
+          label={t("ForgotPassword.step1.viaEmail")}
+          detail={userData?.email || t("ForgotPassword.step1.defaultEmail")}
           isSelected={selectedOption === "email"}
           onClick={() => setSelectedOption("email")}
         />
       </div>
 
-      {/* Continue Button */}
       <div className="h-[7%] flex w-full max-w-3xl">
         <button
           type="button"
           onClick={handleContinue}
           className="w-full bg-black text-white rounded-full text-2xl font-semibold shadow-lg flex items-center justify-center"
+          disabled={isSubmitting}
         >
-          Continue
+          {isSubmitting ? t("ForgotPassword.step1.continueButton.loadingText") : t("ForgotPassword.step1.continueButton.defaultText")}
         </button>
       </div>
     </div>
