@@ -62,7 +62,8 @@ const WorkoutPlanPage = () => {
 						setShowExerciseFlow(false);
 						setIsSubmitting(false);
 					}}
-					workoutType='oneDay'
+					onExerciseComplete={() => {}}
+					workoutType="oneDay"
 					userId={userId!}
 					workoutPlanId={id}
 				/>

@@ -4,6 +4,7 @@ import ExerciseView from '../workouts/ExerciseView';
 import RestView from '../workouts/RestView';
 import CompleteView from '../workouts/CompleteView';
 import { useTranslation } from 'react-i18next';
+import { sendCompleteToBackend, sendProgressToBackend } from '@/app/_services/userService';
 
 
 interface ExerciseFlowProp {
@@ -15,7 +16,14 @@ interface ExerciseFlowProp {
 	workoutPlanId: string;
 }
 
-const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, onExerciseComplete, workoutType, userId, workoutPlanId }) => {
+const ExerciseFlow: React.FC<ExerciseFlowProp> = ({
+	exercises,
+	onClose,
+	onExerciseComplete,
+	workoutType,
+	userId,
+	workoutPlanId,
+}) => {
 	const { t } = useTranslation('global');
 	const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
 	const [currentSet, setCurrentSet] = useState(1);
@@ -25,9 +33,8 @@ const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, onExerci
 	const [restDuration, setRestDuration] = useState(0);
 	const [nextExerciseDetails, setNextExerciseDetails] = useState<Exercise | null>(null);
 	const [completeMessage, setCompleteMessage] = useState<string | null>(null);
-	const [exercisesProgress, setExercisesProgress] = useState<any>([]);
+	const [exercisesProgress, setExercisesProgress] = useState<ExerciseProgressModel[]>([]);
 	const [exerciseStartTime, setExerciseStartTime] = useState<number | null>(null);
-	const [workoutId] = useState(`session_${Date.now()}`);
 
 	const totalExercises = exercises.length;
 	const currentExercise = exercises[currentExerciseIndex];
@@ -35,7 +42,7 @@ const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, onExerci
 	const defaultRestSeconds = currentExercise?.rest_seconds || 60;
 
 	const updateExerciseProgress = () => {
-		const exerciseDuration = Math.floor((Date.now() - exerciseStartTime!) / 1000); // Duration in seconds
+		const exerciseDuration = Math.floor((Date.now() - exerciseStartTime!) / 1000);
 		const repsCompleted = Array(totalSets).fill(currentExercise.reps);
 
 		const exerciseProgress = {
@@ -43,34 +50,22 @@ const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, onExerci
 			sets_completed: totalSets,
 			reps_completed: repsCompleted,
 			duration_seconds: exerciseDuration,
-			calories_burned: 0, // TODO Calculate if possible
+			calories_burned: 0,
 			is_completed: true,
 		};
 
-		setExercisesProgress((prevProgress: any) => [...prevProgress, exerciseProgress]);
-
-		const payload = {
-			workout_plan_id: workoutPlanId,
-			workout_id: workoutId,
-			exercises: [exerciseProgress],
-			day_of_week: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase(),
-		};
-
-		try {
-			fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/workouts/progress?user_id=${userId}`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(payload)
-			});
-		} catch (error) {
-			console.error('Error sending exercise progress:', error);
-		}
-
+		setExercisesProgress((prevProgress: ExerciseProgressModel[]) => [...prevProgress, exerciseProgress]);
 		setExerciseStartTime(null);
-		onExerciseComplete(currentExercise.exercise_id);
-	}
+
+		if (workoutType === 'myPlan') {
+			const payload = {
+				exercises: [exerciseProgress],
+				day_of_week: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase(),
+			};
+			sendProgressToBackend(payload, userId, workoutPlanId);
+			onExerciseComplete(currentExercise.exercise_id);
+		}
+	};
 
 	const handleNext = () => {
 		if (currentSet < totalSets) {
@@ -83,6 +78,8 @@ const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, onExerci
 				setNextExerciseDetails(exercises[currentExerciseIndex]);
 			}
 		} else {
+			updateExerciseProgress();
+
 			if (currentExerciseIndex < totalExercises - 1) {
 				if (isRest) {
 					setCurrentExerciseIndex(currentExerciseIndex + 1);
@@ -96,14 +93,6 @@ const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, onExerci
 					setNextExerciseDetails(exercises[currentExerciseIndex + 1]);
 				}
 			} else {
-				if (workoutType === "challenge") {
-					console.log("Day of challenge completed!");
-				} else if (workoutType === "myPlan") {
-					updateExerciseProgress();
-				} else {
-					console.log("Other workout completed!");
-				}
-				
 				setIsCompleted(true);
 			}
 		}
@@ -149,32 +138,50 @@ const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, onExerci
 	}, [isRest, isCountdown]);
 
 	useEffect(() => {
-		if (isCompleted && workoutType === 'myPlan') {
-			setCompleteMessage(t("ExerciseFlow.completed"));
-			setTimeout(() => {
-				setCompleteMessage(null);
-				onClose();
-			}, 3500);
+		if (isCompleted) {
+			if (workoutType === 'myPlan') {
+				setCompleteMessage(t('ExerciseFlow.completed'));
+				setTimeout(() => {
+					setCompleteMessage(null);
+					onClose();
+				}, 3500);
+			} else if (workoutType === 'oneDay') {
+				var payload = {
+					workout_id: workoutPlanId,
+					duration_seconds: 0,
+					calories_burned: 0,
+					exercises: exercisesProgress,
+					sequence_day: '1',
+					was_skipped: false
+				}
+				sendCompleteToBackend(payload, userId);
+				setCompleteMessage(t('ExerciseFlow.completed'));
+			} else {
+				setCompleteMessage(t('ExerciseFlow.completed'));
+				setTimeout(() => {
+					setCompleteMessage(null);
+					onClose();
+				}, 2500);
+			}
 		}
-	}, [t, isCompleted, workoutType, onClose]);
+	}, [isCompleted, workoutType, onClose, exercisesProgress, t]);
 
 	if (isCompleted) {
-		if (workoutType === 'myPlan') {
+		if (workoutType === 'oneDay') {
+			return (
+				<CompleteView goToPlan='/workouts' textGoTo={t("workouts.plan.goto")}></CompleteView>
+			)
+		} else {
 			return (
 				<>
-					{completeMessage &&
+					{completeMessage && (
 						<div className="fixed inset-0 flex items-center justify-center pointer-events-none">
 							<div className="bg-green-500 text-white text-lg p-8 rounded-lg shadow-2xl">
 								{completeMessage}
 							</div>
-						</div>}
+						</div>
+					)}
 				</>
-			);
-		} else {
-			return (
-				<div className="fixed inset-0 flex items-center justify-center bg-white z-50">
-					<CompleteView goToPlan="/workouts" />
-				</div>
 			);
 		}
 	}
@@ -183,7 +190,7 @@ const ExerciseFlow: React.FC<ExerciseFlowProp> = ({ exercises, onClose, onExerci
 		return (
 			<div className="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
 				<CountdownTimer
-					title={t("ExerciseFlow.ready")}
+					title={t('ExerciseFlow.ready')}
 					duration={5}
 					size={240}
 					strockWidth={16}
