@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 
-const CompleteView: React.FC<{goToPlan: string}> = ({ goToPlan }) => {
+const CompleteView: React.FC<{goToPlan: string, textGoTo: string}> = ({ goToPlan, textGoTo }) => {
     const router = useRouter();
     const { t } = useTranslation('global');
 
@@ -57,7 +57,7 @@ const CompleteView: React.FC<{goToPlan: string}> = ({ goToPlan }) => {
                     className="w-full lg:max-w-3xl bg-gradient-to-r from-emerald-400 to-emerald-600 text-white py-6 rounded-full text-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out"
                     onClick={() => handleNavigation(goToPlan)}
                 >
-                    {t("workouts.plan.goto")}
+                    {textGoTo}
                 </button>
                 <button 
                     className="w-full lg:max-w-3xl bg-green-100 hover:bg-green-200 text-black text-2xl font-bold py-6 rounded-full shadow-lg transition duration-300 ease-in-out"

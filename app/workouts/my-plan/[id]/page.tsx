@@ -159,9 +159,6 @@ export default function MyPlan() {
 			}
 		);
 	}
-	// weeklyProgressData.days.forEach((day: { day_of_week: string; exercises: Exercise[] }) => {
-	// 	daysData[day.day_of_week.toLowerCase()] = day;
-	// });
 
 	const handleExerciseCardClick = (
 		exercise: Exercise,
