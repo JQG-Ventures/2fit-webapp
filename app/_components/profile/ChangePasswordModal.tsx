@@ -57,58 +57,58 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClose, onSu
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <form
-        className="bg-white p-10 rounded-lg w-full max-w-lg"
+        className="bg-white p-14 rounded-lg w-full max-w-2xl"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-3xl font-semibold mb-6">{t('ChangePasswordModal.title') || 'Change Password'}</h2>
+        <h2 className="text-4xl font-semibold mb-8">{t('ChangePasswordModal.title') || 'Change Password'}</h2>
 
-        <div className="mb-6">
-          <label htmlFor="newPassword" className="block text-lg text-gray-700 mb-3">
+        <div className="mb-8">
+          <label htmlFor="newPassword" className="block text-2xl text-gray-700 mb-4">
             {t('ChangePasswordModal.newPassword') || 'New Password'}
           </label>
           <input
             type="password"
             id="newPassword"
-            className={`w-full p-4 border ${errors.newPassword ? 'border-red-500' : 'border-gray-300'} rounded-lg text-lg`}
+            className={`w-full p-5 border ${errors.newPassword ? 'border-red-500' : 'border-gray-300'} rounded-lg text-2xl`}
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
           />
           {errors.newPassword && (
-            <p className="text-red-500 text-base mt-2">{errors.newPassword}</p>
+            <p className="text-red-500 text-lg mt-2">{errors.newPassword}</p>
           )}
         </div>
 
-        <div className="mb-6">
-          <label htmlFor="confirmPassword" className="block text-lg text-gray-700 mb-3">
+        <div className="mb-8">
+          <label htmlFor="confirmPassword" className="block text-2xl text-gray-700 mb-4">
             {t('ChangePasswordModal.confirmPassword') || 'Confirm Password'}
           </label>
           <input
             type="password"
             id="confirmPassword"
-            className={`w-full p-4 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded-lg text-lg`}
+            className={`w-full p-5 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded-lg text-2xl`}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
           {errors.confirmPassword && (
-            <p className="text-red-500 text-base mt-2">{errors.confirmPassword}</p>
+            <p className="text-red-500 text-lg mt-2">{errors.confirmPassword}</p>
           )}
         </div>
 
         {errorMessage && (
-          <p className="text-red-500 text-lg mb-6">{errorMessage}</p>
+          <p className="text-red-500 text-2xl mb-8">{errorMessage}</p>
         )}
 
-        <div className="flex justify-end space-x-6">
+        <div className="flex justify-end space-x-8">
           <button
             type="button"
-            className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg text-lg"
+            className="px-8 py-4 bg-gray-300 text-gray-700 rounded-lg text-2xl"
             onClick={onClose}
           >
             {t('ChangePasswordModal.cancel') || 'Cancel'}
           </button>
           <button
             type="submit"
-            className={`px-6 py-3 bg-green-500 text-white rounded-lg text-lg font-semibold ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`px-8 py-4 bg-green-500 text-white rounded-lg text-2xl font-semibold ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={isSubmitting}
           >
             {isSubmitting ? (t('ChangePasswordModal.updating') || 'Updating...') : (t('ChangePasswordModal.update') || 'Update')}
