@@ -9,7 +9,7 @@ export const fetchUserDataByNumber = async (number: string) => {
 			throw new Error('Error fetching user profile');
 		}
 		const data = await res.json();
-		return data.data;
+		return data.message;
 	} catch (error) {
 		console.error('Error fetching user profile:', error);
 		throw error;
@@ -26,7 +26,7 @@ export const fetchUserDataByEmail = async (email: string) => {
 			throw new Error('Error fetching user profile');
 		}
 		const data = await res.json();
-		return data.data;
+		return data.message;
 	} catch (error) {
 		console.error('Error fetching user profile:', error);
 		throw error;

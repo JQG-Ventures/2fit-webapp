@@ -13,6 +13,7 @@ import { useSession } from 'next-auth/react';
 import { useFetch } from '../../../_hooks/useFetch';
 import { saveWorkout } from '../../../_services/workoutService';
 import ExerciseFlow from '@/app/_components/workouts/ExerciseFlow';
+import { useSessionContext } from '@/app/_providers/SessionProvider';
 
 
 const WorkoutPlanPage = () => {
@@ -20,6 +21,7 @@ const WorkoutPlanPage = () => {
 	const { id } = useParams();
 	const { t } = useTranslation('global');
 	const { data: session } = useSession();
+	const { userId, loading: sessionLoading } = useSessionContext();
 	const [savedMessage, setSavedMessage] = useState<string | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [showExerciseFlow, setShowExerciseFlow] = useState(false);
@@ -61,6 +63,8 @@ const WorkoutPlanPage = () => {
 						setIsSubmitting(false);
 					}}
 					workoutType='oneDay'
+					userId={userId!}
+					workoutPlanId={id}
 				/>
 			) : (
 				<>

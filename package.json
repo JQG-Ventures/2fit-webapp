@@ -32,7 +32,8 @@
     "react-slick": "^0.30.2",
     "scrypt-js": "^3.0.1",
     "slick-carousel": "^1.8.1",
-    "swiper": "^11.1.14"
+    "swiper": "^11.1.14",
+    "uuid": "^11.0.2"
   },
   "devDependencies": {
     "@types/node": "^20",
