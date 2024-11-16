@@ -34,7 +34,7 @@ interface ExerciseView {
     is_completed?: boolean;
 }
 
-interface ExerciseProgressModel {
+interface ExerciseProgress {
     exercise_id: string;
     sets_completed: number;
     reps_completed: number[];
@@ -43,17 +43,24 @@ interface ExerciseProgressModel {
     is_completed: boolean;
 }
 
-interface ExerciseProgress {
-    exercises: ExerciseProgressModel[];
-    day_of_week: string;
-}
+// interface ExerciseProgress {
+//     exercises: ExerciseProgressModel[];
+//     day_of_week: string;
+// }
 
 interface ExerciseComplete {
     workout_id: string;
     duration_seconds: number,
     calories_burned: number,
-    exercises: ExerciseProgressModel[],
+    exercises: ExerciseProgress[],
     sequence_day?: string,
     day_of_week?: string,
     was_skipped: boolean
+}
+
+interface WeeklyProgressData {
+    days: {
+      day_of_week: string;
+      exercises: Exercise[];
+    }[];
 }

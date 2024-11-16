@@ -116,7 +116,6 @@ export default function RegisterStep1() {
                 return;
             }
 
-            // Update Form Data in Context
             setFormData(formattedData);
             updateData(formattedData);
 

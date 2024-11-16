@@ -13,6 +13,16 @@ import ExerciseDetailsModal from "@/app/_components/modals/ExerciseDetailsModal"
 import ExerciseFlow from "@/app/_components/workouts/ExerciseFlow";
 import Image from "next/image";
 
+const daysOfWeekFull = [
+	"monday",
+	"tuesday",
+	"wednesday",
+	"thursday",
+	"friday",
+	"saturday",
+	"sunday",
+];
+
 interface ExerciseCardProps {
 	exercise: Exercise;
 	onClick: (action: "details" | "start") => void;
@@ -88,7 +98,7 @@ const DaysOfWeekSelector: React.FC<DaysOfWeekSelectorProps> = ({
 	</div>
 );
 
-export default function MyPlan() {
+const MyPlan: React.FC = () => {
 	const { t } = useTranslation("global");
 	const router = useRouter();
 	const { userId, loading: sessionLoading } = useSessionContext();
@@ -113,6 +123,11 @@ export default function MyPlan() {
 	);
 
 	useEffect(() => {
+		const currentDayIndex = new Date().getDay() - 1;
+		setSelectedDayIndex(currentDayIndex < 0 ? 6 : currentDayIndex); // Sunday as the last index (6)
+	}, []);
+
+	useEffect(() => {
 		if (weeklyProgressData) {
 			setWeeklyProgressState(weeklyProgressData);
 		}
@@ -133,15 +148,6 @@ export default function MyPlan() {
 	}
 
 	const daysOfWeekLetters = ["M", "T", "W", "Th", "F", "Sa", "Su"];
-	const daysOfWeekFull = [
-		"monday",
-		"tuesday",
-		"wednesday",
-		"thursday",
-		"friday",
-		"saturday",
-		"sunday",
-	];
 	const daysData: {
 		[key: string]: { day_of_week: string; exercises: Exercise[] };
 	} = {};
@@ -251,3 +257,5 @@ export default function MyPlan() {
 		</div>
 	);
 }
+
+export default React.memo(MyPlan);
