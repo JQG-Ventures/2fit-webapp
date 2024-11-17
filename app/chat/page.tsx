@@ -1,28 +1,20 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft, FaTrash, FaPaperPlane } from 'react-icons/fa';
 import LoadingScreen from '../_components/animations/LoadingScreen';
 import ChatComponent from '../_components/chat/Conversation';
 import LockScreen from '../_components/others/LockScreen';
-import { useSessionContext } from '../_providers/SessionProvider';
-import { useFetch } from '../_hooks/useFetch';
 import Modal from '../_components/profile/modal';
+import { useApiGet } from '../utils/apiClient';
 
 
 const Chat: React.FC = () => {
     const router = useRouter();
-	const { userId, loading: sessionLoading } = useSessionContext();
-	const options = useMemo(() => ({
-		method: 'GET',
-	}), []);
-    const { data: conversationData, loading, error, statusCode } = useFetch(
-		userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/conversation/${userId}` : '',
-		options
-	);
-
-    const [isPremium, setIsPremium] = useState(false);
+    const getChatUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/conversation`;
+	const { data: conversationData, isLoading: loading, isError: error } = useApiGet<{ status: string; message: any }>([], getChatUrl);
+    const [isPremium, setIsPremium] = useState(true);
 
     if (loading) return <LoadingScreen />;
     if (error) {

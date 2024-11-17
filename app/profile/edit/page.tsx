@@ -11,9 +11,8 @@ import LoadingScreen from '../../_components/animations/LoadingScreen';
 import PhoneInput from '../../_components/form/PhoneInput';
 import countries from '@/app/data/countries.json';
 import countryCodes from '@/app/data/countryCodes.json';
-import { useSessionContext } from '../../_providers/SessionProvider';
-import { useFetch } from '../../_hooks/useFetch';
-import { useUpdateProfile } from '@/app/_hooks/useUpdateProfile';
+import { useApiGet } from '@/app/utils/apiClient';
+import { useEditProfile } from '@/app/_services/userService';
 
 const formFields: FormField[] = [
 	{
@@ -56,16 +55,28 @@ const formFields: FormField[] = [
 
 const EditProfile: React.FC = () => {
 	const router = useRouter();
-	const { userId, token, loading: sessionLoading } = useSessionContext();
-	const getOptions = useMemo(() => ({
-		method: 'GET',
-	}), []);
+	const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
+	const { data: profile, isLoading: loadingProfile, isError: profileError } =
+		useApiGet<{ status: string; message: any }>([], getProfileUrl);
 
-	const { data: userData, loading, error } = useFetch(
-		userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}` : '',
-		getOptions
-	);
-	const { updateProfile, loading: updating, error: updateError, success: updateSuccess } = useUpdateProfile();
+	const { mutate: editProfile } = useEditProfile();
+
+	const handleEditProfile = async (profile_info: any) => {
+		editProfile(
+			profile_info,
+			{
+				onSuccess: (data) => {
+					if (data.status === 'success') {
+						setSuccessMessage("Profile updated successfully.");
+					}
+				},
+				onError: (error: any) => {
+					setErrorMessage("There was an error updating the profile")
+				},
+			}
+		);
+	};
+
 	const [profileData, setProfileData] = useState<UserProfile | null>(null);
 	const [countryCode, setCountryCode] = useState<string>('');
 	const [phoneNumber, setPhoneNumber] = useState<string>('');
@@ -74,11 +85,11 @@ const EditProfile: React.FC = () => {
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
 	useEffect(() => {
-		if (userData) {
-			setProfileData(userData);
+		if (profile) {
+			setProfileData(profile?.message);
 		}
 
-	}, [userData]);
+	}, [profile]);
 
 	const handleInputChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -111,28 +122,20 @@ const EditProfile: React.FC = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsSubmitting(true);
+		const updatedProfile = {
+			name: profileData?.name,
+			email: profileData?.email,
+			birthdate: profileData?.birthdate,
+			country: profileData?.country,
+			'profile.gender': profileData?.profile?.gender,
+			number: `${countryCode}${phoneNumber}`.replace("+", ""),
+		};
+		await handleEditProfile(updatedProfile);
+		setIsSubmitting(false);
+	}
 
-		try {
-			const updatedProfile = {
-				name: profileData?.name,
-				email: profileData?.email,
-				birthdate: profileData?.birthdate,
-				country: profileData?.country,
-				'profile.gender': profileData?.profile?.gender,
-				number: `${countryCode}${phoneNumber}`.replace("+", ""),
-			};
-	
-			await updateProfile(userId, updatedProfile, token?.accessToken);
-			setSuccessMessage("Profile updated successfully.");
-		} catch {
-			setErrorMessage("There was an error updating the profile")
-		} finally {
-			setIsSubmitting(false);
-		}
-	};
-
-	if (loading) return <LoadingScreen />;
-	if (error) {
+	if (loadingProfile) return <LoadingScreen />;
+	if (errorMessage) {
 		return (
 			<Modal
 				title="Error"

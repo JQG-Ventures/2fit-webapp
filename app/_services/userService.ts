@@ -1,3 +1,5 @@
+import { useApiDelete, useApiPost, useApiPut } from "../utils/apiClient";
+
 export const fetchUserDataByNumber = async (number: string) => {
 	try {
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/by-number/${number}`);
@@ -32,38 +34,34 @@ export const fetchUserDataByEmail = async (email: string) => {
 	}
 };
 
-export const sendProgressToBackend = async (exercisesProgressData: ExerciseProgress, userId: string, workoutPlanId: string) => {
-	try {
-		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/workouts/progress?user_id=${userId}&workout_plan_id=${workoutPlanId}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(exercisesProgressData),
-		});
 
-		if (!res.ok) {
-			throw new Error('There was a problem saving your progress, try it later');
-		}
-	} catch (error) {
-		throw error;
-	}
+export const useSendProgressToBackend = () => {
+	return useApiPost<{ queryParams: { workout_plan_id: string }; body: {exercises: ExerciseProgress[], day_of_week: string} }, { status: string; message: string }>(
+		'/api/users/workouts/progress'
+	);
+};  
+
+export const useSendCompleteToBackend = () => {
+	return useApiPost<{ body: ExerciseComplete }, { status: string; message: string }>(
+		'/api/users/workouts/complete'
+	);
+};
+  
+
+export const useSaveWorkout = () => {
+	return useApiPost<{ queryParams: { workout_id: string } }, { status: string; message: string }>(
+		'/api/workouts/saved'
+	);
 };
 
-export const sendCompleteToBackend = async (exercisesCompleteData: ExerciseComplete, userId: string) => {
-	try {
-		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/workouts/complete?user_id=${userId}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(exercisesCompleteData),
-		});
+export const useDeleteWorkout = () => {
+	return useApiDelete<{ queryParams: { workout_id: string } }, { status: string; message: string }>(
+		'/api/workouts/saved'
+	);
+};
 
-		if (!res.ok) {
-			throw new Error('There was a problem saving your progress, try it later');
-		}
-	} catch (error) {
-		throw error;
-	}
+export const useEditProfile = () => {
+	return useApiPut<any, { status: string; message: string }>(
+		'/api/users/profile'
+	);
 };

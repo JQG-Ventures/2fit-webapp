@@ -1,63 +1,62 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import ProgressBar from '../_components/others/ProgressSlider';
 import PopularExercisesSection from '../_components/_sections/PopularWorkoutsSection';
 import { useSessionContext } from '../_providers/SessionProvider';
-import { fetchWithAuth } from '../utils/fetchWithAuth';
 import LoadingScreen from '../_components/animations/LoadingScreen';
 import Modal from '../_components/profile/modal';
-import { useFetch } from '../_hooks/useFetch';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import './workouts.css';
-
+import { useApiGet } from '../utils/apiClient';
 
 export default function Workouts() {
   const { t } = useTranslation('global');
   const router = useRouter();
   const [isClicked, setIsClicked] = useState(false);
-  const { userId, token, loading: sessionLoading } = useSessionContext();
-  const options = useMemo(() => ({method: 'GET'}), []);
+  const { token, loading: sessionLoading } = useSessionContext();
 
-  const {data: activePlansData, loading: loadingActivePlans, error: errorActivePlans} = useFetch(
-    userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/active-plans/${userId}` : '', options);
-  
-    const [progressData, setProgressData] = useState([]);
+  const getActivePlansUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/active-plans`;
+  const { data: activePlansResponse, isLoading: loadingActivePlans, isError: errorActivePlans } =
+    useApiGet<{ status: string; message: any[] }>(['activePlans'], getActivePlansUrl);
+
+  const [progressData, setProgressData] = useState<any[]>([]);
   const [loadingProgressData, setLoadingProgressData] = useState(false);
-  const [errorProgressData, setErrorProgressData] = useState(null);
+  const [errorProgressData, setErrorProgressData] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProgressData = async () => {
-      if (activePlansData && activePlansData.length > 0) {
+      if (activePlansResponse?.message?.length > 0) {
         setLoadingProgressData(true);
         try {
-          const progressPromises = activePlansData.map(async (plan: any) => {
-            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/workouts/progress?workout_plan_id=${plan.workout_plan_id}&user_id=${userId}`;
-            const response = await fetchWithAuth(url, options);
+          const progressPromises = activePlansResponse.message.map(async (plan) => {
+            const progressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/workouts/progress?workout_plan_id=${plan.workout_plan_id}`;
+            const response = await fetch(progressUrl, {"method": "GET", headers: {"Authorization": `Bearer ${token}`}});
             const jsonData = await response.json();
             if (!response.ok) {
-              throw new Error(jsonData.message || t("workouts.fetchingError"));
+              throw new Error(jsonData.message || t('workouts.fetchingError'));
             }
             return { planId: plan.workout_plan_id, progressData: jsonData.message };
           });
+
           const progressResults = await Promise.all(progressPromises);
-          const plansWithProgress = activePlansData.map((plan: any) => {
+          const plansWithProgress = activePlansResponse.message.map((plan) => {
             const progress = progressResults.find((p) => p.planId === plan.workout_plan_id);
             return {
               ...plan,
               progressData: progress?.progressData || null,
             };
           });
+
           setProgressData(plansWithProgress);
         } catch (error: any) {
-          console.error(error);
           setErrorProgressData(error.message);
         } finally {
           setLoadingProgressData(false);
@@ -66,7 +65,7 @@ export default function Workouts() {
     };
 
     fetchProgressData();
-  }, [activePlansData, userId, t, options]);
+  }, [activePlansResponse, t]);
 
   const handleClick = (planId: string) => {
     if (isClicked) return;
@@ -97,11 +96,12 @@ export default function Workouts() {
   if (sessionLoading || loadingActivePlans || loadingProgressData) {
     return <LoadingScreen />;
   }
+
   if (errorActivePlans || errorProgressData) {
     return (
       <Modal
         title="Error"
-        message={errorActivePlans! || errorProgressData!}
+        message={errorActivePlans || errorProgressData || t('workouts.fetchingError')}
         onClose={() => router.push('/home')}
       />
     );
@@ -116,7 +116,7 @@ export default function Workouts() {
       </div>
 
       <Swiper
-	  	id="testing"
+        id="testing"
         modules={[Pagination]}
         spaceBetween={50}
         slidesPerView={1}
@@ -134,14 +134,14 @@ export default function Workouts() {
               <div className="w-1/2 flex flex-col justify-evenly align-start pr-4">
                 <h2 className="text-white text-3xl font-semibold">
                   {plan.plan_type === 'personalized'
-                    ? t("workouts.weeklyRoutine")
+                    ? t('workouts.weeklyRoutine')
                     : plan.plan_type === 'challenge'
-                    ? t("workouts.challengeProgress")
-                    : t("workouts.workoutProgress")}
+                    ? t('workouts.challengeProgress')
+                    : t('workouts.workoutProgress')}
                 </h2>
                 <span className="text-gray-200 text-2xl">
-                  {plan.progressData?.exercises_left?.length || 0} {t("workouts.exercise")}
-                  {plan.progressData?.exercises_left?.length !== 1 ? 's' : ''} {t("workouts.left")}
+                  {plan.progressData?.exercises_left?.length || 0} {t('workouts.exercise')}
+                  {plan.progressData?.exercises_left?.length !== 1 ? 's' : ''} {t('workouts.left')}
                 </span>
               </div>
               <div className="w-1/2 flex flex-col justify-center align-center text-white">

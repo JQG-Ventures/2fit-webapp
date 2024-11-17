@@ -9,10 +9,10 @@ import ExerciseList from '@/app/_components/workouts/ExerciseList';
 import LoadingScreen from '@/app/_components/animations/LoadingScreen';
 import SavedMessage from '@/app/_components/others/SavedMessage';
 import { useTranslation } from 'react-i18next';
-import { useFetch } from '@/app/_hooks/useFetch';
-import { saveWorkout } from '@/app/_services/workoutService';
 import ExerciseFlow from '@/app/_components/workouts/ExerciseFlow';
 import { useSessionContext } from '@/app/_providers/SessionProvider';
+import { useApiGet } from '@/app/utils/apiClient';
+import { useSaveWorkout } from '@/app/_services/userService';
 
 
 const WorkoutPlanPage: React.FC = () => {
@@ -23,37 +23,33 @@ const WorkoutPlanPage: React.FC = () => {
 	const [savedMessage, setSavedMessage] = useState<string | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 	const [showExerciseFlow, setShowExerciseFlow] = useState<boolean>(false);
+	const { mutate: saveWorkout } = useSaveWorkout();
 
-	const options = useMemo(() => ({ method: 'GET' }), []);
-	const { data: workoutPlan, loading, error } = useFetch(
-		id ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans/${id}` : '',
-		options
-	);
+	const getActivePlansUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans/${id}`;
+  	const { data: workoutPlan, isLoading: loading, isError: error } =
+    	useApiGet<{ status: string; message: any }>(['activePlans'], getActivePlansUrl);
 
 	const handleSaveClick = useCallback(async (planId: string) => {
-		if (!userId) {
-			setSavedMessage(t('workouts.plan.userNotLoggedIn'));
-			setTimeout(() => setSavedMessage(null), 2000);
-			return;
-		}
-
-		try {
-			const result = await saveWorkout(userId, planId, token!);
-
-			if (result.status === 400) {
-				setSavedMessage(t('workouts.plan.workoutAlreadySaved'));
-			} else if (result.status === 200) {
-				setSavedMessage(t('workouts.plan.workoutSaved'));
-			} else {
-				setSavedMessage(t('workouts.plan.savingError'));
-			}
-		} catch (error) {
-			console.error('Error saving workout:', error);
-			setSavedMessage(t('workouts.plan.savingError'));
-		}
-
-		setTimeout(() => setSavedMessage(null), 2000);
-	}, [t, userId]);
+		saveWorkout(
+            { queryParams: { workout_id: planId } },
+            {
+                onSuccess: (data) => {
+                    if (data.status === 'success') {
+                        setSavedMessage(t('workouts.plan.workoutSaved'));
+                        setTimeout(() => setSavedMessage(null), 3000);
+                    }
+                },
+                onError: (error: any) => {
+                    if (error.response?.status === 400) {
+                        setSavedMessage(t('workouts.plan.workoutAlreadySaved'));
+                    } else {
+                        setSavedMessage(t('workouts.plan.savingError'));
+                    }
+                    setTimeout(() => setSavedMessage(null), 3000);
+                },
+            }
+        );
+	}, [t]);
 
 	const handleStartWorkout = useCallback(() => {
 		setIsSubmitting(true);
@@ -77,9 +73,9 @@ const WorkoutPlanPage: React.FC = () => {
 
 	return (
 		<div className="bg-gray-50 w-full min-h-screen">
-			{showExerciseFlow && workoutPlan ? (
+			{showExerciseFlow && workoutPlan?.message ? (
 				<ExerciseFlow
-					exercises={workoutPlan.workout_schedule[0]?.exercises || []}
+					exercises={workoutPlan?.message.workout_schedule[0]?.exercises || []}
 					onClose={handleExerciseFlowClose}
 					onExerciseComplete={() => { }}
 					workoutType="oneDay"
@@ -92,13 +88,13 @@ const WorkoutPlanPage: React.FC = () => {
 						<WorkoutHeader
 							onSaveClick={() => handleSaveClick(id!)}
 							onBackClick={() => router.back()}
-							imageUrl={workoutPlan.image_url}
+							imageUrl={workoutPlan?.message.image_url}
 						/>
-						<WorkoutDetails workoutPlan={workoutPlan} />
+						<WorkoutDetails workoutPlan={workoutPlan?.message} />
 					</div>
 
 					<ExerciseList
-						exercises={workoutPlan.workout_schedule[0]?.exercises || []}
+						exercises={workoutPlan?.message.workout_schedule[0]?.exercises || []}
 						isMobile={true}
 					/>
 

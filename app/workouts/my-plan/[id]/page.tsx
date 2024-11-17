@@ -8,10 +8,10 @@ import { FiPlayCircle } from "react-icons/fi";
 import LoadingScreen from "../../../_components/animations/LoadingScreen";
 import Modal from "../../../_components/profile/modal";
 import { useSessionContext } from "../../../_providers/SessionProvider";
-import { useFetch } from "../../../_hooks/useFetch";
 import ExerciseDetailsModal from "@/app/_components/modals/ExerciseDetailsModal";
 import ExerciseFlow from "@/app/_components/workouts/ExerciseFlow";
 import Image from "next/image";
+import { useApiGet } from "@/app/utils/apiClient";
 
 const daysOfWeekFull = [
 	"monday",
@@ -104,23 +104,11 @@ const MyPlan: React.FC = () => {
 	const { userId, loading: sessionLoading } = useSessionContext();
 	const { id } = useParams();
 	const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
-	const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
-		null
-	);
+	const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 	const [showExerciseFlow, setShowExerciseFlow] = useState<boolean>(false);
 	const [weeklyProgressState, setWeeklyProgressState] = useState<any>(null);
-
-	const options = useMemo(() => ({ method: "GET" }), []);
-	const {
-		data: weeklyProgressData,
-		loading: loadingWeeklyProgress,
-		error: errorWeeklyProgress,
-	} = useFetch(
-		userId
-			? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/weekly-progress/${userId}`
-			: "",
-		options
-	);
+	const getProgressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/weekly-progress`;
+	const { data: weeklyProgressData, isLoading: loadingWeeklyProgress, isError: errorWeeklyProgress } = useApiGet<{ status: string; message: any }>([], getProgressUrl);
 
 	useEffect(() => {
 		const currentDayIndex = new Date().getDay() - 1;
@@ -129,7 +117,7 @@ const MyPlan: React.FC = () => {
 
 	useEffect(() => {
 		if (weeklyProgressData) {
-			setWeeklyProgressState(weeklyProgressData);
+			setWeeklyProgressState(weeklyProgressData.message);
 		}
 	}, [weeklyProgressData]);
 
