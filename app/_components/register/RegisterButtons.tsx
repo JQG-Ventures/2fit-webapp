@@ -14,7 +14,7 @@ export default function RegistrationButtons({
     isNextDisabled
 }: RegistrationButtonsProps) {
     return (
-        <div className="flex flex-row items-center space-x-4 justify-between w-full max-w-3xl">
+        <div className="flex flex-row items-center space-x-4 justify-between w-full lg:max-w-3xl">
             <ButtonWithSpinner
                 type="button"
                 onClick={handlePrev}
