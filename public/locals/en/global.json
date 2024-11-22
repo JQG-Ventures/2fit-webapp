@@ -203,7 +203,8 @@
 		"WorkoutLibrarySectiondescription": "Soon you will have tons of workouts to get you fit, stay tuned!",
 		"viewall": "View All",
 		"WorkoutLibrarySectiondescription2": "Discover more workouts tailored to your fitness goals in our extensive library.",
-		"openlibrary": "Open Workout Library"
+		"openlibrary": "Open Workout Library",
+		"MessageNoExercises": "We are creating more challenges for you. Stay tuned! :)"
 	  },
 	  "SavedWorkoutsSection": {
 		"SavedWorkoutsSectiontitle": "Saved Workouts",

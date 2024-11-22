@@ -213,7 +213,8 @@
 		"WorkoutLibrarySectiondescription": "Pronto tendrás acceso a una variedad de entrenamientos para ponerte en forma, ¡mantente atento!",
 		"viewall": "Ver todo",
 		"WorkoutLibrarySectiondescription2": "Descubre más entrenamientos adaptados a tus objetivos de fitness en nuestra amplia biblioteca.",
-		"openlibrary": "Abrir biblioteca de entrenamientos"
+		"openlibrary": "Abrir biblioteca de entrenamientos",
+		"MessageNoExercises": "Estamos creando más desafíos para ti. ¡Estén atentos! :)"
 	  },
 	  "SavedWorkoutsSection": {
 		"SavedWorkoutsSectiontitle": "Entrenamientos guardados",
