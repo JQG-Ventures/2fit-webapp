@@ -291,5 +291,10 @@
 		"rest": "Take a rest",
 		"nextEx": "Next Exercise",
 		"skip": "Skip rest"
+	},
+	"SavedWorkoutsSection": {
+			"SavedWorkoutsSectiontitle": "My Bookmark",
+			"SavedWorkoutsSectionNoResults": "Failed to fetch saved workouts. Please try again later.",
+			"SavedWorkoutsSectionMinutes": "Minutes"
 	}
 }

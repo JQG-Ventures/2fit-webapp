@@ -9,9 +9,11 @@ import { HiMiniSquares2X2 } from "react-icons/hi2";
 import { ImSpinner8 } from "react-icons/im";
 import { useApiGet } from "../../utils/apiClient";
 import { useDeleteWorkout } from "@/app/_services/userService";
+import { useTranslation } from "react-i18next";
 import ConfirmationModal from "../../_components/modals/confirmationModal";
 
 const SavedWorkouts: React.FC = () => {
+  const { t } = useTranslation("global");
   const router = useRouter();
   const [clickedStates, setClickedStates] = useState<{
     [key: string]: boolean;
@@ -80,7 +82,7 @@ const SavedWorkouts: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-[80%]">
+      <div className="flex justify-center items-center h-screen">
         <ImSpinner8 className="animate-spin h-16 w-16 text-green-600" />
       </div>
     );
@@ -90,7 +92,7 @@ const SavedWorkouts: React.FC = () => {
     return (
       <div className="border-dashed p-8 rounded-lg flex justify-center items-center h-[80%]">
         <p className="text-red-500 text-xl">
-          Failed to fetch saved workouts. Please try again later.
+          {t("SavedWorkoutsSection.SavedWorkoutsSectionNoResults")}
         </p>
       </div>
     );
@@ -106,7 +108,9 @@ const SavedWorkouts: React.FC = () => {
           >
             <FaArrowLeftLong className="h-8 w-8" />
           </button>
-          <h2 className="text-4xl font-semibold">My Bookmark</h2>
+          <h2 className="text-4xl font-semibold">
+            {t("SavedWorkoutsSection.SavedWorkoutsSectiontitle")}
+          </h2>
         </div>
         <div className="flex space-x-4">
           <button className="text-black">
@@ -136,7 +140,9 @@ const SavedWorkouts: React.FC = () => {
               <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                 <h3 className="text-xl font-semibold">{workout.name}</h3>
                 <p className="text-sm">
-                  {workout.duration_weeks * 7} minutes | {workout.level}
+                  {workout.duration_weeks * 7}{" "}
+                  {t("SavedWorkoutsSection.SavedWorkoutsSectionMinutes")} |{" "}
+                  {workout.level}
                 </p>
               </div>
               <button
@@ -164,9 +170,13 @@ const SavedWorkouts: React.FC = () => {
         isOpen={modalOpen}
         onClose={handleCancelDelete}
         onConfirm={handleConfirmDelete}
-        question="Are you sure you want to remove this workout from your saved list?"
-        confirmText="Yes, remove"
-        cancelText="Cancel"
+        question={t("home.SavedWorkoutsSection.SavedWorkoutsSectionquestion")}
+        confirmText={t(
+          "home.SavedWorkoutsSection.SavedWorkoutsSectionconfirmText"
+        )}
+        cancelText={t(
+          "home.SavedWorkoutsSection.SavedWorkoutsSectioncancelText"
+        )}
       />
     </div>
   );
