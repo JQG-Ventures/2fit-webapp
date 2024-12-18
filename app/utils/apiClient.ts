@@ -23,20 +23,36 @@ export const useApiGet = <T>(
 	});
 };
 
-export const useApiPost = <TData extends { body?: any }, TResponse>(
-	baseUrl: string,
-	options?: UseMutationOptions<TResponse, Error, TData & { queryParams?: Record<string, string> }>
+export const useApiPost = <
+  TData extends { body?: any; queryParams?: Record<string, string | number> },
+  TResponse
+>(
+  baseUrl: string,
+  options?: UseMutationOptions<TResponse, Error, TData>,
+  headers?: Record<string, string>
 ) => {
-	return useMutation<TResponse, Error, TData & { queryParams?: Record<string, string> }>({
-		mutationFn: async ({ queryParams, body, ...rest }) => {
-			const url = queryParams
-				? `${baseUrl}?${new URLSearchParams(queryParams).toString()}`
-				: baseUrl;
-			const { data: responseData } = await axiosInstance.post<TResponse>(url, body || rest); // Send `body` directly if it exists
-			return responseData;
-		},
-		...options,
-	});
+  return useMutation<TResponse, Error, TData>({
+    mutationFn: async ({ queryParams, body, ...rest }) => {
+      const url = queryParams
+        ? `${baseUrl}?${new URLSearchParams(
+            Object.entries(queryParams).reduce((acc, [key, value]) => {
+              acc[key] = String(value);
+              return acc;
+            }, {} as Record<string, string>)
+          ).toString()}`
+        : baseUrl;
+
+      const { data: responseData } = await axiosInstance.post<TResponse>(
+        url,
+        body || rest,
+        {
+          headers: headers || {},
+        }
+      );
+      return responseData;
+    },
+    ...options,
+  });
 };
 
 export const useApiPut = <TData, TResponse>(

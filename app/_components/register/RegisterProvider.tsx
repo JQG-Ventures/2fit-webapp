@@ -34,7 +34,7 @@ export const useRegister = () => {
 };
 
 export const RegisterProvider = ({ children }: { children: ReactNode }) => {
-    const [data, setData] = useState<RegisterData>({});
+    const [data, setData] = useState<RegisterData>({} as RegisterData);
 
     const updateData = (newData: RegisterData) => {
         setData((prevData) => ({ ...prevData, ...newData }));

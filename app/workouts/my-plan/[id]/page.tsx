@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { FaArrowLeft, FaCheckCircle, FaFire } from "react-icons/fa";
@@ -26,12 +26,13 @@ const daysOfWeekFull = [
 interface ExerciseCardProps {
 	exercise: Exercise;
 	onClick: (action: "details" | "start") => void;
+	className?: string;
 }
 
-const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onClick }) => (
+const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onClick, className }) => (
 	<div
-		className={`relative bg-white shadow-md rounded-lg overflow-hidden transition-transform transform hover:scale-105 ${exercise.is_completed ? "opacity-75 pointer-events-none" : ""
-			}`}
+		className={`flex-none relative bg-white shadow-md rounded-lg overflow-hidden transition-transform transform hover:scale-105 ${exercise.is_completed ? "opacity-75 pointer-events-none" : ""
+			} ${className || ""}`}
 		onClick={() => onClick("details")}
 	>
 		<div className="relative w-full h-40">
@@ -112,7 +113,7 @@ const MyPlan: React.FC = () => {
 
 	useEffect(() => {
 		const currentDayIndex = new Date().getDay() - 1;
-		setSelectedDayIndex(currentDayIndex < 0 ? 6 : currentDayIndex); // Sunday as the last index (6)
+		setSelectedDayIndex(currentDayIndex < 0 ? 6 : currentDayIndex);
 	}, []);
 
 	useEffect(() => {
@@ -200,28 +201,33 @@ const MyPlan: React.FC = () => {
 				</button>
 				<h1 className="text-5xl font-semibold pl-4">{t('workouts.my-plan.title')}</h1>
 			</div>
-			<div className="w-full h-[80%] pt-10 lg:max-w-3xl">
+			<div className="w-full h-[80%] lg:max-w-3xl flex flex-col">
 				<DaysOfWeekSelector
 					daysOfWeekLetters={daysOfWeekLetters}
 					selectedDayIndex={selectedDayIndex}
 					setSelectedDayIndex={setSelectedDayIndex}
 				/>
+				
 				{selectedDay && selectedDay.exercises.length > 0 ? (
-					<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
-						{selectedDay.exercises.map((exercise) => (
-							<ExerciseCard
-								key={exercise.exercise_id}
-								exercise={exercise}
-								onClick={(action) => handleExerciseCardClick(exercise, action)}
-							/>
-						))}
+					<div className="flex-1 overflow-x-hidden overflow-y-auto mt-4">
+						<div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+							{selectedDay.exercises.map((exercise) => (
+								<ExerciseCard
+									key={exercise.exercise_id}
+									exercise={exercise}
+									onClick={(action) => handleExerciseCardClick(exercise, action)}
+									className="w-full h-auto"
+								/>
+							))}
+						</div>
 					</div>
 				) : (
-					<div className="h-full flex justify-center items-center">
+					<div className="flex-1 flex justify-center items-center mt-4">
 						<p className="text-center text-gray-500">{t('workouts.my-plan.noExercises')}</p>
 					</div>
 				)}
 			</div>
+			
 			{selectedExercise && !showExerciseFlow && (
 				<ExerciseDetailsModal
 					exercise={selectedExercise}
@@ -239,6 +245,7 @@ const MyPlan: React.FC = () => {
 					onExerciseComplete={handleExerciseComplete}
 					workoutType="myPlan"
 					userId={userId!}
+					// @ts-ignore
 					workoutPlanId={id}
 				/>
 			)}
