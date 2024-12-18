@@ -179,7 +179,13 @@
 		"update": "Update",
 		"female": "Female",
 		"male": "Male",
-		"errorFetching": "There was an error fetching the user profile data, try again later!"
+		"errorFetching": "There was an error fetching the user profile data, try again later!",
+		"editModalTitle": "Edit Profile",
+		"updateProfile": {
+			"updateText": "Update",
+			"success": "Edit sucessfully updated!",
+			"error": "There was a problem updating the profile."
+		}
 	},
 	"upgrade": {
 		"title": "Upgrade to Premium",
@@ -237,6 +243,9 @@
 			"letschat": "Let's Chat!",
 			"getyourplan": "Get your plan"
 		}
+	},
+	"chat": {
+		"openWhatsApp": "Open your conversation in WhatsApp"
 	},
 	"workouts": {
 		"exercise": "exercise",

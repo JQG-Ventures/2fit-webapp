@@ -1,3 +1,4 @@
+//@ts-nocheck
 import axios from 'axios';
 import { getSession, signOut } from 'next-auth/react';
 import { refreshAccessToken } from '../config/auth.config';

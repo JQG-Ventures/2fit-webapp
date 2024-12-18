@@ -1,13 +1,12 @@
-'use client';
-
-import React, { useReducer, useEffect, useCallback } from 'react';
+import React, { useReducer, useEffect, useCallback, useState } from 'react';
 import CountdownTimer from '../animations/CountdownTimer';
 import ExerciseView from './ExerciseView';
 import RestView from './RestView';
 import CompleteView from './CompleteView';
 import { useTranslation } from 'react-i18next';
 import { useSendProgressToBackend, useSendCompleteToBackend } from '../../_services/userService';
-import { Action, ExerciseFlowProps, State } from '@/app/_interfaces/ExerciseFlow';
+import { Action, ExerciseFlowProps, State, ExerciseProgress } from '@/app/_interfaces/ExerciseFlow';
+
 
 const initialState: State = {
 	currentExerciseIndex: 0,
@@ -20,41 +19,61 @@ const initialState: State = {
 	completeMessage: null,
 	exercisesProgress: [],
 	exerciseStartTime: null,
+	workoutStartTime: null,
 };
+
+const formatDuration = (seconds: number): string => {
+	const hours = Math.floor(seconds / 3600);
+	const minutes = Math.floor((seconds % 3600) / 60);
+	const secs = seconds % 60;
+  
+	// If the total time is less than 1 hour, format as mm:ss
+	if (hours === 0) {
+	  return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+	}
+  
+	// If 1 hour or more, format as hh:mm
+	return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  };
 
 const reducer = (state: State, action: Action): State => {
 	switch (action.type) {
 		case 'END_COUNTDOWN':
-			return { ...state, isCountdown: false, exerciseStartTime: Date.now() };
+			return {
+				...state,
+				isCountdown: false,
+				workoutStartTime: state.workoutStartTime || Date.now(),
+				exerciseStartTime: Date.now(),
+			};
 		case 'START_REST':
 			return {
 				...state,
 				isRest: true,
-				restDuration: action.restDuration,
-				nextExerciseDetails: action.nextExercise
+				restDuration: action.restDuration!,
+				nextExerciseDetails: action.nextExercise!,
 			};
 		case 'START_EXERCISE':
 			return {
 				...state,
 				isRest: false,
-				currentSet: action.currentSet,
-				exerciseStartTime: Date.now()
+				currentSet: action.currentSet!,
+				exerciseStartTime: state.exerciseStartTime ?? Date.now(),
 			};
 		case 'COMPLETE_EXERCISE':
 			return { ...state, exerciseStartTime: null };
 		case 'SET_EXERCISE_INDEX':
-			return { ...state, currentExerciseIndex: action.index };
+			return { ...state, currentExerciseIndex: action.index! };
 		case 'SET_CURRENT_SET':
-			return { ...state, currentSet: action.set };
+			return { ...state, currentSet: action.set! };
 		case 'ADD_EXERCISE_PROGRESS':
 			return {
 				...state,
-				exercisesProgress: [...state.exercisesProgress, action.progress]
+				exercisesProgress: [...state.exercisesProgress, action.progress!],
 			};
 		case 'COMPLETE_WORKOUT':
 			return { ...state, isCompleted: true };
 		case 'SET_COMPLETE_MESSAGE':
-			return { ...state, completeMessage: action.message };
+			return { ...state, completeMessage: action.message! };
 		default:
 			return state;
 	}
@@ -70,6 +89,7 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 }) => {
 	const { t } = useTranslation('global');
 	const [state, dispatch] = useReducer(reducer, initialState);
+	const [formattedDuration, setFormattedDuration] = useState<string>('');
 
 	const {
 		currentExerciseIndex,
@@ -82,6 +102,7 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 		completeMessage,
 		exercisesProgress,
 		exerciseStartTime,
+		workoutStartTime,
 	} = state;
 
 	const totalExercises = exercises.length;
@@ -102,7 +123,7 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 			sets_completed: totalSets,
 			reps_completed: repsCompleted,
 			duration_seconds: exerciseDuration,
-			calories_burned: 0, // You can calculate this if needed
+			calories_burned: 0,
 			is_completed: true,
 		};
 
@@ -116,39 +137,55 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 			};
 			sendProgress(
 				{
-				  queryParams: { workout_plan_id: workoutPlanId },
-				  body: payload
+					queryParams: { workout_plan_id: workoutPlanId },
+					body: payload,
 				},
 				{
-				  onSuccess: (response) => console.log('Progress saved:', response),
-				  onError: (error) => console.error('Error saving progress:', error.message),
+					onSuccess: (response) => console.log('Progress saved:', response),
+					onError: (error) => console.error('Error saving progress:', error.message),
 				}
-			  );
+			);
 			onExerciseComplete(currentExercise.exercise_id);
 		}
-	}, [exerciseStartTime, totalSets, currentExercise, workoutType, userId, workoutPlanId, onExerciseComplete]);
+	}, [
+		exerciseStartTime,
+		totalSets,
+		currentExercise,
+		workoutType,
+		userId,
+		workoutPlanId,
+		onExerciseComplete,
+		sendProgress,
+	]);
 
 	const handleNext = useCallback(() => {
 		if (currentSet < totalSets) {
 			if (isRest) {
-				dispatch({ type: 'SET_CURRENT_SET', set: currentSet + 1 });
 				dispatch({ type: 'START_EXERCISE', currentSet: currentSet + 1 });
 			} else {
 				dispatch({ type: 'START_REST', restDuration: defaultRestSeconds, nextExercise: currentExercise });
 			}
 		} else {
-			updateExerciseProgress();
+			if (!isRest) {
+				updateExerciseProgress();
 
-			if (currentExerciseIndex < totalExercises - 1) {
-				if (isRest) {
-					dispatch({ type: 'SET_EXERCISE_INDEX', index: currentExerciseIndex + 1 });
-					dispatch({ type: 'SET_CURRENT_SET', set: 1 });
-					dispatch({ type: 'START_REST', restDuration: 120, nextExercise: exercises[currentExerciseIndex + 1] });
+				if (currentExerciseIndex < totalExercises - 1) {
+					dispatch({
+						type: 'START_REST',
+						restDuration: 120,
+						nextExercise: exercises[currentExerciseIndex + 1],
+					});
 				} else {
-					dispatch({ type: 'START_REST', restDuration: 120, nextExercise: exercises[currentExerciseIndex + 1] });
+					dispatch({ type: 'COMPLETE_WORKOUT' });
 				}
 			} else {
-				dispatch({ type: 'COMPLETE_WORKOUT' });
+				if (currentExerciseIndex < totalExercises - 1) {
+					dispatch({ type: 'SET_EXERCISE_INDEX', index: currentExerciseIndex + 1 });
+					dispatch({ type: 'SET_CURRENT_SET', set: 1 });
+					dispatch({ type: 'START_EXERCISE', currentSet: 1 });
+				} else {
+					// Workout is already completed
+				}
 			}
 		}
 	}, [
@@ -160,6 +197,7 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 		totalExercises,
 		exercises,
 		defaultRestSeconds,
+		currentExercise,
 	]);
 
 	const handleBack = useCallback(() => {
@@ -188,7 +226,15 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 				onClose();
 			}
 		}
-	}, [isRest, currentSet, currentExerciseIndex, exercises, defaultRestSeconds, currentExercise, onClose]);
+	}, [
+		isRest,
+		currentSet,
+		currentExerciseIndex,
+		exercises,
+		defaultRestSeconds,
+		currentExercise,
+		onClose,
+	]);
 
 	// Start exercise timer when not resting or in countdown
 	useEffect(() => {
@@ -200,6 +246,11 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 	// Handle workout completion side effects
 	useEffect(() => {
 		if (isCompleted) {
+			const totalWorkoutDuration = workoutStartTime
+				? Math.floor((Date.now() - workoutStartTime) / 1000)
+				: 0;
+			setFormattedDuration(formatDuration(totalWorkoutDuration));
+
 			if (workoutType === 'myPlan') {
 				dispatch({ type: 'SET_COMPLETE_MESSAGE', message: t('ExerciseFlow.completed') });
 				const timer = setTimeout(() => {
@@ -210,21 +261,23 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 			} else if (workoutType === 'oneDay') {
 				const payload = {
 					workout_id: workoutPlanId,
-					duration_seconds: 0, // Calculate if needed
-					calories_burned: 0, // Calculate if needed
+					duration_seconds: totalWorkoutDuration,
+					calories_burned: 0,
 					exercises: exercisesProgress,
 					sequence_day: '1',
 					was_skipped: false,
 				};
+
 				completeWorkout(
 					{
-					  body: payload
+						body: payload,
 					},
 					{
-					  onSuccess: (response) => console.log('Progress saved:', response),
-					  onError: (error) => console.error('Error saving progress:', error.message),
+						onSuccess: (response) => console.log('Workout completed:', response),
+						onError: (error) => console.error('Error completing workout:', error.message),
 					}
-				  );
+				);
+
 				dispatch({ type: 'SET_COMPLETE_MESSAGE', message: t('ExerciseFlow.completed') });
 			} else {
 				dispatch({ type: 'SET_COMPLETE_MESSAGE', message: t('ExerciseFlow.completed') });
@@ -235,12 +288,21 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 				return () => clearTimeout(timer);
 			}
 		}
-	}, [isCompleted, workoutType, onClose, exercisesProgress, t, userId, workoutPlanId]);
+	}, [
+		isCompleted,
+		workoutType,
+		onClose,
+		exercisesProgress,
+		t,
+		userId,
+		workoutPlanId,
+		workoutStartTime,
+		completeWorkout,
+	]);
 
-	// Render completion view
 	if (isCompleted) {
 		if (workoutType === 'oneDay') {
-			return <CompleteView goToPlan='/workouts' textGoTo={t("workouts.plan.goto")} />;
+			return <CompleteView goToPlan="/workouts" textGoTo={t('workouts.plan.goto')} duration={formattedDuration} />;
 		}
 		return (
 			<>
@@ -255,7 +317,6 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 		);
 	}
 
-	// Render countdown timer
 	if (isCountdown) {
 		return (
 			<div className="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
@@ -270,7 +331,6 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 		);
 	}
 
-	// Render rest or exercise view
 	return (
 		<div className="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
 			{isRest ? (

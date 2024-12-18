@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useApiGet, useApiDelete } from '../utils/apiClient';
+import { useApiGet } from '../utils/apiClient';
 import GreetingSection from '../_components/_sections/GreetingSection';
 import SearchBar from '../_components/searchbar/SearchBarComponent';
 import ExerciseBannerSection from '../_components/_sections/ExerciseBannerSection';
@@ -9,13 +9,14 @@ import MotivationSection from '../_components/_sections/MotivationSection';
 import WorkoutLibrarySection from '../_components/_sections/WorkoutLibraryWidgetSection';
 import SavedWorkoutsSection from '../_components/_sections/SavedWorkoutsSection';
 import Footer from '../_components/_sections/Footer';
-import LoadingScreen from '../_components/animations/LoadingScreen';
 import { useSessionContext } from '../_providers/SessionProvider';
 import { useTranslation } from 'react-i18next';
 import { useDeleteWorkout } from '../_services/userService';
+import { useLoading } from '../_providers/LoadingProvider';
 
 const HomePage: React.FC = () => {
     const { t } = useTranslation('global');
+    const { setLoading } = useLoading();
     const { userId, userName, loading: sessionLoading } = useSessionContext();
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
     const { mutate: deleteSavedWorkout } = useDeleteWorkout();
@@ -27,9 +28,9 @@ const HomePage: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const workoutPlansUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans/one-day`;
-    const savedWorkoutPlansUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/saved`;
-    const libraryWorkoutCountUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/library`;
+    const workoutPlansUrl = `/api/workouts/plans/one-day`;
+    const savedWorkoutPlansUrl = `/api/workouts/saved`;
+    const libraryWorkoutCountUrl = `/api/workouts/library`;
 
     const { data: workoutPlans, isLoading: loadingWorkoutPlans, isError: workoutPlansError } =
         useApiGet<{ status: string; message: [] }>(['workoutPlans'], workoutPlansUrl, { enabled: !sessionLoading });
@@ -38,11 +39,21 @@ const HomePage: React.FC = () => {
     const { data: libraryWorkouts, isLoading: loadingLibraryWorkouts, isError: libraryWorkoutsError } =
         useApiGet<{ status: string; message: [] }>(['libraryWorkouts'], libraryWorkoutCountUrl, { enabled: !sessionLoading });
 
+    let isLoading = loadingWorkoutPlans || loadingSavedWorkoutPlans || loadingLibraryWorkouts;
+
+    useEffect(() => {
+        if (isLoading) {
+            setLoading(true);
+        } else {
+            setLoading(false);
+        }
+    }, [isLoading, setLoading])
+
     const handleDeleteWorkout = async (id: string) => {
         deleteSavedWorkout(
             { queryParams: { workout_id: id } },
             {
-                onSuccess: (data) =>  {
+                onSuccess: (data) => {
                     console.log(data);
                 },
                 onError: (error) => {
@@ -55,12 +66,10 @@ const HomePage: React.FC = () => {
     // const guidedWorkoutsUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/guided`;
     // const { data: guidedWorkouts, loading: loadingGuidedWorkouts, error: guidedWorkoutsError } = useFetch(guidedWorkoutsUrl, options);
 
-    const loading = loadingWorkoutPlans || loadingSavedWorkoutPlans || loadingLibraryWorkouts || sessionLoading;
     const error = workoutPlansError || savedWorkoutPlansError || libraryWorkoutsError;
 
     const paddingBottom = isDesktopOrLaptop ? 0 : 100 * 1.1;
 
-    if (loading) return <LoadingScreen />;
     if (error) {
         return (
             <div className="flex justify-center items-center h-48">

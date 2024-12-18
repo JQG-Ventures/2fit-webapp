@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { IoIosArrowDroprightCircle, IoIosLogOut } from 'react-icons/io';
@@ -14,10 +14,13 @@ import SettingItem from '../_components/others/SettingItem';
 import { CiUser, CiBellOn, CiLock, CiCircleQuestion } from 'react-icons/ci';
 import { useApiGet } from '../utils/apiClient';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '../_providers/LoadingProvider';
 
 const ProfilePage: React.FC = () => {
 	const { t } = useTranslation('global');
 	const router = useRouter();
+	const { setLoading } = useLoading();
+	
 	const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
 	const { data: profile, isLoading: loadingProfile, isError: profileError } =
 		useApiGet<{ status: string; message: any }>([], getProfileUrl);
@@ -30,6 +33,14 @@ const ProfilePage: React.FC = () => {
 		{ label: 'Security', icon: CiLock, path: '/profile/security' },
 		{ label: 'Help', icon: CiCircleQuestion, path: '/profile/help' },
 	];
+
+	useEffect(() => {
+		if (loadingProfile) {
+			setLoading(true);
+		  } else {
+			setLoading(false);
+		  }
+	  }, [loadingProfile, setLoading])
 
 	const handleLogout = async () => {
 		setIsLoggingOut(true);
@@ -44,7 +55,6 @@ const ProfilePage: React.FC = () => {
 		router.push(setting.path!);
 	};
 
-	if (loadingProfile) return <LoadingScreen />;
 	if (profileError) {
 		return (
 			<Modal
@@ -54,6 +64,10 @@ const ProfilePage: React.FC = () => {
 			/>
 		);
 	}
+
+	if (loadingProfile) {
+		return null;
+	  }
 
 	return (
 		<div className="flex flex-col justify-between items-center bg-gray-50 h-screen p-10 lg:pt-[10vh]">
@@ -103,6 +117,7 @@ const ProfilePage: React.FC = () => {
 					<SettingItem
 						key={index}
 						label={setting.label}
+						// @ts-ignore
 						icon={setting.icon}
 						onClick={() => handleSetting(setting)}
 						isLoading={isLoading}

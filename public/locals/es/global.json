@@ -189,7 +189,13 @@
 		"female": "Femenino",
 		"male": "Masculino",
 		"other": "Otro",
-		"errorFetching": "Hubo un error trayendo el perfil, intentalo mas tarde!"
+		"errorFetching": "Hubo un error trayendo el perfil, intentalo mas tarde!",
+		"editModalTitle": "Editar Perfil",
+		"updateProfile": {
+			"updateText": "Actualizar",
+			"success": "Perfil actualizado correctamente!",
+			"error": "Hubo un error actualizando el perfil."
+		}
 	},
 	"upgrade": {
 		"title": "Actualizar a Premium",
@@ -247,6 +253,9 @@
 			"letschat": "¡Charlemos!",
 			"getyourplan": "Obtén tu plan!"
 		}
+	},
+	"chat": {
+		"openWhatsApp": "Abre tu conversacion en WhatsApp"
 	},
 	"workouts": {
 		"exercise": "ejercicio",

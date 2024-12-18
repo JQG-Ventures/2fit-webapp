@@ -65,3 +65,10 @@ export const useEditProfile = () => {
 		'/api/users/profile'
 	);
 };
+
+export const useSendMessage = (userPhoneNumber: string) => {
+	return useApiPost<
+	  { body: { message: string } },
+	  { message: string; response: string }
+	>('/api/chat', undefined, { 'User-Phone-Number': userPhoneNumber });
+  };

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 
-const CompleteView: React.FC<{goToPlan: string, textGoTo: string}> = ({ goToPlan, textGoTo }) => {
+const CompleteView: React.FC<{goToPlan: string, textGoTo: string, duration: string}> = ({ goToPlan, textGoTo, duration }) => {
     const router = useRouter();
     const { t } = useTranslation('global');
 
@@ -46,7 +46,7 @@ const CompleteView: React.FC<{goToPlan: string, textGoTo: string}> = ({ goToPlan
                     <div className="h-[60%] border-l border-r border-gray-300 mx-4"></div>
 
                     <div className="flex flex-col items-center">
-                        <h2 className="text-4xl font-bold">10:00</h2>
+                        <h2 className="text-4xl font-bold">{duration}</h2>
                         <span className="text-lg">{t("workouts.plan.minutes")}</span>
                     </div>
                 </div>

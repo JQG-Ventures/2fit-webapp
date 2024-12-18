@@ -3,6 +3,7 @@ import { AiFillHeart, AiOutlineReload } from 'react-icons/ai';
 import SavedMessage from '../others/SavedMessage';
 import { useTranslation } from 'react-i18next';
 import { useSaveWorkout } from '@/app/_services/userService';
+import { FaSpinner } from 'react-icons/fa';
 
 
 interface ExerciseBannerSectionProps {
@@ -71,41 +72,70 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
     );
 };
 
-const ExerciseCard: React.FC<{ exercise: WorkoutPlan, onSaveClick: (id: string, name: string) => void, isSaved: boolean }> = ({ exercise, onSaveClick, isSaved }) => (
-    <a href={`workouts/plan/${exercise._id}`}>
-        <div
-            className="min-w-[280px] h-[350px] bg-black text-white rounded-lg relative overflow-hidden group"
-            style={{ backgroundImage: `url(${exercise.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-        >
-            <div className="absolute inset-0 bg-black opacity-50 group-hover:opacity-30 transition-opacity"></div>
-            <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center z-5">
-                <p className="font-bold text-xl whitespace-normal break-words max-w-[70%] lg:text-2xl">
-                    {exercise.name}
-                </p>
-                <div className="flex space-x-4">
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onSaveClick(exercise._id, exercise.name);
-                        }}
-                        className={`p-2 ${isSaved ? 'bg-red-500' : 'bg-gray-700'} rounded-full transition-transform transform hover:scale-110 active:scale-90`}
-                        disabled={isSaved}
-                    >
-                        <AiFillHeart size={24} />
-                    </button>
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }}
-                        className="p-2 bg-green-500 rounded-full"
-                    >
-                        <AiOutlineReload size={24} />
-                    </button>
-                </div>
+const ExerciseCard: React.FC<{ 
+    exercise: WorkoutPlan, 
+    onSaveClick: (id: string, name: string) => void, 
+    isSaved: boolean 
+}> = ({ exercise, onSaveClick, isSaved }) => {
+    const [loading, setLoading] = useState(false);
+
+    const handleRedirect = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setLoading(true);
+        setTimeout(() => {
+            window.location.href = `workouts/plan/${exercise._id}`;
+        }, 500);
+    };
+
+    return (
+        <a href={`workouts/plan/${exercise._id}`} onClick={handleRedirect}>
+            <div
+                className="min-w-[280px] h-[350px] bg-black text-white rounded-lg relative overflow-hidden group"
+                style={{ backgroundImage: `url(${exercise.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+            >
+                <div className="absolute inset-0 bg-black opacity-50 group-hover:opacity-30 transition-opacity"></div>
+
+                {loading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 z-10">
+                        <FaSpinner className="text-emerald-500 text-5xl animate-spin" />
+                    </div>
+                )}
+
+                {/* Content */}
+                {!loading && (
+                    <>
+                        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center z-5">
+                            <p className="font-bold text-xl whitespace-normal break-words max-w-[70%] lg:text-2xl">
+                                {exercise.name}
+                            </p>
+                            <div className="flex space-x-4">
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        onSaveClick(exercise._id, exercise.name);
+                                    }}
+                                    className={`p-2 ${isSaved ? 'bg-red-500' : 'bg-gray-700'} rounded-full transition-transform transform hover:scale-110 active:scale-90`}
+                                    disabled={isSaved}
+                                >
+                                    <AiFillHeart size={24} />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    }}
+                                    className="p-2 bg-green-500 rounded-full"
+                                >
+                                    <AiOutlineReload size={24} />
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
-        </div>
-    </a>
-);
+        </a>
+    );
+};
 export default ExerciseBannerSection;
