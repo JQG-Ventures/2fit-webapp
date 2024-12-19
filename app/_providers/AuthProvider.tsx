@@ -2,6 +2,8 @@
 
 import { NextUIProvider } from '@nextui-org/react';
 import { SessionProvider } from 'next-auth/react';
+import ReactQueryProvider from './ReactQueryProvider';
+
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -10,7 +12,9 @@ interface ProvidersProps {
 export default function Providers({ children }: ProvidersProps) {
   return (
     <SessionProvider>
-      <NextUIProvider>{children}</NextUIProvider>
+      <ReactQueryProvider>
+          <NextUIProvider>{children}</NextUIProvider>
+      </ReactQueryProvider>
     </SessionProvider>
   );
 }

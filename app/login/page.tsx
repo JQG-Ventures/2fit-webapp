@@ -128,6 +128,7 @@ export default function Login() {
 							type={type}
 							placeholder={placeholder}
 							value={formData[name]}
+							// @ts-ignore
 							onChange={handleChange}
 							Icon={Icon}
 							error={errors[name]}

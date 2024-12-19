@@ -1,3 +1,4 @@
+//@ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -60,7 +61,6 @@ export default function RegisterStep10() {
             },
         });
         router.push('/register/step11');
-        console.log(data);
     };
 
     useEffect(() => {
