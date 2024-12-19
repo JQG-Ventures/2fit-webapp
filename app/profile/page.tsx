@@ -44,7 +44,7 @@ const ProfilePage: React.FC = () => {
 
 	const handleLogout = async () => {
 		setIsLoggingOut(true);
-		await signOut({
+		signOut({
 			callbackUrl: '/',
 			redirect: true,
 		});
