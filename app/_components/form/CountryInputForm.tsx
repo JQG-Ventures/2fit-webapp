@@ -19,18 +19,27 @@ const CountryInputForm: React.FC<CountryInputFormProps> = ({
     countryList,
 }) => {
     const [showDropdown, setShowDropdown] = useState(false);
+    const [inputValue, setInputValue] = useState(selectedCountry);
+    const [filteredCountries, setFilteredCountries] = useState<Country[]>(countryList);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const selectedCountryObj = countryList.find(
-        (country) => country.name === selectedCountry
-    );
+    // Filter countries based on input
+    useEffect(() => {
+        const filtered = countryList.filter((country) =>
+            country.name.toLowerCase().includes(inputValue.toLowerCase())
+        );
+        setFilteredCountries(filtered);
+    }, [inputValue, countryList]);
 
     const handleCountrySelect = (country: Country) => {
         onChange(country.name);
+        setInputValue(country.name);
         setShowDropdown(false);
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value);
+        setShowDropdown(true);
     };
 
     useEffect(() => {
@@ -39,7 +48,6 @@ const CountryInputForm: React.FC<CountryInputFormProps> = ({
                 setShowDropdown(false);
             }
         };
-
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
@@ -48,30 +56,37 @@ const CountryInputForm: React.FC<CountryInputFormProps> = ({
 
     return (
         <div className="flex flex-row relative" ref={dropdownRef}>
+            {/* Dropdown button */}
             <div
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center justify-between w-[15%] bg-gray-200 text-gray-700 rounded-l-lg py-6 px-4 mb-3 leading-tight cursor-pointer focus:outline-none focus:bg-white"
+                className="flex items-center justify-between w-[15%] bg-gray-200 text-gray-700 rounded-l-lg py-6 px-4 mb-3 leading-tight cursor-pointer focus:outline-none"
             >
-                {selectedCountryObj && selectedCountryObj.flag ? (
-                    <img src={selectedCountryObj.flag} alt={selectedCountryObj.name} className="w-6 h-4 mr-2 rounded-sm" />
+                {selectedCountry ? (
+                    <img
+                        src={countryList.find((c) => c.name === selectedCountry)?.flag || ''}
+                        alt={selectedCountry}
+                        className="w-6 h-4 mr-2 rounded-sm"
+                    />
                 ) : (
                     <FaGlobe className="w-6 h-6 text-gray-500" />
                 )}
                 <FaChevronDown className="ml-2 text-sm" />
             </div>
 
+            {/* Editable Input */}
             <input
                 type="text"
                 name="countryName"
-                value={selectedCountry}
+                value={inputValue}
                 onChange={handleInputChange}
                 placeholder="Select Country"
-                className="appearance-none py-6 text-2xl block w-full bg-gray-200 text-gray-700 rounded-r-lg py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                className="appearance-none text-2xl block w-full bg-gray-200 text-gray-700 rounded-r-lg py-3 px-4 mb-3 leading-tight focus:outline-none"
             />
 
+            {/* Filtered Dropdown */}
             {showDropdown && (
-                <div className="absolute z-10 mb-1 bottom-full w-[60%] max-h-60 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg">
-                    {countryList.map((country, index) => (
+                <div className="absolute z-10 top-full w-[60%] max-h-60 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg">
+                    {filteredCountries.map((country, index) => (
                         <div
                             key={index}
                             onClick={() => handleCountrySelect(country)}
@@ -86,6 +101,9 @@ const CountryInputForm: React.FC<CountryInputFormProps> = ({
                             <span className="ml-2 text-gray-500">({country.abbreviation})</span>
                         </div>
                     ))}
+                    {filteredCountries.length === 0 && (
+                        <div className="px-4 py-2 text-gray-500">No results found</div>
+                    )}
                 </div>
             )}
         </div>

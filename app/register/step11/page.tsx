@@ -41,6 +41,8 @@ export default function RegisterStep11() {
             hasRegistered.current = true;
 
             try {
+                // @ts-ignore
+                delete data['countryCode']
                 const result = await registerUser(data);
                 const password = data.password;
                 const email = data.email;
