@@ -32,8 +32,7 @@ const ConfirmationModal: FC<ConfirmationModalProps> = ({
                 >
                     <AiOutlineClose size={20} />
                 </button>
-                <div className='py-4'>
-                    <h3 className="text-lg font-semibold mb-4">Are you sure?</h3>
+                <div className='p-4 pt-6'>
                     <p className="mb-6">{question}</p>
                 </div>
                 <div className="flex justify-center space-x-4">

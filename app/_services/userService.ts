@@ -1,3 +1,5 @@
+import { useApiDelete, useApiPost, useApiPut } from "../utils/apiClient";
+
 export const fetchUserDataByNumber = async (number: string) => {
 	try {
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/by-number/${number}`);
@@ -8,7 +10,7 @@ export const fetchUserDataByNumber = async (number: string) => {
 			throw new Error('Error fetching user profile');
 		}
 		const data = await res.json();
-		return data.data;
+		return data.message;
 	} catch (error) {
 		console.error('Error fetching user profile:', error);
 		throw error;
@@ -25,22 +27,48 @@ export const fetchUserDataByEmail = async (email: string) => {
 			throw new Error('Error fetching user profile');
 		}
 		const data = await res.json();
-		return data.data;
+		return data.message;
 	} catch (error) {
 		console.error('Error fetching user profile:', error);
 		throw error;
 	}
 };
 
-export const normalizeGender = (value: string): string => {
-	const genderMap: { [key: string]: string } = {
-		Male: 'masculino',
-		Female: 'femenino',
-		Other: 'otro',
-	};
-	return genderMap[value] || 'otro';
+
+export const useSendProgressToBackend = () => {
+	return useApiPost<{ queryParams: { workout_plan_id: string }; body: {exercises: ExerciseProgress[], day_of_week: string} }, { status: string; message: string }>(
+		'/api/users/workouts/progress'
+	);
+};  
+
+export const useSendCompleteToBackend = () => {
+	return useApiPost<{ body: ExerciseComplete }, { status: string; message: string }>(
+		'/api/users/workouts/complete'
+	);
+};
+  
+
+export const useSaveWorkout = () => {
+	return useApiPost<{ queryParams: { workout_id: string } }, { status: string; message: string }>(
+		'/api/workouts/saved'
+	);
 };
 
-export const getGenderValue = (gender: string): string => {
-	return gender === 'masculino' ? 'Male' : gender === 'femenino' ? 'Female' : 'Other';
+export const useDeleteWorkout = () => {
+	return useApiDelete<{ queryParams: { workout_id: string } }, { status: string; message: string }>(
+		'/api/workouts/saved'
+	);
 };
+
+export const useEditProfile = () => {
+	return useApiPut<any, { status: string; message: string }>(
+		'/api/users/profile'
+	);
+};
+
+export const useSendMessage = (userPhoneNumber: string) => {
+	return useApiPost<
+	  { body: { message: string } },
+	  { message: string; response: string }
+	>('/api/chat', undefined, { 'User-Phone-Number': userPhoneNumber });
+  };

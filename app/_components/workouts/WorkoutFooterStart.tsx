@@ -1,12 +1,16 @@
-'use client'
+'use client';
 
 import { useTranslation } from 'react-i18next';
 import ButtonWithSpinner from '../others/ButtonWithSpinner';
 
+interface WorkoutFooterProps {
+    onStartClick: () => void;
+    isSubmitting: boolean;
+}
 
-const WorkoutFooter = ({ onStartClick, isSubmitting}) => {
+const WorkoutFooter: React.FC<WorkoutFooterProps> = ({ onStartClick, isSubmitting }) => {
     const { t } = useTranslation('global');
-    
+
     return (
         <div className="h-[13%] fixed bottom-0 left-0 right-0 flex justify-center items-center z-10 bg-white shadow-lg rounded-t-3xl">
             <ButtonWithSpinner
@@ -18,7 +22,7 @@ const WorkoutFooter = ({ onStartClick, isSubmitting}) => {
                 {t("workouts.plan.start")}
             </ButtonWithSpinner>
         </div>
-    )
+    );
 };
 
 export default WorkoutFooter;

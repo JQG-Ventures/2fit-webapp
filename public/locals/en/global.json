@@ -1,288 +1,305 @@
 {
-  "WelcomPage":{
-    "title1": "Welcome to 2Fit-AI",
-    "description1": "Improve your fitness with the help of the latest artificial intelligence technology.",
-    "title2": "Workout Categories",
-    "description2": "Workout categories will help you gain strength, get in better shape and embrace a healthy lifestyle.",
-    "title3": "Custom Workouts",
-    "description3": "With AI assistance, you can access a variety of different workout routines and save them in your app.",
-    "startbtn": "Start Training",
-    "questiontxt": "Already have an account",
-    "signin": "Sign in"
-  },
-  "LoginPage": {
-    "OrSignIn": "Or sign in with",
-    "emailOrPhone": "Email or number",
-    "emailRequired": "Email is required",
-    "passwordRequired": "Password is required",
-    "credsError": "Invalid email or password.",
-    "unexpectedError": "An unexpected error occurred. Please try again.",
-    "socialSignInError": "Social sign-in failed. Please try again.",
-    "loginTitle": [
-      "Login to",
-      "your Account"
-    ],
-    "forgotPassword": "Forgot Password?",
-    "signIn": "Sign In",
-    "dontHaveAcc": "Don't have an account?",
-    "signUp": "Sign Up"
-  },
-  "RegisterPage":{
-    "next": "Continue",
-    "back": "Back",
-    "create": [
-      "Create your",
-      "Account"
-    ],
-    "email": "Email",
-    "policy": [
-      "By continuing you accept our ",
-      "Privacy Policy"
-    ],
-    "nextbtn": "Next",
-    "signuptxt": "Or sign up with",
-    "signupquestion": "Do you have an account?",
-    "signin": "Sign in",
-    "passwordValidationError": "Password must contain uppercase, lowercase, number, special character, and be at least 8 characters long without spaces.",
-    "emailValidationError": "Please enter a valid email address.",
-    "emailRegisteredError": "This email is already registered. Please use a different email.",
-    "emailRegistrationError": "There was an error checking the email. Please try again later."
-  },
-  "RegisterPagestep1":{
-    "create": [
-      "Create your",
-      "Account"
-    ],
-    "name": "Name",
-    "last": "Last",
-    "age": "Age",
-    "phone": "Phone",
-    "nextbtn": "Next",
-    "signuptxt": "Or sign up with",
-    "signupquestion": "Do you have an account?",
-    "signin": "Sign in",
-    "numberRegisteredError": "Number is already registered. Please use a different one.",
-    "numberServerError": "There was an error checking the number. Please try again later.",
-    "nameValidationFill": "Please fill out this field.",
-    "phoneValidationFill": "Please enter a valid phone number.",
-    "countryValidationFill": "Please fill out this field."
-  },
-  "RegisterPagestep3":{
-    "woman": "Woman",
-    "man": "Man",
-    "title": "Tell Us About Yourself",
-    "description": "To give you a better experience and results we need to know your gender"
-  },
-  "RegisterPagestep4":{
-    "weight": "Lose Weight",
-    "fit": "Keep Fit",
-    "stronger": "Get Stronger",
-    "muscle": "Gain Muscle Mass",
-    "title": "What is your goal",
-    "description": "Choose your main objective. Don't worry you can always change it later."
-  },
-  "RegisterPagestep5":{
-    "title": "What is Your Height",
-    "description": "Current height in cm. Don't worry you can always change it later."
-  },
-  "RegisterPagestep6":{
-    "title": "What is Your Weight",
-    "description": "Current weight in kg. Don't worry you can always change it later."
-  },
-  "RegisterPagestep7":{
-    "title": "What is Your Desired Weight",
-    "description": "Target weight in kg. Don't worry this is just and estimation."
-  },
-  "RegisterPagestep8":{
-    "title": "What is your Training Level?",
-    "description": "Choose based on your current activity. This will help us to personalize plans for you.",
-    "level": [
-      "Choose tranining",
-      "level"
-    ],
-    "beginner": [
-      "Beginner",
-      "I want to start training"
-    ],
-    "irregular": [
-      "Irregular training",
-      "I train 1-2 times a week"
-    ],
-    "medium": [
-      "Medium",
-      "I train 3-5 a week"
-    ],
-    "advanced": [
-      "Advanced",
-      "I train more than 5 times a week"
-    ]
-  },
-  "RegisterPagestep9":{
-    "title": "Your phyisical activities",
-    "description": "Which activities do you practice. This will enhance our results for you.",
-    "stretch": "Stretch",
-    "cardio": "Cardio",
-    "yoga": "Yoga",
-    "powertraining": "Power training",
-    "dancing": "Dancing"
-  },
-  "RegisterPagestep10":{
-    "title": "Weekly frequency",
-    "description": "Choose how often do you want to exercise. This will tune the perfect workout for you.",
-    "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-  },
-  "RegisterPagestep11":{
-    "texts": [
-        "We create your training plan",
-        "Analyzing your demographic profile",
-        "Considering your activity level",
-        "Taking your interests into account",
-        "Almost there! Finalizing your plan"
-    ],  
-    "errormsg": "There was an error creating your training plan:( Please try again.",
-    "creating": [
-        "We are creating your",
-        "training plan"
-    ],
-    "homebtn" : "Go to Home"
-  },
-  "Navbar": {
-    "home": "Home",
-    "workouts": "Workouts",
-    "bot": "Bot",
-    "profile": "Profile"
-  },
-  "settings": {
-    "title": "Settings",
-    "accountSettings": "Account Settings",
-    "language": "Language:",
-    "save": "Save"
-  },
-  "profile": {
-    "title": "Profile",
-    "edit": "Edit Profile",
-    "notifications": "Notifications",
-    "security": "Security",
-    "name": "Name",
-    "birthdate": "Birth Date",
-    "email": "Email",
-    "country": "Country",
-    "phonenumber": "Phone Number",
-    "gender": "Gender",
-    "update": "Update",
-    "female": "Female",
-    "male": "Male"
-  },
-  "upgrade": {
-    "title": "Upgrade to Premium",
-    "description": "Enjoy workout access without ads and restrictions"
-  },
-  "home": {
-    "excercisebannersection": {
-        "planfortoday": "What's the plan for today?",
-        "planfortoday2": "Explore Workouts",
-        "noexercisemessage": "Soon you will have access to a variety of workouts to get you fit, stay tuned!"
-      },
-      "GuidedWorkoutsSection": {
-        "guidedworkoutstitle": "Guided Workouts",
-        "guidedworkoutsdescription": "Choose your favorite workout from guided plans.",
-        "viewall":"View All",
-        "noworkoutmessage": "No workouts available at the moment. Please check back later!"
-      },
-      "WorkoutLibrarySection": {
-        "WorkoutLibrarySectiontitle": "Explore Our Workout Library",
-        "WorkoutLibrarySectiondescription": "Soon you will have tons of workouts to get you fit, stay tuned!",
-        "viewall":"View All",
-        "WorkoutLibrarySectiondescription2": "Discover more workouts tailored to your fitness goals in our extensive library.",
-        "openlibrary": "Open Workout Library"
-      },
-      "SavedWorkoutsSection": {
-        "SavedWorkoutsSectiontitle":"Saved Workouts",
-        "SavedWorkoutsSectiondescription":"View All",
-        "viewall":"View All",
-        "SavedWorkoutsSectionquestion": "Do you want to remove this workout from your saved list?",
-        "SavedWorkoutsSectionconfirmText": "Yes, Remove",
-        "SavedWorkoutsSectioncancelText": "Cancel",
-        "SavedWorkoutsSectionrenderLoading": "Loading workout plans and saved workouts..."
-
-
-      },
-    "motivation": {
-      "main": "Keep up the great work!",
-      "base": "Achieve your fitness goals with a personal AI trainer designed just for you.",
-      "phrases": [
-        "Stay consistent and results will follow!",
-        "Every workout is progress, no matter how small.",
-        "Your only limit is the one you set yourself!",
-        "Make today your best workout yet!",
-        "Stay focused, stay fit!"
-      ],
-      "mtvnlsection": "Close motivational section",
-      "mtvnlchatbot": "Open chatbot"
-    },
-    "greeting": {
-      "morning": "Good Morning",
-      "afternoon": "Good Afternoon",
-      "evening": "Good Night"
-    },
-    "trainer": {
-      "talk": "Talk to your trainer",
-      "letschat": "Let's Chat!",
-      "getyourplan": "Get your plan"
-    }
-  },
-  "workouts": {
-    "exercise": "exercise",
-    "left": "left",
-    "challengeProgress": "Challenge progress",
-    "weeklyRoutine": "Weekly routine",
-    "workoutProgress": "Workout progress",
-    "fetchingError": "Error fetching progress",
-    "plan": {
-      "workoutAlreadySaved": "Workout already saved!",
-      "workoutSaved": "Workout Saved!",
-      "savingError": "There was an error saving the workout, try again.",
-      "workoutActivity": "Workout Activity",
-      "seeAll": "See All",
-      "secs": "Seconds",
-      "start": "START",
-      "rest": "Rest",
-      "getReady": "Get Ready!",
-      "startOver": "Start Over",
-      "previous": "Previous",
-      "next": "Next",
-      "pause": "Pause",
-      "resume": "Resume",
-      "skipRest": "Skip Rest",
-      "nextExercise": "Next Exercise:",
-      "takeRest": "TAKE A REST",
-      "congrats": "Congratulations!",
-      "completedSentence": "You have completed this workout!",
-      "workouts": "Workouts",
-      "minutes": "Minutes",
-      "goto": "Go to Another Workout",
-      "home": "Home",
-      "of": "of"
-    },
-    "my-plan": {
-      "title": "My Workout Plan",
-      "noExercises": "No exercises for this day"
-    },
-    "PopularExercisesSection": {
-      "popularExerciseTitle": "Popular Exercises",
-      "seeDetails": "See Details",
-      "PopularSectionEmpty": "We are still learning to give you the bests workouts for you",
-      "exercises": "exercises",
-      "start": "Start Now"
-    }
-  },
-  "ExerciseFlow": {
-    "ready": "Get Ready!",
-    "completed": "Exercise completed!"
-  },
-  "RestView": {
-    "rest": "Take a rest",
-    "nextEx": "Next Exercise",
-    "skip": "Skip rest"
-  }
+	"WelcomPage": {
+		"title1": "Welcome to 2Fit-AI",
+		"description1": "Improve your fitness with the help of the latest artificial intelligence technology.",
+		"title2": "Workout Categories",
+		"description2": "Workout categories will help you gain strength, get in better shape and embrace a healthy lifestyle.",
+		"title3": "Custom Workouts",
+		"description3": "With AI assistance, you can access a variety of different workout routines and save them in your app.",
+		"startbtn": "Start Training",
+		"questiontxt": "Already have an account",
+		"signin": "Sign in"
+	},
+	"LoginPage": {
+		"OrSignIn": "Or sign in with",
+		"emailOrPhone": "Email or number",
+		"emailRequired": "Email is required",
+		"passwordRequired": "Password is required",
+		"credsError": "Invalid email or password.",
+		"unexpectedError": "An unexpected error occurred. Please try again.",
+		"socialSignInError": "Social sign-in failed. Please try again.",
+		"loginTitle": [
+			"Login to",
+			"your Account"
+		],
+		"forgotPassword": "Forgot Password?",
+		"signIn": "Sign In",
+		"dontHaveAcc": "Don't have an account?",
+		"signUp": "Sign Up"
+	},
+	"RegisterPage": {
+		"next": "Continue",
+		"back": "Back",
+		"create": [
+			"Create your",
+			"Account"
+		],
+		"email": "Email",
+		"policy": [
+			"By continuing you accept our ",
+			"Privacy Policy"
+		],
+		"nextbtn": "Next",
+		"signuptxt": "Or sign up with",
+		"signupquestion": "Do you have an account?",
+		"signin": "Sign in",
+		"passwordValidationError": "Password must contain uppercase, lowercase, number, special character, and be at least 8 characters long without spaces.",
+		"emailValidationError": "Please enter a valid email address.",
+		"emailRegisteredError": "This email is already registered. Please use a different email.",
+		"emailRegistrationError": "There was an error checking the email. Please try again later."
+	},
+	"RegisterPagestep1": {
+		"create": [
+			"Create your",
+			"Account"
+		],
+		"name": "Name",
+		"last": "Last",
+		"age": "Age",
+		"phone": "Phone",
+		"nextbtn": "Next",
+		"signuptxt": "Or sign up with",
+		"signupquestion": "Do you have an account?",
+		"signin": "Sign in",
+		"numberRegisteredError": "Number is already registered. Please use a different one.",
+		"numberServerError": "There was an error checking the number. Please try again later.",
+		"nameValidationFill": "Please fill out this field.",
+		"phoneValidationFill": "Please enter a valid phone number.",
+		"countryValidationFill": "Please fill out this field."
+	},
+	"RegisterPagestep3": {
+		"woman": "Woman",
+		"man": "Man",
+		"title": "Tell Us About Yourself",
+		"description": "To give you a better experience and results we need to know your gender"
+	},
+	"RegisterPagestep4": {
+		"weight": "Lose Weight",
+		"fit": "Keep Fit",
+		"stronger": "Get Stronger",
+		"muscle": "Gain Muscle Mass",
+		"title": "What is your goal",
+		"description": "Choose your main objective. Don't worry you can always change it later."
+	},
+	"RegisterPagestep5": {
+		"title": "What is Your Height",
+		"description": "Current height in cm. Don't worry you can always change it later."
+	},
+	"RegisterPagestep6": {
+		"title": "What is Your Weight",
+		"description": "Current weight in kg. Don't worry you can always change it later."
+	},
+	"RegisterPagestep7": {
+		"title": "What is Your Desired Weight",
+		"description": "Target weight in kg. Don't worry this is just and estimation."
+	},
+	"RegisterPagestep8": {
+		"title": "What is your Training Level?",
+		"description": "Choose based on your current activity. This will help us to personalize plans for you.",
+		"level": [
+			"Choose tranining",
+			"level"
+		],
+		"beginner": [
+			"Beginner",
+			"I want to start training"
+		],
+		"irregular": [
+			"Irregular training",
+			"I train 1-2 times a week"
+		],
+		"medium": [
+			"Medium",
+			"I train 3-5 a week"
+		],
+		"advanced": [
+			"Advanced",
+			"I train more than 5 times a week"
+		]
+	},
+	"RegisterPagestep9": {
+		"title": "Your phyisical activities",
+		"description": "Which activities do you practice. This will enhance our results for you.",
+		"stretch": "Stretch",
+		"cardio": "Cardio",
+		"yoga": "Yoga",
+		"powertraining": "Power training",
+		"dancing": "Dancing"
+	},
+	"RegisterPagestep10": {
+		"title": "Weekly frequency",
+		"description": "Choose how often do you want to exercise. This will tune the perfect workout for you.",
+		"days": [
+			"Monday",
+			"Tuesday",
+			"Wednesday",
+			"Thursday",
+			"Friday",
+			"Saturday",
+			"Sunday"
+		]
+	},
+	"RegisterPagestep11": {
+		"texts": [
+			"We create your training plan",
+			"Analyzing your demographic profile",
+			"Considering your activity level",
+			"Taking your interests into account",
+			"Almost there! Finalizing your plan"
+		],
+		"errormsg": "There was an error creating your training plan:( Please try again.",
+		"creating": [
+			"We are creating your",
+			"training plan"
+		],
+		"homebtn": "Go to Home"
+	},
+	"Navbar": {
+		"home": "Home",
+		"workouts": "Workouts",
+		"bot": "Bot",
+		"profile": "Profile"
+	},
+	"settings": {
+		"title": "Settings",
+		"accountSettings": "Account Settings",
+		"language": "Language:",
+		"save": "Save"
+	},
+	"profile": {
+		"title": "Profile",
+		"edit": "Edit Profile",
+		"notifications": "Notifications",
+		"security": "Security",
+		"name": "Name",
+		"birthdate": "Birth Date",
+		"email": "Email",
+		"country": "Country",
+		"phonenumber": "Phone Number",
+		"gender": "Gender",
+		"update": "Update",
+		"female": "Female",
+		"male": "Male",
+		"errorFetching": "There was an error fetching the user profile data, try again later!",
+		"editModalTitle": "Edit Profile",
+		"updateProfile": {
+			"updateText": "Update",
+			"success": "Edit sucessfully updated!",
+			"error": "There was a problem updating the profile."
+		}
+	},
+	"upgrade": {
+		"title": "Upgrade to Premium",
+		"description": "Enjoy workout access without ads and restrictions"
+	},
+	"home": {
+		"error": "There was an error loading the data, try again later!",
+		"excercisebannersection": {
+			"planfortoday": "What's the plan for today?",
+			"planfortoday2": "Explore Workouts",
+			"noexercisemessage": "Soon you will have access to a variety of workouts to get you fit, stay tuned!"
+		},
+		"GuidedWorkoutsSection": {
+			"guidedworkoutstitle": "Guided Workouts",
+			"guidedworkoutsdescription": "Choose your favorite workout from guided plans.",
+			"viewall": "View All",
+			"noworkoutmessage": "No workouts available at the moment. Please check back later!"
+		},
+		"WorkoutLibrarySection": {
+			"WorkoutLibrarySectiontitle": "Explore Our Workout Library",
+			"WorkoutLibrarySectiondescription": "Soon you will have tons of workouts to get you fit, stay tuned!",
+			"viewall": "View All",
+			"WorkoutLibrarySectiondescription2": "Discover more workouts tailored to your fitness goals in our extensive library.",
+			"openlibrary": "Open Workout Library"
+		},
+		"SavedWorkoutsSection": {
+			"SavedWorkoutsSectiontitle": "Saved Workouts",
+			"SavedWorkoutsSectiondescription": "View All",
+			"viewall": "View All",
+			"SavedWorkoutsSectionquestion": "Do you want to remove this workout from your saved list?",
+			"SavedWorkoutsSectionconfirmText": "Yes, Remove",
+			"SavedWorkoutsSectioncancelText": "Cancel",
+			"SavedWorkoutsSectionrenderLoading": "Loading workout plans and saved workouts..."
+		},
+		"motivation": {
+			"main": "Keep up the great work!",
+			"base": "Achieve your fitness goals with a personal AI trainer designed just for you.",
+			"phrases": [
+				"Stay consistent and results will follow!",
+				"Every workout is progress, no matter how small.",
+				"Your only limit is the one you set yourself!",
+				"Make today your best workout yet!",
+				"Stay focused, stay fit!"
+			],
+			"mtvnlsection": "Close motivational section",
+			"mtvnlchatbot": "Open chatbot"
+		},
+		"greeting": {
+			"morning": "Good Morning",
+			"afternoon": "Good Afternoon",
+			"evening": "Good Night"
+		},
+		"trainer": {
+			"talk": "Talk to your trainer",
+			"letschat": "Let's Chat!",
+			"getyourplan": "Get your plan"
+		}
+	},
+	"chat": {
+		"openWhatsApp": "Open your conversation in WhatsApp"
+	},
+	"workouts": {
+		"exercise": "exercise",
+		"left": "left",
+		"challengeProgress": "Challenge progress",
+		"weeklyRoutine": "Weekly routine",
+		"workoutProgress": "Workout progress",
+		"fetchingError": "Error fetching progress",
+		"plan": {
+			"workoutAlreadySaved": "Workout already saved!",
+			"workoutSaved": "Workout Saved!",
+			"savingError": "There was an error saving the workout, try again.",
+			"workoutActivity": "Workout Activity",
+			"seeAll": "See All",
+			"secs": "Seconds",
+			"start": "START",
+			"rest": "Rest",
+			"getReady": "Get Ready!",
+			"startOver": "Start Over",
+			"previous": "Previous",
+			"next": "Next",
+			"pause": "Pause",
+			"resume": "Resume",
+			"skipRest": "Skip Rest",
+			"nextExercise": "Next Exercise:",
+			"takeRest": "TAKE A REST",
+			"congrats": "Congratulations!",
+			"completedSentence": "You have completed this workout!",
+			"workouts": "Workouts",
+			"minutes": "Minutes",
+			"goto": "Go to Another Workout",
+			"home": "Home",
+			"of": "of"
+		},
+		"my-plan": {
+			"title": "My Workout Plan",
+			"noExercises": "No exercises for this day"
+		},
+		"PopularExercisesSection": {
+			"popularExerciseTitle": "Popular Exercises",
+			"seeDetails": "See Details",
+			"PopularSectionEmpty": "We are still learning to give you the bests workouts for you",
+			"exercises": "exercises",
+			"start": "Start Now"
+		}
+	},
+	"ExerciseFlow": {
+		"ready": "Get Ready!",
+		"completed": "Exercise completed!"
+	},
+	"RestView": {
+		"rest": "Take a rest",
+		"nextEx": "Next Exercise",
+		"skip": "Skip rest"
+	}
 }

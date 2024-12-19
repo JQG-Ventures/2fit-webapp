@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
@@ -11,9 +12,9 @@ import LoadingScreen from '../../_components/animations/LoadingScreen';
 import PhoneInput from '../../_components/form/PhoneInput';
 import countries from '@/app/data/countries.json';
 import countryCodes from '@/app/data/countryCodes.json';
-import { useSessionContext } from '../../_providers/SessionProvider';
-import { useFetch } from '../../_hooks/useFetch';
-import { useUpdateProfile } from '@/app/_hooks/useUpdateProfile';
+import { useApiGet } from '@/app/utils/apiClient';
+import { useEditProfile } from '@/app/_services/userService';
+import { useTranslation } from 'react-i18next';
 
 const formFields: FormField[] = [
 	{
@@ -55,17 +56,30 @@ const formFields: FormField[] = [
 ];
 
 const EditProfile: React.FC = () => {
+	const { t } = useTranslation('global');
 	const router = useRouter();
-	const { userId, token, loading: sessionLoading } = useSessionContext();
-	const getOptions = useMemo(() => ({
-		method: 'GET',
-	}), []);
+	const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
+	const { data: profile, isLoading: loadingProfile, isError: profileError } =
+		useApiGet<{ status: string; message: any }>([], getProfileUrl);
 
-	const { data: userData, loading, error } = useFetch(
-		userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}` : '',
-		getOptions
-	);
-	const { updateProfile, loading: updating, error: updateError, success: updateSuccess } = useUpdateProfile();
+	const { mutate: editProfile } = useEditProfile();
+
+	const handleEditProfile = async (profile_info: any) => {
+		editProfile(
+			profile_info,
+			{
+				onSuccess: (data) => {
+					if (data.status === 'success') {
+						setSuccessMessage(t("profile.updateProfile.success"));
+					}
+				},
+				onError: (error: any) => {
+					setErrorMessage(t("profile.updateProfile.error"))
+				},
+			}
+		);
+	};
+
 	const [profileData, setProfileData] = useState<UserProfile | null>(null);
 	const [countryCode, setCountryCode] = useState<string>('');
 	const [phoneNumber, setPhoneNumber] = useState<string>('');
@@ -74,11 +88,11 @@ const EditProfile: React.FC = () => {
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
 	useEffect(() => {
-		if (userData) {
-			setProfileData(userData);
+		if (profile) {
+			setProfileData(profile?.message);
 		}
 
-	}, [userData]);
+	}, [profile]);
 
 	const handleInputChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -92,6 +106,7 @@ const EditProfile: React.FC = () => {
 			if (name === 'gender') {
 				setProfileData((prevData) => ({
 					...prevData!,
+					// @ts-ignore
 					profile: { ...prevData.profile, gender: Number(value) },
 				}));
 			} else if (name === 'birthdate') {
@@ -111,32 +126,24 @@ const EditProfile: React.FC = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsSubmitting(true);
+		const updatedProfile = {
+			name: profileData?.name,
+			email: profileData?.email,
+			birthdate: profileData?.birthdate,
+			country: profileData?.country,
+			'profile.gender': profileData?.profile?.gender,
+			number: `${countryCode}${phoneNumber}`.replace("+", ""),
+		};
+		await handleEditProfile(updatedProfile);
+		setIsSubmitting(false);
+	}
 
-		try {
-			const updatedProfile = {
-				name: profileData?.name,
-				email: profileData?.email,
-				birthdate: profileData?.birthdate,
-				country: profileData?.country,
-				'profile.gender': profileData?.profile?.gender,
-				number: `${countryCode}${phoneNumber}`.replace("+", ""),
-			};
-	
-			await updateProfile(userId, updatedProfile, token?.accessToken);
-			setSuccessMessage("Profile updated successfully.");
-		} catch {
-			setErrorMessage("There was an error updating the profile")
-		} finally {
-			setIsSubmitting(false);
-		}
-	};
-
-	if (loading) return <LoadingScreen />;
-	if (error) {
+	if (loadingProfile) return <LoadingScreen />;
+	if (errorMessage) {
 		return (
 			<Modal
 				title="Error"
-				message={error}
+				message={t("profile.errorFetching")}
 				onClose={() => router.push('/home')}
 			/>
 		);
@@ -146,6 +153,7 @@ const EditProfile: React.FC = () => {
 		<div className="flex flex-col justify-between items-center bg-white h-screen p-14 lg:pt-[10vh]">
 			{(errorMessage || successMessage) && (
 				<Modal
+					title={t("profile.editModalTitle")}
 					message={errorMessage || successMessage}
 					onClose={() => router.back()}
 				/>
@@ -154,7 +162,7 @@ const EditProfile: React.FC = () => {
 				<button onClick={() => router.back()} className="text-gray-700">
 					<FaArrowLeft className="w-8 h-8" />
 				</button>
-				<h1 className="text-5xl font-semibold">Edit Profile</h1>
+				<h1 className="text-5xl font-semibold">{t("profile.editModalTitle")}</h1>
 			</div>
 			<form
 				className="h-[90%] flex flex-col justify-between items-center w-full"
@@ -218,7 +226,7 @@ const EditProfile: React.FC = () => {
 						{isSubmitting && (
 							<div className="loader ease-linear rounded-full border-4 border-t-4 border-white h-6 w-6 mr-2 animate-spin"></div>
 						)}
-						Update
+						{t('profile.updateProfile.updateText')}
 					</button>
 				</div>
 			</form>
