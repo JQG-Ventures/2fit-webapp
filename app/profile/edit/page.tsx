@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft, FaRegEnvelope } from 'react-icons/fa';
 import { IoCalendarOutline } from 'react-icons/io5';
@@ -48,9 +48,8 @@ const formFields: FormField[] = [
 		name: 'gender',
 		type: 'select',
 		options: [
-			{ value: 0, label: 'Male' },
-			{ value: 1, label: 'Female' },
-			{ value: 2, label: 'Other' },
+			{ value: 'm', label: 'Male' },
+			{ value: 'f', label: 'Female' },
 		],
 	},
 ];
@@ -59,9 +58,8 @@ const EditProfile: React.FC = () => {
 	const { t } = useTranslation('global');
 	const router = useRouter();
 	const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
-	const { data: profile, isLoading: loadingProfile, isError: profileError } =
+	const { data: profile, isLoading: loadingProfile } =
 		useApiGet<{ status: string; message: any }>([], getProfileUrl);
-
 	const { mutate: editProfile } = useEditProfile();
 
 	const handleEditProfile = async (profile_info: any) => {
@@ -73,7 +71,7 @@ const EditProfile: React.FC = () => {
 						setSuccessMessage(t("profile.updateProfile.success"));
 					}
 				},
-				onError: (error: any) => {
+				onError: () => {
 					setErrorMessage(t("profile.updateProfile.error"))
 				},
 			}
@@ -90,8 +88,9 @@ const EditProfile: React.FC = () => {
 	useEffect(() => {
 		if (profile) {
 			setProfileData(profile?.message);
+			setCountryCode(profile?.message?.code_number || '');
+			setPhoneNumber(profile?.message?.number || '');
 		}
-
 	}, [profile]);
 
 	const handleInputChange = (
@@ -99,27 +98,14 @@ const EditProfile: React.FC = () => {
 	) => {
 		const { name, value } = e.target;
 		if (name === 'countryCode') {
-			setCountryCode(value);
+			setCountryCode(value.replace('+', ''));
 		} else if (name === 'number') {
 			setPhoneNumber(value);
 		} else if (profileData) {
-			if (name === 'gender') {
-				setProfileData((prevData) => ({
-					...prevData!,
-					// @ts-ignore
-					profile: { ...prevData.profile, gender: Number(value) },
-				}));
-			} else if (name === 'birthdate') {
-				setProfileData((prevData) => ({
-					...prevData!,
-					birthdate: value,
-				}));
-			} else {
-				setProfileData((prevData) => ({
-					...prevData!,
-					[name]: value,
-				}));
-			}
+			setProfileData((prevData) => ({
+				...prevData!,
+				[name]: value,
+			}));
 		}
 	};
 
@@ -131,8 +117,9 @@ const EditProfile: React.FC = () => {
 			email: profileData?.email,
 			birthdate: profileData?.birthdate,
 			country: profileData?.country,
-			'profile.gender': profileData?.profile?.gender,
-			number: `${countryCode}${phoneNumber}`.replace("+", ""),
+			gender: profileData?.gender,
+			code_number: countryCode,
+			number: phoneNumber,
 		};
 		await handleEditProfile(updatedProfile);
 		setIsSubmitting(false);
@@ -189,7 +176,11 @@ const EditProfile: React.FC = () => {
 									name={field.name}
 									type={field.type}
 									placeholder={field.placeholder || ''}
-									value={profileData?.birthdate || ''}
+									value={
+										profileData?.birthdate
+											? new Date(profileData?.birthdate).toISOString().split('T')[0]
+											: ''
+									}
 									onChange={handleInputChange}
 									icon={field.icon}
 								/>
@@ -211,7 +202,7 @@ const EditProfile: React.FC = () => {
 					})}
 					<PhoneInput
 						label="Phone Number"
-						countryCode={countryCode}
+						countryCode={`+${countryCode}`}
 						phoneNumber={phoneNumber}
 						onChange={handleInputChange}
 						countryCodes={countryCodes}
