@@ -1,7 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 
-const ScrollablePicker = ({ value, onChange, range }) => {
-    const pickerRef = useRef(null);
+interface ScrollablePickerProps {
+    value: number;
+    onChange: (value: number) => void;
+    range: number[];
+}
+
+const ScrollablePicker: React.FC<ScrollablePickerProps> = ({ value, onChange, range }) => {
+    const pickerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         if (pickerRef.current) {
@@ -9,21 +15,24 @@ const ScrollablePicker = ({ value, onChange, range }) => {
         }
     }, [value]);
 
-    const handleScroll = (event) => {
-        const containerHeight = event.target.clientHeight;
-        const scrollPosition = event.target.scrollTop;
+    const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+        const containerHeight = event.currentTarget.clientHeight;
+        const scrollPosition = event.currentTarget.scrollTop;
         const itemHeight = 80;
 
-        const centeredIndex = Math.round((scrollPosition + containerHeight / 2 - itemHeight / 2) / itemHeight);
+        const centeredIndex = Math.round(
+            (scrollPosition + containerHeight / 2 - itemHeight / 2) / itemHeight
+        );
         const newValue = range[Math.min(range.length - 1, Math.max(0, centeredIndex))];
         onChange(newValue);
     };
 
-    const centerValue = (value) => {
+    const centerValue = (value: number) => {
         if (pickerRef.current) {
             const itemHeight = 80;
             const targetIndex = range.indexOf(value);
-            const targetScrollPosition = targetIndex * itemHeight - pickerRef.current.clientHeight / 2 + itemHeight / 2;
+            const targetScrollPosition =
+                targetIndex * itemHeight - pickerRef.current.clientHeight / 2 + itemHeight / 2;
             pickerRef.current.scrollTo({
                 top: targetScrollPosition,
                 behavior: 'smooth',
@@ -44,7 +53,9 @@ const ScrollablePicker = ({ value, onChange, range }) => {
                     {range.map((item) => (
                         <div
                             key={item}
-                            className={`h-[80px] flex justify-center items-center transition-colors ${value === item ? 'text-black font-bold text-6xl border-t-4 border-b-4 border-black' : 'text-gray-500 text-4xl'
+                            className={`h-[80px] flex justify-center items-center transition-colors ${value === item
+                                    ? 'text-black font-bold text-6xl border-t-4 border-b-4 border-black'
+                                    : 'text-gray-500 text-4xl'
                                 }`}
                             onClick={() => centerValue(item)}
                         >
