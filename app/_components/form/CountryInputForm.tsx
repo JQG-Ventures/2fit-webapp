@@ -1,110 +1,92 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FaChevronDown, FaGlobe } from 'react-icons/fa';
-
-interface Country {
-    name: string;
-    abbreviation: string;
-    flag: string;
-}
+import React, { useState, useEffect } from 'react';
+import { IoGlobeOutline } from 'react-icons/io5';
 
 interface CountryInputFormProps {
     selectedCountry: string;
     onChange: (country: string) => void;
-    countryList: Country[];
+    countryList: { name: string; code: string; flag: string }[]; // Add "flag"
 }
 
-const CountryInputForm: React.FC<CountryInputFormProps> = ({
-    selectedCountry,
-    onChange,
-    countryList,
-}) => {
-    const [showDropdown, setShowDropdown] = useState(false);
+const CountryInputForm: React.FC<CountryInputFormProps> = ({ selectedCountry, onChange, countryList }) => {
+    const [filteredCountries, setFilteredCountries] = useState(countryList);
     const [inputValue, setInputValue] = useState(selectedCountry);
-    const [filteredCountries, setFilteredCountries] = useState<Country[]>(countryList);
-    const dropdownRef = useRef<HTMLDivElement>(null);
+    const [showDropdown, setShowDropdown] = useState(false);
 
-    // Filter countries based on input
     useEffect(() => {
+        // Filter the country list dynamically
         const filtered = countryList.filter((country) =>
             country.name.toLowerCase().includes(inputValue.toLowerCase())
         );
         setFilteredCountries(filtered);
     }, [inputValue, countryList]);
 
-    const handleCountrySelect = (country: Country) => {
-        onChange(country.name);
-        setInputValue(country.name);
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setInputValue(value);
+        onChange(''); // Clear selection when typing
+    };
+
+    const handleCountrySelect = (country: string) => {
+        setInputValue(country);
+        onChange(country);
         setShowDropdown(false);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.target.value);
+    const handleDropdownClick = () => {
+        // Restore full list and show dropdown
+        setFilteredCountries(countryList);
         setShowDropdown(true);
     };
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setShowDropdown(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+    const handleInputFocus = () => setShowDropdown(true);
+
+    const handleClearInput = () => {
+        setInputValue('');
+        setFilteredCountries(countryList);
+        onChange('');
+    };
 
     return (
-        <div className="flex flex-row relative" ref={dropdownRef}>
-            {/* Dropdown button */}
-            <div
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center justify-between w-[15%] bg-gray-200 text-gray-700 rounded-l-lg py-6 px-4 mb-3 leading-tight cursor-pointer focus:outline-none"
-            >
-                {selectedCountry ? (
-                    <img
-                        src={countryList.find((c) => c.name === selectedCountry)?.flag || ''}
-                        alt={selectedCountry}
-                        className="w-6 h-4 mr-2 rounded-sm"
-                    />
-                ) : (
-                    <FaGlobe className="w-6 h-6 text-gray-500" />
+        <div className="relative w-full">
+            {/* Input and Globe Icon */}
+            <div className="flex items-center rounded-md p-2 bg-gray-200 text-gray-700 py-6">
+                <IoGlobeOutline
+                    className="mx-2 text-gray-500 cursor-pointer"
+                    onClick={handleDropdownClick}
+                />
+                <input
+                    type="text"
+                    placeholder="Select a country"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onFocus={handleInputFocus}
+                    className="w-full outline-none bg-transparent"
+                />
+                {inputValue && (
+                    <button onClick={handleClearInput} className="text-gray-700 mr-2">
+                        &#x2715;
+                    </button>
                 )}
-                <FaChevronDown className="ml-2 text-sm" />
             </div>
 
-            {/* Editable Input */}
-            <input
-                type="text"
-                name="countryName"
-                value={inputValue}
-                onChange={handleInputChange}
-                placeholder="Select Country"
-                className="appearance-none text-2xl block w-full bg-gray-200 text-gray-700 rounded-r-lg py-3 px-4 mb-3 leading-tight focus:outline-none"
-            />
-
-            {/* Filtered Dropdown */}
+            {/* Dropdown List */}
             {showDropdown && (
-                <div className="absolute z-10 top-full w-[60%] max-h-60 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg">
-                    {filteredCountries.map((country, index) => (
-                        <div
-                            key={index}
-                            onClick={() => handleCountrySelect(country)}
-                            className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
+                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-y-auto shadow-lg">
+                    {filteredCountries.map((country) => (
+                        <li
+                            key={country.code}
+                            onClick={() => handleCountrySelect(country.name)}
+                            className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
                         >
-                            {country.flag ? (
-                                <img src={country.flag} alt={country.name} className="w-6 h-4 mr-2 rounded-sm" />
-                            ) : (
-                                <FaGlobe className="w-6 h-6 text-gray-500 mr-2" />
-                            )}
+                            {/* Flag and Country Name */}
+                            <img src={country.flag} alt={country.name} className='w-6 h-4 mr-2 rounded-sm'/>
                             <span className="text-gray-700">{country.name}</span>
-                            <span className="ml-2 text-gray-500">({country.abbreviation})</span>
-                        </div>
+                        </li>
                     ))}
                     {filteredCountries.length === 0 && (
-                        <div className="px-4 py-2 text-gray-500">No results found</div>
+                        <li className="p-2 text-gray-500 text-center">No matches found</li>
                     )}
-                </div>
+                </ul>
             )}
         </div>
     );
