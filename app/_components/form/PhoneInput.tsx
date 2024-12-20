@@ -59,29 +59,38 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
 
     return (
         <div className="flex flex-row relative" ref={dropdownRef}>
+            {/* Dropdown button */}
             <div
                 onClick={() => setShowDropdown(!showDropdown)}
                 className="flex items-center justify-between w-[15%] bg-gray-200 text-gray-700 rounded-l-lg py-6 px-4 mb-3 leading-tight cursor-pointer focus:outline-none focus:bg-white"
             >
                 {selectedCountry && selectedCountry.flag ? (
-                    <Image src={selectedCountry.flag} alt={selectedCountry.name} className="w-6 h-4 mr-2 rounded-sm" />
+                    <Image 
+                        src={selectedCountry.flag} 
+                        alt={selectedCountry.name} 
+                        width={24} 
+                        height={16} 
+                        className="mr-2 rounded-sm" 
+                    />
                 ) : (
                     <FaGlobe className="w-6 h-6 text-gray-500" />
                 )}
                 <FaChevronDown className="ml-2 text-sm" />
             </div>
 
+            {/* Phone input field */}
             <input
                 type="tel"
                 name="number"
                 value={phoneNumber}
                 onChange={handleNumberChange}
                 placeholder="111 467 378 399"
-                className="appearance-none py-6 text-2xl block w-full bg-gray-200 text-gray-700 rounded-r-lg py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                className="appearance-none text-2xl block w-full bg-gray-200 text-gray-700 rounded-r-lg py-6 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
             />
 
+            {/* Dropdown menu */}
             {showDropdown && (
-                <div className="absolute z-10 mb-1 bottom-full w-[60%] max-h-60 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg">
+                <div className="absolute z-10 bottom-full w-[60%] max-h-60 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg">
                     <div
                         onClick={() => handleCountrySelect()}
                         className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
@@ -95,7 +104,13 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                             onClick={() => handleCountrySelect(country)}
                             className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
                         >
-                            <Image src={country.flag} alt={country.name} className="w-6 h-4 mr-2 rounded-sm" />
+                            <Image 
+                                src={country.flag} 
+                                alt={country.name} 
+                                width={24} 
+                                height={16} 
+                                className="mr-2 rounded-sm" 
+                            />
                             <span className="text-gray-700">{country.name}</span>
                             <span className="ml-2 text-gray-500">({country.code})</span>
                         </div>

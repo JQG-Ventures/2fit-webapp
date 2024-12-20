@@ -64,7 +64,8 @@
     "numberRegisteredError": "El numero ya fue registrado. Por favor ingresa otro.",
     "numberServerError": "Hubo un error validando el numero. Intentalo mas tarde.",
     "nameValidationFill": "Por favor llena este campo.",
-    "phoneValidationFill": "Ingresa un numero valido."
+    "phoneValidationFill": "Ingresa un numero valido.",
+    "countryCodeValidationFill" : "Por favor escoja un codigo de país válido."
   },
   "RegisterPagestep3":{
     "woman": "Mujer",

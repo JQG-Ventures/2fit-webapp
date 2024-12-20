@@ -48,6 +48,10 @@ export default function RegisterStep1() {
         { name: 'birthdate', label: 'Birthdate', placeholder: 'mm/dd/yyyy', type: 'date' }
     ];
 
+    const formatPhoneNumber = (phone: string): string => {
+        return phone.replace(/[()\s-]/g, ''); 
+    };    
+
     const validatePhone = (phone: string): boolean => {
         const phoneRegex = /^\+?\d{8,15}$/;
         return phoneRegex.test(phone);
@@ -58,8 +62,10 @@ export default function RegisterStep1() {
 
         if (name === 'countryCode') {
             setCountryCode(value);
+            setFormData({ ...formData, code_number: value });
         } else if (name === 'number') {
-            setPhoneNumber(value);
+            const cleanedValue = formatPhoneNumber(value);
+            setPhoneNumber(cleanedValue);    
         } else {
             setFormData({ ...formData, [name]: value });
         }
@@ -68,41 +74,44 @@ export default function RegisterStep1() {
     const handleNextStep = async () => {
         setIsSubmitting(true);
         const validationErrors: ValidationErrors = {};
-
+    
         if (!formData.name.trim()) {
             validationErrors.name = t("RegisterPagestep1.nameValidationFill");
         }
-
+    
         if (!formData.last.trim()) {
             validationErrors.last = t("RegisterPagestep1.lastValidationFill");
         }
-
-        // Validate Phone Number
-        if (!phoneNumber.trim()) {
+    
+        if (!countryCode.trim()) {
+            validationErrors.number = t("RegisterPagestep1.countryCodeValidationFill");
+        } else if (!phoneNumber.trim()) {
             validationErrors.number = t("RegisterPagestep1.phoneValidationFill");
         } else if (!validatePhone(phoneNumber)) {
             validationErrors.number = t("RegisterPagestep1.phoneValidationInvalid");
         }
-
         if (!formData.birthdate) {
             validationErrors.birthdate = t("RegisterPagestep1.birthdateValidationFill");
         }
-
+    
         setErrors(validationErrors);
-
+    
         if (Object.keys(validationErrors).length === 0) {
             const extractedAge = calculateAge(formData.birthdate);
-            const formattedPhoneNumber = `${countryCode}${phoneNumber}`.replace('+', '');
+            const formattedPhoneNumber = phoneNumber.startsWith(countryCode)
+            ? phoneNumber.replace(countryCode, '')
+            : `${countryCode}${phoneNumber}`;
             const birthdateDate = new Date(formData.birthdate);
-            const formattedBirthdate = birthdateDate.toISOString().replace('Z', '+00:00'); // e.g., "2024-10-23T00:00:00.000+00:00"
-
-            const formattedData = { 
-                ...formData, 
-                age: extractedAge.toString(), 
+            const formattedBirthdate = birthdateDate.toISOString().replace('Z', '+00:00');
+    
+            const formattedData = {
+                ...formData,
+                age: extractedAge.toString(),
                 number: formattedPhoneNumber,
-                birthdate: formattedBirthdate 
+                birthdate: formattedBirthdate,
+                code_number: countryCode
             };
-
+    
             try {
                 const existingUser = await fetchUserDataByNumber(formattedPhoneNumber);
                 if (existingUser) {
@@ -115,37 +124,16 @@ export default function RegisterStep1() {
                 setIsSubmitting(false);
                 return;
             }
-
-            // Update Form Data in Context
+    
             setFormData(formattedData);
             updateData(formattedData);
-
-            // Optionally send code and navigate
-            // Uncomment the following lines when ready to handle sending the code
-            /*
-            try {
-                const response_code = await sendCode(formattedData.number);
-                if (response_code === 200) {
-                    router.push('/register/step2');
-                } else {
-                    setErrors({ server: response_code === 400 ? 
-                        'The number entered is not valid. Please try another one.' :
-                        'There was a problem sending the code. Please try again later.'
-                    });
-                    setIsSubmitting(false);
-                }
-            } catch (error) {
-                setErrors({ server: 'There was a problem sending the code. Please try again later.' });
-                setIsSubmitting(false);
-            }
-            */
-
-            // For now, navigate to next step without sending code
+    
             router.push('/register/step3');
         } else {
             setIsSubmitting(false);
         }
     };
+    
 
     const handlePrevStep = () => router.push('/register');
 
@@ -181,14 +169,17 @@ export default function RegisterStep1() {
                             icon={name === 'birthdate' ? <IoCalendarOutline /> : undefined}
                         />
                     ))}
-                    <PhoneInput
-                        label={t('RegisterPagestep1.phone')}
-                        countryCode={countryCode}
-                        phoneNumber={phoneNumber}
-                        onChange={handleChange}
-                        countryCodes={countryCodes}
-                        error={errors.number}
-                    />
+                        <PhoneInput
+                            label={t('RegisterPagestep1.phone')}
+                            countryCode={countryCode}
+                            phoneNumber={
+                                countryCode ? `(${countryCode}) ${phoneNumber.replace(countryCode, '')}` : phoneNumber
+                            }
+                            onChange={handleChange}
+                            countryCodes={countryCodes}
+                            error={errors.number}
+                        />
+
                     {errors.birthdate && <p className="text-red-500 text-center">{errors.birthdate}</p>}
                     {errors.name && <p className="text-red-500 text-center">{errors.name}</p>}
                     {errors.last && <p className="text-red-500 text-center">{errors.last}</p>}
