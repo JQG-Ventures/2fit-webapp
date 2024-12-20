@@ -91,7 +91,7 @@ export default function RegisterStep1() {
         if (!phoneNumber.trim()) {
             validationErrors.number = t("RegisterPagestep1.phoneValidationFill");
         } else if (!validatePhone(`+${phoneNumber}`)) {
-            validationErrors.number = t("RegisterPagestep1.phoneValidationInvalid");
+            validationErrors.number = t("RegisterPagestep1.phoneValidationFill");
         }
         if (!formData.birthdate) {
             validationErrors.birthdate = t("RegisterPagestep1.birthdateValidationFill");
