@@ -234,4 +234,5 @@ export default function RegisterStep1() {
             </div>
         </div>
     );
+    }
 }
