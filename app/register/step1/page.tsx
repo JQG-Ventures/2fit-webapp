@@ -63,18 +63,25 @@ export default function RegisterStep1() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
+    
         if (name === 'countryCode') {
             setCountryCode(value);
             setFormData({ ...formData, code_number: value });
         } else if (name === 'number') {
-            const cleanedValue = formatPhoneNumber(value);
-            setPhoneNumber(cleanedValue);    
+            // Limpia el número ingresado y evita duplicar el código de país
+            const cleanedValue = formatPhoneNumber(value).replace(countryCode, '').trim();
+            console.log(cleanedValue);
+            setPhoneNumber(cleanedValue);
+    
+            // Agregar console.log para mostrar el número formateado correctamente
+            console.log(`Número completo asignado: (${countryCode}) ${cleanedValue}`);
         } else {
             const updatedFormData = { ...formData, [name]: value };
             setFormData(updatedFormData);
             updateData({ ...updatedFormData, countryCode: countryCode, number: phoneNumber });
         }
     };
+    
 
     const handleCountryChange = (countryName: string) => {
         const updatedFormData = { ...formData, country: countryName };
@@ -85,24 +92,20 @@ export default function RegisterStep1() {
     const handleNextStep = async () => {
         setIsSubmitting(true);
         const validationErrors: ValidationErrors = {};
-    
+
         if (!formData.name.trim()) {
             validationErrors.name = t("RegisterPagestep1.nameValidationFill");
         }
-    
+
         if (!formData.last.trim()) {
             validationErrors.last = t("RegisterPagestep1.lastValidationFill");
         }
-    
+
         if (!countryCode.trim()) {
             validationErrors.number = t("RegisterPagestep1.countryCodeValidationFill");
         } else if (!phoneNumber.trim()) {
-        if (!formData.last.trim()) {
-            validationErrors.last = t("RegisterPagestep1.lastValidationFill");
-        }
-        if (!phoneNumber.trim()) {
             validationErrors.number = t("RegisterPagestep1.phoneValidationFill");
-        } else if (!validatePhone(`+${phoneNumber}`)) {
+        } else if (!validatePhone(`+${phoneNumber.replace(/[()\s]/g, '')}`)) {
             validationErrors.number = t("RegisterPagestep1.phoneValidationInvalid");
         }
         if (!formData.birthdate) {
@@ -113,15 +116,15 @@ export default function RegisterStep1() {
         }
 
         setErrors(validationErrors);
-    
+
         if (Object.keys(validationErrors).length === 0) {
             const extractedAge = calculateAge(formData.birthdate);
             const formattedPhoneNumber = phoneNumber.startsWith(countryCode)
-            ? phoneNumber.replace(countryCode, '')
-            : `${countryCode}${phoneNumber}`;
+                ? phoneNumber.replace(countryCode, '')
+                : `${phoneNumber}`;
             const birthdateDate = new Date(formData.birthdate);
             const formattedBirthdate = birthdateDate.toISOString().replace('Z', '+00:00');
-    
+
             const formattedData = {
                 ...formData,
                 age: extractedAge.toString(),
@@ -129,7 +132,7 @@ export default function RegisterStep1() {
                 birthdate: formattedBirthdate,
                 code_number: countryCode
             };
-    
+
             try {
                 const existingUser = await fetchUserDataByNumber(formattedPhoneNumber);
                 if (existingUser) {
@@ -142,16 +145,15 @@ export default function RegisterStep1() {
                 setIsSubmitting(false);
                 return;
             }
-    
+
             setFormData(formattedData);
             updateData(formattedData);
-    
+
             router.push('/register/step3');
         } else {
             setIsSubmitting(false);
         }
     };
-    
 
     const handlePrevStep = () => router.push('/register');
 
@@ -185,21 +187,21 @@ export default function RegisterStep1() {
                             icon={name === 'birthdate' ? <IoCalendarOutline /> : undefined}
                         />
                     ))}
-                        <CountryInputForm
+                    <CountryInputForm
                         selectedCountry={formData.country}
                         onChange={handleCountryChange}
                         countryList={countryCodes}
-                       />
-                        <PhoneInput
-                            label={t('RegisterPagestep1.phone')}
-                            countryCode={countryCode}
-                            phoneNumber={
-                                countryCode ? `(${countryCode}) ${phoneNumber.replace(countryCode, '')}` : phoneNumber
-                            }
-                            onChange={handleChange}
-                            countryCodes={countryCodes}
-                            error={errors.number}
-                        />
+                    />
+                    <PhoneInput
+                        label={t('RegisterPagestep1.phone')}
+                        countryCode={countryCode}
+                        phoneNumber={
+                            countryCode ? `(${countryCode}) ${phoneNumber.replace(countryCode, '')}` : phoneNumber
+                        }
+                        onChange={handleChange}
+                        countryCodes={countryCodes}
+                        error={errors.number}
+                    />
 
                     {errors.birthdate && <p className="text-red-500 text-center">{errors.birthdate}</p>}
                     {errors.name && <p className="text-red-500 text-center">{errors.name}</p>}
@@ -234,5 +236,4 @@ export default function RegisterStep1() {
             </div>
         </div>
     );
-    }
 }
