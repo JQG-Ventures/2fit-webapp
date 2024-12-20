@@ -68,12 +68,10 @@ export default function RegisterStep1() {
             setCountryCode(value);
             setFormData({ ...formData, code_number: value });
         } else if (name === 'number') {
-            // Limpia el número ingresado y evita duplicar el código de país
             const cleanedValue = formatPhoneNumber(value).replace(countryCode, '').trim();
             console.log(cleanedValue);
             setPhoneNumber(cleanedValue);
     
-            // Agregar console.log para mostrar el número formateado correctamente
             console.log(`Número completo asignado: (${countryCode}) ${cleanedValue}`);
         } else {
             const updatedFormData = { ...formData, [name]: value };
