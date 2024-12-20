@@ -15,6 +15,7 @@ import countryCodes from '@/app/data/countryCodes.json';
 import { useApiGet } from '@/app/utils/apiClient';
 import { useEditProfile } from '@/app/_services/userService';
 import { useTranslation } from 'react-i18next';
+import CountryInputForm from '@/app/_components/form/CountryInputForm';
 
 const formFields: FormField[] = [
 	{
@@ -41,7 +42,7 @@ const formFields: FormField[] = [
 		label: 'Country',
 		name: 'country',
 		type: 'select',
-		options: countries.map((country) => ({ value: country, label: country })),
+		options: countryCodes,
 	},
 	{
 		label: 'Gender',
@@ -157,7 +158,21 @@ const EditProfile: React.FC = () => {
 			>
 				<div className="h-[90%] flex flex-col justify-start py-6 w-full max-w-3xl space-y-8 overflow-y-auto">
 					{formFields.map((field, index) => {
-						if (field.type === 'select') {
+						if (field.name === 'country') {
+							return (
+								<CountryInputForm
+									key={index}
+									selectedCountry={profileData?.country || ''}
+									onChange={(selectedCountry) => {
+										setProfileData((prevData) => ({
+											...prevData!,
+											country: selectedCountry,
+										}));
+									}}
+									countryList={countryCodes}
+								/>
+							);
+						} else if (field.type === 'select') {
 							return (
 								<SelectInput
 									key={index}
