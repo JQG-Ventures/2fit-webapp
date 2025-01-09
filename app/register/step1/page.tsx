@@ -1,6 +1,7 @@
+// @ts-nocheck
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FaApple, FaFacebook, FaGoogle } from 'react-icons/fa';
 import { IoChevronBack, IoCalendarOutline } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
@@ -8,9 +9,9 @@ import { useRegister } from '../../_components/register/RegisterProvider';
 import ButtonWithSpinner from '../../_components/others/ButtonWithSpinner';
 import InputWithIcon from '../../_components/form/InputWithIcon';
 import PhoneInput from '../../_components/form/PhoneInput';
+import CountryInputForm from '../../_components/form/CountryInputForm';
 import countryCodes from '@/app/data/countryCodes.json';
 import { calculateAge } from '@/app/utils/formUtils';
-import { sendCode } from '../../_services/registerService';
 import { fetchUserDataByNumber } from '@/app/_services/userService';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +19,7 @@ interface FormData {
     number: string;
     name: string;
     age: string;
+    country: string;
     birthdate: string;
     last: string;
 }
@@ -29,13 +31,15 @@ interface ValidationErrors {
 export default function RegisterStep1() {
     const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
+    const initialBirthdate = data.birthdate ? new Date(data.birthdate).toISOString().split('T')[0] : '';
     const [countryCode, setCountryCode] = useState<string>(data.countryCode || '');
     const [phoneNumber, setPhoneNumber] = useState<string>(data.number || '');
     const [formData, setFormData] = useState<FormData>({
         number: data.number || '',
         name: data.name || '',
         age: data.age || '',
-        birthdate: data.birthdate || '',
+        country: data.country || '',
+        birthdate: initialBirthdate,
         last: data.last || ''
     });
     const [errors, setErrors] = useState<ValidationErrors>({});
@@ -55,14 +59,23 @@ export default function RegisterStep1() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-
         if (name === 'countryCode') {
             setCountryCode(value);
+            updateData({ ...formData, countryCode: value, number: phoneNumber });
         } else if (name === 'number') {
             setPhoneNumber(value);
+            updateData({ ...formData, countryCode: countryCode, number: value });
         } else {
-            setFormData({ ...formData, [name]: value });
+            const updatedFormData = { ...formData, [name]: value };
+            setFormData(updatedFormData);
+            updateData({ ...updatedFormData, countryCode: countryCode, number: phoneNumber });
         }
+    };
+
+    const handleCountryChange = (countryName: string) => {
+        const updatedFormData = { ...formData, country: countryName };
+        setFormData(updatedFormData);
+        updateData({ ...updatedFormData, countryCode: countryCode, number: phoneNumber });
     };
 
     const handleNextStep = async () => {
@@ -72,20 +85,19 @@ export default function RegisterStep1() {
         if (!formData.name.trim()) {
             validationErrors.name = t("RegisterPagestep1.nameValidationFill");
         }
-
         if (!formData.last.trim()) {
             validationErrors.last = t("RegisterPagestep1.lastValidationFill");
         }
-
-        // Validate Phone Number
         if (!phoneNumber.trim()) {
             validationErrors.number = t("RegisterPagestep1.phoneValidationFill");
-        } else if (!validatePhone(phoneNumber)) {
-            validationErrors.number = t("RegisterPagestep1.phoneValidationInvalid");
+        } else if (!validatePhone(`+${phoneNumber}`)) {
+            validationErrors.number = t("RegisterPagestep1.phoneValidationFill");
         }
-
         if (!formData.birthdate) {
             validationErrors.birthdate = t("RegisterPagestep1.birthdateValidationFill");
+        }
+        if (!formData.country) {
+            validationErrors.country = t("RegisterPagestep1.countryValidationFill");
         }
 
         setErrors(validationErrors);
@@ -94,13 +106,13 @@ export default function RegisterStep1() {
             const extractedAge = calculateAge(formData.birthdate);
             const formattedPhoneNumber = `${countryCode}${phoneNumber}`.replace('+', '');
             const birthdateDate = new Date(formData.birthdate);
-            const formattedBirthdate = birthdateDate.toISOString().replace('Z', '+00:00'); // e.g., "2024-10-23T00:00:00.000+00:00"
-
-            const formattedData = { 
-                ...formData, 
-                age: extractedAge.toString(), 
-                number: formattedPhoneNumber,
-                birthdate: formattedBirthdate 
+            const formattedBirthdate = birthdateDate.toISOString().replace('Z', '+00:00');
+            const formattedData = {
+                ...formData,
+                age: extractedAge.toString(),
+                code_number: countryCode.replace('+', ''),
+                number: phoneNumber,
+                birthdate: formattedBirthdate
             };
 
             try {
@@ -116,31 +128,8 @@ export default function RegisterStep1() {
                 return;
             }
 
-            // Update Form Data in Context
             setFormData(formattedData);
             updateData(formattedData);
-
-            // Optionally send code and navigate
-            // Uncomment the following lines when ready to handle sending the code
-            /*
-            try {
-                const response_code = await sendCode(formattedData.number);
-                if (response_code === 200) {
-                    router.push('/register/step2');
-                } else {
-                    setErrors({ server: response_code === 400 ? 
-                        'The number entered is not valid. Please try another one.' :
-                        'There was a problem sending the code. Please try again later.'
-                    });
-                    setIsSubmitting(false);
-                }
-            } catch (error) {
-                setErrors({ server: 'There was a problem sending the code. Please try again later.' });
-                setIsSubmitting(false);
-            }
-            */
-
-            // For now, navigate to next step without sending code
             router.push('/register/step3');
         } else {
             setIsSubmitting(false);
@@ -151,12 +140,11 @@ export default function RegisterStep1() {
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 items-center">
-            <div className='h-[15%] pt-20 w-full lg:max-w-3xl'>
+            <div className='h-[10%] pt-20 w-full lg:max-w-3xl'>
                 <button onClick={handlePrevStep} className="text-4xl lg:hidden">
                     <IoChevronBack />
                 </button>
             </div>
-
             <div className='h-[15%] flex flex-row w-full lg:max-w-3xl mb-4'>
                 <button onClick={handlePrevStep} className="hidden text-4xl lg:flex mr-14 mt-5 text-center">
                     <IoChevronBack />
@@ -166,8 +154,7 @@ export default function RegisterStep1() {
                     {t('RegisterPagestep1.create.1')}
                 </h1>
             </div>
-
-            <div className='h-[50%] flex w-full items-center justify-center'>
+            <div className='h-[60%] flex w-full items-center justify-center'>
                 <form className="w-full lg:max-w-3xl space-y-8">
                     {user_data_fields.map(({ name, label, placeholder, type }) => (
                         <InputWithIcon
@@ -181,6 +168,11 @@ export default function RegisterStep1() {
                             icon={name === 'birthdate' ? <IoCalendarOutline /> : undefined}
                         />
                     ))}
+                    <CountryInputForm
+                        selectedCountry={formData.country}
+                        onChange={handleCountryChange}
+                        countryList={countryCodes}
+                    />
                     <PhoneInput
                         label={t('RegisterPagestep1.phone')}
                         countryCode={countryCode}
@@ -193,6 +185,7 @@ export default function RegisterStep1() {
                     {errors.name && <p className="text-red-500 text-center">{errors.name}</p>}
                     {errors.last && <p className="text-red-500 text-center">{errors.last}</p>}
                     {errors.number && <p className="text-red-500 text-center">{errors.number}</p>}
+                    {errors.country && <p className="text-red-500 text-center">{errors.country}</p>}
                     {errors.server && <p className="text-red-500 text-center">{errors.server}</p>}
                     <ButtonWithSpinner
                         type="button"
@@ -204,9 +197,8 @@ export default function RegisterStep1() {
                     </ButtonWithSpinner>
                 </form>
             </div>
-
-            <div className="h-[15%] flex flex-col justify-start text-center">
-                <p className="text-gray-500 mb-10">{t('RegisterPagestep1.signuptxt')}</p>
+            <div className="h-[12%] flex flex-col justify-start text-center">
+                <p className="text-gray-500 mb-6">{t('RegisterPagestep1.signuptxt')}</p>
                 <div className="flex flex-row justify-evenly space-x-8">
                     {[FaApple, FaFacebook, FaGoogle].map((Icon, idx) => (
                         <button key={idx} className="text-5xl">
@@ -215,12 +207,11 @@ export default function RegisterStep1() {
                     ))}
                 </div>
             </div>
-
-            <div className="h-[5%] text-center">
+            <div className="h-[3%] text-center">
                 <p className="text-gray-500">
                     {t('RegisterPagestep1.signupquestion')} <a href="#" className="text-indigo-600 underline">{t('RegisterPagestep1.signin')}</a>
                 </p>
             </div>
         </div>
-    )
+    );
 }

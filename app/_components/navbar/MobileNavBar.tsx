@@ -13,68 +13,58 @@ type NavItem = {
 
 type MobileNavBarProps = {
     navItems: NavItem[];
+    selectedPath: string;
+    onNavClick: (path: string) => void;
 };
 
-const MobileNavBar: React.FC<MobileNavBarProps> = ({ navItems }) => {
+const MobileNavBar: React.FC<MobileNavBarProps> = ({ navItems, selectedPath, onNavClick }) => {
     const pathname = usePathname();
     const hideMobileNavBarPaths = ['/workouts/plan', '/workouts/countdown', '/profile/edit', '/profile/notification', '/profile/security', '/profile/premium'];
-
-    if (hideMobileNavBarPaths.some(path => pathname.startsWith(path))) {
-        return null;
-    }    
     const [previousPath, setPreviousPath] = useState<string>(pathname);
 
     const getAnimationClasses = (isActive: boolean, itemIndex: number) => {
-        const currentIndex = navItems.findIndex(item => pathname.startsWith(item.href));
+        const currentIndex = navItems.findIndex(item => selectedPath.startsWith(item.href));
         const prevIndex = navItems.findIndex(item => previousPath.startsWith(item.href));
-
         let backgroundAnimation = '';
         let textOutAnimation = '';
         let textInAnimation = '';
-
         if (isActive) {
             if (Math.abs(currentIndex - prevIndex) === 1) {
-                backgroundAnimation = currentIndex < prevIndex
-                    ? styles['slide-left']
-                    : styles['slide-right'];
-                textInAnimation = currentIndex < prevIndex
-                    ? styles['text-slide-in-right']
-                    : styles['text-slide-in-left'];
+                backgroundAnimation = currentIndex < prevIndex ? styles['slide-left'] : styles['slide-right'];
+                textInAnimation = currentIndex < prevIndex ? styles['text-slide-in-right'] : styles['text-slide-in-left'];
             } else {
                 backgroundAnimation = styles['appear-center'];
                 textInAnimation = styles['appear-center'];
             }
         } else if (itemIndex === prevIndex) {
             if (Math.abs(currentIndex - prevIndex) === 1) {
-                textOutAnimation = currentIndex < prevIndex
-                    ? styles['text-slide-out-left']
-                    : styles['text-slide-out-right'];
+                textOutAnimation = currentIndex < prevIndex ? styles['text-slide-out-left'] : styles['text-slide-out-right'];
             } else {
                 textOutAnimation = styles['disappear-center'];
             }
         }
-
-        return {
-            backgroundAnimation,
-            textOutAnimation,
-            textInAnimation,
-        };
+        return { backgroundAnimation, textOutAnimation, textInAnimation };
     };
 
     useEffect(() => {
         setPreviousPath(pathname);
     }, [pathname]);
 
+    if (hideMobileNavBarPaths.some(path => pathname.startsWith(path))) {
+        return null;
+    }
+
     return (
         <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex bg-gray-800 text-white py-4 px-6 rounded-full w-4/5 h-18">
             {navItems.map((item, index) => {
-                const isActive = pathname.startsWith(item.href);
+                const isActive = selectedPath.startsWith(item.href);
                 const { backgroundAnimation, textOutAnimation, textInAnimation } = getAnimationClasses(isActive, index);
-
                 return (
                     <Link
                         href={item.href}
                         key={item.href}
+                        prefetch={true}
+                        onClick={() => onNavClick(item.href)}
                         className={`flex-1 flex justify-center ${isActive ? 'relative z-1' : ''}`}
                     >
                         <div

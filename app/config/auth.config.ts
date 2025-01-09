@@ -1,7 +1,8 @@
+// @ts-nocheck
 import type { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-async function refreshAccessToken(token: any) {
+export async function refreshAccessToken(token: any) {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/refresh-token`, {
             method: "POST",

@@ -6,4 +6,5 @@ interface UserProfile {
 	country: string;
 	number: string;
 	gender: string;
+	profile: any;
 }

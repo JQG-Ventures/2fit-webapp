@@ -1,3 +1,4 @@
+import { useApiDelete, useApiPost, useApiPut } from "../utils/apiClient";
 
 export const fetchUserDataByNumber = async (number: string) => {
 	try {
@@ -33,20 +34,46 @@ export const fetchUserDataByEmail = async (email: string) => {
 	}
 };
 
-export const normalizeGender = (value: string): string => {
-	const genderMap: { [key: string]: string } = {
-		Male: 'masculino',
-		Female: 'femenino',
-		Other: 'otro',
-	};
-	return genderMap[value] || 'otro';
+
+export const useSendProgressToBackend = () => {
+	return useApiPost<{ queryParams: { workout_plan_id: string }; body: {exercises: ExerciseProgress[], day_of_week: string} }, { status: string; message: string }>(
+		'/api/users/workouts/progress'
+	);
+};  
+
+export const useSendCompleteToBackend = () => {
+	return useApiPost<{ body: ExerciseComplete }, { status: string; message: string }>(
+		'/api/users/workouts/complete'
+	);
+};
+  
+
+export const useSaveWorkout = () => {
+	return useApiPost<{ queryParams: { workout_id: string } }, { status: string; message: string }>(
+		'/api/workouts/saved'
+	);
 };
 
-export const getGenderValue = (gender: string): string => {
-	return gender === 'masculino' ? 'Male' : gender === 'femenino' ? 'Female' : 'Other';
+export const useDeleteWorkout = () => {
+	return useApiDelete<{ queryParams: { workout_id: string } }, { status: string; message: string }>(
+		'/api/workouts/saved'
+	);
 };
 
-export const updateUserCredentials = async (
+export const useEditProfile = () => {
+	return useApiPut<any, { status: string; message: string }>(
+		'/api/users/profile'
+	);
+};
+
+export const useSendMessage = (userPhoneNumber: string) => {
+	return useApiPost<
+	  { body: { message: string } },
+	  { message: string; response: string }
+	>('/api/chat', undefined, { 'User-Phone-Number': userPhoneNumber });
+  };
+
+  export const updateUserCredentials = async (
 	userId: string,
 	email: string,
 	password: string,
@@ -81,5 +108,4 @@ export const updateUserCredentials = async (
 	  throw error;
 	}
   };
-  
-  
+

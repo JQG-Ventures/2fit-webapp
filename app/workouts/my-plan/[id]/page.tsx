@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { FaArrowLeft, FaCheckCircle, FaFire } from "react-icons/fa";
@@ -8,20 +8,31 @@ import { FiPlayCircle } from "react-icons/fi";
 import LoadingScreen from "../../../_components/animations/LoadingScreen";
 import Modal from "../../../_components/profile/modal";
 import { useSessionContext } from "../../../_providers/SessionProvider";
-import { useFetch } from "../../../_hooks/useFetch";
 import ExerciseDetailsModal from "@/app/_components/modals/ExerciseDetailsModal";
 import ExerciseFlow from "@/app/_components/workouts/ExerciseFlow";
 import Image from "next/image";
+import { useApiGet } from "@/app/utils/apiClient";
+
+const daysOfWeekFull = [
+	"monday",
+	"tuesday",
+	"wednesday",
+	"thursday",
+	"friday",
+	"saturday",
+	"sunday",
+];
 
 interface ExerciseCardProps {
 	exercise: Exercise;
 	onClick: (action: "details" | "start") => void;
+	className?: string;
 }
 
-const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onClick }) => (
+const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onClick, className }) => (
 	<div
-		className={`relative bg-white shadow-md rounded-lg overflow-hidden transition-transform transform hover:scale-105 ${exercise.is_completed ? "opacity-75 pointer-events-none" : ""
-			}`}
+		className={`flex-none relative bg-white shadow-md rounded-lg overflow-hidden transition-transform transform hover:scale-105 ${exercise.is_completed ? "opacity-75 pointer-events-none" : ""
+			} ${className || ""}`}
 		onClick={() => onClick("details")}
 	>
 		<div className="relative w-full h-40">
@@ -88,33 +99,26 @@ const DaysOfWeekSelector: React.FC<DaysOfWeekSelectorProps> = ({
 	</div>
 );
 
-export default function MyPlan() {
+const MyPlan: React.FC = () => {
 	const { t } = useTranslation("global");
 	const router = useRouter();
 	const { userId, loading: sessionLoading } = useSessionContext();
 	const { id } = useParams();
 	const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
-	const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
-		null
-	);
+	const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 	const [showExerciseFlow, setShowExerciseFlow] = useState<boolean>(false);
 	const [weeklyProgressState, setWeeklyProgressState] = useState<any>(null);
+	const getProgressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/weekly-progress`;
+	const { data: weeklyProgressData, isLoading: loadingWeeklyProgress, isError: errorWeeklyProgress } = useApiGet<{ status: string; message: any }>([], getProgressUrl);
 
-	const options = useMemo(() => ({ method: "GET" }), []);
-	const {
-		data: weeklyProgressData,
-		loading: loadingWeeklyProgress,
-		error: errorWeeklyProgress,
-	} = useFetch(
-		userId
-			? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/weekly-progress/${userId}`
-			: "",
-		options
-	);
+	useEffect(() => {
+		const currentDayIndex = new Date().getDay() - 1;
+		setSelectedDayIndex(currentDayIndex < 0 ? 6 : currentDayIndex);
+	}, []);
 
 	useEffect(() => {
 		if (weeklyProgressData) {
-			setWeeklyProgressState(weeklyProgressData);
+			setWeeklyProgressState(weeklyProgressData.message);
 		}
 	}, [weeklyProgressData]);
 
@@ -133,15 +137,6 @@ export default function MyPlan() {
 	}
 
 	const daysOfWeekLetters = ["M", "T", "W", "Th", "F", "Sa", "Su"];
-	const daysOfWeekFull = [
-		"monday",
-		"tuesday",
-		"wednesday",
-		"thursday",
-		"friday",
-		"saturday",
-		"sunday",
-	];
 	const daysData: {
 		[key: string]: { day_of_week: string; exercises: Exercise[] };
 	} = {};
@@ -159,9 +154,6 @@ export default function MyPlan() {
 			}
 		);
 	}
-	// weeklyProgressData.days.forEach((day: { day_of_week: string; exercises: Exercise[] }) => {
-	// 	daysData[day.day_of_week.toLowerCase()] = day;
-	// });
 
 	const handleExerciseCardClick = (
 		exercise: Exercise,
@@ -209,28 +201,33 @@ export default function MyPlan() {
 				</button>
 				<h1 className="text-5xl font-semibold pl-4">{t('workouts.my-plan.title')}</h1>
 			</div>
-			<div className="w-full h-[80%] pt-10 lg:max-w-3xl">
+			<div className="w-full h-[80%] lg:max-w-3xl flex flex-col">
 				<DaysOfWeekSelector
 					daysOfWeekLetters={daysOfWeekLetters}
 					selectedDayIndex={selectedDayIndex}
 					setSelectedDayIndex={setSelectedDayIndex}
 				/>
+				
 				{selectedDay && selectedDay.exercises.length > 0 ? (
-					<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
-						{selectedDay.exercises.map((exercise) => (
-							<ExerciseCard
-								key={exercise.exercise_id}
-								exercise={exercise}
-								onClick={(action) => handleExerciseCardClick(exercise, action)}
-							/>
-						))}
+					<div className="flex-1 overflow-x-hidden overflow-y-auto mt-4">
+						<div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+							{selectedDay.exercises.map((exercise) => (
+								<ExerciseCard
+									key={exercise.exercise_id}
+									exercise={exercise}
+									onClick={(action) => handleExerciseCardClick(exercise, action)}
+									className="w-full h-auto"
+								/>
+							))}
+						</div>
 					</div>
 				) : (
-					<div className="h-full flex justify-center items-center">
+					<div className="flex-1 flex justify-center items-center mt-4">
 						<p className="text-center text-gray-500">{t('workouts.my-plan.noExercises')}</p>
 					</div>
 				)}
 			</div>
+			
 			{selectedExercise && !showExerciseFlow && (
 				<ExerciseDetailsModal
 					exercise={selectedExercise}
@@ -248,9 +245,12 @@ export default function MyPlan() {
 					onExerciseComplete={handleExerciseComplete}
 					workoutType="myPlan"
 					userId={userId!}
+					// @ts-ignore
 					workoutPlanId={id}
 				/>
 			)}
 		</div>
 	);
 }
+
+export default React.memo(MyPlan);

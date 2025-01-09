@@ -7,6 +7,16 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
+    "./node_modules/swiper/**/*.{js,css,map,mjs,ts,less,scss,}"
+  ],
+  safelist: [
+    'swiper', 
+    'swiper-container',
+    'swiper-pagination', 
+    'swiper-slide', 
+    'swiper-wrapper', 
+    'swiper-pagination-bullet',
+    'swiper-pagination-bullet-active'
   ],
   theme: {
     extend: {
@@ -18,6 +28,9 @@ const config: Config = {
     },
   },
   darkMode: 'class',
-  plugins: [nextui()],
+  plugins: [
+    nextui(),
+    require('tailwind-scrollbar'),
+  ],
 };
 export default config;
