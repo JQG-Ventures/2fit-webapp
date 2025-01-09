@@ -12,22 +12,20 @@ import Modal from '../_components/profile/modal';
 import LoadingScreen from '../_components/animations/LoadingScreen';
 import SettingItem from '../_components/others/SettingItem';
 import { CiUser, CiBellOn, CiLock, CiCircleQuestion } from 'react-icons/ci';
-import { useFetch } from '../_hooks/useFetch';
-import { useSessionContext } from '../_providers/SessionProvider';
+import { useApiGet } from '../utils/apiClient';
+import { useTranslation } from 'react-i18next';
+import { useLoading } from '../_providers/LoadingProvider';
 import Premium from '../_components/profile/PremiumContent';
 
 const ProfilePage: React.FC = () => {
+	const { t } = useTranslation('global');
 	const router = useRouter();
-	const { userId, loading: sessionLoading } = useSessionContext();
+	const { setLoading } = useLoading();
 	const [showPremium, setShowPremium] = useState(false);
-	const options = useMemo(() => ({
-		method: 'GET',
-	}), []);
-
-	const { data: userData, loading, error } = useFetch(
-		userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}` : '',
-		options
-	);
+	
+	const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
+	const { data: profile, isLoading: loadingProfile, isError: profileError } =
+		useApiGet<{ status: string; message: any }>([], getProfileUrl);
 
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
@@ -39,35 +37,39 @@ const ProfilePage: React.FC = () => {
 	];
 
 	useEffect(() => {
-		if (!sessionLoading && !userId) {
-			router.push('/login');
-		}
-	}, [userId, sessionLoading, router]);
+		if (loadingProfile) {
+			setLoading(true);
+		  } else {
+			setLoading(false);
+		  }
+	  }, [loadingProfile, setLoading])
 
 	const handleLogout = async () => {
 		setIsLoggingOut(true);
-		await signOut({
+		signOut({
 			callbackUrl: '/',
 			redirect: true,
 		});
 	};
 
-	const handleSetting = async (setting) => {
+	const handleSetting = async (setting: Setting) => {
 		setIsLoading(true);
-		router.push(setting.path);
+		router.push(setting.path!);
 	};
 
-	if (loading || sessionLoading) return <LoadingScreen />;
-
-	if (error) {
+	if (profileError) {
 		return (
 			<Modal
 				title="Error"
-				message={error}
+				message={t('profile.errorFetching')}
 				onClose={() => router.push('/home')}
 			/>
 		);
 	}
+
+	if (loadingProfile) {
+		return null;
+	  }
 
 	return (
 		<div className="flex flex-col justify-between items-center bg-gray-50 h-screen p-10 lg:pt-[10vh]">
@@ -78,7 +80,6 @@ const ProfilePage: React.FC = () => {
 			<div className="h-[10%] flex justify-left items-center w-full lg:hidden">
 				<h1 className="text-5xl font-semibold pl-4">Profile</h1>
 			</div>
-
 			<div className="h-[20%] flex flex-col items-center w-full lg:max-w-6xl">
 				<div className="relative w-40 h-40">
 					<Image
@@ -90,24 +91,21 @@ const ProfilePage: React.FC = () => {
 					/>
 					<div
 						className="absolute bottom-0 right-0 bg-green-500 p-1 rounded-full cursor-pointer"
-						onClick={() => router.push('/profile/edit')}
+						onClick={() => {}}
 					>
 						<MdModeEditOutline className="text-white w-8 h-8 ml-1" />
 					</div>
 				</div>
 				<h2 className="text-3xl font-semibold mt-4 truncate max-w-full text-center">
-					{userData?.name || 'Username'}
+					{profile?.message?.name || 'Username'}
 				</h2>
 				<p className="text-gray-400 overflow-hidden text-ellipsis max-w-full text-center">
-					{userData?.email || 'user@yourdomain.com'}
+					{profile?.message?.email || 'user@yourdomain.com'}
 				</p>
 			</div>
-
-			<div
-				className="h-[12%] w-full lg:max-w-6xl bg-gradient-to-r from-green-400 to-green-700 flex flex-col justify-center text-white rounded-[25px] px-8 shadow-lg w-full cursor-pointer"
-				onClick={() => setShowPremium(true)}
-			>
-				<div className="flex flex-row items-center justify-between">
+			<div className="h-[12%] w-full lg:max-w-6xl bg-gradient-to-r from-green-400 to-green-700 flex flex-col justify-center text-white rounded-[25px] px-8 shadow-lg w-fullcursor-pointer"
+				onClick={() => setShowPremium(true)} >
+z				<div className="flex flex-row items-center justify-between">
 					<div className="flex justify-left space-x-6 w-[80%] items-center pb-4">
 						<span className="bg-gradient-to-b from-yellow-300 to-yellow-700 text-white rounded-full px-4 py-2 text-2xl">
 							PRO
@@ -120,20 +118,18 @@ const ProfilePage: React.FC = () => {
 					Enjoy workout access without ads and restrictions
 				</p>
 			</div>
- 
 			<div className="border-t border-gray-300 w-full my-14 lg:my-0 lg:max-w-6xl"></div>
-
 			<div className="w-full h-[45%] mb-24 overflow-y-auto lg:max-w-6xl lg:mb-0">
 				{settings.map((setting, index) => (
 					<SettingItem
 						key={index}
 						label={setting.label}
+						// @ts-ignore
 						icon={setting.icon}
 						onClick={() => handleSetting(setting)}
 						isLoading={isLoading}
 					/>
 				))}
-
 				<div className="flex items-center justify-between w-full py-8 px-4">
 					<div className="flex items-center space-x-4">
 						<BsMoon className="text-gray-500 w-5 h-5" />
@@ -141,7 +137,6 @@ const ProfilePage: React.FC = () => {
 					</div>
 					<ToggleButton />
 				</div>
-
 				<SettingItem
 					label="Logout"
 					icon={IoIosLogOut}

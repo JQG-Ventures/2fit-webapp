@@ -6,14 +6,35 @@ import { Inter } from "next/font/google";
 import { RegisterProvider } from "./_components/register/RegisterProvider";
 import { default as AuthProvider } from "./_providers/AuthProvider";
 import NavBar from "./_components/navbar/NavBar";
-import { LanguageProvider } from './utils/LanguageContext';
+import { LanguageProvider } from "./utils/LanguageContext";
 import { ReactNode } from "react";
-import '@/app/utils/i18n';
-import { SessionProvider as CustomSessionProvider } from './_providers/SessionProvider';
-
-
+import "@/app/utils/i18n";
+import { SessionProvider as CustomSessionProvider } from "./_providers/SessionProvider";
+import { AnimatePresence, motion } from "framer-motion";
+import { LoadingProvider, useLoading } from "./_providers/LoadingProvider";
+import LoadingScreen from "./_components/animations/LoadingScreen";
 
 const inter = Inter({ subsets: ["latin"] });
+
+const LayoutContent = ({ children }: { children: ReactNode }) => {
+	const { isLoading } = useLoading();
+	return (
+		<>
+			<NavBar />
+			{isLoading && <LoadingScreen />}
+			<AnimatePresence mode="wait">
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={{ opacity: 0, y: -20 }}
+					transition={{ duration: 0.5 }}
+				>
+					{children}
+				</motion.div>
+			</AnimatePresence>
+		</>
+	);
+};
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
 	return (
@@ -27,15 +48,16 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
 					<RegisterProvider>
 						<AuthProvider>
 							<CustomSessionProvider>
-								{children}
+								<LoadingProvider>
+									<LayoutContent>{children}</LayoutContent>
+								</LoadingProvider>
 							</CustomSessionProvider>
 						</AuthProvider>
-						<NavBar />
 					</RegisterProvider>
 				</LanguageProvider>
 			</body>
 		</html>
 	);
-}
+};
 
 export default RootLayout;

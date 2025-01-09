@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { AiFillHeart, AiOutlineClose } from 'react-icons/ai';
 import ConfirmationModal from '../modals/confirmationModal';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 
 interface Workout {
     _id: string;
@@ -15,7 +13,7 @@ interface Workout {
 
 interface SavedWorkoutsSectionProps {
     workouts: Workout[];
-    deleteWorkout: (userId: string, workoutId: string, token: string) => Promise<void>;
+    deleteWorkout: (workoutId: string) => Promise<void>;
     emptyMessage: string;
     sectionTitle: string;
 }
@@ -26,21 +24,11 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
     emptyMessage,
     sectionTitle
 }) => {
-    const router = useRouter();
+    const { t } = useTranslation('global');
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
     const [savedWorkouts, setSavedWorkouts] = useState<Workout[]>(workouts);
-    const { t } = useTranslation('global');
-    const [userId, setUserId] = useState<string>('');
-    const { data: session, status } = useSession();
-
-    useEffect(() => {
-		if (status === 'authenticated' && session?.user?.userId) {
-			setUserId(session.user.userId);
-		} else if (status === 'unauthenticated') {
-			router.back();
-		}
-	}, [session, status, router]);
+    
 
     const handleHeartClick = (workout: Workout) => {
         setSelectedWorkout(workout);
@@ -49,14 +37,10 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
 
     const handleConfirm = async () => {
         if (selectedWorkout) {
-            try {
-                await deleteWorkout(userId, selectedWorkout._id, session?.user?.token);
-                setSavedWorkouts(prevWorkouts => prevWorkouts.filter(workout => workout._id !== selectedWorkout._id));
-                setModalOpen(false);
-                setSelectedWorkout(null);
-            } catch (error) {
-                console.error('Error removing workout from saved list:', error);
-            }
+            await deleteWorkout(selectedWorkout._id);
+            setSavedWorkouts(prevWorkouts => prevWorkouts.filter(workout => workout._id !== selectedWorkout._id));
+            setModalOpen(false);
+            setSelectedWorkout(null);
         } else {
             setModalOpen(false);
             setSelectedWorkout(null);

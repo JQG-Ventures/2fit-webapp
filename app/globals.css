@@ -1,7 +1,11 @@
+@import 'swiper/css';
+@import 'swiper/css/pagination';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 @tailwind utilities;
+
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -17,8 +21,12 @@
   }
 }
 
+nav {
+  z-index: 999;
+}
+
+
 body {
-  color: rgb(var(--foreground-rgb));
   /* background: linear-gradient(
       to bottom,
       transparent,
@@ -50,10 +58,6 @@ body.fade {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-nav {
-  z-index: 1000;
 }
 
 @media (min-width: 1224px) {
@@ -100,4 +104,10 @@ nav {
 	to {
 		transform: rotate(360deg);
 	}
+}
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
 }

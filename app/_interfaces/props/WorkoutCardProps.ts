@@ -4,4 +4,5 @@ interface WorkoutCardProps {
     image: string;
     exercises?: string;
     startText?: string;
+    workoutId: string;
 }

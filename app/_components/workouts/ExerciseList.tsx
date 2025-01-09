@@ -21,9 +21,9 @@ const ExerciseList: React.FC<{exercises: Exercise[], isMobile: boolean}> = ({ ex
                             /> 
                         </div>
                         <div className="w-[70%] text-left ml-6">
-                            <h3 className="text-black text-4xl font-semibold mb-8">{exercise.name}</h3>
+                            <h3 className="text-black text-4xl font-semibold mb-8 mt-4">{exercise.name}</h3>
                             <p className="text-gray-700">{exercise.sets} sets x {exercise.reps} reps</p>
-                            <p className="text-gray-500">{t("workouts.plan.rest")}: {exercise.rest_seconds} {t("workouts.plan.secs")}</p>
+                            <p className="text-gray-500 mb-4">{t("workouts.plan.rest")}: {exercise.rest_seconds} {t("workouts.plan.secs")}</p>
                         </div>
                     </div>
                 ))}
