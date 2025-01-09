@@ -10,16 +10,16 @@ export async function middleware(req: NextRequest) {
     const publicRoutes = ['/login', '/register'];
     const isRootRoute = pathname === '/';
     const isPublicRoute = isRootRoute || publicRoutes.some((route) => pathname.startsWith(route));
-    const isAuthenticated = Boolean(token);
+    const isNotAuthenticated = Boolean(!token?.accessToken);
 
-    if (!isAuthenticated) {
+    if (isNotAuthenticated) {
         if (isPublicRoute) {
             return NextResponse.next();
         }
         return NextResponse.redirect(new URL('/', req.url));
     }
 
-    if (isAuthenticated && isPublicRoute) {
+    if (!isNotAuthenticated && isPublicRoute) {
         return NextResponse.redirect(new URL('/home', req.url));
     }
 

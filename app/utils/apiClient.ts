@@ -1,27 +1,30 @@
 import { useQuery, useMutation, QueryKey, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
 import axiosInstance from '../utils/axiosInstance';
+import { AxiosError } from 'axios';
 
-interface UseApiGetOptions<T> extends Omit<UseQueryOptions<T, Error, T, any>, 'queryKey' | 'queryFn'> {
-	axiosConfig?: Record<string, any>;
+interface UseApiGetOptions<T> extends Omit<
+  UseQueryOptions<T, AxiosError, T, QueryKey>,
+  'queryKey' | 'queryFn'
+> {
+  axiosConfig?: Record<string, any>;
 }
 
-// Generic GET Hook
-export const useApiGet = <T>(
-	key: string[],
-	url: string,
-	options?: UseApiGetOptions<T>
-) => {
-	const { axiosConfig, ...queryOptions } = options || {};
-
-	return useQuery<T, Error>({
-		queryKey: key,
-		queryFn: async () => {
-			const { data } = await axiosInstance.get<T>(url, axiosConfig);
-			return data;
-		},
-		...queryOptions,
-	});
-};
+export function useApiGet<T>(
+  key: string[],
+  url: string,
+  options?: UseApiGetOptions<T>
+) {
+  const { axiosConfig, ...queryOptions } = options || {};
+  
+  return useQuery<T, AxiosError>({
+    queryKey: key,
+    queryFn: async () => {
+      const response = await axiosInstance.get<T>(url, axiosConfig);
+      return response.data;
+    },
+    ...queryOptions,
+  });
+}
 
 export const useApiPost = <
   TData extends { body?: any; queryParams?: Record<string, string | number> },
