@@ -12,16 +12,12 @@ type LoadingContextType = {
 const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 
 export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [isLoading, setLoadingState] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
     const setLoading = (loading: boolean) => {
-        try {
-            setLoadingState(loading);
-        } catch (error) {
-            console.error("Error in LoadingProvider:", error);
-        }
-    };
+        setIsLoading(loading);
+      };
 
     const navigateWithLoading = (path: string) => {
         setLoading(true);

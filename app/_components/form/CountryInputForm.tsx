@@ -4,7 +4,7 @@ import { IoGlobeOutline } from 'react-icons/io5';
 interface CountryInputFormProps {
     selectedCountry: string;
     onChange: (country: string) => void;
-    countryList: { name: string; code: string; flag: string }[]; // Add "flag"
+    countryList: { name: string; code: string; flag: string }[];
 }
 
 const CountryInputForm: React.FC<CountryInputFormProps> = ({ selectedCountry, onChange, countryList }) => {
@@ -13,7 +13,10 @@ const CountryInputForm: React.FC<CountryInputFormProps> = ({ selectedCountry, on
     const [showDropdown, setShowDropdown] = useState(false);
 
     useEffect(() => {
-        // Filter the country list dynamically
+        setInputValue(selectedCountry);
+    }, [selectedCountry]);
+
+    useEffect(() => {
         const filtered = countryList.filter((country) =>
             country.name.toLowerCase().includes(inputValue.toLowerCase())
         );
@@ -23,7 +26,7 @@ const CountryInputForm: React.FC<CountryInputFormProps> = ({ selectedCountry, on
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setInputValue(value);
-        onChange(''); // Clear selection when typing
+        onChange('');
     };
 
     const handleCountrySelect = (country: string) => {
@@ -33,7 +36,6 @@ const CountryInputForm: React.FC<CountryInputFormProps> = ({ selectedCountry, on
     };
 
     const handleDropdownClick = () => {
-        // Restore full list and show dropdown
         setFilteredCountries(countryList);
         setShowDropdown(true);
     };
@@ -48,7 +50,6 @@ const CountryInputForm: React.FC<CountryInputFormProps> = ({ selectedCountry, on
 
     return (
         <div className="relative w-full">
-            {/* Input and Globe Icon */}
             <div className="flex items-center rounded-md p-2 bg-gray-200 text-gray-700 py-6">
                 <IoGlobeOutline
                     className="mx-2 text-gray-500 cursor-pointer"
@@ -69,7 +70,6 @@ const CountryInputForm: React.FC<CountryInputFormProps> = ({ selectedCountry, on
                 )}
             </div>
 
-            {/* Dropdown List */}
             {showDropdown && (
                 <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-y-auto shadow-lg">
                     {filteredCountries.map((country) => (
@@ -78,8 +78,7 @@ const CountryInputForm: React.FC<CountryInputFormProps> = ({ selectedCountry, on
                             onClick={() => handleCountrySelect(country.name)}
                             className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
                         >
-                            {/* Flag and Country Name */}
-                            <img src={country.flag} alt={country.name} className='w-6 h-4 mr-2 rounded-sm'/>
+                            <img src={country.flag} alt={country.name} className='w-6 h-4 mr-2 rounded-sm' />
                             <span className="text-gray-700">{country.name}</span>
                         </li>
                     ))}

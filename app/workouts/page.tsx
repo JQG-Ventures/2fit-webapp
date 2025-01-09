@@ -32,8 +32,6 @@ export default function Workouts() {
 	const { data: popularWorkoutResponse, isLoading: loadingPopularWorkouts, isError: errorPopularWorkouts } =
 		useApiGet<{ status: string; message: any[] }>(['popularWorkouts'], getPopularWorkoutsUrl);
 
-	console.log("debug this", popularWorkoutResponse)
-
 	const [progressData, setProgressData] = useState<any[]>([]);
 	const [loadingProgressData, setLoadingProgressData] = useState(true);
 	const [errorProgressData, setErrorProgressData] = useState<string | null>(null);
@@ -43,7 +41,6 @@ export default function Workouts() {
 		if (sessionLoading || loadingActivePlans || loadingProgressData || loadingPopularWorkouts) {
 			setLoading(true);
 		} else {
-			console.log("stopped", loadingPopularWorkouts)
 			setLoading(false);
 		}
 	}, [sessionLoading, loadingActivePlans, loadingProgressData, setLoading])
