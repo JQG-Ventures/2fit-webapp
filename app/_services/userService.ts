@@ -72,3 +72,40 @@ export const useSendMessage = (userPhoneNumber: string) => {
 	  { message: string; response: string }
 	>('/api/chat', undefined, { 'User-Phone-Number': userPhoneNumber });
   };
+
+  export const updateUserCredentials = async (
+	userId: string,
+	email: string,
+	password: string,
+	token: string,
+  ) => {
+	try {
+	  const body = JSON.stringify({
+		email,
+		password,
+	  });
+  
+	  const res = await fetch(
+		`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}/credentials`,
+		{
+		  method: 'PUT',
+		  headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${token}`,
+		  },
+		  body,
+		}
+	  );
+  
+	  if (!res.ok) {
+		const errorData = await res.json();
+		throw new Error(errorData.message || 'Error updating user credentials.');
+	  }
+  
+	  const data = await res.json();
+	  return data;
+	} catch (error) {
+	  throw error;
+	}
+  };
+
