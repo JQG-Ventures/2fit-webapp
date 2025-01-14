@@ -140,7 +140,7 @@ export default function Workouts() {
 										<div className="animate-spin rounded-full h-10 w-10 border-t-4 border-green-500"></div>
 									</div>
 								) : (
-									<ProgressBar percentage={plan.progressData?.progress || 0} />
+									<ProgressBar percentage={Number(Math.round(plan.progressData?.progress)) || 0} />
 								)}
 							</div>
 						</div>

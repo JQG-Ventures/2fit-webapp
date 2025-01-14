@@ -9,7 +9,10 @@ import Modal from '../../_components/profile/modal';
 import InputWithIcon from '../../_components/form/InputWithIcon';
 import SelectInput from '../../_components/form/SelectInput';
 import LoadingScreen from '../../_components/animations/LoadingScreen';
-import PhoneInput from '../../_components/form/PhoneInput';
+
+
+import 'react-phone-input-2/lib/bootstrap.css'
+import PhoneInput from 'react-phone-input-2';
 import countries from '@/app/data/countries.json';
 import countryCodes from '@/app/data/countryCodes.json';
 import { useApiGet } from '@/app/utils/apiClient';
@@ -98,16 +101,30 @@ const EditProfile: React.FC = () => {
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
 	) => {
 		const { name, value } = e.target;
-		if (name === 'countryCode') {
-			setCountryCode(value.replace('+', ''));
-		} else if (name === 'number') {
-			setPhoneNumber(value);
-		} else if (profileData) {
+		if (profileData) {
 			setProfileData((prevData) => ({
 				...prevData!,
 				[name]: value,
 			}));
 		}
+	};
+
+	const handlePhoneChange = (value: string, data: any) => {
+		let phoneCode = data.dialCode;
+		let number;
+		if (value.startsWith(`${data.dialCode}`)) {
+			number =  value.replace(phoneCode, '').trim()
+		} else {
+			number = value;
+		}
+	
+		if (phoneCode !== countryCode) {
+			setPhoneNumber('');
+		} else {
+			setPhoneNumber(number);
+		}
+	
+		setCountryCode(phoneCode);
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -124,7 +141,7 @@ const EditProfile: React.FC = () => {
 		};
 		await handleEditProfile(updatedProfile);
 		setIsSubmitting(false);
-	}
+	};
 
 	if (loadingProfile) return <LoadingScreen />;
 	if (errorMessage) {
@@ -194,7 +211,7 @@ const EditProfile: React.FC = () => {
 									value={
 										profileData?.birthdate
 											? new Date(profileData?.birthdate).toISOString().split('T')[0]
-											: ''
+										: ''
 									}
 									onChange={handleInputChange}
 									icon={field.icon}
@@ -216,11 +233,11 @@ const EditProfile: React.FC = () => {
 						}
 					})}
 					<PhoneInput
-						label="Phone Number"
-						countryCode={`+${countryCode}`}
-						phoneNumber={phoneNumber}
-						onChange={handleInputChange}
-						countryCodes={countryCodes}
+						country={'us'}
+						value={`+${countryCode}${phoneNumber}`}
+						onChange={handlePhoneChange}
+						inputClass="!w-full !py-6 !border-none !bg-gray-200 !rounded-md cursor-pointer"
+						
 					/>
 				</div>
 				<div className="h-[10%] flex flex-col w-full max-w-xl">
