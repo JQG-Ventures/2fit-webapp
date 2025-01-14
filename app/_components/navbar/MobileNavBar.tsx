@@ -19,7 +19,7 @@ type MobileNavBarProps = {
 
 const MobileNavBar: React.FC<MobileNavBarProps> = ({ navItems, selectedPath, onNavClick }) => {
     const pathname = usePathname();
-    const hideMobileNavBarPaths = ['/workouts/plan', '/workouts/countdown', '/profile/edit'];
+    const hideMobileNavBarPaths = ['/workouts/plan', '/workouts/my-plan', '/workouts/countdown', '/profile/edit'];
     const [previousPath, setPreviousPath] = useState<string>(pathname);
 
     const getAnimationClasses = (isActive: boolean, itemIndex: number) => {
