@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa';
 import ToggleButton from '../../_components/profile/togglebutton';
 import Modal from '../../_components/profile/modal';
 import LoadingScreen from '../../_components/animations/LoadingScreen';
-import { useSessionContext } from '../../_providers/SessionProvider';
-import { useFetch } from '../../_hooks/useFetch';
-import { useUpdateProfile } from '../../_hooks/useUpdateProfile';
+import { useApiGet } from '../../utils/apiClient';
 import { useTranslation } from 'react-i18next';
+import { useLoading } from '../../_providers/LoadingProvider';
+import { useUpdateProfile } from '../../_services/userService';
 
 interface NotificationItemProps {
   label: string;
@@ -28,77 +28,78 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ label, isOn, onTogg
 
 const Notification: React.FC = () => {
   const router = useRouter();
-  const { userId, token, loading: sessionLoading } = useSessionContext();
-  const getOptions = useMemo(() => ({ method: 'GET' }), []);
   const { t } = useTranslation('global');
+  const { setLoading } = useLoading();
 
-  const { data: userData, loading, error } = useFetch(
-    userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}` : '',
-    getOptions
-  );
-  const { updateProfile } = useUpdateProfile();
+  const getProfileUrl = '/api/users/profile';
+  const { data: userData, isLoading, isError } = useApiGet<{ status: string; message: any }>([], getProfileUrl);
+
+  const updateNotifications = useUpdateProfile();
 
   const [notifications, setNotifications] = useState({
     general: false,
     updates: false,
     services: false,
-    tips: false
+    tips: false,
   });
 
-  const [errorMessage, setErrorMessage] = useState<React.ReactNode | null>(null);
-  const [successMessage, setSuccessMessage] = useState<React.ReactNode | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (userData?.settings?.notifications) {
-
+    setLoading(isLoading);
+    if (userData?.message?.settings?.notifications) {
       setNotifications({
-        general: userData.settings.notifications.general,
-        updates: userData.settings.notifications.updates,
-        services: userData.settings.notifications.services,
-        tips: userData.settings.notifications.tips
+        general: userData.message.settings.notifications.general,
+        updates: userData.message.settings.notifications.updates,
+        services: userData.message.settings.notifications.services,
+        tips: userData.message.settings.notifications.tips,
       });
     }
-  }, [userData]);
+  }, [isLoading, setLoading, userData]);
 
   const handleToggle = async (type: keyof typeof notifications) => {
-    const newStatus = !notifications[type];
+    const previousState = notifications[type];
+    const newStatus = !previousState;
     const updatedNotifications = { ...notifications, [type]: newStatus };
+  
     setNotifications(updatedNotifications);
-
+  
     try {
       const updatedProfile = {
         settings: {
           notifications: {
-            general: updatedNotifications.general,
-            updates: updatedNotifications.updates,
-            services: updatedNotifications.services,
-            tips: updatedNotifications.tips,
-            bot: true,    
-            reminders: true,  
+            ...updatedNotifications,
           },
-          nutrition_enabled: userData.settings.nutrition_enabled,
-          language_preference: userData.settings.language_preference,
+          nutrition_enabled: userData.message.settings.nutrition_enabled,
+          language_preference: userData.message.settings.language_preference,
         },
       };
-      await updateProfile(userId, updatedProfile, token);
-    } catch {
-      setErrorMessage(`Hubo un error al actualizar la configuración de notificaciones de ${type}.`);
+  
+      const response = await updateNotifications.mutateAsync(updatedProfile);
+  
+      setSuccessMessage(t('profile.Notifications.SuccessMessage'));
+    } catch (error) {
+  
+      setNotifications({ ...notifications, [type]: previousState });
+      setErrorMessage(t('profile.Notifications.ErrorMessage'));
     }
   };
+  
 
-  if (loading || sessionLoading) return <LoadingScreen />;
-  if (error) {
+  if (isLoading) return <LoadingScreen />;
+  if (isError) {
     return (
       <Modal
         title="Error"
-        message={error}
+        message={t('profile.Notifications.FetchError')}
         onClose={() => router.push('/home')}
       />
     );
   }
 
   const notificationItems = [
-    { label: t('profile.Notifications.GeneralNotifications'), key: 'general' },      
+    { label: t('profile.Notifications.GeneralNotifications'), key: 'general' },
     { label: t('profile.Notifications.AppUpdates'), key: 'updates' },
     { label: t('profile.Notifications.NewServicesAvailable'), key: 'services' },
     { label: t('profile.Notifications.NewTipsAvailable'), key: 'tips' },
@@ -106,18 +107,9 @@ const Notification: React.FC = () => {
 
   return (
     <div className="flex flex-col justify-between items-center bg-white h-screen p-14 lg:pt-[10vh]">
-      {errorMessage && (
-        <Modal
-          message={errorMessage}
-          onClose={() => setErrorMessage(null)}
-        />
-      )}
-      {successMessage && (
-        <Modal
-          message={successMessage}
-          onClose={() => setSuccessMessage(null)}
-        />
-      )}
+      {errorMessage && <Modal message={errorMessage} onClose={() => setErrorMessage(null)} />}
+      {successMessage && <Modal message={successMessage} onClose={() => setSuccessMessage(null)} />}
+
       <div className="h-[12%] flex flex-row justify-left space-x-8 items-center w-full lg:max-w-3xl">
         <button onClick={() => router.back()} className="text-gray-700">
           <FaArrowLeft className="w-8 h-8" />
@@ -125,9 +117,7 @@ const Notification: React.FC = () => {
         <h1 className="text-5xl font-semibold">{t('profile.Notifications.Title')}</h1>
       </div>
 
-      <div
-        className="h-[88%] flex flex-col justify-start py-6 w-full max-w-3xl space-y-8 overflow-y-auto"
-      >
+      <div className="h-[88%] flex flex-col justify-start py-6 w-full max-w-3xl space-y-8 overflow-y-auto">
         {notificationItems.map((item) => (
           <NotificationItem
             key={item.key}

@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import ToggleButton from '../../_components/profile/togglebutton';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa';
 import { MdKeyboardArrowRight } from 'react-icons/md';
-import { useSessionContext } from '../../_providers/SessionProvider';
-import { useFetch } from '../../_hooks/useFetch';
+import { useApiGet } from '../../utils/apiClient';
 import { useTranslation } from 'react-i18next';
 import ChangePasswordModal from '../../_components/profile/ChangePasswordModal';
-import { updateUserCredentials } from '../../_services/userService'; 
-import LoadingScreen from '../../_components/animations/LoadingScreen';
 import Modal from '../../_components/profile/modal';
+import LoadingScreen from '../../_components/animations/LoadingScreen';
+import { useLoading } from '../../_providers/LoadingProvider';
+import { useResetPassword } from '../../_services/userService';
 
 interface SecurityItemProps {
   label: string;
@@ -35,55 +35,49 @@ const SecurityItem: React.FC<SecurityItemProps> = ({ label, hasArrow = false, is
 
 const Security: React.FC = () => {
   const router = useRouter();
-  const { userId, token, loading: sessionLoading } = useSessionContext();
-  const getOptions = useMemo(
-    () => ({
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }),
-    [token]
-  );
-  const { t } = useTranslation('global');
+	const { t } = useTranslation('global');
+	const { setLoading } = useLoading();
 
-  const { data: userData, loading, error } = useFetch(
-    userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}` : '',
-    getOptions
-  );
+	const resetPassword = useResetPassword();
 
-  const [securitySettings, setSecuritySettings] = useState({
-    faceID: false,
-    rememberMe: false,
-    touchID: false,
-  });
+	const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
+	const { data: userData, isLoading, isError } = useApiGet<{ status: string; message: any }>([], getProfileUrl);
 
-  const [errorMessage, setErrorMessage] = useState<React.ReactNode | null>(null);
-  const [successMessage, setSuccessMessage] = useState<React.ReactNode | null>(null);
-  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
-  const [passwordUpdateError, setPasswordUpdateError] = useState('');
+	const [securitySettings, setSecuritySettings] = useState({
+		faceID: false,
+		rememberMe: false,
+		touchID: false,
+	});
 
-  useEffect(() => {
-    if (userData?.settings?.security) {
-      setSecuritySettings({
-        faceID: userData.settings.security.faceID,
-        rememberMe: userData.settings.security.rememberMe,
-        touchID: userData.settings.security.touchID,
-      });
-    }
-  }, [userData]);
+	const [errorMessage, setErrorMessage] = useState<React.ReactNode | null>(null);
+	const [successMessage, setSuccessMessage] = useState<React.ReactNode | null>(null);
+	const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+	const [passwordUpdateError, setPasswordUpdateError] = useState('');
 
-  const handleToggle = (type: keyof typeof securitySettings) => {
-    const newStatus = !securitySettings[type];
-    const updatedSecuritySettings = { ...securitySettings, [type]: newStatus };
-    setSecuritySettings(updatedSecuritySettings);
-  };
+	useEffect(() => {
+		setLoading(isLoading);
+		if (userData?.message?.settings?.security) {
+			setSecuritySettings({
+				faceID: userData.message.settings.security.faceID,
+				rememberMe: userData.message.settings.security.rememberMe,
+				touchID: userData.message.settings.security.touchID,
+			});
+		}
+	}, [isLoading, setLoading, userData]);
 
   const handlePasswordChangeSubmit = async (newPassword: string) => {
     try {
-      const email = userData.email;
-      await updateUserCredentials(userId, email, newPassword, token);
-      setSuccessMessage(t('profile.Security.Successfullchangepswd'));
+      const email = userData?.message?.email;
+  
+      if (!email) {
+        throw new Error('User data is incomplete');
+      }
+      const response = await resetPassword.mutateAsync({
+        email,
+        password: newPassword,
+      });
+  
+      setSuccessMessage(response.message);
       setIsChangePasswordModalOpen(false);
     } catch (error) {
       setPasswordUpdateError(t('profile.Security.Failedchangepswd'));
@@ -91,12 +85,12 @@ const Security: React.FC = () => {
   };
   
 
-  if (loading || sessionLoading) return <LoadingScreen />;
-  if (error) {
+  if (isLoading) return <LoadingScreen />;
+  if (isError) {
     return (
       <Modal
         title="Error"
-        message={error}
+        message={t('profile.errorFetching')}
         onClose={() => router.push('/home')}
       />
     );
@@ -112,10 +106,10 @@ const Security: React.FC = () => {
   return (
     <div className="flex flex-col justify-between items-center bg-white h-screen p-14 lg:pt-[10vh]">
       {errorMessage && (
-        <Modal message={errorMessage} onClose={() => setErrorMessage(null)} />
+        <Modal message={t('profile.Security.Failedchangepswd')} onClose={() => setErrorMessage(null)} />
       )}
       {successMessage && (
-        <Modal message={successMessage} onClose={() => setSuccessMessage(null)} />
+        <Modal message={t('profile.Security.Successfullchangepswd')} onClose={() => setSuccessMessage(null)} />
       )}
 
       <div className="h-[12%] flex flex-row justify-left space-x-8 items-center w-full lg:max-w-3xl">
