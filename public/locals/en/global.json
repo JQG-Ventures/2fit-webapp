@@ -186,6 +186,25 @@
 			"updateText": "Update",
 			"success": "Edit sucessfully updated!",
 			"error": "There was a problem updating the profile."
+		},
+		"Security": {
+			"Title" : "Security",
+			"FaceID": "Face ID",
+			"RememberMe": "Remember me",
+			"TouchID": "Touch ID",
+			"GoogleAuthenticator" : "Google Authenticator",
+			"ChangePassword" : "Change Password",
+			"Successfullchangepswd" : "Password has been successfully changed",
+			"Failedchangepswd" : "Something failed, please try again."
+		},
+		"Notifications": {
+			"Title" : "Notifications",
+			"GeneralNotifications": "General Notifications",
+			"AppUpdates": "Updates",
+			"NewServicesAvailable": "New Services Available",
+			"NewTipsAvailable" : "New Tips Available",
+			"SuccessMessage" : "Ypur option was successfully changed.",
+			"ErrorMessage" : "There was an error, please try again."
 		}
 	},
 	"upgrade": {
@@ -322,5 +341,12 @@
             },
     "note": "Pay once, cancel any time.",
     "subscribeButton": "Subscribe"
-  }
+  },
+  "ChangePasswordModal": {
+		"title": "Change Password",
+		"newPassword": "New Password",
+		"confirmPassword": "Confirm Password:",
+		"cancel": "Cancel",
+		"update": "Update"
+	}
 }

@@ -105,7 +105,7 @@ const ProfilePage: React.FC = () => {
 			</div>
 			<div className="h-[12%] w-full lg:max-w-6xl bg-gradient-to-r from-green-400 to-green-700 flex flex-col justify-center text-white rounded-[25px] px-8 shadow-lg w-fullcursor-pointer"
 				onClick={() => setShowPremium(true)} >
-z				<div className="flex flex-row items-center justify-between">
+				<div className="flex flex-row items-center justify-between">
 					<div className="flex justify-left space-x-6 w-[80%] items-center pb-4">
 						<span className="bg-gradient-to-b from-yellow-300 to-yellow-700 text-white rounded-full px-4 py-2 text-2xl">
 							PRO
