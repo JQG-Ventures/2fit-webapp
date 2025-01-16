@@ -186,25 +186,6 @@
 			"updateText": "Update",
 			"success": "Edit sucessfully updated!",
 			"error": "There was a problem updating the profile."
-		},
-		"Security": {
-			"Title" : "Security",
-			"FaceID": "Face ID",
-			"RememberMe": "Remember me",
-			"TouchID": "Touch ID",
-			"GoogleAuthenticator" : "Google Authenticator",
-			"ChangePassword" : "Change Password",
-			"Successfullchangepswd" : "Password has been successfully changed",
-			"Failedchangepswd" : "Something failed, please try again."
-		},
-		"Notifications": {
-			"Title" : "Notifications",
-			"GeneralNotifications": "General Notifications",
-			"AppUpdates": "Updates",
-			"NewServicesAvailable": "New Services Available",
-			"NewTipsAvailable" : "New Tips Available",
-			"SuccessMessage" : "Ypur option was successfully changed.",
-			"ErrorMessage" : "There was an error, please try again."
 		}
 	},
 	"upgrade": {
@@ -320,33 +301,5 @@
 		"rest": "Take a rest",
 		"nextEx": "Next Exercise",
 		"skip": "Skip rest"
-	},
-    "BePremium": {
-    "title": "Be Premium",
-    "subtitle": "Get Unlimited Access",
-    "description": "Enjoy workout access without ads and restrictions.",
-            "plans": {
-                "1": {
-                    "name": "1 Month",
-                    "price": "$16.99/m"
-                },
-                "2": {
-                    "name": "6 Months",
-                    "price": "$66.99/m"
-                },
-                "3": {
-                    "name": "12 Months",
-                    "price": "$116.99/m"
-                }
-            },
-    "note": "Pay once, cancel any time.",
-    "subscribeButton": "Subscribe"
-  },
-  "ChangePasswordModal": {
-		"title": "Change Password",
-		"newPassword": "New Password",
-		"confirmPassword": "Confirm Password:",
-		"cancel": "Cancel",
-		"update": "Update"
 	}
 }

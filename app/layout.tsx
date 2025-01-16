@@ -18,6 +18,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 const LayoutContent = ({ children }: { children: ReactNode }) => {
 	const { isLoading } = useLoading();
+		
 	return (
 		<>
 			<NavBar />

@@ -59,7 +59,7 @@ const ExerciseDetailsModal: React.FC<ExerciseDetailsModalProp> = ({ exercise, on
 					</div>
 				</div>
 				<button
-					className="absolute top-2 right-2 text-gray-700"
+					className="absolute top-2 right-2 mt-2 mr-4 text-gray-200"
 					onClick={onClose}
 				>
 					✕

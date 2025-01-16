@@ -32,11 +32,11 @@ const HomePage: React.FC = () => {
     const savedWorkoutPlansUrl = `/api/workouts/saved`;
     const libraryWorkoutCountUrl = `/api/workouts/library`;
 
-    const { data: workoutPlans, isLoading: loadingWorkoutPlans, isError: workoutPlansError } =
+    const { data: workoutPlans, error: errorWorkoutPlans, isLoading: loadingWorkoutPlans, isError: workoutPlansError } =
         useApiGet<{ status: string; message: [] }>(['workoutPlans'], workoutPlansUrl, { enabled: !sessionLoading });
-    const { data: savedWorkoutPlans, isLoading: loadingSavedWorkoutPlans, isError: savedWorkoutPlansError } =
+    const { data: savedWorkoutPlans, error: errorSavedPlans, isLoading: loadingSavedWorkoutPlans, isError: savedWorkoutPlansError } =
         useApiGet<{ status: string; message: [] }>(['savedWorkoutPlans'], savedWorkoutPlansUrl, { enabled: !!userId && !sessionLoading });
-    const { data: libraryWorkouts, isLoading: loadingLibraryWorkouts, isError: libraryWorkoutsError } =
+    const { data: libraryWorkouts, error: errorLibraryWorkouts, isLoading: loadingLibraryWorkouts, isError: libraryWorkoutsError } =
         useApiGet<{ status: string; message: [] }>(['libraryWorkouts'], libraryWorkoutCountUrl, { enabled: !sessionLoading });
 
     let isLoading = loadingWorkoutPlans || loadingSavedWorkoutPlans || loadingLibraryWorkouts;
@@ -53,9 +53,7 @@ const HomePage: React.FC = () => {
         deleteSavedWorkout(
             { queryParams: { workout_id: id } },
             {
-                onSuccess: (data) => {
-                    console.log(data);
-                },
+                onSuccess: () => { },
                 onError: (error) => {
                     console.log(error);
                 }
@@ -67,10 +65,14 @@ const HomePage: React.FC = () => {
     // const { data: guidedWorkouts, loading: loadingGuidedWorkouts, error: guidedWorkoutsError } = useFetch(guidedWorkoutsUrl, options);
 
     const error = workoutPlansError || savedWorkoutPlansError || libraryWorkoutsError;
+    const detailedError = errorWorkoutPlans || errorSavedPlans || errorLibraryWorkouts;
 
     const paddingBottom = isDesktopOrLaptop ? 0 : 100 * 1.1;
 
     if (error) {
+        if (detailedError!.response?.status === 401 || detailedError!.response?.status === 403) {
+            return null;
+        }
         return (
             <div className="flex justify-center items-center h-48">
                 <p>Error: {t("home.error")}</p>
