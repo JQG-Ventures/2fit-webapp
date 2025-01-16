@@ -9,7 +9,6 @@ import ToggleButton from '../_components/profile/togglebutton';
 import { MdModeEditOutline } from 'react-icons/md';
 import { BsMoon } from 'react-icons/bs';
 import Modal from '../_components/profile/modal';
-import LoadingScreen from '../_components/animations/LoadingScreen';
 import SettingItem from '../_components/others/SettingItem';
 import { CiUser, CiBellOn, CiLock, CiCircleQuestion } from 'react-icons/ci';
 import { useApiGet } from '../utils/apiClient';

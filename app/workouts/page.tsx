@@ -32,8 +32,6 @@ export default function Workouts() {
 	const { data: popularWorkoutResponse, isLoading: loadingPopularWorkouts, isError: errorPopularWorkouts } =
 		useApiGet<{ status: string; message: any[] }>(['popularWorkouts'], getPopularWorkoutsUrl);
 
-	console.log("debug this", popularWorkoutResponse)
-
 	const [progressData, setProgressData] = useState<any[]>([]);
 	const [loadingProgressData, setLoadingProgressData] = useState(true);
 	const [errorProgressData, setErrorProgressData] = useState<string | null>(null);
@@ -43,7 +41,6 @@ export default function Workouts() {
 		if (sessionLoading || loadingActivePlans || loadingProgressData || loadingPopularWorkouts) {
 			setLoading(true);
 		} else {
-			console.log("stopped", loadingPopularWorkouts)
 			setLoading(false);
 		}
 	}, [sessionLoading, loadingActivePlans, loadingProgressData, setLoading])
@@ -143,7 +140,7 @@ export default function Workouts() {
 										<div className="animate-spin rounded-full h-10 w-10 border-t-4 border-green-500"></div>
 									</div>
 								) : (
-									<ProgressBar percentage={plan.progressData?.progress || 0} />
+									<ProgressBar percentage={Number(Math.round(plan.progressData?.progress)) || 0} />
 								)}
 							</div>
 						</div>

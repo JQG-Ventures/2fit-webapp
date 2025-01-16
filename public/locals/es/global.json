@@ -196,25 +196,6 @@
 			"updateText": "Actualizar",
 			"success": "Perfil actualizado correctamente!",
 			"error": "Hubo un error actualizando el perfil."
-		},
-		"Security": {
-			"Title" : "Seguridad",
-			"FaceID": "Face ID",
-			"RememberMe": "Recuerdame",
-			"TouchID": "Touch ID",
-			"GoogleAuthenticator" : "Autenticador de google",
-			"ChangePassword" : "Cambiar contraseña",
-			"Successfullchangepswd" : "La contraseña se cambió correctamente",
-			"Failedchangepswd" : "Algo falló, por favor intentelo de nuevo."
-		},
-		"Notifications": {
-			"Title" : "Notificaciones",
-			"GeneralNotifications": "Notificaciones Generales",
-			"AppUpdates": "Actualizaciones",
-			"NewServicesAvailable": "Nuevos Servicios Disponibles",
-			"NewTipsAvailable" : "Nuevos Consejos Disponibles",
-			"SuccessMessage" : "Se cambio su opción con éxito.",
-			"ErrorMessage" : "Hubo un error, por favor intentalo de nuevo."
 		}
 	},
 	"upgrade": {
@@ -330,33 +311,5 @@
 		"rest": "Tómate un descanso",
 		"nextEx": "Siguiente Ejercicio",
 		"skip": "Saltar descanso"
-	},
-  "BePremium": {
-  "title": "Sé Premium.",
-        "subtitle": "Obtén Acceso Ilimitado.",
-        "description": "Disfruta de acceso a entrenamientos sin anuncios ni restricciones.",
-        "plans": {
-            "1": {
-                "name": "1 Mes.",
-                "price": "$16.99/m"
-            },
-            "2": {
-                "name": "6 Meses.",
-                "price": "$66.99/m"
-            },
-            "3": {
-                "name": "12 Meses.",
-                "price": "$116.99/m"
-            }
-        },
-        "note": "Paga una vez, cancela cuando quieras.",
-        "subscribeButton": "Suscribirse."
-  },
-  "ChangePasswordModal": {
-		"title": "Cambiar contraseña",
-		"newPassword": "Nueva contraseña",
-		"confirmPassword": "Confirmar contraseña:",
-		"cancel": "Cancelar",
-		"update": "Actualizar"
 	}
 }

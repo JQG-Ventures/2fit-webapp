@@ -1,8 +1,10 @@
 // @ts-nocheck
-import type { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { signOut } from "next-auth/react";
+import { NextResponse } from 'next/server';
+import { logout } from "../utils/sessionUtils";
 
-export async function refreshAccessToken(token: any) {
+async function refreshAccessToken(token) {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/refresh-token`, {
             method: "POST",
@@ -12,23 +14,28 @@ export async function refreshAccessToken(token: any) {
             },
         });
 
-        const refreshedToken = await response.json();
+        if (!response.ok) {
+            throw new Error('Failed to refresh access token');
+        }
 
-        if (!response.ok) throw refreshedToken;
+        const refreshed = await response.json()
+        const newAccess = refreshed.message.access_token
+        const newExp = refreshed.message.expires_at * 1000
 
         return {
             ...token,
-            accessToken: refreshedToken.message.access_token,
-            exp: Date.now() + refreshedToken.message.expires_at,
-        };
+            accessToken: newAccess,
+            accessTokenExpires: newExp,
+        }
     } catch (error) {
-        return { ...token, error: "Refresh token failed" };
+        return { ...token, error: "RefreshAccessTokenError" };
     }
 }
 
-export const authConfig: NextAuthConfig = {
+export const authConfig = {
     providers: [
         CredentialsProvider({
+            name: 'Credentials',
             credentials: {
                 email: { label: "Email", type: "text" },
                 password: { label: "Password", type: "password" },
@@ -43,23 +50,21 @@ export const authConfig: NextAuthConfig = {
                             password: credentials?.password,
                         }),
                     });
-                    const user = await res.json();
+                    const data = await res.json()
 
-                    if (res.ok && user?.message?.access_token) {
-                        return {
-                            accessToken: user.message.access_token,
-                            refreshToken: user.message.refresh_token,
-                            userId: user.message.user_id,
-                            userName: user.message.name,
-                            expiresAt: Date.now() + user.message.expires_at,
-                        };
-                    } else {
-                        console.error("Authentication failed, response:", user);
-                        return null;
+                    if (!res.ok || !data?.message?.access_token) {
+                        return null
+                    }
+
+                    return {
+                        accessToken: data.message.access_token,
+                        refreshToken: data.message.refresh_token,
+                        userId: data.message.user_id,
+                        userName: data.message.name,
+                        accessTokenExpires: data.message.exp * 1000,
                     }
                 } catch (error) {
-                    console.error("Error in authorize function:", error);
-                    throw new Error("Authentication failed");
+                    throw new Error("LoginRequestError");
                 }
             },
         }),
@@ -67,29 +72,39 @@ export const authConfig: NextAuthConfig = {
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token.accessToken = user.accessToken;
-                token.refreshToken = user.refreshToken;
-                token.exp = user.expiresAt;
-                token.userId = user.userId;
-                token.userName = user.userName;
+                token.accessToken = user.accessToken
+                token.refreshToken = user.refreshToken
+                token.userId = user.userId
+                token.userName = user.userName
+                token.accessTokenExpires = user.accessTokenExpires
             }
 
-            if (Date.now() < token.exp) {
-                return token;
+            if (Date.now() < (token.accessTokenExpires ?? 0)) {
+                return token
             }
-            return refreshAccessToken(token);
+
+            const refreshedToken = await refreshAccessToken(token)
+            if (refreshedToken.error) {
+                return { userId: null, accessToken: null, refreshToken: null };
+            }
+            return refreshedToken
         },
         async session({ session, token }) {
-            if (token) {
-                session.user = {
-                    ...session.user,
-                    token: token.accessToken,
-                    userId: token.userId,
-                    userName: token.userName,
-                };
+            if (token?.error === 'RefreshAccessTokenError') {
+                if (typeof window !== "undefined") {
+                    await logout();
+                }
             }
-            session.refreshToken = token.refreshToken;
-            return session;
+
+            session.user = {
+                ...session.user,
+                userId: token.userId,
+                userName: token.userName,
+                token: token.accessToken,
+            }
+            session.refreshToken = token.refreshToken
+            session.accessTokenExpires = token.accessTokenExpires
+            return session
         },
     },
     secret: process.env.NEXTAUTH_SECRET,

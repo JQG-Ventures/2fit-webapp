@@ -17,7 +17,10 @@ const NavBar: React.FC = () => {
     const [isClient, setIsClient] = useState(false);
     const [selectedPath, setSelectedPath] = useState(pathname);
     const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
-    const showNavBarPaths = ['/home', '/workouts', '/bot', '/profile'];
+    let showNavBarPaths = [];
+
+    if (isDesktopOrLaptop) {showNavBarPaths = ['/home', '/workouts', '/bot', '/profile', '/premium'];}
+    else {showNavBarPaths = ['/home', '/workouts', '/bot', '/profile'];}
     const shouldShowNavBar = showNavBarPaths.some(path => pathname.startsWith(path));
 
     const navItems = [
