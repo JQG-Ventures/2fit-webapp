@@ -279,6 +279,11 @@
     "nextEx": "Siguiente Ejercicio",
     "skip": "Saltar descanso"
   },
+  "SavedWorkoutsSection": {
+		  "SavedWorkoutsSectiontitle": "Mis favoritos",
+		  "SavedWorkoutsSectionNoResults": "No se pudieron recuperar los entrenamientos guardados. Por favor, inténtelo de nuevo más tarde.",
+		  "SavedWorkoutsSectionMinutes": "Minutos"
+  },
   "premium": {
     "premiumTitle1": "2Fit",
     "premiumTitle2": "Pass",
