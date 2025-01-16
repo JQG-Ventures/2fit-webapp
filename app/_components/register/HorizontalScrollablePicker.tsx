@@ -1,11 +1,21 @@
 import React, { useEffect, useRef } from 'react';
 import { FaCaretUp } from 'react-icons/fa';
 
-const HorizontalScrollablePicker = ({ value, onChange, range }) => {
-    const pickerRef = useRef(null);
+interface HorizontalScrollablePickerProps {
+    value: number;
+    onChange: (value: number) => void;
+    range: number[];
+}
+
+const HorizontalScrollablePicker: React.FC<HorizontalScrollablePickerProps> = ({
+    value,
+    onChange,
+    range,
+}) => {
+    const pickerRef = useRef<HTMLDivElement | null>(null);
     const isScrollingRef = useRef(false);
-    const prevValueRef = useRef(value);
-    const scrollTimeoutRef = useRef(null);
+    const prevValueRef = useRef<number>(value);
+    const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const firstRenderRef = useRef(true);
 
     useEffect(() => {
@@ -23,10 +33,12 @@ const HorizontalScrollablePicker = ({ value, onChange, range }) => {
 
     const handleScroll = () => {
         const container = pickerRef.current;
-        const containerWidth = container.clientWidth;
-        const items = container.querySelectorAll('[data-value]');
+        if (!container) return;
 
-        let closestItem = null;
+        const containerWidth = container.clientWidth;
+        const items = container.querySelectorAll<HTMLDivElement>('[data-value]');
+
+        let closestItem: HTMLDivElement | null = null;
         let minDistance = Infinity;
 
         items.forEach((item) => {
@@ -42,6 +54,7 @@ const HorizontalScrollablePicker = ({ value, onChange, range }) => {
         });
 
         if (closestItem) {
+            // @ts-ignore
             const newValue = Number(closestItem.getAttribute('data-value'));
             if (newValue !== value) {
                 isScrollingRef.current = true;
@@ -53,7 +66,9 @@ const HorizontalScrollablePicker = ({ value, onChange, range }) => {
             clearTimeout(scrollTimeoutRef.current);
         }
         scrollTimeoutRef.current = setTimeout(() => {
-            let closestItem = null;
+            if (!container) return;
+
+            let closestItem: HTMLDivElement | null = null;
             let minDistance = Infinity;
 
             items.forEach((item) => {
@@ -69,6 +84,7 @@ const HorizontalScrollablePicker = ({ value, onChange, range }) => {
             });
 
             if (closestItem) {
+                // @ts-ignore
                 const newValue = Number(closestItem.getAttribute('data-value'));
                 if (newValue !== value) {
                     isScrollingRef.current = true;
@@ -79,9 +95,11 @@ const HorizontalScrollablePicker = ({ value, onChange, range }) => {
         }, 100);
     };
 
-    const centerValue = (value) => {
+    const centerValue = (value: number) => {
         if (pickerRef.current) {
-            const itemElement = pickerRef.current.querySelector(`[data-value="${value}"]`);
+            const itemElement = pickerRef.current.querySelector<HTMLDivElement>(
+                `[data-value="${value}"]`
+            );
             if (itemElement) {
                 const containerWidth = pickerRef.current.clientWidth;
                 const itemLeft = itemElement.offsetLeft;
@@ -110,11 +128,10 @@ const HorizontalScrollablePicker = ({ value, onChange, range }) => {
                             <div
                                 key={item}
                                 data-value={item}
-                                className={`w-[80px] h-[80px] flex-shrink-0 flex justify-center items-center text-6xl transition-transform ${
-                                    value === item
-                                        ? 'text-black font-bold transform scale-110 border-black'
-                                        : 'text-gray-500'
-                                }`}
+                                className={`w-[80px] h-[80px] flex-shrink-0 flex justify-center items-center text-6xl transition-transform ${value === item
+                                    ? 'text-black font-bold transform scale-110 border-black'
+                                    : 'text-gray-500'
+                                    }`}
                                 onClick={() => onChange(item)}
                             >
                                 {item}

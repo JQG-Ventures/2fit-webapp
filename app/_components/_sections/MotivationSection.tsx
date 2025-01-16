@@ -5,7 +5,7 @@ import { FaRobot, FaTimes } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 
-// Example motivational messages
+
 const motivationalMessages = [
     "Stay consistent and results will follow!",
     "Every workout is progress, no matter how small.",
@@ -14,9 +14,8 @@ const motivationalMessages = [
     "Stay focused, stay fit!"
 ];
 
-// Helper function to get the message of the day
 const getMotivationalMessage = () => {
-    const dayOfWeek = new Date().getDay(); // Get current day of the week (0 - Sunday, 6 - Saturday)
+    const dayOfWeek = new Date().getDay();
     return motivationalMessages[dayOfWeek % motivationalMessages.length];
 };
 
@@ -28,13 +27,11 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
     const router = useRouter()
 
     useEffect(() => {
-        // Set the daily motivational message based on the day of the week
         const message = getMotivationalMessage();
         setDailyMessage(message);
     }, []);
 
     const handleIconClick = () => {
-        // Toggle visibility on icon click
         setIsVisible(!isVisible);
     };
 

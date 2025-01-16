@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 

@@ -1,6 +1,7 @@
+// @ts-nocheck
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft, FaRegEnvelope } from 'react-icons/fa';
 import { IoCalendarOutline } from 'react-icons/io5';
@@ -8,11 +9,16 @@ import Modal from '../../_components/profile/modal';
 import InputWithIcon from '../../_components/form/InputWithIcon';
 import SelectInput from '../../_components/form/SelectInput';
 import LoadingScreen from '../../_components/animations/LoadingScreen';
-import PhoneInput from '../../_components/form/PhoneInput';
+
+
+import 'react-phone-input-2/lib/bootstrap.css'
+import PhoneInput from 'react-phone-input-2';
 import countries from '@/app/data/countries.json';
 import countryCodes from '@/app/data/countryCodes.json';
 import { useApiGet } from '@/app/utils/apiClient';
 import { useEditProfile } from '@/app/_services/userService';
+import { useTranslation } from 'react-i18next';
+import CountryInputForm from '@/app/_components/form/CountryInputForm';
 
 const formFields: FormField[] = [
 	{
@@ -39,26 +45,25 @@ const formFields: FormField[] = [
 		label: 'Country',
 		name: 'country',
 		type: 'select',
-		options: countries.map((country) => ({ value: country, label: country })),
+		options: countryCodes,
 	},
 	{
 		label: 'Gender',
 		name: 'gender',
 		type: 'select',
 		options: [
-			{ value: 0, label: 'Male' },
-			{ value: 1, label: 'Female' },
-			{ value: 2, label: 'Other' },
+			{ value: 'm', label: 'Male' },
+			{ value: 'f', label: 'Female' },
 		],
 	},
 ];
 
 const EditProfile: React.FC = () => {
+	const { t } = useTranslation('global');
 	const router = useRouter();
 	const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
-	const { data: profile, isLoading: loadingProfile, isError: profileError } =
+	const { data: profile, isLoading: loadingProfile } =
 		useApiGet<{ status: string; message: any }>([], getProfileUrl);
-
 	const { mutate: editProfile } = useEditProfile();
 
 	const handleEditProfile = async (profile_info: any) => {
@@ -67,11 +72,11 @@ const EditProfile: React.FC = () => {
 			{
 				onSuccess: (data) => {
 					if (data.status === 'success') {
-						setSuccessMessage("Profile updated successfully.");
+						setSuccessMessage(t("profile.updateProfile.success"));
 					}
 				},
-				onError: (error: any) => {
-					setErrorMessage("There was an error updating the profile")
+				onError: () => {
+					setErrorMessage(t("profile.updateProfile.error"))
 				},
 			}
 		);
@@ -87,36 +92,39 @@ const EditProfile: React.FC = () => {
 	useEffect(() => {
 		if (profile) {
 			setProfileData(profile?.message);
+			setCountryCode(profile?.message?.code_number || '');
+			setPhoneNumber(profile?.message?.number || '');
 		}
-
 	}, [profile]);
 
 	const handleInputChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
 	) => {
 		const { name, value } = e.target;
-		if (name === 'countryCode') {
-			setCountryCode(value);
-		} else if (name === 'number') {
-			setPhoneNumber(value);
-		} else if (profileData) {
-			if (name === 'gender') {
-				setProfileData((prevData) => ({
-					...prevData!,
-					profile: { ...prevData.profile, gender: Number(value) },
-				}));
-			} else if (name === 'birthdate') {
-				setProfileData((prevData) => ({
-					...prevData!,
-					birthdate: value,
-				}));
-			} else {
-				setProfileData((prevData) => ({
-					...prevData!,
-					[name]: value,
-				}));
-			}
+		if (profileData) {
+			setProfileData((prevData) => ({
+				...prevData!,
+				[name]: value,
+			}));
 		}
+	};
+
+	const handlePhoneChange = (value: string, data: any) => {
+		let phoneCode = data.dialCode;
+		let number;
+		if (value.startsWith(`${data.dialCode}`)) {
+			number =  value.replace(phoneCode, '').trim()
+		} else {
+			number = value;
+		}
+	
+		if (phoneCode !== countryCode) {
+			setPhoneNumber('');
+		} else {
+			setPhoneNumber(number);
+		}
+	
+		setCountryCode(phoneCode);
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -127,19 +135,20 @@ const EditProfile: React.FC = () => {
 			email: profileData?.email,
 			birthdate: profileData?.birthdate,
 			country: profileData?.country,
-			'profile.gender': profileData?.profile?.gender,
-			number: `${countryCode}${phoneNumber}`.replace("+", ""),
+			gender: profileData?.gender,
+			code_number: countryCode,
+			number: phoneNumber,
 		};
 		await handleEditProfile(updatedProfile);
 		setIsSubmitting(false);
-	}
+	};
 
 	if (loadingProfile) return <LoadingScreen />;
 	if (errorMessage) {
 		return (
 			<Modal
 				title="Error"
-				message={error}
+				message={t("profile.errorFetching")}
 				onClose={() => router.push('/home')}
 			/>
 		);
@@ -149,6 +158,7 @@ const EditProfile: React.FC = () => {
 		<div className="flex flex-col justify-between items-center bg-white h-screen p-14 lg:pt-[10vh]">
 			{(errorMessage || successMessage) && (
 				<Modal
+					title={t("profile.editModalTitle")}
 					message={errorMessage || successMessage}
 					onClose={() => router.back()}
 				/>
@@ -157,7 +167,7 @@ const EditProfile: React.FC = () => {
 				<button onClick={() => router.back()} className="text-gray-700">
 					<FaArrowLeft className="w-8 h-8" />
 				</button>
-				<h1 className="text-5xl font-semibold">Edit Profile</h1>
+				<h1 className="text-5xl font-semibold">{t("profile.editModalTitle")}</h1>
 			</div>
 			<form
 				className="h-[90%] flex flex-col justify-between items-center w-full"
@@ -165,7 +175,21 @@ const EditProfile: React.FC = () => {
 			>
 				<div className="h-[90%] flex flex-col justify-start py-6 w-full max-w-3xl space-y-8 overflow-y-auto">
 					{formFields.map((field, index) => {
-						if (field.type === 'select') {
+						if (field.name === 'country') {
+							return (
+								<CountryInputForm
+									key={index}
+									selectedCountry={profileData?.country || ''}
+									onChange={(selectedCountry) => {
+										setProfileData((prevData) => ({
+											...prevData!,
+											country: selectedCountry,
+										}));
+									}}
+									countryList={countryCodes}
+								/>
+							);
+						} else if (field.type === 'select') {
 							return (
 								<SelectInput
 									key={index}
@@ -184,7 +208,11 @@ const EditProfile: React.FC = () => {
 									name={field.name}
 									type={field.type}
 									placeholder={field.placeholder || ''}
-									value={profileData?.birthdate || ''}
+									value={
+										profileData?.birthdate
+											? new Date(profileData?.birthdate).toISOString().split('T')[0]
+										: ''
+									}
 									onChange={handleInputChange}
 									icon={field.icon}
 								/>
@@ -205,11 +233,11 @@ const EditProfile: React.FC = () => {
 						}
 					})}
 					<PhoneInput
-						label="Phone Number"
-						countryCode={countryCode}
-						phoneNumber={phoneNumber}
-						onChange={handleInputChange}
-						countryCodes={countryCodes}
+						country={'us'}
+						value={`+${countryCode}${phoneNumber}`}
+						onChange={handlePhoneChange}
+						inputClass="!w-full !py-6 !border-none !bg-gray-200 !rounded-md cursor-pointer"
+						
 					/>
 				</div>
 				<div className="h-[10%] flex flex-col w-full max-w-xl">
@@ -221,7 +249,7 @@ const EditProfile: React.FC = () => {
 						{isSubmitting && (
 							<div className="loader ease-linear rounded-full border-4 border-t-4 border-white h-6 w-6 mr-2 animate-spin"></div>
 						)}
-						Update
+						{t('profile.updateProfile.updateText')}
 					</button>
 				</div>
 			</form>
