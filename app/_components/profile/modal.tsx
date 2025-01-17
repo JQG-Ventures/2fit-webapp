@@ -8,10 +8,10 @@ interface ModalProps {
 
 const Modal: React.FC<ModalProps> = ({ title, message, onClose }) => {
   return (
-    <div className="fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-t-lg shadow-lg w-full mb-0 transform transition-all duration-300 ease-in-out translate-y-10 opacity-100 animate-slide-up">
+    <div className="fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-[999]">
+      <div className="bg-white p-10 rounded-t-3xl shadow-xl w-full mb-0 transform transition-all duration-300 ease-in-out translate-y-10 opacity-100 animate-slide-up">
         <h2 className="text-red-500 text-3xl font-bold text-center">{title}</h2>
-        <div className="my-10 text-center">{message}</div>
+        <div className="my-14 text-center">{message}</div>
         <div className="flex justify-center">
           <button 
             onClick={onClose} 

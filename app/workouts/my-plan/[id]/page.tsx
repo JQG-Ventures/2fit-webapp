@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { FaArrowLeft, FaCheckCircle, FaFire } from "react-icons/fa";
@@ -26,13 +26,12 @@ const daysOfWeekFull = [
 interface ExerciseCardProps {
 	exercise: Exercise;
 	onClick: (action: "details" | "start") => void;
-	className?: string;
 }
 
-const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onClick, className }) => (
+const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onClick }) => (
 	<div
-		className={`flex-none relative bg-white shadow-md rounded-lg overflow-hidden transition-transform transform hover:scale-105 ${exercise.is_completed ? "opacity-75 pointer-events-none" : ""
-			} ${className || ""}`}
+		className={`relative bg-white shadow-md rounded-lg overflow-hidden transition-transform transform hover:scale-105 ${exercise.is_completed ? "opacity-75 pointer-events-none" : ""
+			}`}
 		onClick={() => onClick("details")}
 	>
 		<div className="relative w-full h-40">
@@ -113,12 +112,16 @@ const MyPlan: React.FC = () => {
 
 	useEffect(() => {
 		const currentDayIndex = new Date().getDay() - 1;
-		setSelectedDayIndex(currentDayIndex < 0 ? 6 : currentDayIndex);
+		setSelectedDayIndex(currentDayIndex < 0 ? 6 : currentDayIndex); // Sunday as the last index (6)
 	}, []);
 
 	useEffect(() => {
 		if (weeklyProgressData) {
-			setWeeklyProgressState(weeklyProgressData.message);
+			const normalizedDays = weeklyProgressData.message.days.map((day: any) => ({
+				...day,
+				exercises: normalizeExercises(day.exercises),
+			}));
+			setWeeklyProgressState({ ...weeklyProgressData.message, days: normalizedDays });
 		}
 	}, [weeklyProgressData]);
 
@@ -155,6 +158,14 @@ const MyPlan: React.FC = () => {
 		);
 	}
 
+	const normalizeExercises = (exercises: Exercise[]): Exercise[] => {
+		const uniqueExercises: { [key: string]: Exercise } = {};
+		exercises.forEach((exercise) => {
+			uniqueExercises[exercise.exercise_id] = exercise;
+		});
+		return Object.values(uniqueExercises);
+	};	
+
 	const handleExerciseCardClick = (
 		exercise: Exercise,
 		action: "details" | "start"
@@ -178,16 +189,19 @@ const MyPlan: React.FC = () => {
 	const handleExerciseComplete = (exerciseId: string) => {
 		setWeeklyProgressState((prevState: any) => {
 			if (!prevState) return prevState;
+	
 			return {
 				...prevState,
 				days: prevState.days.map((day: any) => ({
 					...day,
-					exercises: day.exercises.map((exercise: Exercise) => {
-						if (exercise.exercise_id === exerciseId) {
-							return { ...exercise, is_completed: true };
-						}
-						return exercise;
-					}),
+					exercises: normalizeExercises(
+						day.exercises.map((exercise: Exercise) => {
+							if (exercise.exercise_id === exerciseId && !exercise.is_completed) {
+								return { ...exercise, is_completed: true };
+							}
+							return exercise;
+						})
+					),
 				})),
 			};
 		});
@@ -201,33 +215,28 @@ const MyPlan: React.FC = () => {
 				</button>
 				<h1 className="text-5xl font-semibold pl-4">{t('workouts.my-plan.title')}</h1>
 			</div>
-			<div className="w-full h-[80%] lg:max-w-3xl flex flex-col">
+			<div className="w-full h-[80%] pt-10 lg:max-w-3xl">
 				<DaysOfWeekSelector
 					daysOfWeekLetters={daysOfWeekLetters}
 					selectedDayIndex={selectedDayIndex}
 					setSelectedDayIndex={setSelectedDayIndex}
 				/>
-				
 				{selectedDay && selectedDay.exercises.length > 0 ? (
-					<div className="flex-1 overflow-x-hidden overflow-y-auto mt-4">
-						<div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-							{selectedDay.exercises.map((exercise) => (
-								<ExerciseCard
-									key={exercise.exercise_id}
-									exercise={exercise}
-									onClick={(action) => handleExerciseCardClick(exercise, action)}
-									className="w-full h-auto"
-								/>
-							))}
-						</div>
+					<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
+						{selectedDay.exercises.map((exercise) => (
+							<ExerciseCard
+								key={exercise.exercise_id}
+								exercise={exercise}
+								onClick={(action) => handleExerciseCardClick(exercise, action)}
+							/>
+						))}
 					</div>
 				) : (
-					<div className="flex-1 flex justify-center items-center mt-4">
+					<div className="h-full flex justify-center items-center">
 						<p className="text-center text-gray-500">{t('workouts.my-plan.noExercises')}</p>
 					</div>
 				)}
 			</div>
-			
 			{selectedExercise && !showExerciseFlow && (
 				<ExerciseDetailsModal
 					exercise={selectedExercise}
@@ -245,7 +254,6 @@ const MyPlan: React.FC = () => {
 					onExerciseComplete={handleExerciseComplete}
 					workoutType="myPlan"
 					userId={userId!}
-					// @ts-ignore
 					workoutPlanId={id}
 				/>
 			)}
