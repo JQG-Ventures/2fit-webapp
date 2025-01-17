@@ -53,7 +53,8 @@
     "numberServerError": "There was an error checking the number. Please try again later.",
     "nameValidationFill": "Please fill out this field.",
     "phoneValidationFill": "Please enter a valid phone number.",
-    "countryValidationFill": "Please fill out this field."
+    "countryValidationFill": "Please fill out this field.",
+    "birthdateValidationFill": "Please enter a valid date."
   },
   "RegisterPagestep3": {
     "woman": "Woman",
@@ -163,7 +164,8 @@
     "description": "Enjoy workout access without ads and restrictions"
   },
   "home": {
-    "error": "There was an error loading the data, try again later!",
+    "errorTitle": "Error :(",
+    "error": "There is a problem that we are solving, try again later!",
     "excercisebannersection": {
       "planfortoday": "What's the plan for today?",
       "planfortoday2": "Explore Workouts",

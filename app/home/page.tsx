@@ -13,6 +13,7 @@ import { useSessionContext } from '../_providers/SessionProvider';
 import { useTranslation } from 'react-i18next';
 import { useDeleteWorkout } from '../_services/userService';
 import { useLoading } from '../_providers/LoadingProvider';
+import Modal from '../_components/profile/modal';
 
 const HomePage: React.FC = () => {
     const { t } = useTranslation('global');
@@ -74,9 +75,11 @@ const HomePage: React.FC = () => {
             return null;
         }
         return (
-            <div className="flex justify-center items-center h-48">
-                <p>Error: {t("home.error")}</p>
-            </div>
+            <Modal
+				title={t("home.errorTitle")}
+				message={t("home.error")}
+				onClose={() => {}}
+			/>
         );
     }
 

@@ -53,7 +53,8 @@
     "numberServerError": "Hubo un error validando el numero. Intentalo mas tarde.",
     "nameValidationFill": "Por favor llena este campo.",
     "phoneValidationFill": "Ingresa un numero valido.",
-    "countryValidationFill": "Por favor llena este campo."
+    "countryValidationFill": "Por favor llena este campo.",
+    "birthdateValidationFill": "Ingresa una fecha valida"
   },
   "RegisterPagestep3": {
     "woman": "Mujer",
@@ -170,7 +171,8 @@
     "description": "Disfruta del acceso a los entrenamientos sin anuncios ni restricciones"
   },
   "home": {
-    "error": "There was an error loading the data, try again later!",
+    "errorTitle": "Lo sentimos :(",
+    "error": "Hubo un problema que estamos solucionando, intentalo mas tarde!",
     "excercisebannersection": {
       "planfortoday": "¿Cuales son los planes para hoy?",
       "planfortoday2": "Explora los entrenamientos",
