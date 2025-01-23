@@ -72,15 +72,15 @@
   },
   "RegisterPagestep5": {
     "title": "Cual es tu altura?",
-    "description": "Actual altura en cm. No te preoucpes, podras cambiarlo luego."
+    "description": "Actual altura en cm. No te preocupes, podras cambiarlo luego."
   },
   "RegisterPagestep6": {
     "title": "Cual es tu peso?",
-    "description": "Actual peso en kg. No te preoucpes, podras cambiarlo luego."
+    "description": "Actual peso en kg. No te preocupes, podras cambiarlo luego."
   },
   "RegisterPagestep7": {
     "title": "Cual es tu peso deseado?",
-    "description": "Peso deseado en kg. No te preoucpes, esto es solo una estimacion."
+    "description": "Peso deseado en kg. No te preocupes, esto es solo una estimacion."
   },
   "RegisterPagestep8": {
     "title": "Cual es tu nivel actual?",
