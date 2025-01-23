@@ -1,8 +1,8 @@
 'use client';
 
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import { useState } from 'react';
+import { FaArrowLeft, FaArrowRight, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 
@@ -15,23 +15,39 @@ interface ExerciseViewProp {
 const ExerciseView: React.FC<ExerciseViewProp> = ({ exercise, onNext, onBack }) => {
 	const { t } = useTranslation('global');
 	const [isPaused, setIsPaused] = useState(false);
+	const [isMuted, setIsMuted] = useState(true);
+	const videoRef = useRef<HTMLVideoElement>(null);
 
 	if (!exercise) {
 		return null;
 	}
 
+	const toggleMute = () => {
+		if (videoRef.current) {
+			videoRef.current.muted = !isMuted;
+			setIsMuted(!isMuted);
+		}
+	};
+
 	return (
 		<div className="flex flex-col items-center justify-center h-full w-full bg-white">
-			<div className="relative h-[50%] w-full overflow-hidden">
-				<Image
-					src={exercise.image_url}
-					alt={exercise.name}
-					layout="fill"
-					objectFit="cover"
-					className="object-cover"
+			<div className="relative h-[30%] w-full overflow-hidden">
+				<video
+					ref={videoRef}
+					src={exercise.video_url}
+					autoPlay
+					loop
+					muted={isMuted}
+					className="object-cover w-full h-full"
 				/>
+				<button
+					onClick={toggleMute}
+					className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white p-3 rounded-full shadow-lg hover:bg-opacity-75 transition"
+				>
+					{isMuted ? <FaVolumeMute className="text-xl" /> : <FaVolumeUp className="text-xl" />}
+				</button>
 			</div>
-			<div className="flex flex-col justify-between items-center h-[40%] pt-6">
+			<div className="flex flex-col justify-evenly items-center h-[60%] pt-6">
 				<div>
 					<h2 className="text-center text-5xl font-bold">{exercise.name}</h2>
 					<p className="text-center text-lg mt-2">
@@ -57,7 +73,7 @@ const ExerciseView: React.FC<ExerciseViewProp> = ({ exercise, onNext, onBack }) 
 				</CountdownCircleTimer>
 				<button
 					onClick={() => setIsPaused((prev) => !prev)}
-					className={`border border-green-500 w-full py-4 rounded-full font-semibold transition-all duration-300 ease-in-out ${isPaused
+					className={`border border-green-500 w-full py-4 px-6 rounded-full font-semibold transition-all duration-300 ease-in-out ${isPaused
 						? 'text-green-500 hover:bg-green-500 hover:text-white'
 						: 'text-white bg-green-500 hover:bg-green-400'
 						}`}

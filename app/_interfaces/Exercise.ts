@@ -25,6 +25,7 @@ interface ExerciseView {
     description: string;
     category: string;
     image_url: string;
+    video_url: string;
     muscle_group: string[];
     difficulty?: string;
     level?: string;
