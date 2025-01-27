@@ -9,16 +9,21 @@ import MotivationSection from '../_components/_sections/MotivationSection';
 import WorkoutLibrarySection from '../_components/_sections/WorkoutLibraryWidgetSection';
 import SavedWorkoutsSection from '../_components/_sections/SavedWorkoutsSection';
 import Footer from '../_components/_sections/Footer';
-import { useSessionContext } from '../_providers/SessionProvider';
 import { useTranslation } from 'react-i18next';
 import { useDeleteWorkout } from '../_services/userService';
 import { useLoading } from '../_providers/LoadingProvider';
 import Modal from '../_components/profile/modal';
+import { useSession } from 'next-auth/react';
 
 const HomePage: React.FC = () => {
     const { t } = useTranslation('global');
     const { setLoading } = useLoading();
-    const { userId, userName, loading: sessionLoading } = useSessionContext();
+    const { data: session, status } = useSession();
+
+    console.log(session)
+    const userId = session?.user?.id;
+    const userName = session?.user?.userName;
+    const sessionLoading = status === 'loading';
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
     const { mutate: deleteSavedWorkout } = useDeleteWorkout();
 
@@ -76,10 +81,10 @@ const HomePage: React.FC = () => {
         }
         return (
             <Modal
-				title={t("home.errorTitle")}
-				message={t("home.error")}
-				onClose={() => {}}
-			/>
+                title={t("home.errorTitle")}
+                message={t("home.error")}
+                onClose={() => { }}
+            />
         );
     }
 
