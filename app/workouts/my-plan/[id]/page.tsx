@@ -7,11 +7,11 @@ import { FaArrowLeft, FaCheckCircle, FaFire } from "react-icons/fa";
 import { FiPlayCircle } from "react-icons/fi";
 import LoadingScreen from "../../../_components/animations/LoadingScreen";
 import Modal from "../../../_components/profile/modal";
-import { useSessionContext } from "../../../_providers/SessionProvider";
 import ExerciseDetailsModal from "@/app/_components/modals/ExerciseDetailsModal";
 import ExerciseFlow from "@/app/_components/workouts/ExerciseFlow";
 import Image from "next/image";
 import { useApiGet } from "@/app/utils/apiClient";
+import { useSession } from "next-auth/react";
 
 const daysOfWeekFull = [
 	"monday",
@@ -101,7 +101,9 @@ const DaysOfWeekSelector: React.FC<DaysOfWeekSelectorProps> = ({
 const MyPlan: React.FC = () => {
 	const { t } = useTranslation("global");
 	const router = useRouter();
-	const { userId, loading: sessionLoading } = useSessionContext();
+	const { data: session, status } = useSession();
+	const userId = session?.user?.id;
+	const sessionLoading = status === 'loading';
 	const { id } = useParams();
 	const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
 	const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
@@ -164,7 +166,7 @@ const MyPlan: React.FC = () => {
 			uniqueExercises[exercise.exercise_id] = exercise;
 		});
 		return Object.values(uniqueExercises);
-	};	
+	};
 
 	const handleExerciseCardClick = (
 		exercise: Exercise,
@@ -189,7 +191,7 @@ const MyPlan: React.FC = () => {
 	const handleExerciseComplete = (exerciseId: string) => {
 		setWeeklyProgressState((prevState: any) => {
 			if (!prevState) return prevState;
-	
+
 			return {
 				...prevState,
 				days: prevState.days.map((day: any) => ({

@@ -8,7 +8,6 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import ProgressBar from '../_components/others/ProgressSlider';
 import PopularExercisesSection from '../_components/_sections/PopularWorkoutsSection';
-import { useSessionContext } from '../_providers/SessionProvider';
 import Modal from '../_components/profile/modal';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -16,6 +15,7 @@ import { Pagination } from 'swiper/modules';
 import './workouts.css';
 import { useApiGet } from '../utils/apiClient';
 import { useLoading } from '../_providers/LoadingProvider';
+import { useSession } from 'next-auth/react';
 
 export default function Workouts() {
 	const { t } = useTranslation('global');
@@ -23,7 +23,11 @@ export default function Workouts() {
 	const { setLoading } = useLoading();
 
 	const [isClicked, setIsClicked] = useState(false);
-	const { token, loading: sessionLoading } = useSessionContext();
+	const { data: session, status } = useSession();
+	const token = session?.user.token;
+
+	console.log(token, 'token')
+	const sessionLoading = status === 'loading';
 
 	const getActivePlansUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/active-plans`;
 	const getPopularWorkoutsUrl = `/api/workouts/popular`;
