@@ -87,7 +87,7 @@ const PopularExercisesSection: React.FC<PopularExercisesSectionProps> = ({ worko
             </div>
 
             {workouts.length < 1 ? (
-                <div className="text-center pt-4">
+                <div className="flex items-center h-full text-center pt-4">
                     <p className="text-gray-500 text-1xl mb-4">
                         {t('workouts.PopularExercisesSection.PopularSectionEmpty')}
                     </p>

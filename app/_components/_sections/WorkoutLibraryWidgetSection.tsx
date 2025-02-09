@@ -15,7 +15,7 @@ interface WorkoutLibrarySectionProps {
 }
 
 const WorkoutCard: React.FC<WorkoutCardProps> = ({ title, workoutCount, description, image }) => (
-    <div className="relative bg-white p-6 rounded-xl shadow-md mb-6 lg:mb-0 lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl active:scale-95">
+    <div className="relative bg-white p-6 rounded-xl shadow-md mb-6 lg:mb-0 lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl active:scale-95 z-10">
         {/* Background Image */}
         <div 
             className="absolute inset-0 bg-cover bg-center transition-transform duration-300 ease-in-out"

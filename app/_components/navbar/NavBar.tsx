@@ -47,7 +47,7 @@ const NavBar: React.FC = () => {
     if (!isClient) return null;
 
     return (
-        <div style={{ display: shouldShowNavBar ? 'block' : 'none' }} className='fixed z-[999]'>
+        <div style={{ display: shouldShowNavBar ? 'block' : 'none' }} className='relative z-[50]'>
             {isDesktopOrLaptop 
                 ? <DesktopNavBar navItems={navItems} selectedPath={selectedPath} onNavClick={handleNavClick} /> 
                 : <MobileNavBar navItems={navItems} selectedPath={selectedPath} onNavClick={handleNavClick} />}
