@@ -212,7 +212,12 @@
 			"SavedWorkoutsSectionquestion": "Do you want to remove this workout from your saved list?",
 			"SavedWorkoutsSectionconfirmText": "Yes, Remove",
 			"SavedWorkoutsSectioncancelText": "Cancel",
-			"SavedWorkoutsSectionrenderLoading": "Loading workout plans and saved workouts..."
+			"SavedWorkoutsSectionrenderLoading": "Loading workout plans and saved workouts...",
+			"levels": {
+				"beginner": "Beginner",
+				"intermediate": "Intermediate",
+				"advanced": "Advanced"
+			}
 		},
 		"motivation": {
 			"main": "Keep up the great work!",

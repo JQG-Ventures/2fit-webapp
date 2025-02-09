@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { AiFillHeart, AiOutlineClose } from 'react-icons/ai';
 import ConfirmationModal from '../modals/confirmationModal';
 import { useTranslation } from 'react-i18next';
@@ -16,19 +16,24 @@ interface SavedWorkoutsSectionProps {
     deleteWorkout: (workoutId: string) => Promise<void>;
     emptyMessage: string;
     sectionTitle: string;
+    onViewAllClick: () => void;
 }
 
 const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
     workouts,
     deleteWorkout,
     emptyMessage,
-    sectionTitle
+    sectionTitle,
+    onViewAllClick
 }) => {
     const { t } = useTranslation('global');
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
     const [savedWorkouts, setSavedWorkouts] = useState<Workout[]>(workouts);
-    
+
+    useEffect(() => {
+        setSavedWorkouts(workouts);
+    }, [workouts]);
 
     const handleHeartClick = (workout: Workout) => {
         setSelectedWorkout(workout);
@@ -84,7 +89,9 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
         <div className="bg-white p-4 rounded-lg">
             <div className="flex justify-between items-center mb-8 px-2">
                 <h2 className="text-4xl font-bold text-gray-800">{sectionTitle}</h2>
-                <a href="#" className="text-blue-600 hover:underline text-lg lg:text-2xl">{t('home.SavedWorkoutsSection.viewall')}</a>
+                <button onClick={onViewAllClick} className="text-blue-600 hover:underline text-lg lg:text-2xl">
+                    {t('home.SavedWorkoutsSection.viewall')}
+                </button>
             </div>
 
             {savedWorkouts.length === 0 ? (
