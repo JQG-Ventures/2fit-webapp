@@ -8,7 +8,7 @@ import ExerciseBannerSection from '../_components/_sections/ExerciseBannerSectio
 import MotivationSection from '../_components/_sections/MotivationSection';
 import WorkoutLibrarySection from '../_components/_sections/WorkoutLibraryWidgetSection';
 import SavedWorkoutsSection from '../_components/_sections/SavedWorkoutsSection';
-import SavedWorkouts from '../_components/_sections/SavedWorkouts';
+import SavedWorkoutsList from '../_components/_sections/SavedWorkoutsList';
 import Footer from '../_components/_sections/Footer';
 import { useSessionContext } from '../_providers/SessionProvider';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,7 @@ const HomePage: React.FC = () => {
     const { userId, userName, loading: sessionLoading } = useSessionContext();
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
     const { mutate: deleteSavedWorkout } = useDeleteWorkout();
-    const [showSavedWorkouts, setShowSavedWorkouts] = useState(false);
+    const [showSavedWorkoutsList, setShowSavedWorkoutsList] = useState(false);
 
     useEffect(() => {
         const handleResize = () => setIsDesktopOrLaptop(window.innerWidth >= 1224);
@@ -65,20 +65,6 @@ const HomePage: React.FC = () => {
     };
 
     const paddingBottom = isDesktopOrLaptop ? 0 : 100 * 1.1;
-
-    if (error) {
-        if (detailedError!.response?.status === 401 || detailedError!.response?.status === 403) {
-            return null;
-        }
-        return (
-            <Modal
-				title={t("home.errorTitle")}
-				message={t("home.error")}
-				onClose={() => {}}
-			/>
-        );
-    }
-
     return (
         <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom }}>
             <div className="flex flex-col lg:flex-row lg:space-x-8">
@@ -107,16 +93,16 @@ const HomePage: React.FC = () => {
                     deleteWorkout={handleDeleteWorkout}
                     emptyMessage={t('home.SavedWorkoutsSection.SavedWorkoutsSectiondescription')}
                     sectionTitle={t('home.SavedWorkoutsSection.SavedWorkoutsSectiontitle')}
-                    onViewAllClick={() => setShowSavedWorkouts(true)}
+                    onViewAllClick={() => setShowSavedWorkoutsList(true)}
                 />
-                {showSavedWorkouts && (
-                    <SavedWorkouts
+                {showSavedWorkoutsList && (
+                    <SavedWorkoutsList
                         workouts={savedWorkoutPlans?.message || []}
                         deleteWorkout={handleDeleteWorkout}
                         refetchSavedWorkouts={refetchSavedWorkouts}
                         emptyMessage={t('home.SavedWorkoutsSection.SavedWorkoutsSectiondescription')}
                         sectionTitle={t('home.SavedWorkoutsSection.SavedWorkoutsSectiontitle')}
-                        onClose={() => setShowSavedWorkouts(false)}
+                        onClose={() => setShowSavedWorkoutsList(false)}
                     />
                 )}
                 {isDesktopOrLaptop && <Footer />}

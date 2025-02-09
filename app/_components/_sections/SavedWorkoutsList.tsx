@@ -5,7 +5,7 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import { CiBookmarkMinus } from "react-icons/ci";
 import { CgNotes } from "react-icons/cg";
 import { HiMiniSquares2X2 } from "react-icons/hi2";
-import DeleteWorkoutModal from "../../_components/modals/deleteWorkoutModal";
+import DeleteWorkoutModal from "../modals/deleteWorkoutModal";
 import { useTranslation } from "react-i18next";
 import { useDeleteWorkout } from "@/app/_services/userService";
 
