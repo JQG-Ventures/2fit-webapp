@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AiFillHeart, AiOutlineReload } from 'react-icons/ai';
 import SavedMessage from '../others/SavedMessage';
 import { useTranslation } from 'react-i18next';
 import { useSaveWorkout } from '@/app/_services/userService';
 import { FaSpinner } from 'react-icons/fa';
 
-
 interface ExerciseBannerSectionProps {
     hasRoutine: boolean;
     exercises: WorkoutPlan[];
     savedWorkoutPlans: WorkoutPlan[];
+    refetchSavedWorkouts: () => void;
 }
 
-
-const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutine, exercises, savedWorkoutPlans }) => {
+const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutine, exercises, savedWorkoutPlans, refetchSavedWorkouts }) => {
     const { t } = useTranslation('global');
     const [savedMessage, setSavedMessage] = useState<string | null>(null);
-    const [savedExerciseIds, setSavedExerciseIds] = useState<string[]>(savedWorkoutPlans.map(workout => workout._id));
+    const [savedExerciseIds, setSavedExerciseIds] = useState<string[]>([]);
+
+    useEffect(() => {
+        setSavedExerciseIds(savedWorkoutPlans.map(workout => workout._id));
+    }, [savedWorkoutPlans]);
+
     const { mutate: saveWorkout } = useSaveWorkout();
 
     const handleSaveWorkout = async (id: string, name: string) => {
@@ -25,9 +29,10 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
             {
                 onSuccess: (data) => {
                     if (data.status === 'success') {
-                        setSavedExerciseIds([...savedExerciseIds, id])
+                        setSavedExerciseIds(prevIds => [...prevIds, id]);
                         setSavedMessage(`${name} saved!`);
                         setTimeout(() => setSavedMessage(null), 3000);
+                        refetchSavedWorkouts();
                     }
                 },
                 onError: (error: any) => {
@@ -102,7 +107,6 @@ const ExerciseCard: React.FC<{
                     </div>
                 )}
 
-                {/* Content */}
                 {!loading && (
                     <>
                         <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center z-5">
@@ -138,4 +142,5 @@ const ExerciseCard: React.FC<{
         </a>
     );
 };
+
 export default ExerciseBannerSection;
