@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery, useMutation, QueryKey, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
 import axiosInstance from '../utils/axiosInstance';
 import { AxiosError } from 'axios';

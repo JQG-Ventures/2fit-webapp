@@ -97,7 +97,7 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
                         <h2 className="text-4xl font-semibold ml-8">{t("workouts.plan.workoutActivity")}</h2>
                     </div>
                     <div className="no-scrollbar overflow-y-auto flex-grow">
-                        <ExerciseList exercises={exercises} isMobile={true} />
+                        <ExerciseList exercises={exercises} isMobile={true} onExerciseSelect={() => {}}/>
                     </div>
                     <WorkoutFooter
                         onStartClick={() => handleStartClick()}
@@ -108,7 +108,7 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
 
             {!isMobile && (
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={t("workouts.plan.workoutActivity")}>
-                    <ExerciseList exercises={exercises} isMobile={false} />
+                    <ExerciseList exercises={exercises} isMobile={false} onExerciseSelect={() => {}}/>
                 </Modal>
             )}
         </div>

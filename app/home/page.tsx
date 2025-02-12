@@ -20,8 +20,8 @@ const HomePage: React.FC = () => {
     const { setLoading } = useLoading();
     const { data: session, status } = useSession();
 
-    console.log(session)
     const userId = session?.user?.id;
+    // @ts-ignore
     const userName = session?.user?.userName;
     const sessionLoading = status === 'loading';
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
@@ -60,9 +60,7 @@ const HomePage: React.FC = () => {
             { queryParams: { workout_id: id } },
             {
                 onSuccess: () => { },
-                onError: (error) => {
-                    console.log(error);
-                }
+                onError: (error) => console.error(error)
             }
         );
     };

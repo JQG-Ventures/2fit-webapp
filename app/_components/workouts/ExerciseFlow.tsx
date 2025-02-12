@@ -117,7 +117,7 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 		const repsCompleted = Array(totalSets).fill(currentExercise.reps);
 
 		const exerciseProgress: ExerciseProgress = {
-			exercise_id: currentExercise.exercise_id,
+			exercise_id: currentExercise.exercise_id!,
 			sets_completed: totalSets,
 			reps_completed: repsCompleted,
 			duration_seconds: exerciseDuration,
@@ -143,7 +143,7 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 					onError: (error) => console.error('Error saving progress:', error.message),
 				}
 			);
-			onExerciseComplete(currentExercise.exercise_id);
+			onExerciseComplete(currentExercise.exercise_id!);
 		}
 	}, [
 		exerciseStartTime,
@@ -181,8 +181,6 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 					dispatch({ type: 'SET_EXERCISE_INDEX', index: currentExerciseIndex + 1 });
 					dispatch({ type: 'SET_CURRENT_SET', set: 1 });
 					dispatch({ type: 'START_EXERCISE', currentSet: 1 });
-				} else {
-					// Workout is already completed
 				}
 			}
 		}
@@ -234,14 +232,12 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 		onClose,
 	]);
 
-	// Start exercise timer when not resting or in countdown
 	useEffect(() => {
 		if (!isRest && !isCountdown && exerciseStartTime === null) {
 			dispatch({ type: 'START_EXERCISE', currentSet });
 		}
 	}, [isRest, isCountdown, exerciseStartTime, currentSet]);
 
-	// Handle workout completion side effects
 	useEffect(() => {
 		if (isCompleted) {
 			const totalWorkoutDuration = workoutStartTime

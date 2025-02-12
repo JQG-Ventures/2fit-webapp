@@ -208,21 +208,6 @@ export default function RegisterStep1() {
                     </ButtonWithSpinner>
                 </form>
             </div>
-            <div className="h-[12%] flex flex-col justify-start text-center">
-                <p className="text-gray-500 mb-6">{t('RegisterPagestep1.signuptxt')}</p>
-                <div className="flex flex-row justify-evenly space-x-8">
-                    {[FaApple, FaFacebook, FaGoogle].map((Icon, idx) => (
-                        <button key={idx} className="text-5xl">
-                            <Icon className={idx === 1 ? 'text-blue-600' : idx === 2 ? 'text-red-600' : 'text-gray-800'} />
-                        </button>
-                    ))}
-                </div>
-            </div>
-            <div className="h-[3%] text-center">
-                <p className="text-gray-500">
-                    {t('RegisterPagestep1.signupquestion')} <a href="#" className="text-indigo-600 underline">{t('RegisterPagestep1.signin')}</a>
-                </p>
-            </div>
         </div>
     );
 }

@@ -22,9 +22,13 @@
     "forgotPassword": "Forgot Password?",
     "signIn": "Sign In",
     "dontHaveAcc": "Don't have an account?",
-    "signUp": "Sign Up"
+    "signUp": "Sign Up",
+    "googleUserError": "No registered user, please sign up!",
+    "googleError": "There was an error with Google, try again later...",
+    "googleAuthError": "User not registered with Google"
   },
   "RegisterPage": {
+    "registeredGoogle": "Account already registered, please login.",
     "next": "Continue",
     "back": "Back",
     "create": ["Create your", "Account"],
@@ -37,7 +41,8 @@
     "passwordValidationError": "Password must contain uppercase, lowercase, number, special character, and be at least 8 characters long without spaces.",
     "emailValidationError": "Please enter a valid email address.",
     "emailRegisteredError": "This email is already registered. Please use a different email.",
-    "emailRegistrationError": "There was an error checking the email. Please try again later."
+    "emailRegistrationError": "There was an error checking the email. Please try again later.",
+    "googleError": "There is a problem contacting google, try again later!"
   },
   "RegisterPagestep1": {
     "create": ["Create your", "Account"],
@@ -129,7 +134,11 @@
     "home": "Home",
     "workouts": "Workouts",
     "bot": "Bot",
-    "profile": "Profile"
+    "profile": "Profile",
+    "startTypingSrc": "Start typing to find your workouts",
+    "close": "Close",
+    "searchText": "Search workouts...",
+    "loading": "Loading..."
   },
   "settings": {
     "title": "Settings",
@@ -254,8 +263,12 @@
       "of": "of"
     },
     "my-plan": {
+      "exerciseOptions": "Modify your routine",
+      "deleteExercise": "Delete Exercise",
+      "changeExercise": "Modify Exercise",
       "title": "My Workout Plan",
-      "noExercises": "No exercises for this day"
+      "noExercises": "No exercises for this day",
+      "confirm": "Confirm"
     },
     "PopularExercisesSection": {
       "popularExerciseTitle": "Popular Exercises",
@@ -315,5 +328,12 @@
     "expireDate": "Expire",
     "cardHolderName": "Cardholder's Name",
     "cvv": "CVC/CVV 2"
+  },
+  "exercise": {
+    "level": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    }
   }
 }
