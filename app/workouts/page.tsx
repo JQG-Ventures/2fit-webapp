@@ -24,9 +24,9 @@ export default function Workouts() {
 
 	const [isClicked, setIsClicked] = useState(false);
 	const { data: session, status } = useSession();
-	const token = session?.user.token;
+	// @ts-ignore
+	const token = session?.user?.token;
 
-	console.log(token, 'token')
 	const sessionLoading = status === 'loading';
 
 	const getActivePlansUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/active-plans`;
@@ -73,7 +73,7 @@ export default function Workouts() {
 					const progressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/workouts/progress?workout_plan_id=${plan.workout_plan_id}`;
 					const response = await fetch(progressUrl, { "method": "GET", headers: { "Authorization": `Bearer ${token}` } });
 					const jsonData = await response.json();
-					if (!response.ok) throw new Error(jsonData.message || t('workouts.fetchingError'));
+					if (!response.ok) console.error(jsonData.message || t('workouts.fetchingError'));
 					return { planId: plan.workout_plan_id, progressData: jsonData.message };
 				});
 
@@ -105,7 +105,7 @@ export default function Workouts() {
 	};
 
 	if (errorActivePlans || errorProgressData || errorPopularWorkouts) {
-		setLoading(false); // Ensure loading stops if there's an error
+		setLoading(false);
 		return (
 			<Modal
 				title="Error"

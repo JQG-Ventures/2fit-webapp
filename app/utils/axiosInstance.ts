@@ -1,8 +1,9 @@
-//@ts-nocheck
+// @ts-nocheck
+
+"use client";
+
 import axios from 'axios';
 import { getSession } from 'next-auth/react';
-import { refreshAccessToken } from '../config/auth.config';
-import { redirect } from 'next/dist/server/api-utils';
 
 const axiosInstance = axios.create({
 	baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -25,7 +26,6 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
 	(response) => response,
 	async (error) => {
-		console.log(error)
 		const originalRequest = error.config;
 		if (error.response?.status === 401 && !originalRequest._retry) {
 			originalRequest._retry = true;
@@ -35,7 +35,6 @@ axiosInstance.interceptors.response.use(
 
 			if (!session?.user?.token) {
 				window.location.href = '/re-auth';
-				// signOut({ callbackUrl: '/login', redirect: true })
 				return new Promise(() => {})
 			}
 

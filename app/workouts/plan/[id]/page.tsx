@@ -71,7 +71,6 @@ const WorkoutPlanPage: React.FC = () => {
 		if (loadingPlans) {
 			setLoading(true);
 		} else {
-			console.log("JUST HERE", workoutPlan)
 			setLoading(false);
 		}
 	}, [loadingPlans, setLoading])
@@ -115,6 +114,7 @@ const WorkoutPlanPage: React.FC = () => {
 					<ExerciseList
 						exercises={workoutPlan?.message.workout_schedule[0]?.exercises || []}
 						isMobile={true}
+						onExerciseSelect={ () => {} }
 					/>
 
 					<WorkoutFooter onStartClick={handleStartWorkout} isSubmitting={isSubmitting} />

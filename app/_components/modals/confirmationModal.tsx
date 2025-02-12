@@ -1,7 +1,8 @@
 'use client';
 
 import { FC } from 'react';
-import { AiOutlineClose } from 'react-icons/ai';
+import CustomModal from './CustomModal';
+
 
 interface ConfirmationModalProps {
     isOpen: boolean;
@@ -11,6 +12,7 @@ interface ConfirmationModalProps {
     confirmText: string;
     cancelText: string;
 }
+
 
 const ConfirmationModal: FC<ConfirmationModalProps> = ({
     isOpen,
@@ -23,34 +25,29 @@ const ConfirmationModal: FC<ConfirmationModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg text-center relative z-60 w-11/12 max-w-lg sm:w-5/6">
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
-                    aria-label="Close"
-                >
-                    <AiOutlineClose size={20} />
-                </button>
-                <div className='p-4 pt-6'>
-                    <p className="mb-6">{question}</p>
+        <CustomModal isOpen={isOpen} handleCloseModal={onClose}>
+            {
+                <div className="w-full justify-center items-center space-y-12">
+                    <h1 className="text-center">{question}</h1>
+                    <div className={`h-[10%] flex flex-row justify-evenly items-center w-full`}>
+                        <button
+                            onClick={onConfirm}
+                            type="submit"
+                            className="w-[45%] max-w-xl bg-gradient-to-r from-green-400 to-green-700 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
+                        >
+                            {confirmText}
+                        </button>
+                        <button
+                            onClick={onClose}
+                            type="submit"
+                            className="w-[45%] max-w-xl bg-red-500 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
+                        >
+                            {cancelText}
+                        </button>
+                    </div>
                 </div>
-                <div className="flex justify-center space-x-4">
-                    <button
-                        onClick={onConfirm}
-                        className="bg-gray-300 text-gray-800 px-5 py-2 rounded-lg hover:bg-red-600"
-                    >
-                        {confirmText}
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-gray-400"
-                    >
-                        {cancelText}
-                    </button>
-                </div>
-            </div>
-        </div>
+            }
+        </CustomModal>
     );
 };
 

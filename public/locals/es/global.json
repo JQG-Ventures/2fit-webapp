@@ -22,9 +22,13 @@
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "signIn": "Loguearte",
     "dontHaveAcc": "¿No tienes cuenta?",
-    "signUp": "Registro"
+    "signUp": "Registro",
+    "googleUserError": "Usuario no registrado, por favor registrese!",
+    "googleError": "Hubo un error con Google, intentalo mas tarde",
+    "googleAuthError": "Usuario no registrado con Google"
   },
   "RegisterPage": {
+    "registeredGoogle": "Cuenta ya existente, por favor logueate!",
     "next": "Siguiente",
     "back": "Atras",
     "create": ["Crea tu", "Cuenta"],
@@ -37,7 +41,8 @@
     "passwordValidationError": "La contraseña debe contener mayúscula, minúscula, número, carácteres especiales, y debe ser de mínimo 8 caracteres sin espacios.",
     "emailValidationError": "Ingresa una dirección de correo electrónico válida.",
     "emailRegisteredError": "Este correo ya se encuentra registrado. Utiliza un correo distinto.",
-    "emailRegistrationError": "Hubo un error validando el correo. Por favor intentalo de nuevo mas tarde."
+    "emailRegistrationError": "Hubo un error validando el correo. Por favor intentalo de nuevo mas tarde.",
+    "googleError": "Hubo un error contactando Google, intentalo mas tarde!"
   },
   "RegisterPagestep1": {
     "create": ["Crea tu", "Cuenta"],
@@ -130,7 +135,11 @@
     "home": "Inicio",
     "workouts": "Ejercicio",
     "bot": "Bot",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "startTypingSrc": "Inicia a escribir para encontrar tus rutinas",
+    "close": "Cerrar",
+    "searchText": "Buscar ejercicios...",
+    "loading": "Cargando..."
   },
   "settings": {
     "title": "Configuración",
@@ -261,8 +270,12 @@
       "of": "de"
     },
     "my-plan": {
+      "exerciseOptions": "Modifica tu rutina",
+      "deleteExercise": "Eliminar Ejericios",
+      "changeExercise": "Cambiar Ejercicio",
       "title": "Mi plan de entrenamiento",
-      "noExercises": "No ejercicios en este día"
+      "noExercises": "No ejercicios en este día",
+      "confirm": "Confirmar"
     },
     "PopularExercisesSection": {
       "popularExerciseTitle": "Ejercicios Populares",
@@ -328,5 +341,12 @@
     "expireDate": "Fecha de caducidad",
     "cardHolderName": "Nombre del titular de la tarjeta",
     "cvv": "CVC/CVV 2"
+  },
+  "exercise": {
+    "level": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado"
+    }
   }
 }
