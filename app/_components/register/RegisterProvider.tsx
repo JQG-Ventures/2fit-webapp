@@ -15,7 +15,8 @@ interface RegisterData {
     training_days_per_week: string[]
     target_weight: 0,
     weight: number,
-    workout_type: string[]
+    workout_type: string[],
+    auth_provider: string
 }
 
 interface RegisterContextType {

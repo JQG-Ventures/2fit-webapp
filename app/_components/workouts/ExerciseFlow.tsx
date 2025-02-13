@@ -26,15 +26,13 @@ const formatDuration = (seconds: number): string => {
 	const hours = Math.floor(seconds / 3600);
 	const minutes = Math.floor((seconds % 3600) / 60);
 	const secs = seconds % 60;
-  
-	// If the total time is less than 1 hour, format as mm:ss
+
 	if (hours === 0) {
-	  return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+		return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 	}
-  
-	// If 1 hour or more, format as hh:mm
+
 	return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-  };
+};
 
 const reducer = (state: State, action: Action): State => {
 	switch (action.type) {
@@ -119,7 +117,7 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 		const repsCompleted = Array(totalSets).fill(currentExercise.reps);
 
 		const exerciseProgress: ExerciseProgress = {
-			exercise_id: currentExercise.exercise_id,
+			exercise_id: currentExercise.exercise_id!,
 			sets_completed: totalSets,
 			reps_completed: repsCompleted,
 			duration_seconds: exerciseDuration,
@@ -145,7 +143,7 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 					onError: (error) => console.error('Error saving progress:', error.message),
 				}
 			);
-			onExerciseComplete(currentExercise.exercise_id);
+			onExerciseComplete(currentExercise.exercise_id!);
 		}
 	}, [
 		exerciseStartTime,
@@ -183,8 +181,6 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 					dispatch({ type: 'SET_EXERCISE_INDEX', index: currentExerciseIndex + 1 });
 					dispatch({ type: 'SET_CURRENT_SET', set: 1 });
 					dispatch({ type: 'START_EXERCISE', currentSet: 1 });
-				} else {
-					// Workout is already completed
 				}
 			}
 		}
@@ -236,14 +232,12 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 		onClose,
 	]);
 
-	// Start exercise timer when not resting or in countdown
 	useEffect(() => {
 		if (!isRest && !isCountdown && exerciseStartTime === null) {
 			dispatch({ type: 'START_EXERCISE', currentSet });
 		}
 	}, [isRest, isCountdown, exerciseStartTime, currentSet]);
 
-	// Handle workout completion side effects
 	useEffect(() => {
 		if (isCompleted) {
 			const totalWorkoutDuration = workoutStartTime
@@ -256,7 +250,7 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 				const timer = setTimeout(() => {
 					dispatch({ type: 'SET_COMPLETE_MESSAGE', message: null });
 					onClose();
-				}, 3500);
+				}, 2500);
 				return () => clearTimeout(timer);
 			} else if (workoutType === 'oneDay') {
 				const payload = {
@@ -307,8 +301,11 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 		return (
 			<>
 				{completeMessage && (
-					<div className="fixed inset-0 flex items-center justify-center pointer-events-none">
-						<div className="bg-green-500 text-white text-lg p-8 rounded-lg shadow-2xl">
+					<div
+						className="fixed inset-0 flex items-center justify-center pointer-events-none"
+						style={{ zIndex: 100 }}
+					>
+						<div className="bg-green-500 text-white text-lg p-8 rounded-lg shadow-2xl pointer-events-auto">
 							{completeMessage}
 						</div>
 					</div>
