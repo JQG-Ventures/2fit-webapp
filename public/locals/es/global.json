@@ -196,8 +196,41 @@
 			"updateText": "Actualizar",
 			"success": "Perfil actualizado correctamente!",
 			"error": "Hubo un error actualizando el perfil."
+		},
+		"Notifications": {
+			   "Title": "Notificaciones",
+				"GeneralNotifications": "Notificaciones Generales.",
+				"AppUpdates": "Actualizaciones.",
+				"NewServicesAvailable": "Nuevos Servicios Disponibles.",
+				"NewTipsAvailable": "Nuevos tips disponibles.",
+      			"SuccessMessage": "Acción realizada correctamente",
+      			"ErrorMessage": "Algo falló, por favor intenta de nuevo mas tarde."
+			},
+		"Security": {
+			        "Title": "Seguridad",
+					"FaceID": "Face ID.",
+					"RememberMe": "Recuerdame.",
+					"TouchID": "Touch ID.",
+					"GoogleAuthenticator": "Google Authenticator.",
+					"ChangePassword": "Cambiar contraseña.",
+					"Successfullchangepswd": "Se cambió la contraseña exitosamente.",
+					"Failedchangepswd": "Algo falló, por favor intenta de nuevo mas tarde."
 		}
 	},
+	"ChangePasswordModal": {
+		"title": "Cambiar contraseña",
+		"newPassword": "Escribe tu nueva contraseña",
+		"confirmPassword": "Confirma tu nueva contraseña",
+		"cancel": "Cancelar",
+		"update": "Actualizar",
+		"updating": "Actualizando...",
+		"Successfullchangepswd": "La contraseña se ha cambiado exitosamente",
+		"Failedchangepswd": "Algo falló, por favor intenta nuevamente más tarde...",
+		"passwordRequired": "La contraseña es obligatoria.",
+		"passwordValidationError": "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas y minúsculas, un número, un carácter especial y no contener espacios.",
+		"confirmPasswordRequired": "Por favor, confirma tu contraseña.",
+		"passwordsDoNotMatch": "Las contraseñas no coinciden."
+		},
 	"upgrade": {
 		"title": "Actualizar a Premium",
 		"description": "Disfruta del acceso a los entrenamientos sin anuncios ni restricciones"
