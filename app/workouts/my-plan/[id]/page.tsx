@@ -1,120 +1,86 @@
 "use client";
 
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { FaArrowLeft, FaCheckCircle, FaFire } from "react-icons/fa";
-import { FiPlayCircle } from "react-icons/fi";
+import { FaArrowLeft } from "react-icons/fa";
 import LoadingScreen from "../../../_components/animations/LoadingScreen";
 import Modal from "../../../_components/profile/modal";
-import { useSessionContext } from "../../../_providers/SessionProvider";
-import { useFetch } from "../../../_hooks/useFetch";
 import ExerciseDetailsModal from "@/app/_components/modals/ExerciseDetailsModal";
 import ExerciseFlow from "@/app/_components/workouts/ExerciseFlow";
-import Image from "next/image";
+import { useApiGet } from "@/app/utils/apiClient";
+import { useSession } from "next-auth/react";
+import { HiDotsHorizontal } from "react-icons/hi";
+import ConfirmationModal from "@/app/_components/modals/confirmationModal";
+import { useDeleteExercises, useModifyExercises } from "@/app/_services/workoutService";
+import ExerciseCard from "@/app/_components/workouts/my-plan/ExerciseCard";
+import DaysOfWeekSelector from "@/app/_components/workouts/my-plan/DaysOfWeekSelector";
+import ViewModal from "@/app/_components/modals/ViewModal";
+import CustomModal from "@/app/_components/modals/CustomModal";
+import ExerciseList from "@/app/_components/workouts/ExerciseList";
+import { getSimilarExercises } from "@/app/_services/exerciseService";
 
-interface ExerciseCardProps {
-	exercise: Exercise;
-	onClick: (action: "details" | "start") => void;
-}
 
-const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onClick }) => (
-	<div
-		className={`relative bg-white shadow-md rounded-lg overflow-hidden transition-transform transform hover:scale-105 ${exercise.is_completed ? "opacity-75 pointer-events-none" : ""
-			}`}
-		onClick={() => onClick("details")}
-	>
-		<div className="relative w-full h-40">
-			<Image
-				src={exercise.image_url}
-				alt={exercise.name}
-				layout="fill"
-				objectFit="cover"
-			/>
-			{exercise.is_completed && (
-				<div className="absolute inset-0 bg-black opacity-75"></div>
-			)}
-			{!exercise.is_completed && (
-				<button
-					className="absolute inset-0 flex items-center justify-center text-white text-6xl"
-					onClick={(e) => {
-						e.stopPropagation();
-						onClick("start");
-					}}
-				>
-					<FiPlayCircle />
-				</button>
-			)}
-			{exercise.is_completed && (
-				<div className="absolute top-2 left-2 text-green-500 text-2xl">
-					<FaCheckCircle />
-				</div>
-			)}
-		</div>
-		<div className="p-3">
-			<h3 className="text-md font-semibold">{exercise.name}</h3>
-			<p className="text-base font-light flex items-center">
-				<FaFire className="text-green-500 mr-1" />
-				{exercise.sets} sets x {exercise.reps} reps
-			</p>
-		</div>
-	</div>
-);
+const daysOfWeekFull = [
+	"monday",
+	"tuesday",
+	"wednesday",
+	"thursday",
+	"friday",
+	"saturday",
+	"sunday",
+];
 
-interface DaysOfWeekSelectorProps {
-	daysOfWeekLetters: string[];
-	selectedDayIndex: number;
-	setSelectedDayIndex: (index: number) => void;
-}
-
-const DaysOfWeekSelector: React.FC<DaysOfWeekSelectorProps> = ({
-	daysOfWeekLetters,
-	selectedDayIndex,
-	setSelectedDayIndex,
-}) => (
-	<div className="flex flex-row justify-between p-6">
-		{daysOfWeekLetters.map((dayLetter, index) => (
-			<button
-				key={index}
-				className={`w-12 h-12 rounded-full flex items-center justify-center ${selectedDayIndex === index
-					? "bg-green-500 text-white"
-					: "text-gray-700"
-					}`}
-				onClick={() => setSelectedDayIndex(index)}
-			>
-				{dayLetter}
-			</button>
-		))}
-	</div>
-);
-
-export default function MyPlan() {
-	const { t } = useTranslation("global");
-	const router = useRouter();
-	const { userId, loading: sessionLoading } = useSessionContext();
+const MyPlan: React.FC = () => {
 	const { id } = useParams();
-	const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
-	const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
-		null
-	);
-	const [showExerciseFlow, setShowExerciseFlow] = useState<boolean>(false);
-	const [weeklyProgressState, setWeeklyProgressState] = useState<any>(null);
+	const router = useRouter();
+	const { t } = useTranslation("global");
+	const { data: session, status } = useSession();
 
-	const options = useMemo(() => ({ method: "GET" }), []);
-	const {
-		data: weeklyProgressData,
-		loading: loadingWeeklyProgress,
-		error: errorWeeklyProgress,
-	} = useFetch(
-		userId
-			? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/weekly-progress/${userId}`
-			: "",
-		options
-	);
+	const sessionLoading = status === 'loading';
+	const userId = session?.user?.id;
+	// @ts-ignore
+	const token = session?.user?.token;
+
+
+	const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
+	const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+	const [showExerciseFlow, setShowExerciseFlow] = useState<boolean>(false);
+
+	const [showOptionsModal, setShowOptionsModal] = useState<boolean>(false);
+	const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+	const [isOptionalExercisesOpen, setIsOptionalExercisesOpen] = useState(false);
+
+	const [isDeleteMode, setIsDeleteMode] = useState<boolean>(false);
+	const [isOptionalMode, setIsOptionalMode] = useState<boolean>(false);
+
+	const [exercisesToDelete, setExercisesToDelete] = useState<{ [key: string]: string[] }>({});
+	const [weeklyProgressState, setWeeklyProgressState] = useState<any>(null);
+	const [similarExercises, setSimilarExercises] = useState([]);
+
+	const getProgressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/weekly-progress`;
+	const { data: weeklyProgressData, isLoading: loadingWeeklyProgress, isError: errorWeeklyProgress, refetch: refetchWeeklyProgress } = useApiGet<{ status: string; message: any }>([], getProgressUrl);
+	const { mutate: deleteExercises } = useDeleteExercises(id.toString());
+	const { mutate: modifyExercises } = useModifyExercises(id.toString());
+
+	const [selectedExerciseForReplacement, setSelectedExerciseForReplacement] = useState<string>('');
+	const [showExerciseReplaceConfirm, setShowExerciseReplaceConfirm] = useState(false);
+	const [exerciseToReplaceId, setExerciseToReplaceId] = useState<string>('');
+	const [exercisesToReplace, setExercisesToReplace] = useState<{ [key: string]: { old_exercise_id: string; new_exercise: string }[] }>({});
+
+
+	useEffect(() => {
+		const currentDayIndex = new Date().getDay() - 1;
+		setSelectedDayIndex(currentDayIndex < 0 ? 6 : currentDayIndex);
+	}, []);
 
 	useEffect(() => {
 		if (weeklyProgressData) {
-			setWeeklyProgressState(weeklyProgressData);
+			const normalizedDays = weeklyProgressData.message.days.map((day: any) => ({
+				...day,
+				exercises: normalizeExercises(day.exercises),
+			}));
+			setWeeklyProgressState({ ...weeklyProgressData.message, days: normalizedDays });
 		}
 	}, [weeklyProgressData]);
 
@@ -133,15 +99,6 @@ export default function MyPlan() {
 	}
 
 	const daysOfWeekLetters = ["M", "T", "W", "Th", "F", "Sa", "Su"];
-	const daysOfWeekFull = [
-		"monday",
-		"tuesday",
-		"wednesday",
-		"thursday",
-		"friday",
-		"saturday",
-		"sunday",
-	];
 	const daysData: {
 		[key: string]: { day_of_week: string; exercises: Exercise[] };
 	} = {};
@@ -159,9 +116,69 @@ export default function MyPlan() {
 			}
 		);
 	}
-	// weeklyProgressData.days.forEach((day: { day_of_week: string; exercises: Exercise[] }) => {
-	// 	daysData[day.day_of_week.toLowerCase()] = day;
-	// });
+
+	const normalizeExercises = (exercises: Exercise[]): Exercise[] => {
+		const uniqueExercises: { [key: string]: Exercise } = {};
+		exercises.forEach((exercise) => {
+			uniqueExercises[exercise.exercise_id!] = exercise;
+		});
+		return Object.values(uniqueExercises);
+	};
+
+	const handleDeleteMode = () => {
+		setIsDeleteMode(true);
+		setShowOptionsModal(false);
+	};
+
+	const handleOptionalMode = () => {
+		setIsOptionalMode(true);
+		setShowOptionsModal(false);
+	};
+
+	const handleDeleteSelect = (exerciseId: string) => {
+		setExercisesToDelete((prev) => {
+			const updated = { ...prev };
+			const day = daysOfWeekFull[selectedDayIndex];
+
+			if (!updated[day]) {
+				updated[day] = [];
+			}
+
+			if (updated[day].includes(exerciseId)) {
+				updated[day] = updated[day].filter(id => id !== exerciseId);
+			} else {
+				updated[day] = [...updated[day], exerciseId];
+			}
+
+			if (updated[day].length === 0) {
+				delete updated[day];
+			}
+
+			return { ...updated };
+		});
+	};
+
+	const handleOptionalSelect = async (exercise_id: string) => {
+		setExerciseToReplaceId(exercise_id);
+		const similarExercises = await getSimilarExercises(exercise_id, token);
+		setSimilarExercises(similarExercises);
+		setIsOptionalExercisesOpen(true);
+	};
+
+	const handleConfirmDelete = () => {
+		deleteExercises(
+			exercisesToDelete,
+			{
+				onSuccess: (response) => {
+					setIsDeleteMode(false);
+					setExercisesToDelete({});
+					setShowConfirmationModal(false);
+					refetchWeeklyProgress();
+				},
+				onError: (error) => console.error('Error ddeleting exercises:', error.message),
+			}
+		);
+	};
 
 	const handleExerciseCardClick = (
 		exercise: Exercise,
@@ -176,26 +193,102 @@ export default function MyPlan() {
 	};
 
 	const selectedDayName = daysOfWeekFull[selectedDayIndex];
-	const selectedDay = daysData[selectedDayName];
+	const selectedDay = weeklyProgressState?.days.find((day: any) => day.day_of_week.toLowerCase() === selectedDayName);
+
 
 	const handleExerciseStart = (exercise: Exercise) => {
 		setSelectedExercise(exercise);
 		setShowExerciseFlow(true);
 	};
 
+	const handleExerciseSelection = (selectedExercise: Exercise) => {
+		const day = daysOfWeekFull[selectedDayIndex];
+
+		setExercisesToReplace((prev) => ({
+			...prev,
+			[day]: [
+				...(prev[day] || []),
+				{ old_exercise_id: exerciseToReplaceId, new_exercise: selectedExercise._id! },
+			],
+		}));
+
+		setWeeklyProgressState((prevState: any) => {
+			if (!prevState) return prevState;
+
+			return {
+				...prevState,
+				days: prevState.days.map((dayData: any) => {
+					if (dayData.day_of_week.toLowerCase() !== day.toLowerCase()) {
+						return dayData;
+					}
+
+					return {
+						...dayData,
+						exercises: dayData.exercises.map((exercise: Exercise) => {
+							if (exercise.exercise_id === exerciseToReplaceId) {
+								return { ...selectedExercise, exercise_id: exerciseToReplaceId };
+							}
+							return exercise;
+						}),
+					};
+				}),
+			};
+		});
+
+		setShowExerciseReplaceConfirm(false);
+		setIsOptionalExercisesOpen(false);
+		setExerciseToReplaceId('');
+	};
+
+	const handleConfirmExerciseReplace = () => {
+		deleteExercises(
+			exercisesToDelete,
+			{
+				onSuccess: (response) => {
+					setIsDeleteMode(false);
+					setExercisesToDelete({});
+					setShowConfirmationModal(false);
+					refetchWeeklyProgress();
+				},
+				onError: (error) => console.error('Error ddeleting exercises:', error.message),
+			}
+		);
+
+		modifyExercises(
+			exercisesToReplace,
+			{
+				onSuccess: () => {
+					setIsOptionalMode(false);
+					setExercisesToReplace({});
+					setShowConfirmationModal(false);
+					refetchWeeklyProgress();
+				},
+				onError: (error) => console.error('Error replacing exercises:', error.message),
+			}
+		);
+
+		setIsOptionalMode(false);
+		setExercisesToReplace({});
+		setShowConfirmationModal(false);
+		refetchWeeklyProgress();
+	};
+
 	const handleExerciseComplete = (exerciseId: string) => {
 		setWeeklyProgressState((prevState: any) => {
 			if (!prevState) return prevState;
+
 			return {
 				...prevState,
 				days: prevState.days.map((day: any) => ({
 					...day,
-					exercises: day.exercises.map((exercise: Exercise) => {
-						if (exercise.exercise_id === exerciseId) {
-							return { ...exercise, is_completed: true };
-						}
-						return exercise;
-					}),
+					exercises: normalizeExercises(
+						day.exercises.map((exercise: Exercise) => {
+							if (exercise.exercise_id === exerciseId && !exercise.is_completed) {
+								return { ...exercise, is_completed: true };
+							}
+							return exercise;
+						})
+					),
 				})),
 			};
 		});
@@ -204,12 +297,12 @@ export default function MyPlan() {
 	return (
 		<div className="flex flex-col h-screen bg-white p-10 items-center lg:pt-[10vh]">
 			<div className="h-[10%] flex flex-row items-center w-full lg:max-w-3xl">
-				<button onClick={() => router.back()} className="text-gray-700 mr-4">
-					<FaArrowLeft className="w-8 h-8" />
-				</button>
-				<h1 className="text-5xl font-semibold pl-4">{t('workouts.my-plan.title')}</h1>
+				<button onClick={() => router.back()} className="text-gray-700 mr-4"><FaArrowLeft className="w-8 h-8" /></button>
+				<h1 className="text-5xl text-center font-semibold lg:w-full">{t('workouts.my-plan.title')}</h1>
+				<button onClick={() => setShowOptionsModal(true)} className="text-gray-700 ml-4"><HiDotsHorizontal className="w-8 h-8" /></button>
 			</div>
-			<div className="w-full h-[80%] pt-10 lg:max-w-3xl">
+
+			<div className="w-full h-[80%] overflow-y-auto pt-10 lg:max-w-3xl">
 				<DaysOfWeekSelector
 					daysOfWeekLetters={daysOfWeekLetters}
 					selectedDayIndex={selectedDayIndex}
@@ -217,11 +310,16 @@ export default function MyPlan() {
 				/>
 				{selectedDay && selectedDay.exercises.length > 0 ? (
 					<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
-						{selectedDay.exercises.map((exercise) => (
+						{selectedDay && selectedDay.exercises.map((exercise: Exercise) => (
 							<ExerciseCard
 								key={exercise.exercise_id}
 								exercise={exercise}
 								onClick={(action) => handleExerciseCardClick(exercise, action)}
+								isDeleteMode={isDeleteMode}
+								isOptionalMode={isOptionalMode}
+								onDeleteSelect={handleDeleteSelect}
+								onOptionalSelect={handleOptionalSelect}
+								selectedForDelete={exercisesToDelete[selectedDayName]?.includes(exercise.exercise_id!) || false}
 							/>
 						))}
 					</div>
@@ -231,6 +329,45 @@ export default function MyPlan() {
 					</div>
 				)}
 			</div>
+
+			<div className={`h-[10%] flex flex-row justify-between items-center w-full max-w-xl ${!isDeleteMode ? 'hidden' : ''}`}>
+				<button
+					onClick={() => { setShowConfirmationModal(true) }}
+					type="submit"
+					className="w-[45%] bg-gradient-to-r from-green-400 to-green-700 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
+				>{t("workouts.my-plan.confirm")}
+				</button>
+				<button
+					onClick={() => {
+						setIsDeleteMode(false);
+						setExercisesToDelete({});
+					}}
+					type="submit"
+					className="w-[45%] bg-red-500 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
+				>{t('home.SavedWorkoutsSection.SavedWorkoutsSectioncancelText')}
+				</button>
+			</div>
+
+			<div className={`h-[10%] flex flex-row justify-between items-center w-full max-w-xl ${!isOptionalMode ? 'hidden' : ''}`}>
+				<button
+					onClick={() => setShowConfirmationModal(true)}
+					type="submit"
+					className="w-[45%] bg-gradient-to-r from-green-400 to-green-700 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
+				>
+					{t("workouts.my-plan.confirm")}
+				</button>
+				<button
+					onClick={() => {
+						setIsOptionalMode(false);
+						setExercisesToReplace({});
+					}}
+					type="submit"
+					className="w-[45%] bg-red-500 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
+				>
+					{t('home.SavedWorkoutsSection.SavedWorkoutsSectioncancelText')}
+				</button>
+			</div>
+
 			{selectedExercise && !showExerciseFlow && (
 				<ExerciseDetailsModal
 					exercise={selectedExercise}
@@ -238,6 +375,7 @@ export default function MyPlan() {
 					onStartExercise={() => handleExerciseStart(selectedExercise)}
 				/>
 			)}
+
 			{showExerciseFlow && selectedExercise && (
 				<ExerciseFlow
 					exercises={[selectedExercise]}
@@ -248,9 +386,61 @@ export default function MyPlan() {
 					onExerciseComplete={handleExerciseComplete}
 					workoutType="myPlan"
 					userId={userId!}
-					workoutPlanId={id}
+					workoutPlanId={id.toString()}
 				/>
 			)}
+
+
+			{/* Modal for options e.g. Change Exercise and Delete Exercise */}
+			<CustomModal handleCloseModal={() => setShowOptionsModal(false)} isOpen={showOptionsModal}>
+				{
+					<>
+						<h1 className="text-gray-700 text-3xl font-semibold text-center mb-12">{t("workouts.my-plan.exerciseOptions")}</h1>
+						<div className="flex flex-col space-y-8">
+							<button
+								className="bg-gradient-to-r from-green-400 to-green-600 text-white p-3 rounded-full w-full max-w-xs mx-auto"
+								onClick={handleOptionalMode}
+							>
+								{t("workouts.my-plan.changeExercise")}
+							</button>
+							<button
+								className="bg-red-500 text-white p-3 rounded-full w-full max-w-xs mx-auto"
+								onClick={handleDeleteMode}
+							>
+								{t("workouts.my-plan.deleteExercise")}
+							</button>
+						</div>
+					</>
+				}
+			</CustomModal>
+
+			{/* Modal for confirmation Question */}
+			<ConfirmationModal
+				isOpen={showConfirmationModal}
+				onClose={() => { setShowConfirmationModal(false) }}
+				onConfirm={isDeleteMode ? handleConfirmDelete : handleConfirmExerciseReplace}
+				question={isDeleteMode ? t('home.SavedWorkoutsSection.SavedWorkoutsSectionquestion') : "Modificar?"}
+				confirmText={t('home.SavedWorkoutsSection.SavedWorkoutsSectionconfirmText')}
+				cancelText={t('home.SavedWorkoutsSection.SavedWorkoutsSectioncancelText')}
+			/>
+
+			<ConfirmationModal
+				isOpen={showExerciseReplaceConfirm}
+				onClose={() => setShowExerciseReplaceConfirm(false)}
+				onConfirm={handleConfirmExerciseReplace}
+				question={t("workouts.my-plan.confirmExerciseReplace")}
+				confirmText={t("workouts.my-plan.replace")}
+				cancelText={t("workouts.my-plan.cancel")}
+			/>
+
+			{isOptionalExercisesOpen && (
+				<ViewModal isOpen={isOptionalExercisesOpen} onClose={() => setIsOptionalExercisesOpen(false)} title={t("workouts.plan.workoutActivity")}>
+					<ExerciseList exercises={similarExercises} isMobile={true} onExerciseSelect={handleExerciseSelection} />
+				</ViewModal>
+			)}
+
 		</div>
 	);
 }
+
+export default React.memo(MyPlan);

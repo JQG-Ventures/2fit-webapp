@@ -16,23 +16,25 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
     const { t } = useTranslation('global');
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     let totalDurationSeconds = 0;
     let numberOfExercises = 0;
-    
 
-    workoutPlan.workout_schedule.forEach(schedule => {
-        schedule.exercises.forEach(exercise => {
-            const sets = exercise.sets;
-            const restSeconds = exercise.rest_seconds;
+
+    workoutPlan.workout_schedule?.forEach(schedule => {
+        schedule.exercises?.forEach(exercise => {
+            const sets = exercise.sets || 0;
+            const restSeconds = exercise.rest_seconds || 0;
             const setDurationSeconds = 120;
             const exerciseDurationSeconds = sets * setDurationSeconds;
             const totalRestBetweenSets = (sets - 1) * restSeconds;
-
+    
             totalDurationSeconds += exerciseDurationSeconds + totalRestBetweenSets;
         });
     });
-    workoutPlan.workout_schedule.forEach(schedule => {
-        numberOfExercises += schedule.exercises.length;
+    
+    workoutPlan.workout_schedule?.forEach(schedule => {
+        numberOfExercises += schedule.exercises?.length || 0;
     });
 
     const totalDurationMinutes = totalDurationSeconds / 60;
@@ -42,6 +44,15 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
             setIsFullScreen(true);
         } else {
             setIsModalOpen(true);
+        }
+    };
+
+    const handleStartClick = async () => {
+        setIsSubmitting(true);
+        try {
+            console.log("Workout started");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -86,17 +97,18 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
                         <h2 className="text-4xl font-semibold ml-8">{t("workouts.plan.workoutActivity")}</h2>
                     </div>
                     <div className="no-scrollbar overflow-y-auto flex-grow">
-                        <ExerciseList exercises={exercises} isMobile={true} />
+                        <ExerciseList exercises={exercises} isMobile={true} onExerciseSelect={() => {}}/>
                     </div>
                     <WorkoutFooter
-                        onStartClick={() => {/* Add your start functionality here */ }}
+                        onStartClick={() => handleStartClick()}
+                        isSubmitting={isSubmitting}
                     />
                 </div>
             )}
 
             {!isMobile && (
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={t("workouts.plan.workoutActivity")}>
-                    <ExerciseList exercises={exercises} isMobile={false} />
+                    <ExerciseList exercises={exercises} isMobile={false} onExerciseSelect={() => {}}/>
                 </Modal>
             )}
         </div>

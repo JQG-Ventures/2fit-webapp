@@ -15,16 +15,18 @@ interface WorkoutLibrarySectionProps {
 }
 
 const WorkoutCard: React.FC<WorkoutCardProps> = ({ title, workoutCount, description, image }) => (
-    <div
-        className="relative bg-white p-6 rounded-xl shadow-md mb-6 lg:mb-0 lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl active:scale-95"
-    >
+    <div className="relative bg-white p-6 rounded-xl shadow-md mb-6 lg:mb-0 lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl active:scale-95 z-10">
+        {/* Background Image */}
         <div 
             className="absolute inset-0 bg-cover bg-center transition-transform duration-300 ease-in-out"
             style={{ backgroundImage: `url(${image})` }}
         ></div>
+
+        {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-black opacity-50 to-transparent transition-opacity duration-300 ease-in-out"></div>
 
-        <div className="relative z-5">
+        {/* Content */}
+        <div className="relative z-10">
             <h2 className="text-lg text-gray-200">{workoutCount}+ workouts</h2>
             <h4 className="text-2xl tracking-wide text-white font-semibold mb-4">{title}</h4>
             <p className="text-xl text-gray-200">{description}</p>
@@ -38,8 +40,8 @@ const WorkoutLibrarySection: React.FC<WorkoutLibrarySectionProps> = ({ workouts 
     const { t } = useTranslation('global');
 
     return (
-        <div className="relative bg-gray-100 p-8 rounded-xl my-16 md:px-12 lg:px-20">
-            <div className="relative z-5 p-6 lg:p-12">
+        <div className="bg-gray-100 p-8 rounded-xl my-16 md:px-12 lg:px-20">
+            <div className="z-5 p-6 lg:p-12">
                 <h2 className="text-2xl font-bold mb-8 lg:text-3xl">{t('home.WorkoutLibrarySection.WorkoutLibrarySectiontitle')}</h2>
 
                 {/* For mobile view */}
@@ -70,7 +72,6 @@ const WorkoutLibrarySection: React.FC<WorkoutLibrarySectionProps> = ({ workouts 
                     ))}
                 </div>
 
-                {/* Conditionally display this section based on the number of workouts */}
                 {workouts.length > 0 ? (
                     <div className="text-center pt-10">
                         <p className="text-gray-700 text-lg mb-4">{t('home.WorkoutLibrarySection.WorkoutLibrarySectiondescription2')}</p>

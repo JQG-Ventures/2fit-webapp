@@ -31,7 +31,7 @@ export default function Login() {
 	const [errors, setErrors] = useState<{ [key in keyof FormData]?: string }>({});
 	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
-	const { status } = useSession();
+	const { data: session, status } = useSession();
 	const [formData, setFormData] = useState<FormData>({
 		email: '',
 		password: '',
@@ -90,17 +90,49 @@ export default function Login() {
 
 	const handlePrevStep = () => router.push('/');
 
-	const handleSocialSignIn = async (provider: string) => {
+	async function handleSocialSignIn(provider: string) {
 		setIsSocialLoading(prev => ({ ...prev, [provider]: true }));
 		try {
-			await signIn(provider, { callbackUrl: '/home' });
+			if (provider === "google") {
+				const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/google-login`, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					// @ts-ignore
+					body: JSON.stringify({ id_token: session?.googleIdToken })
+				});
+
+				if (!res.ok) {
+					if (res.status === 404) {
+						setError(t("LoginPage.googleUserError"));
+					} else if (res.status === 400) {
+						setError(t("LoginPage.googleError"));
+					} else if (res.status === 401) {
+						setError(t("LoginPage.googleAuthError"));
+					} else {
+						setError(t("unexpectedError"));
+					}
+					return;
+				}
+
+				const data = await res.json();
+
+				await signIn("flaskgoogle", {
+					access_token: data.message.access_token,
+					refresh_token: data.message.refresh_token,
+					expires_at: data.message.expires_at,
+					user_id: data.message.user_id,
+					user_name: data.message.name,
+					redirect: false
+				});
+
+				window.location.href = '/home';
+			}
 		} catch (err) {
 			setError(t("LoginPage.socialSignInError"));
-			setShowModal(true);
 		} finally {
 			setIsSocialLoading(prev => ({ ...prev, [provider]: false }));
 		}
-	};
+	}
 
 	return (
 		<div className="flex flex-col h-screen bg-white p-10 items-center">
@@ -128,6 +160,7 @@ export default function Login() {
 							type={type}
 							placeholder={placeholder}
 							value={formData[name]}
+							// @ts-ignore
 							onChange={handleChange}
 							Icon={Icon}
 							error={errors[name]}

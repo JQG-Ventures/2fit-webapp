@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AiFillHeart, AiOutlineReload } from 'react-icons/ai';
-import { saveWorkout } from '../../_services/workoutService';
 import SavedMessage from '../others/SavedMessage';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSaveWorkout } from '@/app/_services/userService';
+import { FaSpinner } from 'react-icons/fa';
 
 
 interface ExerciseBannerSectionProps {
@@ -17,32 +16,30 @@ interface ExerciseBannerSectionProps {
 const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutine, exercises, savedWorkoutPlans }) => {
     const { t } = useTranslation('global');
     const [savedMessage, setSavedMessage] = useState<string | null>(null);
-    const [savedExerciseIds, setSavedExerciseIds] = useState<string[]>(
-        savedWorkoutPlans.map(workout => workout._id)
-    );
-    const [userId, setUserId] = useState<string>('');
-    const { data: session, status } = useSession();
-    const router = useRouter();
+    const [savedExerciseIds, setSavedExerciseIds] = useState<string[]>(savedWorkoutPlans.map(workout => workout._id));
+    const { mutate: saveWorkout } = useSaveWorkout();
 
-    useEffect(() => {
-		if (status === 'authenticated' && session?.user?.userId) {
-			setUserId(session.user.userId);
-		} else if (status === 'unauthenticated') {
-			router.back();
-		}
-	}, [session, status, router]);
-
-    const handleSaveClick = async (id: string, name: string) => {
-        const result = await saveWorkout(userId, id, session?.user?.token ?? '');
-        if (result.status === 400) {
-            setSavedMessage('Workout already saved!');
-        } else if (result.status === 200) {
-            setSavedMessage(`${name} saved!`);
-            setSavedExerciseIds([...savedExerciseIds, id]);
-        } else {
-            setSavedMessage('There was an error saving the workout, try again.');
-        }
-        setTimeout(() => setSavedMessage(null), 550000);
+    const handleSaveWorkout = async (id: string, name: string) => {
+        saveWorkout(
+            { queryParams: { workout_id: id } },
+            {
+                onSuccess: (data) => {
+                    if (data.status === 'success') {
+                        setSavedExerciseIds([...savedExerciseIds, id])
+                        setSavedMessage(`${name} saved!`);
+                        setTimeout(() => setSavedMessage(null), 3000);
+                    }
+                },
+                onError: (error: any) => {
+                    if (error.response?.status === 400) {
+                        setSavedMessage('Workout already saved!');
+                    } else {
+                        setSavedMessage('There was an error saving the workout, try again.');
+                    }
+                    setTimeout(() => setSavedMessage(null), 3000);
+                },
+            }
+        );
     };
 
     return (
@@ -57,7 +54,7 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
                         <ExerciseCard
                             key={index}
                             exercise={exercise}
-                            onSaveClick={handleSaveClick}
+                            onSaveClick={handleSaveWorkout}
                             isSaved={savedExerciseIds.includes(exercise._id)}
                         />
                     ))}
@@ -75,41 +72,70 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
     );
 };
 
-const ExerciseCard: React.FC<{ exercise: WorkoutPlan, onSaveClick: (id: string, name: string) => void, isSaved: boolean }> = ({ exercise, onSaveClick, isSaved }) => (
-    <a href={`workouts/plan/${exercise._id}`}>
-        <div
-            className="min-w-[280px] h-[350px] bg-black text-white rounded-lg relative overflow-hidden group"
-            style={{ backgroundImage: `url(${exercise.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-        >
-            <div className="absolute inset-0 bg-black opacity-50 group-hover:opacity-30 transition-opacity"></div>
-            <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center z-5">
-                <p className="font-bold text-xl whitespace-normal break-words max-w-[70%] lg:text-2xl">
-                    {exercise.name}
-                </p>
-                <div className="flex space-x-4">
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onSaveClick(exercise._id, exercise.name);
-                        }}
-                        className={`p-2 ${isSaved ? 'bg-red-500' : 'bg-gray-700'} rounded-full transition-transform transform hover:scale-110 active:scale-90`}
-                        disabled={isSaved}
-                    >
-                        <AiFillHeart size={24} />
-                    </button>
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }}
-                        className="p-2 bg-green-500 rounded-full"
-                    >
-                        <AiOutlineReload size={24} />
-                    </button>
-                </div>
+const ExerciseCard: React.FC<{ 
+    exercise: WorkoutPlan, 
+    onSaveClick: (id: string, name: string) => void, 
+    isSaved: boolean 
+}> = ({ exercise, onSaveClick, isSaved }) => {
+    const [loading, setLoading] = useState(false);
+
+    const handleRedirect = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setLoading(true);
+        setTimeout(() => {
+            window.location.href = `workouts/plan/${exercise._id}`;
+        }, 500);
+    };
+
+    return (
+        <a href={`workouts/plan/${exercise._id}`} onClick={handleRedirect}>
+            <div
+                className="min-w-[280px] h-[350px] bg-black text-white rounded-lg relative overflow-hidden group"
+                style={{ backgroundImage: `url(${exercise.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+            >
+                <div className="absolute inset-0 bg-black opacity-50 group-hover:opacity-30 transition-opacity"></div>
+
+                {loading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 z-10">
+                        <FaSpinner className="text-emerald-500 text-5xl animate-spin" />
+                    </div>
+                )}
+
+                {/* Content */}
+                {!loading && (
+                    <>
+                        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center z-5">
+                            <p className="font-bold text-xl whitespace-normal break-words max-w-[70%] lg:text-2xl">
+                                {exercise.name}
+                            </p>
+                            <div className="flex space-x-4">
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        onSaveClick(exercise._id, exercise.name);
+                                    }}
+                                    className={`p-2 ${isSaved ? 'bg-red-500' : 'bg-gray-700'} rounded-full transition-transform transform hover:scale-110 active:scale-90`}
+                                    disabled={isSaved}
+                                >
+                                    <AiFillHeart size={24} />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    }}
+                                    className="p-2 bg-green-500 rounded-full"
+                                >
+                                    <AiOutlineReload size={24} />
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
-        </div>
-    </a>
-);
+        </a>
+    );
+};
 export default ExerciseBannerSection;
