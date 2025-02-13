@@ -152,11 +152,11 @@ const WorkoutLibrarySection = () => {
                     <ImSpinner8 className="animate-spin h-16 w-16 text-green-600" />
                 </div>
             ) : message ? (
-                <div className="border-dashed p-8 rounded-lg flex justify-center items-center h-[80%]">
+                <div className="border-dashed p-8 rounded-lg flex justify-center items-center h-[80%] w-[90%]">
                     <p className="text-gray-500 text-xl">{message}</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-8 h-[80%] w-[90%] lg:max-w-3xl pt-8 pb-20">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-8 h-[80%] w-[80%] lg:max-w-3xl pt-8 pb-20">
                     <AnimatedList
                         items={workouts?.message || []}
                         animationDuration={500}
