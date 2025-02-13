@@ -6,6 +6,7 @@ declare module "next-auth" {
         token?: string | null; 
         refreshToken?: string | null;
         accessToken?: string | null;
+        googleIdToken?: string | null;
     } 
     
     interface Session { 

@@ -7,6 +7,7 @@ import { useRegister } from '../../_components/register/RegisterProvider';
 import { useTranslation } from 'react-i18next';
 import RegistrationHeader from '@/app/_components/register/RegistrationHeader';
 import RegistrationButtons from '@/app/_components/register/RegisterButtons';
+import { signIn, useSession } from "next-auth/react";
 
 
 export default function RegisterStep10() {
@@ -14,10 +15,14 @@ export default function RegisterStep10() {
     const { data, updateData } = useRegister();
     const [isSubmittingNext, setIsSubmittingNext] = useState(false);
     const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
+    const { data: session } = useSession();
     const [selectedDays, setSelectedDays] = useState<string[]>(
         data.training_preferences?.available_days || []
     );
     const router = useRouter();
+    console.log(data);
+    console.log(session);
+
 
     const days = [
         { id: 1, label: t('RegisterPagestep10.days.0'), value: 'monday' },

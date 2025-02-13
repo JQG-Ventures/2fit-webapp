@@ -1,5 +1,6 @@
 interface Exercise {
-    exercise_id: string;
+    _id?: string;
+    exercise_id?: string;
     reps: number;
     sets: number;
     rest_seconds: number;
@@ -16,7 +17,7 @@ interface Exercise {
 }
 
 interface ExerciseView {
-    exercise_id: string;
+    exercise_id?: string;
     reps: number;
     sets: number;
     rest_seconds: number;
@@ -25,6 +26,7 @@ interface ExerciseView {
     description: string;
     category: string;
     image_url: string;
+    video_url?: string;
     muscle_group: string[];
     difficulty?: string;
     level?: string;

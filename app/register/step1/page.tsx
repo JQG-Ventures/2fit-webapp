@@ -8,7 +8,9 @@ import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import ButtonWithSpinner from '../../_components/others/ButtonWithSpinner';
 import InputWithIcon from '../../_components/form/InputWithIcon';
-import PhoneInput from '../../_components/form/PhoneInput';
+// import PhoneInput from '../../_components/form/PhoneInput';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/bootstrap.css'
 import CountryInputForm from '../../_components/form/CountryInputForm';
 import countryCodes from '@/app/data/countryCodes.json';
 import { calculateAge } from '@/app/utils/formUtils';
@@ -57,19 +59,30 @@ export default function RegisterStep1() {
         return phoneRegex.test(phone);
     };
 
+    const handlePhoneChange = (value: string, data: any) => {
+        let phoneCode = data.dialCode;
+        let number;
+        if (value.startsWith(`${data.dialCode}`)) {
+            number = value.replace(phoneCode, '').trim()
+        } else {
+            number = value;
+        }
+
+        if (phoneCode !== countryCode) {
+            setPhoneNumber('');
+        } else {
+            setPhoneNumber(number);
+        }
+
+        setCountryCode(phoneCode);
+        updateData({ ...formData, countryCode: phoneCode, number: number });
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        if (name === 'countryCode') {
-            setCountryCode(value);
-            updateData({ ...formData, countryCode: value, number: phoneNumber });
-        } else if (name === 'number') {
-            setPhoneNumber(value);
-            updateData({ ...formData, countryCode: countryCode, number: value });
-        } else {
-            const updatedFormData = { ...formData, [name]: value };
-            setFormData(updatedFormData);
-            updateData({ ...updatedFormData, countryCode: countryCode, number: phoneNumber });
-        }
+        const updatedFormData = { ...formData, [name]: value };
+        setFormData(updatedFormData);
+        updateData({ ...updatedFormData, countryCode: countryCode, number: phoneNumber });
     };
 
     const handleCountryChange = (countryName: string) => {
@@ -174,12 +187,10 @@ export default function RegisterStep1() {
                         countryList={countryCodes}
                     />
                     <PhoneInput
-                        label={t('RegisterPagestep1.phone')}
-                        countryCode={countryCode}
-                        phoneNumber={phoneNumber}
-                        onChange={handleChange}
-                        countryCodes={countryCodes}
-                        error={errors.number}
+                        countryCode={'us'}
+                        value={`+${countryCode}${phoneNumber}`}
+                        onChange={handlePhoneChange}
+                        inputClass="!w-full !py-6 !border-none !bg-gray-200 !rounded-md cursor-pointer"
                     />
                     {errors.birthdate && <p className="text-red-500 text-center">{errors.birthdate}</p>}
                     {errors.name && <p className="text-red-500 text-center">{errors.name}</p>}
@@ -196,21 +207,6 @@ export default function RegisterStep1() {
                         {t('RegisterPagestep1.nextbtn')}
                     </ButtonWithSpinner>
                 </form>
-            </div>
-            <div className="h-[12%] flex flex-col justify-start text-center">
-                <p className="text-gray-500 mb-6">{t('RegisterPagestep1.signuptxt')}</p>
-                <div className="flex flex-row justify-evenly space-x-8">
-                    {[FaApple, FaFacebook, FaGoogle].map((Icon, idx) => (
-                        <button key={idx} className="text-5xl">
-                            <Icon className={idx === 1 ? 'text-blue-600' : idx === 2 ? 'text-red-600' : 'text-gray-800'} />
-                        </button>
-                    ))}
-                </div>
-            </div>
-            <div className="h-[3%] text-center">
-                <p className="text-gray-500">
-                    {t('RegisterPagestep1.signupquestion')} <a href="#" className="text-indigo-600 underline">{t('RegisterPagestep1.signin')}</a>
-                </p>
             </div>
         </div>
     );

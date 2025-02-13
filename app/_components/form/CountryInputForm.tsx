@@ -41,7 +41,7 @@ const CountryDropdown: React.FC<CountryInputFormProps> = ({
           <img
             src={currentCountry.flag}
             alt={currentCountry.name}
-            className="mx-4 w-6 h-4 rounded-sm"
+            className="ml-3 mr-8 w-8 h-6 rounded-sm"
           />
         ) : (
           <IoGlobeOutline className="mx-2 text-gray-500" />

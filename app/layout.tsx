@@ -9,7 +9,6 @@ import NavBar from "./_components/navbar/NavBar";
 import { LanguageProvider } from "./utils/LanguageContext";
 import { ReactNode } from "react";
 import "@/app/utils/i18n";
-import { SessionProvider as CustomSessionProvider } from "./_providers/SessionProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import { LoadingProvider, useLoading } from "./_providers/LoadingProvider";
 import LoadingScreen from "./_components/animations/LoadingScreen";
@@ -18,7 +17,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 const LayoutContent = ({ children }: { children: ReactNode }) => {
 	const { isLoading } = useLoading();
-		
+
 	return (
 		<>
 			<NavBar />
@@ -48,11 +47,9 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
 				<LanguageProvider>
 					<RegisterProvider>
 						<AuthProvider>
-							<CustomSessionProvider>
-								<LoadingProvider>
-									<LayoutContent>{children}</LayoutContent>
-								</LoadingProvider>
-							</CustomSessionProvider>
+							<LoadingProvider>
+								<LayoutContent>{children}</LayoutContent>
+							</LoadingProvider>
 						</AuthProvider>
 					</RegisterProvider>
 				</LanguageProvider>

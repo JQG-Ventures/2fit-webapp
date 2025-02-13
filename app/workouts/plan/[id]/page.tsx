@@ -10,10 +10,10 @@ import LoadingScreen from '@/app/_components/animations/LoadingScreen';
 import SavedMessage from '@/app/_components/others/SavedMessage';
 import { useTranslation } from 'react-i18next';
 import ExerciseFlow from '@/app/_components/workouts/ExerciseFlow';
-import { useSessionContext } from '@/app/_providers/SessionProvider';
 import { useApiGet } from '@/app/utils/apiClient';
 import { useSaveWorkout } from '@/app/_services/userService';
 import { useLoading } from '@/app/_providers/LoadingProvider';
+import { useSession } from 'next-auth/react';
 
 
 const WorkoutPlanPage: React.FC = () => {
@@ -21,7 +21,9 @@ const WorkoutPlanPage: React.FC = () => {
 	const { id } = useParams();
 	const { t } = useTranslation('global');
 	const { setLoading } = useLoading();
-	const { userId } = useSessionContext();
+	const { data: session, status } = useSession();
+    const userId = session?.user?.id;
+    const sessionLoading = status === 'loading';
 	const [savedMessage, setSavedMessage] = useState<string | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 	const [showExerciseFlow, setShowExerciseFlow] = useState<boolean>(false);
@@ -69,7 +71,6 @@ const WorkoutPlanPage: React.FC = () => {
 		if (loadingPlans) {
 			setLoading(true);
 		} else {
-			console.log("JUST HERE", workoutPlan)
 			setLoading(false);
 		}
 	}, [loadingPlans, setLoading])
@@ -113,6 +114,7 @@ const WorkoutPlanPage: React.FC = () => {
 					<ExerciseList
 						exercises={workoutPlan?.message.workout_schedule[0]?.exercises || []}
 						isMobile={true}
+						onExerciseSelect={ () => {} }
 					/>
 
 					<WorkoutFooter onStartClick={handleStartWorkout} isSubmitting={isSubmitting} />
