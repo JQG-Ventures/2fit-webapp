@@ -48,13 +48,9 @@ const HomePage: React.FC = () => {
     let isLoading = loadingWorkoutPlans || loadingSavedWorkoutPlans || loadingLibraryWorkouts;
 
     useEffect(() => {
-        if (isLoading) {
-            setLoading(true);
-        } else {
-            setLoading(false);
-        }
-    }, [isLoading, setLoading])
-
+        setLoading(isLoading);
+    }, [isLoading]);
+    
     const handleDeleteWorkout = async (id: string) => {
         deleteSavedWorkout(
             { queryParams: { workout_id: id } },
@@ -86,11 +82,19 @@ const HomePage: React.FC = () => {
         );
     }
 
+    console.log("Rendering home");
+
     return (
         <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom }}>
             <div className="flex flex-col lg:flex-row lg:space-x-8">
-                <div className="flex-1">
+                <div className={isDesktopOrLaptop ? `flex-1` : 'flex flex-row justify-between pr-6'}>
                     <GreetingSection userName={userName || 'Guest'} />
+                    
+                    {!isDesktopOrLaptop &&
+                        <div className='flex justify-end items-center'>
+                            <SearchBar />
+                        </div>
+                    }
                 </div>
                 {isDesktopOrLaptop && (
                     <div className="flex flex-col flex-1 mt-16 pt-10">
@@ -99,7 +103,7 @@ const HomePage: React.FC = () => {
                     </div>
                 )}
             </div>
-            {!isDesktopOrLaptop && <SearchBar />}
+
             <div className="space-y-12">
                 <ExerciseBannerSection
                     hasRoutine={!!userId}
