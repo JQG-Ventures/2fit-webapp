@@ -3,7 +3,6 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { CiBookmarkMinus } from "react-icons/ci";
 
 interface DeleteWorkoutModalProps {
   isOpen: boolean;
@@ -16,7 +15,6 @@ interface DeleteWorkoutModalProps {
     level: string;
     duration: number;
   } | null;
-  isSaved: boolean;
 }
 
 const DeleteWorkoutModal: React.FC<DeleteWorkoutModalProps> = ({
@@ -24,7 +22,6 @@ const DeleteWorkoutModal: React.FC<DeleteWorkoutModalProps> = ({
   onClose,
   onConfirm,
   workout,
-  isSaved,
 }) => {
   const { t } = useTranslation("global");
 
@@ -60,18 +57,6 @@ const DeleteWorkoutModal: React.FC<DeleteWorkoutModalProps> = ({
               {t(`SavedWorkoutsSection.levels.${workout.level}`)}
             </p>
           </div>
-
-          <button className="absolute bottom-4 right-4 p-2">
-            <div
-              className={`h-12 w-12 flex items-center justify-center rounded-full ${
-                isSaved ? "bg-white" : "bg-transparent"
-              }`}
-            >
-              <CiBookmarkMinus
-                className={`h-8 w-8 ${isSaved ? "text-black" : "text-white"}`}
-              />
-            </div>
-          </button>
         </div>
 
         <div className="flex justify-between gap-4 mb-8 mt-8">
