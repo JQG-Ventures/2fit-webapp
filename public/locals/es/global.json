@@ -294,6 +294,72 @@
     "nextEx": "Siguiente Ejercicio",
     "skip": "Saltar descanso"
   },
+  "ForgotPassword": {
+    "forgotPassword": "Olvidaste tu contraseña",
+    "step0": {
+      "enterEmailPrompt": "Ingresa el correo electrónico asociado con tu cuenta para restablecer tu contraseña.",
+      "emailPlaceholder": "Ingresa tu correo electrónico",
+      "userNotFound": "No se encontró un usuario con este correo electrónico.",
+      "errorOccurred": "Ocurrió un error. Por favor intenta nuevamente.",
+      "submitting": "Enviando...",
+      "continue": "Continuar"
+    },
+    "step1": {
+      "headerTitle": "Olvidaste tu contraseña",
+      "illustrationAlt": "Ilustración de Olvidaste tu contraseña",
+      "prompt": "Selecciona los detalles de contacto que debemos usar para restablecer tu contraseña.",
+      "viaSms": "vía SMS:",
+      "viaEmail": "vía Correo electrónico:",
+      "defaultPhoneNumber": "+1 111 ******99",
+      "defaultEmail": "and***ey@tudominio.com",
+      "errorModalTitle": "Error",
+      "errorModalMessage": "Ocurrió un error. Por favor intenta nuevamente.",
+      "continueButton": {
+        "defaultText": "Continuar",
+        "loadingText": "Enviando..."
+      }
+    },
+    "step2": {
+      "verificationScreen": {
+        "headerTitle": "Verificación de Código",
+        "codeSentInfo": "El código ha sido enviado a",
+        "resendCode": {
+          "prompt": "Reenviar código en",
+          "resendButton": "Reenviar"
+        },
+        "verifyButton": {
+          "defaultText": "Verificar",
+          "loadingText": "Verificando..."
+        },
+        "incorrectCodeAlert": "Código incorrecto"
+      }
+    },
+    "step3": {
+      "createPasswordScreen": {
+        "headerTitle": "Crear Nueva Contraseña",
+        "imageAlt": "Ilustración de Crear Nueva Contraseña",
+        "instruction": "Crea tu nueva contraseña",
+        "newPasswordPlaceholder": "Nueva Contraseña",
+        "confirmPasswordPlaceholder": "Confirmar Contraseña",
+        "errorMessages": {
+          "passwordRequired": "Se requiere una contraseña.",
+          "passwordInvalid": "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, un número y un carácter especial.",
+          "confirmPasswordRequired": "Por favor confirma tu contraseña.",
+          "passwordsDoNotMatch": "Las contraseñas no coinciden.",
+          "apiError": "Ocurrió un error. Por favor intenta nuevamente."
+        },
+        "continueButton": {
+          "defaultText": "Continuar",
+          "loadingText": "Actualizando..."
+        },
+        "modal": {
+          "successTitle": "¡Felicidades!",
+          "successMessage": "Tu cuenta está lista para usar.",
+          "goToHomepage": "Ir a la página principal"
+        }
+      }
+    }
+  },
   "premium": {
     "premiumTitle1": "2Fit",
     "premiumTitle2": "Pass",
