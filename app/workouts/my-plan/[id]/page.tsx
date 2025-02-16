@@ -80,6 +80,7 @@ const MyPlan: React.FC = () => {
 				...day,
 				exercises: normalizeExercises(day.exercises),
 			}));
+			console.log('debugging1', weeklyProgressData)
 			setWeeklyProgressState({ ...weeklyProgressData.message, days: normalizedDays });
 		}
 	}, [weeklyProgressData]);
@@ -215,12 +216,15 @@ const MyPlan: React.FC = () => {
 		setWeeklyProgressState((prevState: any) => {
 			if (!prevState) return prevState;
 
+			console.log('debugging2', prevState)
 			return {
 				...prevState,
 				days: prevState.days.map((dayData: any) => {
 					if (dayData.day_of_week.toLowerCase() !== day.toLowerCase()) {
 						return dayData;
 					}
+
+					console.log('debugging3', dayData)
 
 					return {
 						...dayData,
@@ -276,7 +280,8 @@ const MyPlan: React.FC = () => {
 	const handleExerciseComplete = (exerciseId: string) => {
 		setWeeklyProgressState((prevState: any) => {
 			if (!prevState) return prevState;
-
+			
+			console.log('debugging4', prevState)
 			return {
 				...prevState,
 				days: prevState.days.map((day: any) => ({
@@ -308,9 +313,9 @@ const MyPlan: React.FC = () => {
 					selectedDayIndex={selectedDayIndex}
 					setSelectedDayIndex={setSelectedDayIndex}
 				/>
-				{selectedDay && selectedDay.exercises.length > 0 ? (
+				{selectedDay && selectedDay.exercises && selectedDay.exercises.length > 0 ? (
 					<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
-						{selectedDay && selectedDay.exercises.map((exercise: Exercise) => (
+						{selectedDay.exercises.map((exercise: Exercise) => (
 							<ExerciseCard
 								key={exercise.exercise_id}
 								exercise={exercise}
