@@ -82,8 +82,6 @@ const HomePage: React.FC = () => {
         );
     }
 
-    console.log("Rendering home");
-
     return (
         <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom }}>
             <div className="flex flex-col lg:flex-row lg:space-x-8">
