@@ -12,15 +12,24 @@ import "@/app/utils/i18n";
 import { AnimatePresence, motion } from "framer-motion";
 import { LoadingProvider, useLoading } from "./_providers/LoadingProvider";
 import LoadingScreen from "./_components/animations/LoadingScreen";
+import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const LayoutContent = ({ children }: { children: ReactNode }) => {
 	const { isLoading } = useLoading();
+	const pathname = usePathname();
+    const { data: session, status } = useSession();
+
+	const hideNavBarPaths = ['/login', '/re-auth', '/register', '/login/google']
+	// @ts-nocheck
+    const shouldShowNavBar = window.location.pathname !== '/' && !hideNavBarPaths.includes(pathname) && status === "authenticated";
+
 
 	return (
 		<>
-			<NavBar />
+			{shouldShowNavBar && <NavBar />}
 			{isLoading && <LoadingScreen />}
 			<AnimatePresence mode="wait">
 				<motion.div

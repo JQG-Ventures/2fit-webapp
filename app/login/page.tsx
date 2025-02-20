@@ -31,7 +31,6 @@ export default function Login() {
 	const [errors, setErrors] = useState<{ [key in keyof FormData]?: string }>({});
 	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
-	const { data: session, status } = useSession();
 	const [formData, setFormData] = useState<FormData>({
 		email: '',
 		password: '',
@@ -42,7 +41,6 @@ export default function Login() {
 		facebook: false,
 		apple: false,
 	});
-	const [showModal, setShowModal] = useState<boolean>(false);
 	const formFields: FormField[] = [
 		{ name: 'email', label: 'Email or Number', placeholder: t("LoginPage.emailOrPhone"), type: 'text', Icon: FiMail },
 		{ name: 'password', label: 'Password', placeholder: '******************', type: 'password', Icon: FiLock }
@@ -94,39 +92,7 @@ export default function Login() {
 		setIsSocialLoading(prev => ({ ...prev, [provider]: true }));
 		try {
 			if (provider === "google") {
-				const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/google-login`, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					// @ts-ignore
-					body: JSON.stringify({ id_token: session?.googleIdToken })
-				});
-
-				if (!res.ok) {
-					if (res.status === 404) {
-						setError(t("LoginPage.googleUserError"));
-					} else if (res.status === 400) {
-						setError(t("LoginPage.googleError"));
-					} else if (res.status === 401) {
-						setError(t("LoginPage.googleAuthError"));
-					} else {
-						setError(t("unexpectedError"));
-					}
-					return;
-				}
-
-				const data = await res.json();
-
-				await signIn("flaskgoogle", {
-					access_token: data.message.access_token,
-					refresh_token: data.message.refresh_token,
-					expires_at: data.message.expires_at,
-					user_id: data.message.user_id,
-					user_name: data.message.name,
-					redirect: false
-				});
-
-				window.location.href = '/home';
-			}
+				await signIn('google', { callbackUrl: '/login/google' })}
 		} catch (err) {
 			setError(t("LoginPage.socialSignInError"));
 		} finally {
@@ -191,25 +157,16 @@ export default function Login() {
 
 			<div className="h-[15%] flex flex-col justify-start text-center">
 				<p className="text-gray-500 mb-10">{t("LoginPage.OrSignIn")}</p>
-				<div className="flex flex-row justify-evenly space-x-8">
-					{[
-						{ icon: FaApple, name: 'apple' },
-						{ icon: FaFacebook, name: 'facebook' },
-						{ icon: FaGoogle, name: 'google' },
-					].map(({ icon: Icon, name }, idx) => (
-						<ButtonWithSpinner
-							key={idx}
-							type="button"
-							loading={isSocialLoading[name]}
-							onClick={() => handleSocialSignIn(name)}
-							className="text-5xl"
-						>
-							<Icon className={
-								name === 'facebook' ? 'text-blue-600' :
-									name === 'google' ? 'text-red-600' : ''
-							} />
-						</ButtonWithSpinner>
-					))}
+				<div className="flex flex-row justify-center space-x-8">
+					<ButtonWithSpinner
+						key={"test"}
+						type="button"
+						loading={isSocialLoading['google']}
+						onClick={() => handleSocialSignIn('google')}
+						className="text-5xl"
+					>
+						<FaGoogle className='text-red-600' />
+					</ButtonWithSpinner>
 				</div>
 			</div>
 
