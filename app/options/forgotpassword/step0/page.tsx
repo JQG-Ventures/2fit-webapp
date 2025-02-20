@@ -29,7 +29,7 @@ const Step0: React.FC = () => {
         return;
       }
 
-      router.push(`/options/forgotpassword/step1?userId=${userData._id}`);
+      router.push(`/options/forgotpassword/step1?userId=${userData.email}`);
     } catch (err) {
       setError(t("ForgotPassword.step0.errorOccurred"));
       setIsSubmitting(false);
@@ -48,13 +48,14 @@ const Step0: React.FC = () => {
       </div>
 
       <div className="h-[61%] flex flex-col items-center w-full max-w-lg justify-end pb-12">
-        <Image
-          src="/images/options/passwordlock.png"
-          alt={t("ForgotPassword.step0.illustrationAlt")}
-          width={250}
-          height={250}
-          className="w-2/3 h-auto"
-        />
+      <Image
+        src="/images/options/forgot-password-illustration.jpg"
+        alt="Forgot Password"
+        width={250}
+        height={250}
+        unoptimized
+        className="w-2/3 h-auto"
+      />
         <p className="text-2xl text-gray-900 mt-4 text-center px-4">
           {t("ForgotPassword.step0.enterEmailPrompt")}
         </p>
