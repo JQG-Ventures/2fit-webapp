@@ -173,8 +173,8 @@ export default function Login() {
 					)}
 					<div className="flex justify-end mb-10">
 						<p className="mt-4 text-[12px]">
-							<a href="/forgot-password" className="text-blue-900 font-medium hover:text-blue-500">
-								{t('LoginPage.forgotPassword')}
+							<a href="/options/forgotpassword/step0" className="text-blue-900 font-medium hover:text-blue-500">
+							{t('LoginPage.forgotPassword')}
 							</a>
 						</p>
 					</div>
