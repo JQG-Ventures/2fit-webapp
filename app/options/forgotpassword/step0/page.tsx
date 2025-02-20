@@ -29,7 +29,7 @@ const Step0: React.FC = () => {
         return;
       }
 
-      router.push(`/options/forgotpassword/step1?userId=${userData._id}`);
+      router.push(`/options/forgotpassword/step1?userId=${userData.email}`);
     } catch (err) {
       setError(t("ForgotPassword.step0.errorOccurred"));
       setIsSubmitting(false);

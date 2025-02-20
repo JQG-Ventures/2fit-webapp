@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { MdSms, MdEmail } from "react-icons/md";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import LoadingScreen from "../../../_components/animations/LoadingScreen";
-import { useFetch } from "../../../_hooks/useFetch";
 import Modal from "../../../_components/profile/modal";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
+import { useApiGet } from "../../../utils/apiClient";
+import { useLoading } from "../../../_providers/LoadingProvider";
 
 interface OptionItemProps {
   icon: React.ComponentType<{ className?: string }>;
@@ -37,19 +38,22 @@ const OptionItem: React.FC<OptionItemProps> = ({ icon: Icon, label, detail, isSe
 );
 
 const ForgotPassword: React.FC = () => {
-  const { t } = useTranslation('global');
+  const { t } = useTranslation("global");
   const router = useRouter();
   const searchParams = useSearchParams();
   const userId = searchParams.get("userId");
+  const { setLoading } = useLoading();
 
-  const getOptions = useMemo(() => ({ method: "GET" }), []);
-  const { data: userData, loading, error } = useFetch(
-    userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}` : "",
-    getOptions
-  );
+  const userApiUrl = userId ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/by-email/${userId}` : "";
+  const { data: userData, isLoading, isError } = useApiGet<{ status: string; message: any }>(["user", userId], userApiUrl, { enabled: !!userId });
 
   const [selectedOption, setSelectedOption] = useState<"sms" | "email" | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
 
   useEffect(() => {
     if (!userId) {
@@ -60,24 +64,17 @@ const ForgotPassword: React.FC = () => {
   const handleContinue = () => {
     if (selectedOption) {
       setIsSubmitting(true);
-      const contactValue = selectedOption === "sms" ? userData?.number : userData?.email;
+      const contactValue = selectedOption === "sms" ? userData?.message?.number : userData?.message?.email;
       router.push(`/options/forgotpassword/step2?contact=${encodeURIComponent(contactValue || "")}`);
     }
   };
 
-  if (loading) return <LoadingScreen />;
-  if (error) {
-    return (
-      <Modal
-        title={t("ForgotPassword.step1.errorModalTitle")}
-        message={error}
-        onClose={() => router.push("/options/forgotpassword/step0")}
-      />
-    );
-  }
+  if (isLoading) return <LoadingScreen />;
+
 
   return (
     <div className="flex flex-col justify-between items-center bg-white h-screen p-14">
+
       <div className="h-[12%] flex flex-row justify-left space-x-8 items-center w-full max-w-3xl">
         <button onClick={() => router.push("/login")} className="text-gray-700">
           <IoIosArrowBack className="text-3xl cursor-pointer" />
@@ -87,7 +84,7 @@ const ForgotPassword: React.FC = () => {
 
       <div className="h-[51%] flex flex-col items-center w-full max-w-lg justify-end pb-12">
         <Image
-          src="/images/options/forgot-password-illustration.png"
+          src="/images/options/passwordlock.png"
           alt={t("ForgotPassword.step1.illustrationAlt")}
           width={250}
           height={250}
@@ -102,7 +99,7 @@ const ForgotPassword: React.FC = () => {
         <OptionItem
           icon={MdSms}
           label={t("ForgotPassword.step1.viaSms")}
-          detail={userData?.number || t("ForgotPassword.step1.defaultPhoneNumber")}
+          detail={userData?.message?.number || t("ForgotPassword.step1.defaultPhoneNumber")}
           isSelected={selectedOption === "sms"}
           onClick={() => setSelectedOption("sms")}
         />
@@ -110,7 +107,7 @@ const ForgotPassword: React.FC = () => {
         <OptionItem
           icon={MdEmail}
           label={t("ForgotPassword.step1.viaEmail")}
-          detail={userData?.email || t("ForgotPassword.step1.defaultEmail")}
+          detail={userData?.message?.email || t("ForgotPassword.step1.defaultEmail")}
           isSelected={selectedOption === "email"}
           onClick={() => setSelectedOption("email")}
         />
