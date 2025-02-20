@@ -34,8 +34,17 @@ axiosInstance.interceptors.request.use(
 			const session = await getSession();
 
 			if (!session?.user?.token) {
-				window.location.href = '/re-auth';
-				return new Promise(() => {})
+				const excludedRoutes = ['/login', '/re-auth', '/register', '/login/google'];
+
+				if (
+					window.location.pathname !== '/' &&
+					!excludedRoutes.some(route => window.location.pathname === route) &&
+					!window.location.pathname.startsWith('/register/')
+				) {
+					window.location.href = '/re-auth';
+				}
+
+				return new Promise(() => { })
 			}
 
 			originalRequest.headers.Authorization = `Bearer ${session.user.token}`;

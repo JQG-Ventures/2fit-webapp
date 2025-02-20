@@ -9,9 +9,10 @@ export default function GoogleLoginCallback() {
     const { data: session, status } = useSession();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [hasSentRequest, setHasSentRequest] = useState(false);
 
     useEffect(() => {
-        if (status === "loading") {
+        if (status === "loading" || hasSentRequest) {
             return;
         }
 
@@ -22,31 +23,29 @@ export default function GoogleLoginCallback() {
         }
 
         async function handleGoogleLogin() {
-            // @ts-ignore
-            if (!session?.googleIdToken && status === "unauthenticated") {
-                return;
-            }
+            setHasSentRequest(true);
 
             try {
+                // @ts-ignore
+                if (!session?.googleIdToken) {
+                    setError("Missing Google ID Token");
+                    setLoading(false);
+                    return;
+                }
+
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/google-login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     // @ts-ignore
-                    body: JSON.stringify({ id_token: session?.googleIdToken })
+                    body: JSON.stringify({ id_token: session?.googleIdToken }),
                 });
 
                 if (!res.ok) {
-
-                    if (res.status === 404) {
-                        setError("Invalid user");
-                    } else if (res.status === 400) {
-                        setError("There was an error contacting google, please try again later");
-                    } else if (res.status === 400) {
-                        setError("User not registered with Google");
-                    } 
-
-                    setError("There was a login error, try again later")
+                    const errorMessage = res.status === 404 ? "Invalid user"
+                        : res.status === 400 ? "User not registered with Google"
+                        : "There was a login error, try again later";
                     
+                    setError(errorMessage);
                     setLoading(false);
                     return;
                 }
@@ -62,15 +61,15 @@ export default function GoogleLoginCallback() {
                     redirect: false
                 });
 
-                window.location.href = '/home';
+                router.push('/home');
             } catch {
                 setError("Network error");
+                setLoading(false);
             }
-            setLoading(false);
         }
 
         handleGoogleLogin();
-    }, [status, session]);
+    }, [status, session, hasSentRequest]);
 
     if (status === "loading" || loading) {
         return (

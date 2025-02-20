@@ -84,6 +84,7 @@ const ExerciseCard: React.FC<{
         e.stopPropagation();
         setLoading(true);
         setTimeout(() => {
+            // @ts-nocheck
             window.location.href = `workouts/plan/${exercise._id}`;
         }, 500);
     };
