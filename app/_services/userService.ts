@@ -129,3 +129,34 @@ export const useUpdateProfile = () => {
         { status: string; message: string }
     >('/api/users/profile');
 };
+export const updatePassword = async (
+	contact: string,
+	code: string,
+	newPassword: string
+  ) => {
+	try {
+	  const body = JSON.stringify({
+		contact,
+		code,
+		new_password: newPassword,
+	  });
+  
+	  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/update-password`, {
+		method: "POST",
+		headers: {
+		  "Content-Type": "application/json",
+		},
+		body,
+	  });
+  
+	  if (!res.ok) {
+		const errorData = await res.json();
+		throw new Error(errorData.message || "Error updating password.");
+	  }
+  
+	  return await res.json();
+	} catch (error) {
+	  throw error;
+	}
+  };
+  
