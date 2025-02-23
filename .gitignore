@@ -39,3 +39,5 @@ next-env.d.ts
 .idea/2fit-webapp.iml
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/vcs.xml
+
+.env.development
