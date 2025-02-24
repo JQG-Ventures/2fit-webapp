@@ -80,7 +80,6 @@ const MyPlan: React.FC = () => {
 				...day,
 				exercises: normalizeExercises(day.exercises),
 			}));
-			console.log('debugging1', weeklyProgressData)
 			setWeeklyProgressState({ ...weeklyProgressData.message, days: normalizedDays });
 		}
 	}, [weeklyProgressData]);
@@ -216,15 +215,12 @@ const MyPlan: React.FC = () => {
 		setWeeklyProgressState((prevState: any) => {
 			if (!prevState) return prevState;
 
-			console.log('debugging2', prevState)
 			return {
 				...prevState,
 				days: prevState.days.map((dayData: any) => {
 					if (dayData.day_of_week.toLowerCase() !== day.toLowerCase()) {
 						return dayData;
 					}
-
-					console.log('debugging3', dayData)
 
 					return {
 						...dayData,
@@ -280,8 +276,7 @@ const MyPlan: React.FC = () => {
 	const handleExerciseComplete = (exerciseId: string) => {
 		setWeeklyProgressState((prevState: any) => {
 			if (!prevState) return prevState;
-			
-			console.log('debugging4', prevState)
+
 			return {
 				...prevState,
 				days: prevState.days.map((day: any) => ({
