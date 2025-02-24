@@ -175,6 +175,7 @@
   "home": {
     "errorTitle": "Error :(",
     "error": "There is a problem that we are solving, try again later!",
+    "completeRoutine": "Complete today's routine!",
     "excercisebannersection": {
       "planfortoday": "What's the plan for today?",
       "planfortoday2": "Explore Workouts",
