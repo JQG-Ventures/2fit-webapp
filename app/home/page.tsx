@@ -103,10 +103,7 @@ const HomePage: React.FC = () => {
         return null;
     };
 
-
     const todayExercise = getTodayPendingExercise();
-
-    console.log("active plans", activePlans?.message);
 
     return (
         <Link href={`/workouts`} passHref>
