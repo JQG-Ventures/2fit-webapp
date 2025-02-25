@@ -187,17 +187,17 @@
 			"success": "Edit sucessfully updated!",
 			"error": "There was a problem updating the profile."
 		},
-    "Notifications": {
-      "Title": "Notifications",
+		"Notifications": {
+			"Title": "Notifications",
 			"GeneralNotifications": "General Notifications",
 			"AppUpdates": "App Updates",
 			"NewServicesAvailable": "New Services Available",
 			"NewTipsAvailable": "New Tips Available",
-      "SuccessMessage": "Action performed correctly",
-      "ErrorMessage": "Something failed, please try again later..."
+			"SuccessMessage": "Action performed correctly",
+			"ErrorMessage": "Something failed, please try again later..."
 		},
-    "Security": {
-      "Title": "Security",
+		"Security": {
+			"Title": "Security",
 			"FaceID": "Face ID",
 			"RememberMe": "Remember Me",
 			"TouchID": "Touch ID",
@@ -205,20 +205,20 @@
 			"ChangePassword": "Change Password"
 		}
 	},
-  "ChangePasswordModal": {
-  "title": "Change Password",
-  "newPassword": "Write your new password",
-  "confirmPassword": "Confirm your new password",
-  "cancel": "Cancel.",
-  "update": "Update",
-  "updating": "updating...",
-  "Successfullchangepswd": "Password has successfully changed",
-  "Failedchangepswd": "Something failed, please try again later...",
-  "passwordRequired": "Password is required.",
-  "passwordValidationError": "Password must be at least 8 characters long, include uppercase and lowercase letters, a number, and a special character, and contain no spaces.",
-  "confirmPasswordRequired": "Please confirm your password.",
-  "passwordsDoNotMatch": "Passwords do not match."
-},
+	"ChangePasswordModal": {
+		"title": "Change Password",
+		"newPassword": "Write your new password",
+		"confirmPassword": "Confirm your new password",
+		"cancel": "Cancel.",
+		"update": "Update",
+		"updating": "updating...",
+		"Successfullchangepswd": "Password has successfully changed",
+		"Failedchangepswd": "Something failed, please try again later...",
+		"passwordRequired": "Password is required.",
+		"passwordValidationError": "Password must be at least 8 characters long, include uppercase and lowercase letters, a number, and a special character, and contain no spaces.",
+		"confirmPasswordRequired": "Please confirm your password.",
+		"passwordsDoNotMatch": "Passwords do not match."
+	},
 	"upgrade": {
 		"title": "Upgrade to Premium",
 		"description": "Enjoy workout access without ads and restrictions"
@@ -333,70 +333,206 @@
 		"nextEx": "Next Exercise",
 		"skip": "Skip rest"
 	},
-  "ForgotPassword": {
-  "forgotPassword": "Forgot Password",
-  "step0": {
-    "enterEmailPrompt": "Enter the email associated with your account to reset your password.",
-    "emailPlaceholder": "Enter your email",
-    "userNotFound": "User not found with this email.",
-    "errorOccurred": "An error occurred. Please try again.",
-    "submitting": "Submitting...",
-    "continue": "Continue"
-  },
-  "step1": {
-    "headerTitle": "Forgot Password",
-    "illustrationAlt": "Forgot Password Illustration",
-    "prompt": "Select which contact details should we use to reset your password.",
-    "viaSms": "via SMS:",
-    "viaEmail": "via Email:",
-    "defaultPhoneNumber": "+1 111 ******99",
-    "defaultEmail": "and***ey@yourdomain.com",
-    "errorModalTitle": "Error",
-    "errorModalMessage": "An error occurred. Please try again.",
-    "continueButton": {
-      "defaultText": "Continue",
-      "loadingText": "Submitting..."
-    }
-  },
-  "step2": {
-    "verificationScreen": {
-      "headerTitle": "Code Verification",
-      "codeSentInfo": "Code has been sent to {displayedContact}",
-      "resendCode": {
-        "prompt": "Resend code in",
-        "resendButton": "Resend"
-      },
-      "verifyButton": {
-        "defaultText": "Verify",
-        "loadingText": "Verifying..."
-      },
-      "incorrectCodeAlert": "Incorrect code"
-    }
-  },
-  "step3": {
-    "createPasswordScreen": {
-      "headerTitle": "Create New Password",
-      "imageAlt": "Create New Password Illustration",
-      "instruction": "Create Your New Password",
-      "newPasswordPlaceholder": "New Password",
-      "confirmPasswordPlaceholder": "Confirm Password",
-      "errorMessages": {
-        "passwordRequired": "Password is required.",
-        "passwordInvalid": "Password must be at least 8 characters, include uppercase, lowercase, a number, and a special character.",
-        "confirmPasswordRequired": "Please confirm your password.",
-        "passwordsDoNotMatch": "Passwords do not match.",
-        "apiError": "An error occurred. Please try again."
-      },
-      "continueButton": {
-        "defaultText": "Continue",
-        "loadingText": "Updating..."
-      },
-      "modal": {
-        "successTitle": "Congratulations!",
-        "successMessage": "Your account is ready to use.",
-        "goToHomepage": "Go to Homepage"
-      }
-    }
-  }
-}
+	"ForgotPassword": {
+		"forgotPassword": "Forgot Password",
+		"step0": {
+			"enterEmailPrompt": "Enter the email associated with your account to reset your password.",
+			"emailPlaceholder": "Enter your email",
+			"userNotFound": "User not found with this email.",
+			"errorOccurred": "An error occurred. Please try again.",
+			"submitting": "Submitting...",
+			"continue": "Continue"
+		},
+		"step1": {
+			"headerTitle": "Forgot Password",
+			"illustrationAlt": "Forgot Password Illustration",
+			"prompt": "Select which contact details should we use to reset your password.",
+			"viaSms": "via SMS:",
+			"viaEmail": "via Email:",
+			"defaultPhoneNumber": "+1 111 ******99",
+			"defaultEmail": "and***ey@yourdomain.com",
+			"errorModalTitle": "Error",
+			"errorModalMessage": "An error occurred. Please try again.",
+			"continueButton": {
+				"defaultText": "Continue",
+				"loadingText": "Submitting..."
+			}
+		},
+		"upgrade": {
+			"title": "Upgrade to Premium",
+			"description": "Enjoy workout access without ads and restrictions"
+		},
+		"home": {
+			"errorTitle": "Error :(",
+			"error": "There is a problem that we are solving, try again later!",
+			"completeRoutine": "Complete today's routine!",
+			"excercisebannersection": {
+				"planfortoday": "What's the plan for today?",
+				"planfortoday2": "Explore Workouts",
+				"noexercisemessage": "Soon you will have access to a variety of workouts to get you fit, stay tuned!"
+			},
+			"GuidedWorkoutsSection": {
+				"guidedworkoutstitle": "Guided Workouts",
+				"guidedworkoutsdescription": "Choose your favorite workout from guided plans.",
+				"viewall": "View All",
+				"noworkoutmessage": "No workouts available at the moment. Please check back later!"
+			},
+			"WorkoutLibrarySection": {
+				"WorkoutLibrarySectiontitle": "Explore Our Workout Library",
+				"WorkoutLibrarySectiondescription": "Soon you will have tons of workouts to get you fit, stay tuned!",
+				"viewall": "View All",
+				"WorkoutLibrarySectiondescription2": "Discover more workouts tailored to your fitness goals in our extensive library.",
+				"openlibrary": "Open Workout Library"
+			},
+			"SavedWorkoutsSection": {
+				"SavedWorkoutsSectiontitle": "Saved Workouts",
+				"SavedWorkoutsSectiondescription": "View All",
+				"viewall": "View All",
+				"SavedWorkoutsSectionquestion": "Do you want to remove this workout from your saved list?",
+				"SavedWorkoutsSectionconfirmText": "Yes, Remove",
+				"SavedWorkoutsSectioncancelText": "Cancel",
+				"SavedWorkoutsSectionrenderLoading": "Loading workout plans and saved workouts..."
+			},
+			"motivation": {
+				"main": "Keep up the great work!",
+				"base": "Achieve your fitness goals with a personal AI trainer designed just for you.",
+				"phrases": [
+					"Stay consistent and results will follow!",
+					"Every workout is progress, no matter how small.",
+					"Your only limit is the one you set yourself!",
+					"Make today your best workout yet!",
+					"Stay focused, stay fit!"
+				],
+				"mtvnlsection": "Close motivational section",
+				"mtvnlchatbot": "Open chatbot"
+			},
+			"greeting": {
+				"morning": "Good Morning",
+				"afternoon": "Good Afternoon",
+				"evening": "Good Night"
+			},
+			"trainer": {
+				"talk": "Talk to your trainer",
+				"letschat": "Let's Chat!",
+				"getyourplan": "Get your plan"
+			}
+		},
+		"chat": {
+			"openWhatsApp": "Open your conversation in WhatsApp"
+		},
+		"workouts": {
+			"exercise": "exercise",
+			"left": "left",
+			"challengeProgress": "Challenge progress",
+			"weeklyRoutine": "Weekly routine",
+			"workoutProgress": "Workout progress",
+			"fetchingError": "Error fetching progress",
+			"plan": {
+				"workoutAlreadySaved": "Workout already saved!",
+				"workoutSaved": "Workout Saved!",
+				"savingError": "There was an error saving the workout, try again.",
+				"workoutActivity": "Workout Activity",
+				"seeAll": "See All",
+				"secs": "Seconds",
+				"start": "START",
+				"rest": "Rest",
+				"getReady": "Get Ready!",
+				"startOver": "Start Over",
+				"previous": "Previous",
+				"next": "Next",
+				"pause": "Pause",
+				"resume": "Resume",
+				"skipRest": "Skip Rest",
+				"nextExercise": "Next Exercise:",
+				"takeRest": "TAKE A REST",
+				"congrats": "Congratulations!",
+				"completedSentence": "You have completed this workout!",
+				"workouts": "Workouts",
+				"minutes": "Minutes",
+				"goto": "Go to Another Workout",
+				"home": "Home",
+				"of": "of"
+			},
+			"my-plan": {
+				"exerciseOptions": "Modify your routine",
+				"deleteExercise": "Delete Exercise",
+				"changeExercise": "Modify Exercise",
+				"title": "My Workout Plan",
+				"noExercises": "No exercises for this day",
+				"confirm": "Confirm"
+			},
+			"PopularExercisesSection": {
+				"popularExerciseTitle": "Popular Exercises",
+				"seeDetails": "See Details",
+				"PopularSectionEmpty": "We are still learning to give you the bests workouts for you",
+				"exercises": "exercises",
+				"start": "Start Now"
+			}
+		},
+		"ExerciseFlow": {
+			"ready": "Get Ready!",
+			"completed": "Exercise completed!"
+		},
+		"RestView": {
+			"rest": "Take a rest",
+			"nextEx": "Next Exercise",
+			"skip": "Skip rest"
+		},
+		"premium": {
+			"premiumTitle1": "2Fit",
+			"premiumTitle2": "Pass",
+			"continue": "Continuar"
+		},
+		"BePremium": {
+			"title": "Be Premium",
+			"subtitle": "Get Unlimited Access",
+			"description": "Enjoy workout access without ads and restrictions.",
+			"plans": {
+				"1": {
+					"name": "1 Month",
+					"price": "$16.99/m"
+				},
+				"step2": {
+					"verificationScreen": {
+						"headerTitle": "Code Verification",
+						"codeSentInfo": "Code has been sent to {displayedContact}",
+						"resendCode": {
+							"prompt": "Resend code in",
+							"resendButton": "Resend"
+						},
+						"verifyButton": {
+							"defaultText": "Verify",
+							"loadingText": "Verifying..."
+						},
+						"incorrectCodeAlert": "Incorrect code"
+					}
+				},
+				"step3": {
+					"createPasswordScreen": {
+						"headerTitle": "Create New Password",
+						"imageAlt": "Create New Password Illustration",
+						"instruction": "Create Your New Password",
+						"newPasswordPlaceholder": "New Password",
+						"confirmPasswordPlaceholder": "Confirm Password",
+						"errorMessages": {
+							"passwordRequired": "Password is required.",
+							"passwordInvalid": "Password must be at least 8 characters, include uppercase, lowercase, a number, and a special character.",
+							"confirmPasswordRequired": "Please confirm your password.",
+							"passwordsDoNotMatch": "Passwords do not match.",
+							"apiError": "An error occurred. Please try again."
+						},
+						"continueButton": {
+							"defaultText": "Continue",
+							"loadingText": "Updating..."
+						},
+						"modal": {
+							"successTitle": "Congratulations!",
+							"successMessage": "Your account is ready to use.",
+							"goToHomepage": "Go to Homepage"
+						}
+					}
+				}
+			}
+		}
+	}
 }

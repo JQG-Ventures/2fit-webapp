@@ -198,23 +198,23 @@
 			"error": "Hubo un error actualizando el perfil."
 		},
 		"Notifications": {
-			   "Title": "Notificaciones",
-				"GeneralNotifications": "Notificaciones Generales",
-				"AppUpdates": "Actualizaciones",
-				"NewServicesAvailable": "Nuevos Servicios Disponibles",
-				"NewTipsAvailable": "Nuevos tips disponibles",
-      			"SuccessMessage": "Acción realizada correctamente",
-      			"ErrorMessage": "Algo falló, por favor intenta de nuevo mas tarde!"
-			},
+			"Title": "Notificaciones",
+			"GeneralNotifications": "Notificaciones Generales",
+			"AppUpdates": "Actualizaciones",
+			"NewServicesAvailable": "Nuevos Servicios Disponibles",
+			"NewTipsAvailable": "Nuevos tips disponibles",
+			"SuccessMessage": "Acción realizada correctamente",
+			"ErrorMessage": "Algo falló, por favor intenta de nuevo mas tarde!"
+		},
 		"Security": {
-			        "Title": "Seguridad",
-					"FaceID": "Face ID",
-					"RememberMe": "Recuerdame",
-					"TouchID": "Touch ID",
-					"GoogleAuthenticator": "Google Authenticator",
-					"ChangePassword": "Cambiar contraseña",
-					"Successfullchangepswd": "Se cambió la contraseña exitosamente",
-					"Failedchangepswd": "Algo falló, por favor intenta de nuevo mas tarde"
+			"Title": "Seguridad",
+			"FaceID": "Face ID",
+			"RememberMe": "Recuerdame",
+			"TouchID": "Touch ID",
+			"GoogleAuthenticator": "Google Authenticator",
+			"ChangePassword": "Cambiar contraseña",
+			"Successfullchangepswd": "Se cambió la contraseña exitosamente",
+			"Failedchangepswd": "Algo falló, por favor intenta de nuevo mas tarde"
 		}
 	},
 	"ChangePasswordModal": {
@@ -230,7 +230,7 @@
 		"passwordValidationError": "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas y minúsculas, un número, un carácter especial y no contener espacios.",
 		"confirmPasswordRequired": "Por favor, confirma tu contraseña.",
 		"passwordsDoNotMatch": "Las contraseñas no coinciden."
-		},
+	},
 	"upgrade": {
 		"title": "Actualizar a Premium",
 		"description": "Disfruta del acceso a los entrenamientos sin anuncios ni restricciones"
@@ -345,70 +345,210 @@
 		"nextEx": "Siguiente Ejercicio",
 		"skip": "Saltar descanso"
 	},
-  "ForgotPassword": {
-  "forgotPassword": "Olvidaste tu contraseña",
-  "step0": {
-    "enterEmailPrompt": "Ingresa el correo electrónico asociado con tu cuenta para restablecer tu contraseña.",
-    "emailPlaceholder": "Ingresa tu correo electrónico",
-    "userNotFound": "No se encontró un usuario con este correo electrónico.",
-    "errorOccurred": "Ocurrió un error. Por favor intenta nuevamente.",
-    "submitting": "Enviando...",
-    "continue": "Continuar"
-  },
-  "step1": {
-    "headerTitle": "Olvidaste tu contraseña",
-    "illustrationAlt": "Ilustración de Olvidaste tu contraseña",
-    "prompt": "Selecciona los detalles de contacto que debemos usar para restablecer tu contraseña.",
-    "viaSms": "vía SMS:",
-    "viaEmail": "vía Correo electrónico:",
-    "defaultPhoneNumber": "+1 111 ******99",
-    "defaultEmail": "and***ey@tudominio.com",
-    "errorModalTitle": "Error",
-    "errorModalMessage": "Ocurrió un error. Por favor intenta nuevamente.",
-    "continueButton": {
-      "defaultText": "Continuar",
-      "loadingText": "Enviando..."
-    }
-  },
-  "step2": {
-    "verificationScreen": {
-      "headerTitle": "Verificación de Código",
-      "codeSentInfo": "El código ha sido enviado a",
-      "resendCode": {
-        "prompt": "Reenviar código en",
-        "resendButton": "Reenviar"
-      },
-      "verifyButton": {
-        "defaultText": "Verificar",
-        "loadingText": "Verificando..."
-      },
-      "incorrectCodeAlert": "Código incorrecto"
-    }
-  },
-  "step3": {
-    "createPasswordScreen": {
-      "headerTitle": "Crear Nueva Contraseña",
-      "imageAlt": "Ilustración de Crear Nueva Contraseña",
-      "instruction": "Crea tu nueva contraseña",
-      "newPasswordPlaceholder": "Nueva Contraseña",
-      "confirmPasswordPlaceholder": "Confirmar Contraseña",
-      "errorMessages": {
-        "passwordRequired": "Se requiere una contraseña.",
-        "passwordInvalid": "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, un número y un carácter especial.",
-        "confirmPasswordRequired": "Por favor confirma tu contraseña.",
-        "passwordsDoNotMatch": "Las contraseñas no coinciden.",
-        "apiError": "Ocurrió un error. Por favor intenta nuevamente."
-      },
-      "continueButton": {
-        "defaultText": "Continuar",
-        "loadingText": "Actualizando..."
-      },
-      "modal": {
-        "successTitle": "¡Felicidades!",
-        "successMessage": "Tu cuenta está lista para usar.",
-        "goToHomepage": "Ir a la página principal"
-      }
-    }
-  }
-}
-}
+	"ForgotPassword": {
+		"forgotPassword": "Olvidaste tu contraseña",
+		"step0": {
+			"enterEmailPrompt": "Ingresa el correo electrónico asociado con tu cuenta para restablecer tu contraseña.",
+			"emailPlaceholder": "Ingresa tu correo electrónico",
+			"userNotFound": "No se encontró un usuario con este correo electrónico.",
+			"errorOccurred": "Ocurrió un error. Por favor intenta nuevamente.",
+			"submitting": "Enviando...",
+			"continue": "Continuar"
+		},
+		"step1": {
+			"headerTitle": "Olvidaste tu contraseña",
+			"illustrationAlt": "Ilustración de Olvidaste tu contraseña",
+			"prompt": "Selecciona los detalles de contacto que debemos usar para restablecer tu contraseña.",
+			"viaSms": "vía SMS:",
+			"viaEmail": "vía Correo electrónico:",
+			"defaultPhoneNumber": "+1 111 ******99",
+			"defaultEmail": "and***ey@tudominio.com",
+			"errorModalTitle": "Error",
+			"errorModalMessage": "Ocurrió un error. Por favor intenta nuevamente.",
+			"continueButton": {
+				"defaultText": "Continuar",
+				"loadingText": "Enviando..."
+			}
+		},
+		"upgrade": {
+			"title": "Actualizar a Premium",
+			"description": "Disfruta del acceso a los entrenamientos sin anuncios ni restricciones"
+		},
+		"home": {
+			"errorTitle": "Lo sentimos :(",
+			"error": "Hubo un problema que estamos solucionando, intentalo mas tarde!",
+			"completeRoutine": "¡Completa la rutina de hoy!",
+			"excercisebannersection": {
+				"planfortoday": "¿Cuales son los planes para hoy?",
+				"planfortoday2": "Explora los entrenamientos",
+				"noexercisemessage": "Pronto tendrás acceso a una variedad de entrenamientos para ponerte en forma, ¡mantente atento!"
+			},
+			"GuidedWorkoutsSection": {
+				"guidedworkoutstitle": "Entrenamientos guiados",
+				"guidedworkoutsdescription": "Elige tu entrenamiento favorito de los planes guiados.",
+				"viewall": "Ver todo",
+				"noworkoutmessage": "No hay entrenamientos disponibles en este momento. ¡Por favor, vuelva a consultar más tarde!"
+			},
+			"WorkoutLibrarySection": {
+				"WorkoutLibrarySectiontitle": "Explora nuestra biblioteca de ejercicios",
+				"WorkoutLibrarySectiondescription": "Pronto tendrás un montón de entrenamientos para ponerte en forma, ¡mantente atento!",
+				"viewall": "Ver todo",
+				"WorkoutLibrarySectiondescription2": "Descubre más entrenamientos adaptados a tus objetivos de fitness en nuestra amplia biblioteca.",
+				"openlibrary": "Abrir biblioteca de entrenamientos"
+			},
+			"SavedWorkoutsSection": {
+				"SavedWorkoutsSectiontitle": "Entrenamientos guardados",
+				"SavedWorkoutsSectiondescription": "Los ejercicios que te gustan aparecerán aquí",
+				"viewall": "Ver todo",
+				"SavedWorkoutsSectionquestion": "¿Quieres eliminar este entrenamiento de tu lista de guardados?",
+				"SavedWorkoutsSectionconfirmText": "Si, remover",
+				"SavedWorkoutsSectioncancelText": "Cancelar",
+				"SavedWorkoutsSectionrenderLoading": "Cargando planes de entrenamiento y entrenamientos guardados..."
+			},
+			"motivation": {
+				"main": "¡Sigue con el excelente trabajo!",
+				"base": "Alcanza tus objetivos de fitness con un entrenador personal de IA diseñado especialmente para ti.",
+				"phrases": [
+					"¡Mantente constante y los resultados llegarán!",
+					"Cada entrenamiento es un progreso, por pequeño que sea.",
+					"¡Tu único límite es el que te pones a ti mismo!",
+					"¡Haz de hoy tu mejor entrenamiento hasta ahora!",
+					"¡Mantente enfocado, mantente en forma!"
+				],
+				"mtvnlsection": "Cerrar sección motivacional",
+				"mtvnlchatbot": "Abrir chatbot"
+			},
+			"greeting": {
+				"morning": "Buenos Días",
+				"afternoon": "Buenas Tardes",
+				"evening": "Buenas Noches"
+			},
+			"trainer": {
+				"talk": "Habla con tu entrenador",
+				"letschat": "¡Charlemos!",
+				"getyourplan": "Obtén tu plan!"
+			}
+		},
+		"chat": {
+			"openWhatsApp": "Abre tu conversacion en WhatsApp"
+		},
+		"workouts": {
+			"exercise": "ejercicio",
+			"left": "restante",
+			"challengeProgress": "Progreso del Challenge",
+			"weeklyRoutine": "Rutina Semanal",
+			"workoutProgress": "Progreso del plan",
+			"fetchingError": "Error trayendo la informacion",
+			"plan": {
+				"workoutAlreadySaved": "El plan ya ha sido guardado!",
+				"workoutSaved": "Plan guardado!",
+				"savingError": "Hubo un error guardando el plan, intente mas tarde.",
+				"workoutActivity": "Actividad del Plan",
+				"seeAll": "Ver todo",
+				"secs": "Segundos",
+				"start": "INICIO",
+				"rest": "Descanso",
+				"getReady": "Alistate!",
+				"startOver": "Iniciar de nuevo",
+				"previous": "Anterior",
+				"next": "Siguiente",
+				"pause": "Pausar",
+				"resume": "Resumir",
+				"skipRest": "Saltar descanso",
+				"nextExercise": "Siguiente ejercicio:",
+				"takeRest": "TOMA UN DESCANSO",
+				"congrats": "Felicidades!",
+				"completedSentence": "Haz completado esta rutina!",
+				"workouts": "Rutinas",
+				"minutes": "Minutos",
+				"goto": "Buscar otra rutina",
+				"home": "Inicio",
+				"of": "de"
+			},
+			"my-plan": {
+				"exerciseOptions": "Modifica tu rutina",
+				"deleteExercise": "Eliminar Ejericios",
+				"changeExercise": "Cambiar Ejercicio",
+				"title": "Mi plan de entrenamiento",
+				"noExercises": "No ejercicios en este día",
+				"confirm": "Confirmar"
+			},
+			"PopularExercisesSection": {
+				"popularExerciseTitle": "Ejercicios Populares",
+				"seeDetails": "Ver Detalles",
+				"PopularSectionEmpty": "Seguimos aprendiendo de ti para darte las mejores recomendaciones!",
+				"exercises": "ejercicios",
+				"start": "Iniciar ahora"
+			}
+		},
+		"ExerciseFlow": {
+			"ready": "¡Alístate!",
+			"completed": "¡Ejercicio completado!"
+		},
+		"RestView": {
+			"rest": "Tómate un descanso",
+			"nextEx": "Siguiente Ejercicio",
+			"skip": "Saltar descanso"
+		},
+		"premium": {
+			"premiumTitle1": "2Fit",
+			"premiumTitle2": "Pass",
+			"continue": "Continuar",
+			"benefit1Title": "AI-Powered workout plans",
+			"benefit1Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+			"benefit2Title": "Personal nutrition guidance",
+			"benefit2Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+			"benefit3Title": "Comprehensive progress tracking",
+			"benefit3Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+		},
+		"BePremium": {
+			"title": "Sé Premium.",
+			"subtitle": "Obtén Acceso Ilimitado.",
+			"description": "Disfruta de acceso a entrenamientos sin anuncios ni restricciones.",
+			"plans": {
+				"1": {
+					"name": "1 Mes.",
+					"price": "16.99"
+				},
+				"verifyButton": {
+					"defaultText": "Verificar",
+					"loadingText": "Verificando..."
+				},
+				"incorrectCodeAlert": "Código incorrecto"
+			}
+		},
+		"step2": {
+			"verificationScreen": {
+				"headerTitle": "Verificación de Código",
+				"codeSentInfo": "El código ha sido enviado a",
+				"resendCode": {
+					"prompt": "Reenviar código en",
+					"resendButton": "Reenviar"
+				},
+				"step3": {
+					"createPasswordScreen": {
+						"headerTitle": "Crear Nueva Contraseña",
+						"imageAlt": "Ilustración de Crear Nueva Contraseña",
+						"instruction": "Crea tu nueva contraseña",
+						"newPasswordPlaceholder": "Nueva Contraseña",
+						"confirmPasswordPlaceholder": "Confirmar Contraseña",
+						"errorMessages": {
+							"passwordRequired": "Se requiere una contraseña.",
+							"passwordInvalid": "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, un número y un carácter especial.",
+							"confirmPasswordRequired": "Por favor confirma tu contraseña.",
+							"passwordsDoNotMatch": "Las contraseñas no coinciden.",
+							"apiError": "Ocurrió un error. Por favor intenta nuevamente."
+						},
+						"continueButton": {
+							"defaultText": "Continuar",
+							"loadingText": "Actualizando..."
+						},
+						"modal": {
+							"successTitle": "¡Felicidades!",
+							"successMessage": "Tu cuenta está lista para usar.",
+							"goToHomepage": "Ir a la página principal"
+						}
+					}
+				}
+			}
+		}

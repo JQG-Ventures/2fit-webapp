@@ -20,11 +20,11 @@ const inter = Inter({ subsets: ["latin"] });
 const LayoutContent = ({ children }: { children: ReactNode }) => {
 	const { isLoading } = useLoading();
 	const pathname = usePathname();
-    const { data: session, status } = useSession();
+    const { status } = useSession();
 
 	const hideNavBarPaths = ['/login', '/re-auth', '/register', '/login/google']
 	// @ts-nocheck
-    const shouldShowNavBar = window.location.pathname !== '/' && !hideNavBarPaths.includes(pathname) && status === "authenticated";
+    const shouldShowNavBar = pathname !== '/' && !hideNavBarPaths.includes(pathname) && status === "authenticated";
 
 
 	return (
