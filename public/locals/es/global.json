@@ -199,22 +199,22 @@
 		},
 		"Notifications": {
 			   "Title": "Notificaciones",
-				"GeneralNotifications": "Notificaciones Generales.",
-				"AppUpdates": "Actualizaciones.",
-				"NewServicesAvailable": "Nuevos Servicios Disponibles.",
-				"NewTipsAvailable": "Nuevos tips disponibles.",
+				"GeneralNotifications": "Notificaciones Generales",
+				"AppUpdates": "Actualizaciones",
+				"NewServicesAvailable": "Nuevos Servicios Disponibles",
+				"NewTipsAvailable": "Nuevos tips disponibles",
       			"SuccessMessage": "Acción realizada correctamente",
-      			"ErrorMessage": "Algo falló, por favor intenta de nuevo mas tarde."
+      			"ErrorMessage": "Algo falló, por favor intenta de nuevo mas tarde!"
 			},
 		"Security": {
 			        "Title": "Seguridad",
-					"FaceID": "Face ID.",
-					"RememberMe": "Recuerdame.",
-					"TouchID": "Touch ID.",
-					"GoogleAuthenticator": "Google Authenticator.",
-					"ChangePassword": "Cambiar contraseña.",
-					"Successfullchangepswd": "Se cambió la contraseña exitosamente.",
-					"Failedchangepswd": "Algo falló, por favor intenta de nuevo mas tarde."
+					"FaceID": "Face ID",
+					"RememberMe": "Recuerdame",
+					"TouchID": "Touch ID",
+					"GoogleAuthenticator": "Google Authenticator",
+					"ChangePassword": "Cambiar contraseña",
+					"Successfullchangepswd": "Se cambió la contraseña exitosamente",
+					"Failedchangepswd": "Algo falló, por favor intenta de nuevo mas tarde"
 		}
 	},
 	"ChangePasswordModal": {
