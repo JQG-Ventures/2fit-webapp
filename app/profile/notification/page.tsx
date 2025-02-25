@@ -18,7 +18,7 @@ interface NotificationItemProps {
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({ label, isOn, onToggle }) => (
-  <div className="flex items-center justify-between w-full py-5 pl-7">
+  <div className="flex items-center justify-between w-full py-5">
     <div className="flex items-center space-x-4">
       <span className="text-3xl">{label}</span>
     </div>
@@ -77,8 +77,6 @@ const Notification: React.FC = () => {
       };
   
       const response = await updateNotifications.mutateAsync(updatedProfile);
-  
-      setSuccessMessage(t('profile.Notifications.SuccessMessage'));
     } catch (error) {
   
       setNotifications({ ...notifications, [type]: previousState });
@@ -107,8 +105,7 @@ const Notification: React.FC = () => {
 
   return (
     <div className="flex flex-col justify-between items-center bg-white h-screen p-14 lg:pt-[10vh]">
-      {errorMessage && <Modal message={errorMessage} onClose={() => setErrorMessage(null)} />}
-      {successMessage && <Modal message={successMessage} onClose={() => setSuccessMessage(null)} />}
+      {errorMessage && <Modal title='Error' message={errorMessage} onClose={() => setErrorMessage(null)} />}
 
       <div className="h-[12%] flex flex-row justify-left space-x-8 items-center w-full lg:max-w-3xl">
         <button onClick={() => router.back()} className="text-gray-700">

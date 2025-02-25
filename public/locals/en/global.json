@@ -189,20 +189,20 @@
 		},
     "Notifications": {
       "Title": "Notifications",
-			"GeneralNotifications": "General Notifications.",
-			"AppUpdates": "App Updates.",
-			"NewServicesAvailable": "New Services Available.",
-			"NewTipsAvailable": "New Tips Available.",
+			"GeneralNotifications": "General Notifications",
+			"AppUpdates": "App Updates",
+			"NewServicesAvailable": "New Services Available",
+			"NewTipsAvailable": "New Tips Available",
       "SuccessMessage": "Action performed correctly",
       "ErrorMessage": "Something failed, please try again later..."
 		},
     "Security": {
       "Title": "Security",
-			"FaceID": "Face ID.",
-			"RememberMe": "Remember Me.",
-			"TouchID": "Touch ID.",
-			"GoogleAuthenticator": "Google Authenticator.",
-			"ChangePassword": "Change Password."
+			"FaceID": "Face ID",
+			"RememberMe": "Remember Me",
+			"TouchID": "Touch ID",
+			"GoogleAuthenticator": "Google Authenticator",
+			"ChangePassword": "Change Password"
 		}
 	},
   "ChangePasswordModal": {

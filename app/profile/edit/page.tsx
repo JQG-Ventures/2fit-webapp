@@ -236,7 +236,7 @@ const EditProfile: React.FC = () => {
 						country={'us'}
 						value={`+${countryCode}${phoneNumber}`}
 						onChange={handlePhoneChange}
-						inputClass="!w-full !py-6 !border-none !bg-gray-200 !rounded-md cursor-pointer"
+						inputClass="!w-full !py-6 !border-none !bg-gray-200 !rounded-md cursor-pointer focus:!border focus:!border-gray-300 focus:!bg-white"
 						
 					/>
 				</div>
