@@ -20,10 +20,6 @@ export default function RegisterStep10() {
         data.training_preferences?.available_days || []
     );
     const router = useRouter();
-    console.log(data);
-    console.log(session);
-
-
     const days = [
         { id: 1, label: t('RegisterPagestep10.days.0'), value: 'monday' },
         { id: 2, label: t('RegisterPagestep10.days.1'), value: 'tuesday' },
