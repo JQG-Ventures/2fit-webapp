@@ -113,9 +113,18 @@ const SavedWorkoutsModal: React.FC<SavedWorkoutsModalProps> = ({ workouts, onClo
   };
 
   return (
-    <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex justify-center items-center z-50 transform -translate-y-12">
-      <div className="bg-white w-full max-w-3xl rounded-lg shadow-lg p-6 relative h-full sm:h-[100vh] overflow-hidden flex flex-col">
-
+    <div
+      className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex justify-center items-center z-50 transform -translate-y-12"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose(); // Cierra el modal al hacer clic en los costados oscuros
+        }
+      }}
+    >
+      <div
+        className="bg-white w-full max-w-3xl rounded-lg shadow-lg p-6 relative h-full sm:h-[100vh] overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()} // Evita cerrar el modal si se hace clic dentro
+      >
         <div className="h-[10%] flex flex-row w-full lg:max-w-3xl py-4 px-6">
           <div className="flex flex-row items-center space-x-6">
             <button onClick={onClose} className="flex items-center text-gray-600 hover:text-green-600">
@@ -133,6 +142,7 @@ const SavedWorkoutsModal: React.FC<SavedWorkoutsModalProps> = ({ workouts, onClo
           </div>
         </div>
 
+        {/* Contenido del modal */}
         <div className="h-[90%] overflow-y-auto px-4 sm:px-6 py-4">
           <div className="grid grid-cols-2 gap-4 sm:gap-x-4 gap-x-6 gap-y-6 justify-center">
             {workoutList.map((workout) => {
