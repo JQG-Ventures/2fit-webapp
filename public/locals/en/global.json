@@ -165,7 +165,8 @@
     "updateProfile": {
       "updateText": "Update",
       "success": "Edit sucessfully updated!",
-      "error": "There was a problem updating the profile."
+      "error": "There was a problem updating the profile.",
+      "errorUploadingImage": "There was an error uploading the image"
     },
     "Notifications": {
       "Title": "Notifications",

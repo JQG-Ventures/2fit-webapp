@@ -162,7 +162,8 @@
     "updateProfile": {
       "updateText": "Actualizar",
       "success": "Perfil actualizado correctamente!",
-      "error": "Hubo un error actualizando el perfil."
+      "error": "Hubo un error actualizando el perfil.",
+      "errorUploadingImage": "Hubo un error subiendo la imagen"
     },
     "Notifications": {
       "Title": "Notificaciones",

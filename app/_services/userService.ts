@@ -129,6 +129,15 @@ export const useUpdateProfile = () => {
         { status: string; message: string }
     >('/api/users/profile');
 };
+
+export const useUploadProfileImage = () => {
+	return useApiPost<{ body: FormData }, { status: string; message: string; url: string }>(
+		'/api/users/profile/image',
+		undefined,
+		{ 'Content-Type': 'multipart/form-data' }
+	);
+};
+
 export const updatePassword = async (
 	contact: string,
 	code: string,

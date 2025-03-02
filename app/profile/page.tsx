@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { IoIosArrowDroprightCircle, IoIosLogOut } from 'react-icons/io';
@@ -14,14 +14,15 @@ import { CiUser, CiBellOn, CiLock, CiCircleQuestion } from 'react-icons/ci';
 import { useApiGet } from '../utils/apiClient';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '../_providers/LoadingProvider';
+import { useUploadProfileImage } from '../_services/userService';
 
 const ProfilePage: React.FC = () => {
 	const { t } = useTranslation('global');
 	const router = useRouter();
 	const { setLoading } = useLoading();
-	
+
 	const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
-	const { data: profile, isLoading: loadingProfile, isError: profileError } =
+	const { data: profile, isLoading: loadingProfile, isError: profileError, refetch } =
 		useApiGet<{ status: string; message: any }>([], getProfileUrl);
 
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -32,14 +33,17 @@ const ProfilePage: React.FC = () => {
 		{ label: 'Security', icon: CiLock, path: '/profile/security' },
 		{ label: 'Help', icon: CiCircleQuestion, path: '/profile/help' },
 	];
+	const updateProfileImage = useUploadProfileImage();
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const [imageError, setImageError]  = useState('');
 
 	useEffect(() => {
 		if (loadingProfile) {
 			setLoading(true);
-		  } else {
+		} else {
 			setLoading(false);
-		  }
-	  }, [loadingProfile, setLoading])
+		}
+	}, [loadingProfile, setLoading])
 
 	const handleLogout = async () => {
 		setIsLoggingOut(true);
@@ -54,11 +58,40 @@ const ProfilePage: React.FC = () => {
 		router.push(setting.path!);
 	};
 
-	if (profileError) {
+	const handleEditImageClick = () => {
+		if (fileInputRef.current) {
+			fileInputRef.current.click();
+		}
+	};
+
+	const handleFileChange = async (
+		event: React.ChangeEvent<HTMLInputElement>
+	) => {
+		const file = event.target.files?.[0];
+		if (!file) return;
+
+		const formData = new FormData();
+		formData.append('image', file);
+
+		try {
+			const response = await updateProfileImage.mutateAsync({ body: formData });
+			if (response.status === 'success') {
+				refetch();
+			} else {
+				setImageError(t('profile.updateProfile.errorUploadingImage'));
+				console.error('Failed to update profile image');
+			}
+		} catch (error) {
+			setImageError(t('profile.updateProfile.errorUploadingImage'));
+			console.error('Error uploading profile image', error);
+		}
+	};
+
+	if (profileError || imageError) {
 		return (
 			<Modal
 				title="Error"
-				message={t('profile.errorFetching')}
+				message={imageError ? imageError  : t('profile.errorFetching')}
 				onClose={() => router.push('/home')}
 			/>
 		);
@@ -66,17 +99,26 @@ const ProfilePage: React.FC = () => {
 
 	if (loadingProfile) {
 		return null;
-	  }
+	}
 
 	return (
 		<div className="flex flex-col justify-between items-center bg-gray-50 h-screen p-10 lg:pt-[10vh]">
+			<input
+				type="file"
+				accept="image/*"
+				ref={fileInputRef}
+				style={{ display: 'none' }}
+				onChange={handleFileChange}
+			/>
 			<div className="h-[10%] flex justify-left items-center w-full lg:hidden">
 				<h1 className="text-5xl font-semibold pl-4">Profile</h1>
 			</div>
 			<div className="h-[20%] flex flex-col items-center w-full lg:max-w-6xl">
 				<div className="relative w-40 h-40">
 					<Image
-						src="/images/userprofile.png"
+						src={
+							profile?.message?.profile_image || '/images/userprofile.png'
+						}
 						alt="Profile Picture"
 						width={160}
 						height={160}
@@ -84,7 +126,7 @@ const ProfilePage: React.FC = () => {
 					/>
 					<div
 						className="absolute bottom-0 right-0 bg-green-500 p-1 rounded-full cursor-pointer"
-						onClick={() => {}}
+						onClick={handleEditImageClick}
 					>
 						<MdModeEditOutline className="text-white w-8 h-8 ml-1" />
 					</div>
