@@ -17,7 +17,7 @@ const InputWithIcon: React.FC<InputWithIconProps> = ({
                     value={value}
                     onChange={onChange}
                     placeholder={placeholder}
-                    className="appearance-none py-6 text-2xl block w-full bg-gray-200 text-gray-700 rounded-lg py-4 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                    className="appearance-none py-6 text-2xl block w-full bg-gray-200 text-gray-700 rounded-lg py-4 px-4 mb-3 leading-tight focus:border focus:border-gray-300 focus:bg-white"
                 />
         </div>
     );
