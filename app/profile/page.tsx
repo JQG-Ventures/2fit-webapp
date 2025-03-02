@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useCallback, useRef, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { IoIosArrowDroprightCircle, IoIosLogOut } from 'react-icons/io';
@@ -27,71 +27,76 @@ const ProfilePage: React.FC = () => {
 
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 	const [loadingSetting, setLoadingSetting] = useState<string | null>(null);
-	const settings = [
-		{ label: 'Edit Profile', icon: CiUser, path: '/profile/edit' },
-		{ label: 'Notifications', icon: CiBellOn, path: '/profile/notification' },
-		{ label: 'Security', icon: CiLock, path: '/profile/security' },
-		{ label: 'Help', icon: CiCircleQuestion, path: '/profile/help' },
-	];
 	const updateProfileImage = useUploadProfileImage();
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const [imageError, setImageError]  = useState('');
+	const [imageError, setImageError] = useState('');
+
+	// Memoize static settings array
+	const settings = useMemo(
+		() => [
+			{ label: 'Edit Profile', icon: CiUser, path: '/profile/edit' },
+			{ label: 'Notifications', icon: CiBellOn, path: '/profile/notification' },
+			{ label: 'Security', icon: CiLock, path: '/profile/security' },
+			{ label: 'Help', icon: CiCircleQuestion, path: '/profile/help' },
+		],
+		[]
+	);
 
 	useEffect(() => {
-		if (loadingProfile) {
-			setLoading(true);
-		} else {
-			setLoading(false);
-		}
-	}, [loadingProfile, setLoading])
+		setLoading(loadingProfile);
+	}, [loadingProfile, setLoading]);
 
-	const handleLogout = async () => {
+	const handleLogout = useCallback(async () => {
 		setIsLoggingOut(true);
 		signOut({
 			callbackUrl: '/',
 			redirect: true,
 		});
-	};
+	}, []);
 
-	const handleSetting = async (setting: Setting) => {
-		setLoadingSetting(setting.label);
-		router.push(setting.path!);
-	};
+	const handleSetting = useCallback(
+		async (setting: { label: string; path?: string }) => {
+			setLoadingSetting(setting.label);
+			router.push(setting.path!);
+		},
+		[router]
+	);
 
-	const handleEditImageClick = () => {
+	const handleEditImageClick = useCallback(() => {
 		if (fileInputRef.current) {
 			fileInputRef.current.click();
 		}
-	};
+	}, []);
 
-	const handleFileChange = async (
-		event: React.ChangeEvent<HTMLInputElement>
-	) => {
-		const file = event.target.files?.[0];
-		if (!file) return;
+	const handleFileChange = useCallback(
+		async (event: React.ChangeEvent<HTMLInputElement>) => {
+			const file = event.target.files?.[0];
+			if (!file) return;
 
-		const formData = new FormData();
-		formData.append('image', file);
+			const formData = new FormData();
+			formData.append('image', file);
 
-		try {
-			const response = await updateProfileImage.mutateAsync({ body: formData });
-			if (response.status === 'success') {
-				refetch();
-			} else {
+			try {
+				const response = await updateProfileImage.mutateAsync({ body: formData });
+				if (response.status === 'success') {
+					refetch();
+				} else {
+					setImageError(t('profile.updateProfile.errorUploadingImage'));
+					console.error('Failed to update profile image');
+				}
+			} catch (error) {
 				setImageError(t('profile.updateProfile.errorUploadingImage'));
-				console.error('Failed to update profile image');
+				console.error('Error uploading profile image', error);
 			}
-		} catch (error) {
-			setImageError(t('profile.updateProfile.errorUploadingImage'));
-			console.error('Error uploading profile image', error);
-		}
-	};
+		},
+		[refetch, t, updateProfileImage]
+	);
 
 	if (profileError || imageError) {
 		return (
 			<Modal
 				title="Error"
-				message={imageError ? imageError  : t('profile.errorFetching')}
+				message={imageError ? imageError : t('profile.errorFetching')}
 				onClose={() => router.push('/home')}
 			/>
 		);
@@ -110,15 +115,13 @@ const ProfilePage: React.FC = () => {
 				onChange={handleFileChange}
 				className='hidden'
 			/>
-			<div className="h-[10%] flex justify-left items-center w-full lg:hidden">
+			<div className="h-[10%] flex justify-start items-center w-full lg:hidden">
 				<h1 className="text-5xl font-semibold pl-4">Profile</h1>
 			</div>
 			<div className="h-[30%] flex flex-col lg:justify-evenly md:justify-evenly items-center w-full lg:max-w-6xl">
 				<div className="relative w-40 h-40">
 					<Image
-						src={
-							profile?.message?.profile_image || '/images/userprofile.png'
-						}
+						src={profile?.message?.profile_image || '/images/userprofile.png'}
 						alt="Profile Picture"
 						width={160}
 						height={160}
@@ -138,10 +141,12 @@ const ProfilePage: React.FC = () => {
 					{profile?.message?.email || 'user@yourdomain.com'}
 				</p>
 			</div>
-			<div className="h-[12%] w-full lg:max-w-6xl bg-gradient-to-r from-green-400 to-green-700 flex flex-col justify-center text-white rounded-[25px] px-8 shadow-lg w-fullcursor-pointer"
-				onClick={() => router.push('/premium')} >
+			<div
+				className="h-[12%] w-full lg:max-w-6xl bg-gradient-to-r from-green-400 to-green-700 flex flex-col justify-center text-white rounded-[25px] px-8 shadow-lg cursor-pointer"
+				onClick={() => router.push('/premium')}
+			>
 				<div className="flex flex-row items-center justify-between">
-					<div className="flex justify-left space-x-6 w-[80%] items-center pb-4">
+					<div className="flex justify-start space-x-6 w-[80%] items-center pb-4">
 						<span className="bg-gradient-to-b from-yellow-300 to-yellow-700 text-white rounded-full px-4 py-2 text-2xl">
 							PRO
 						</span>
@@ -149,9 +154,7 @@ const ProfilePage: React.FC = () => {
 					</div>
 					<IoIosArrowDroprightCircle className="text-white w-10 h-10" />
 				</div>
-				<p className="text-xl">
-					Enjoy workout access without ads and restrictions
-				</p>
+				<p className="text-xl">Enjoy workout access without ads and restrictions</p>
 			</div>
 			<div className="lg:hidden border-t border-gray-300 w-full my-14 lg:my-0 lg:max-w-6xl"></div>
 			<div className="w-full h-[45%] mb-24 overflow-y-auto lg:max-w-6xl lg:mb-0">
@@ -159,7 +162,6 @@ const ProfilePage: React.FC = () => {
 					<SettingItem
 						key={index}
 						label={setting.label}
-						// @ts-ignore
 						icon={setting.icon}
 						onClick={() => handleSetting(setting)}
 						isLoading={loadingSetting === setting.label}
