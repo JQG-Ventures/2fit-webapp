@@ -107,8 +107,8 @@ const ProfilePage: React.FC = () => {
 				type="file"
 				accept="image/*"
 				ref={fileInputRef}
-				style={{ display: 'none' }}
 				onChange={handleFileChange}
+				className='hidden'
 			/>
 			<div className="h-[10%] flex justify-left items-center w-full lg:hidden">
 				<h1 className="text-5xl font-semibold pl-4">Profile</h1>
@@ -170,7 +170,7 @@ const ProfilePage: React.FC = () => {
 						<BsMoon className="text-gray-500 w-5 h-5" />
 						<span className="text-3xl font-medium">Dark Theme</span>
 					</div>
-					<ToggleButton />
+					<ToggleButton isOn={false} onToggle={() => {}} />
 				</div>
 				<SettingItem
 					label="Logout"
