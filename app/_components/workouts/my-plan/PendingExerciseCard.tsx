@@ -17,7 +17,7 @@ const PendingExerciseCard: React.FC<PendingExerciseCardProps> = ({
     const { t } = useTranslation('global');
 
     return (
-        <div className="flex flex-row items-center w-[95%] max-w-4xl mx-auto p-4 rounded-2xl shadow-lg border border-gray-200 lg:my-16 hover:shadow-2xl cursor-pointer h-48">
+        <div className="flex flex-row items-center w-[95%] mx-auto p-4 rounded-2xl shadow-lg border border-gray-200 lg:my-16 hover:shadow-2xl cursor-pointer h-48">
             {/* Exercise Image */}
             <div className="w-[20%] h-full">
                 <img
@@ -32,7 +32,7 @@ const PendingExerciseCard: React.FC<PendingExerciseCardProps> = ({
                 {/* Top Section */}
                 <div className="flex flex-row justify-between">
                     <h3 className="text-2xl text-center font-semibold truncate">{t('home.completeRoutine')}</h3>
-                    <FaArrowCircleRight />
+                    <FaArrowCircleRight className=" text-3xl"/>
                 </div>
 
                 {/* Bottom Section */}

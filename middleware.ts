@@ -7,7 +7,7 @@ export async function middleware(req: NextRequest) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const { pathname } = req.nextUrl;
 
-    const publicRoutes = ['/login', '/register', '/re-auth'];
+    const publicRoutes = ['/login', '/register', '/re-auth', '/options/forgotpassword/step0', '/options/forgotpassword/step1', '/options/forgotpassword/step2', '/options/forgotpassword/step3'];
     const isRootRoute = pathname === '/';
     const isPublicRoute = isRootRoute || publicRoutes.some((route) => pathname.startsWith(route));
     const isNotAuthenticated = Boolean(!token?.accessToken);
@@ -28,6 +28,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
     matcher: [
-        '/((?!_next|api|static|favicon.ico).*)',
+        '/((?!_next|api|static|favicon.ico|images).*)',
     ],
 };

@@ -115,4 +115,57 @@ export const useSendMessage = (userPhoneNumber: string) => {
 		{ body: { message: string } },
 		{ message: string; response: string }
 	>('/api/chat', undefined, { 'User-Phone-Number': userPhoneNumber });
+  };
+
+export const useResetPassword = () => {
+		return useApiPut<{ email: string; password: string }, { status: string; message: string }>(
+			'/api/users/reset-password'
+		);
 };
+
+export const useUpdateProfile = () => {
+    return useApiPut<
+        { settings: object },
+        { status: string; message: string }
+    >('/api/users/profile');
+};
+
+export const useUploadProfileImage = () => {
+	return useApiPost<{ body: FormData }, { status: string; message: string; url: string }>(
+		'/api/users/profile/image',
+		undefined,
+		{ 'Content-Type': 'multipart/form-data' }
+	);
+};
+
+export const updatePassword = async (
+	contact: string,
+	code: string,
+	newPassword: string
+  ) => {
+	try {
+	  const body = JSON.stringify({
+		contact,
+		code,
+		new_password: newPassword,
+	  });
+  
+	  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/update-password`, {
+		method: "POST",
+		headers: {
+		  "Content-Type": "application/json",
+		},
+		body,
+	  });
+  
+	  if (!res.ok) {
+		const errorData = await res.json();
+		throw new Error(errorData.message || "Error updating password.");
+	  }
+  
+	  return await res.json();
+	} catch (error) {
+	  throw error;
+	}
+  };
+  
