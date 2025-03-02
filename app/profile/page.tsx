@@ -113,7 +113,7 @@ const ProfilePage: React.FC = () => {
 			<div className="h-[10%] flex justify-left items-center w-full lg:hidden">
 				<h1 className="text-5xl font-semibold pl-4">Profile</h1>
 			</div>
-			<div className="h-[20%] flex flex-col items-center w-full lg:max-w-6xl">
+			<div className="h-[30%] flex flex-col lg:justify-evenly md:justify-evenly items-center w-full lg:max-w-6xl">
 				<div className="relative w-40 h-40">
 					<Image
 						src={
@@ -153,7 +153,7 @@ const ProfilePage: React.FC = () => {
 					Enjoy workout access without ads and restrictions
 				</p>
 			</div>
-			<div className="border-t border-gray-300 w-full my-14 lg:my-0 lg:max-w-6xl"></div>
+			<div className="lg:hidden border-t border-gray-300 w-full my-14 lg:my-0 lg:max-w-6xl"></div>
 			<div className="w-full h-[45%] mb-24 overflow-y-auto lg:max-w-6xl lg:mb-0">
 				{settings.map((setting, index) => (
 					<SettingItem
