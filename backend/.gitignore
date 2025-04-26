@@ -1,0 +1,10 @@
+assistant.json
+.env
+venv
+__pycache__
+audio.ogg
+.idea/misc.xml
+.idea/2fit-bot-service.iml
+.idea/vcs.xml
+.idea/modules.xml
+.idea/inspectionProfiles/profiles_settings.xml
