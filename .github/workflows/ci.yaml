@@ -1,0 +1,115 @@
+name: Full CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  full-ci:
+    name: Full CI Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.9.18
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9.18
+
+      - name: Set up Node.js 22.14.0
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Detect changed paths
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+
+      # BACKEND JOBS
+      - name: Install backend dependencies
+        if: steps.changes.outputs.backend == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install flake8 black mypy pydocstyle
+
+      - name: Run flake8 (Python lint)
+        if: steps.changes.outputs.backend == 'true'
+        run: |
+          cd backend
+          flake8 .
+
+      - name: Run black --check (Python format check)
+        if: steps.changes.outputs.backend == 'true'
+        run: |
+          cd backend
+          black --check .
+
+      - name: Run mypy (Python static typing check)
+        if: steps.changes.outputs.backend == 'true'
+        run: |
+          cd backend
+          mypy .
+
+      - name: Run pydocstyle (Python docstring check)
+        if: steps.changes.outputs.backend == 'true'
+        run: |
+          cd backend
+          pydocstyle .
+
+      # FRONTEND JOBS
+      - name: Install frontend dependencies
+        if: steps.changes.outputs.frontend == 'true'
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run next lint (Next.js ESLint check)
+        if: steps.changes.outputs.frontend == 'true'
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Run Prettier format check
+        if: steps.changes.outputs.frontend == 'true'
+        run: |
+          cd frontend
+          npx prettier --check .
+
+      - name: Run Next.js build
+        if: steps.changes.outputs.frontend == 'true'
+        run: |
+          cd frontend
+          npm run build
