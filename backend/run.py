@@ -18,4 +18,4 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(debug=s.DEBUG, port=5001)
+    app.run(debug=s.DEBUG, port=5000)
