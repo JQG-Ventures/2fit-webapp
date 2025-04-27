@@ -5,13 +5,12 @@ import { FaRobot, FaTimes } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 
-
 const motivationalMessages = [
-    "Stay consistent and results will follow!",
-    "Every workout is progress, no matter how small.",
-    "Your only limit is the one you set yourself!",
-    "Make today your best workout yet!",
-    "Stay focused, stay fit!"
+    'Stay consistent and results will follow!',
+    'Every workout is progress, no matter how small.',
+    'Your only limit is the one you set yourself!',
+    'Make today your best workout yet!',
+    'Stay focused, stay fit!',
 ];
 
 const getMotivationalMessage = () => {
@@ -21,10 +20,10 @@ const getMotivationalMessage = () => {
 
 const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
     const { t } = useTranslation('global');
-    const [dailyMessage, setDailyMessage] = useState("");
+    const [dailyMessage, setDailyMessage] = useState('');
     const [isHovered, setIsHovered] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
-    const router = useRouter()
+    const router = useRouter();
 
     useEffect(() => {
         const message = getMotivationalMessage();
@@ -37,18 +36,17 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
 
     return (
         isVisible && (
-            <div className="flex flex-col items-center w-[95%] max-w-4xl mx-auto p-8 rounded-2xl shadow-lg border border-gray-200 lg:my-16 hover:shadow-2xl transition-shadow duration-300 ease-in-out"> 
+            <div className="flex flex-col items-center w-[95%] max-w-4xl mx-auto p-8 rounded-2xl shadow-lg border border-gray-200 lg:my-16 hover:shadow-2xl transition-shadow duration-300 ease-in-out">
                 <div className="flex justify-between items-start w-full mb-6">
                     <div className="flex flex-col w-[80%]">
                         <h2 className="text-3xl font-bold mb-4">
-                            {isBotUser ? t('home.motivation.main') : "Get Fit with 2Fit AI"}
+                            {isBotUser ? t('home.motivation.main') : 'Get Fit with 2Fit AI'}
                         </h2>
                         <p className="text-lg text-gray-600">
                             {isBotUser
                                 ? dailyMessage
-                                : "Achieve your fitness goals with a personal AI trainer designed just for you."
-                            }
-                        </p>                        
+                                : 'Achieve your fitness goals with a personal AI trainer designed just for you.'}
+                        </p>
                     </div>
                     <div className="w-[20%] flex justify-end">
                         <div
@@ -57,7 +55,11 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
                             onMouseEnter={() => setIsHovered(true)}
                             onMouseLeave={() => setIsHovered(false)}
                             onClick={handleIconClick}
-                            aria-label={isHovered ? t('home.motivation.mtvnlsection') : t('home.motivation.mtvnlchatbot')}
+                            aria-label={
+                                isHovered
+                                    ? t('home.motivation.mtvnlsection')
+                                    : t('home.motivation.mtvnlchatbot')
+                            }
                             role="button"
                         >
                             {isHovered ? (
@@ -75,14 +77,15 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
                     <p className="text-gray-700 text-lg">{t('home.trainer.talk')}</p>
                     <div className="button-container">
                         {isBotUser ? (
-                            <button 
+                            <button
                                 onClick={() => router.push('/chat')}
-                                className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition-colors">
+                                className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition-colors"
+                            >
                                 {t('home.trainer.letschat')}
                             </button>
                         ) : (
                             <button className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition-colors">
-                                 {t('home.trainer.getyourplan')}
+                                {t('home.trainer.getyourplan')}
                             </button>
                         )}
                     </div>

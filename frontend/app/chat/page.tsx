@@ -18,10 +18,17 @@ const Chat: React.FC = () => {
     const { setLoading } = useLoading();
 
     const getChatUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/conversation`;
-    const { data: conversationData, isLoading: loading, isError: error } = useApiGet<{ status: string; message: any }>(['conversationData'], getChatUrl);
+    const {
+        data: conversationData,
+        isLoading: loading,
+        isError: error,
+    } = useApiGet<{ status: string; message: any }>(['conversationData'], getChatUrl);
     const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
-    const { data: profile, isLoading: loadingProfile, isError: profileError } =
-        useApiGet<{ status: string; message: any }>(['profileData'], getProfileUrl);
+    const {
+        data: profile,
+        isLoading: loadingProfile,
+        isError: profileError,
+    } = useApiGet<{ status: string; message: any }>(['profileData'], getProfileUrl);
 
     useEffect(() => {
         if (loading || loadingProfile) {
@@ -29,9 +36,11 @@ const Chat: React.FC = () => {
         } else {
             setLoading(false);
         }
-    }, [loadingProfile, loading, setLoading])
+    }, [loadingProfile, loading, setLoading]);
 
-    const { mutate: sendMessage } = useSendMessage(`${profile?.message.code_number}${profile?.message.number}`);
+    const { mutate: sendMessage } = useSendMessage(
+        `${profile?.message.code_number}${profile?.message.number}`,
+    );
 
     const [isPremium, setIsPremium] = useState(true);
     const [messages, setMessages] = useState<any[]>([]);
@@ -76,18 +85,12 @@ const Chat: React.FC = () => {
                     console.error('Error sending message:', error.message);
                     setIsBotTyping(false);
                 },
-            }
+            },
         );
     };
 
     if (error) {
-        return (
-            <Modal
-                title="Error"
-                message={error}
-                onClose={() => router.push('/home')}
-            />
-        );
+        return <Modal title="Error" message={error} onClose={() => router.push('/home')} />;
     }
 
     return (
@@ -100,13 +103,22 @@ const Chat: React.FC = () => {
                     <h1 className="text-5xl text-white font-semibold">2Fit.AI Coach</h1>
                 </div>
                 <button>
-                    <FaWhatsapp onClick={() => window.open(`https://wa.me/${50670340514}?text=Hey 2Fit bot!`, '_blank')} className="text-white w-12 h-12" title={`${t('chat.openWhatsApp')}`}></FaWhatsapp>
+                    <FaWhatsapp
+                        onClick={() =>
+                            window.open(`https://wa.me/${50670340514}?text=Hey 2Fit bot!`, '_blank')
+                        }
+                        className="text-white w-12 h-12"
+                        title={`${t('chat.openWhatsApp')}`}
+                    ></FaWhatsapp>
                 </button>
             </div>
             <div className="h-[90%] flex flex-col justify-between items-center w-full">
                 {isPremium ? (
                     <div className="h-[85%] w-full max-w-3xl overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
-                        <ChatComponent conversationData={{ message: messages }} isBotTyping={isBotTyping} />
+                        <ChatComponent
+                            conversationData={{ message: messages }}
+                            isBotTyping={isBotTyping}
+                        />
                     </div>
                 ) : (
                     <LockScreen

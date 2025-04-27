@@ -1,5 +1,5 @@
-from __future__ import annotations
 from azure.storage.blob import BlobServiceClient
+from typing import Optional
 
 import app.settings as s
 import logging
@@ -13,9 +13,13 @@ logging.Logger.root.level = 10
 class AzureService:
     def __init__(self, db):
         self.db = db
-        self.blob_service_client = BlobServiceClient.from_connection_string(s.AZURE_CONNECTION_STRING)
+        self.blob_service_client = BlobServiceClient.from_connection_string(
+            s.AZURE_CONNECTION_STRING
+        )
 
-    def upload_content(self, file_path: str, title: str, description: str, tags: list[str]) -> str | None:
+    def upload_content(
+        self, file_path: str, title: str, description: str, tags: list[str]
+    ) -> Optional[str]:
         """
         Upload content to Azure Blob Storage and save metadata to MongoDB.
 
@@ -31,7 +35,9 @@ class AzureService:
         try:
             content_id = str(uuid.uuid4())
             file_name = os.path.basename(file_path)
-            blob_client = self.blob_service_client.get_blob_client(container=s.AZURE_CONTAINER_NAME, blob=file_name)
+            blob_client = self.blob_service_client.get_blob_client(
+                container=s.AZURE_CONTAINER_NAME, blob=file_name
+            )
 
             with open(file_path, "rb") as data:
                 blob_client.upload_blob(data)
@@ -42,17 +48,19 @@ class AzureService:
                 "description": description,
                 "tags": tags,
                 "file_path": file_name,
-                "blob_url": blob_client.url
+                "blob_url": blob_client.url,
             }
 
             self.db.contents.insert_one(content_metadata)
 
             return content_id
         except Exception as e:
-            logging.exception(f"There was a problem uploading the blob to Azure Storage Account, error: {e}")
-            return
+            logging.exception(
+                f"There was a problem uploading the blob to Azure Storage Account, error: {e}"
+            )
+            return None
 
-    def get_content_by_tags(self, tags: list[str]) -> str | None:
+    def get_content_by_tags(self, tags: list[str]) -> Optional[str]:
         """
         Retrieve content URL by tags.
 
@@ -66,13 +74,17 @@ class AzureService:
             content = self.db.contents.find_one({"tags": {"$in": tags}})
             if content:
                 return content["blob_url"]
+            return None
         except Exception as e:
             logging.exception(f"Could not get the content from DB {e}")
             return None
 
-    def upload_profile_image(self, file_stream, user_id: str, original_filename: str) -> str | None:
+    def upload_profile_image(
+        self, file_stream, user_id: str, original_filename: str
+    ) -> Optional[str]:
         """
-        Upload a profile image to Azure Blob Storage, saving it under a folder named after the user_id,
+        Upload a profile image to Azure Blob Storage,
+        saving it under a folder named after the user_id,
         and return the blob URL.
 
         Args:
@@ -84,12 +96,16 @@ class AzureService:
             str: The URL of the uploaded image.
         """
         try:
-            extension = original_filename.rsplit('.', 1)[1].lower() if '.' in original_filename else 'png'
+            extension = (
+                original_filename.rsplit(".", 1)[1].lower() if "." in original_filename else "png"
+            )
             # Generate a unique filename without user_id since the folder will be the user_id
             unique_filename = f"profile_{uuid.uuid4().hex}.{extension}"
             # Include the user_id as a folder in the blob path
             blob_path = f"{user_id}/{unique_filename}"
-            blob_client = self.blob_service_client.get_blob_client(container=s.AZURE_PROFILE_CONTAINER_NAME, blob=blob_path)
+            blob_client = self.blob_service_client.get_blob_client(
+                container=s.AZURE_PROFILE_CONTAINER_NAME, blob=blob_path
+            )
             file_stream.seek(0)
             blob_client.upload_blob(file_stream, overwrite=True)
             return blob_client.url

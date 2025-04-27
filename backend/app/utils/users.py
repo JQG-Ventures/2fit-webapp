@@ -19,12 +19,12 @@ def validate_user_by_credentials(user: dict, password) -> bool:
     """
 
     try:
-        hashed_password = user['password_hash']
+        hashed_password = user["password_hash"]
         return check_password_hash(hashed_password, password)
     except Exception as e:
         logging.exception(f"{e}")
         return False
-    
+
 
 def roles_required(required_roles):
     def decorator(fn):
@@ -32,11 +32,13 @@ def roles_required(required_roles):
         def wrapper(*args, **kwargs):
             verify_jwt_in_request()
             claims = get_jwt()
-            roles = claims.get('roles', [])
+            roles = claims.get("roles", [])
             # Check if the user has any of the required roles
             if any(role in roles for role in required_roles):
                 return fn(*args, **kwargs)
             else:
                 abort(403)  # Forbidden
+
         return wrapper
+
     return decorator

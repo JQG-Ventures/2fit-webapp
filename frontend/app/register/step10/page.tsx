@@ -7,8 +7,7 @@ import { useRegister } from '../../_components/register/RegisterProvider';
 import { useTranslation } from 'react-i18next';
 import RegistrationHeader from '@/app/_components/register/RegistrationHeader';
 import RegistrationButtons from '@/app/_components/register/RegisterButtons';
-import { signIn, useSession } from "next-auth/react";
-
+import { signIn, useSession } from 'next-auth/react';
 
 export default function RegisterStep10() {
     const { t } = useTranslation('global');
@@ -17,7 +16,7 @@ export default function RegisterStep10() {
     const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
     const { data: session } = useSession();
     const [selectedDays, setSelectedDays] = useState<string[]>(
-        data.training_preferences?.available_days || []
+        data.training_preferences?.available_days || [],
     );
     const router = useRouter();
     const days = [
@@ -91,13 +90,15 @@ export default function RegisterStep10() {
                         key={day.id}
                         onClick={() => handleDaySelection(day.value)}
                         className={`flex items-center justify-center w-full my-6 p-8 border border-gray-300 rounded-lg text-3xl transition-all duration-300 transform font-semibold
-                            ${selectedDays.includes(day.value)
-                                ? 'bg-black text-gray-50 scale-105 shadow-lg'
-                                : 'bg-white text-black hover:scale-105 hover:shadow-md'
+                            ${
+                                selectedDays.includes(day.value)
+                                    ? 'bg-black text-gray-50 scale-105 shadow-lg'
+                                    : 'bg-white text-black hover:scale-105 hover:shadow-md'
                             }
-                            ${days.length % 2 !== 0 && day.id === days.length
-                                ? 'col-span-2 lg:col-span-1 lg:justify-self-center'
-                                : ''
+                            ${
+                                days.length % 2 !== 0 && day.id === days.length
+                                    ? 'col-span-2 lg:col-span-1 lg:justify-self-center'
+                                    : ''
                             }
                         `}
                         aria-pressed={selectedDays.includes(day.value)}

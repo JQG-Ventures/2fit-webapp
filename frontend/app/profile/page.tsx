@@ -17,173 +17,177 @@ import { useLoading } from '../_providers/LoadingProvider';
 import { useUploadProfileImage } from '../_services/userService';
 
 const ProfilePage: React.FC = () => {
-	const { t } = useTranslation('global');
-	const router = useRouter();
-	const { setLoading } = useLoading();
+    const { t } = useTranslation('global');
+    const router = useRouter();
+    const { setLoading } = useLoading();
 
-	const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
-	const { data: profile, isLoading: loadingProfile, isError: profileError, refetch } =
-		useApiGet<{ status: string; message: any }>([], getProfileUrl);
+    const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
+    const {
+        data: profile,
+        isLoading: loadingProfile,
+        isError: profileError,
+        refetch,
+    } = useApiGet<{ status: string; message: any }>([], getProfileUrl);
 
-	const [isLoggingOut, setIsLoggingOut] = useState(false);
-	const [loadingSetting, setLoadingSetting] = useState<string | null>(null);
-	const updateProfileImage = useUploadProfileImage();
-	const fileInputRef = useRef<HTMLInputElement>(null);
-	const [imageError, setImageError] = useState('');
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [loadingSetting, setLoadingSetting] = useState<string | null>(null);
+    const updateProfileImage = useUploadProfileImage();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [imageError, setImageError] = useState('');
 
-	// Memoize static settings array
-	const settings = useMemo(
-		() => [
-			{ label: 'Edit Profile', icon: CiUser, path: '/profile/edit' },
-			{ label: 'Notifications', icon: CiBellOn, path: '/profile/notification' },
-			{ label: 'Security', icon: CiLock, path: '/profile/security' },
-			{ label: 'Help', icon: CiCircleQuestion, path: '/profile/help' },
-		],
-		[]
-	);
+    // Memoize static settings array
+    const settings = useMemo(
+        () => [
+            { label: 'Edit Profile', icon: CiUser, path: '/profile/edit' },
+            { label: 'Notifications', icon: CiBellOn, path: '/profile/notification' },
+            { label: 'Security', icon: CiLock, path: '/profile/security' },
+            { label: 'Help', icon: CiCircleQuestion, path: '/profile/help' },
+        ],
+        [],
+    );
 
-	useEffect(() => {
-		setLoading(loadingProfile);
-	}, [loadingProfile, setLoading]);
+    useEffect(() => {
+        setLoading(loadingProfile);
+    }, [loadingProfile, setLoading]);
 
-	const handleLogout = useCallback(async () => {
-		setIsLoggingOut(true);
-		signOut({
-			callbackUrl: '/',
-			redirect: true,
-		});
-	}, []);
+    const handleLogout = useCallback(async () => {
+        setIsLoggingOut(true);
+        signOut({
+            callbackUrl: '/',
+            redirect: true,
+        });
+    }, []);
 
-	const handleSetting = useCallback(
-		async (setting: { label: string; path?: string }) => {
-			setLoadingSetting(setting.label);
-			router.push(setting.path!);
-		},
-		[router]
-	);
+    const handleSetting = useCallback(
+        async (setting: { label: string; path?: string }) => {
+            setLoadingSetting(setting.label);
+            router.push(setting.path!);
+        },
+        [router],
+    );
 
-	const handleEditImageClick = useCallback(() => {
-		if (fileInputRef.current) {
-			fileInputRef.current.click();
-		}
-	}, []);
+    const handleEditImageClick = useCallback(() => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    }, []);
 
-	const handleFileChange = useCallback(
-		async (event: React.ChangeEvent<HTMLInputElement>) => {
-			const file = event.target.files?.[0];
-			if (!file) return;
+    const handleFileChange = useCallback(
+        async (event: React.ChangeEvent<HTMLInputElement>) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
 
-			const formData = new FormData();
-			formData.append('image', file);
+            const formData = new FormData();
+            formData.append('image', file);
 
-			try {
-				const response = await updateProfileImage.mutateAsync({ body: formData });
-				if (response.status === 'success') {
-					refetch();
-				} else {
-					setImageError(t('profile.updateProfile.errorUploadingImage'));
-					console.error('Failed to update profile image');
-				}
-			} catch (error) {
-				setImageError(t('profile.updateProfile.errorUploadingImage'));
-				console.error('Error uploading profile image', error);
-			}
-		},
-		[refetch, t, updateProfileImage]
-	);
+            try {
+                const response = await updateProfileImage.mutateAsync({ body: formData });
+                if (response.status === 'success') {
+                    refetch();
+                } else {
+                    setImageError(t('profile.updateProfile.errorUploadingImage'));
+                    console.error('Failed to update profile image');
+                }
+            } catch (error) {
+                setImageError(t('profile.updateProfile.errorUploadingImage'));
+                console.error('Error uploading profile image', error);
+            }
+        },
+        [refetch, t, updateProfileImage],
+    );
 
-	if (profileError || imageError) {
-		return (
-			<Modal
-				title="Error"
-				message={imageError ? imageError : t('profile.errorFetching')}
-				onClose={() => router.push('/home')}
-			/>
-		);
-	}
+    if (profileError || imageError) {
+        return (
+            <Modal
+                title="Error"
+                message={imageError ? imageError : t('profile.errorFetching')}
+                onClose={() => router.push('/home')}
+            />
+        );
+    }
 
-	if (loadingProfile) {
-		return null;
-	}
+    if (loadingProfile) {
+        return null;
+    }
 
-	return (
-		<div className="flex flex-col justify-between items-center bg-gray-50 h-screen p-10 lg:pt-[10vh]">
-			<input
-				type="file"
-				accept="image/*"
-				ref={fileInputRef}
-				onChange={handleFileChange}
-				className='hidden'
-			/>
-			<div className="h-[10%] flex justify-start items-center w-full lg:hidden">
-				<h1 className="text-5xl font-semibold pl-4">Profile</h1>
-			</div>
-			<div className="h-[30%] flex flex-col lg:justify-evenly md:justify-evenly items-center w-full lg:max-w-6xl">
-				<div className="relative w-40 h-40">
-					<Image
-						src={profile?.message?.profile_image || '/images/userprofile.png'}
-						alt="Profile Picture"
-						width={160}
-						height={160}
-						className="rounded-full object-cover border-4 border-white shadow-lg w-full h-full"
-					/>
-					<div
-						className="absolute bottom-0 right-0 bg-green-500 p-1 rounded-full cursor-pointer"
-						onClick={handleEditImageClick}
-					>
-						<MdModeEditOutline className="text-white w-8 h-8 ml-1" />
-					</div>
-				</div>
-				<h2 className="text-3xl font-semibold mt-4 truncate max-w-full text-center">
-					{profile?.message?.name || 'Username'}
-				</h2>
-				<p className="text-gray-400 overflow-hidden text-ellipsis max-w-full text-center">
-					{profile?.message?.email || 'user@yourdomain.com'}
-				</p>
-			</div>
-			<div
-				className="h-[12%] w-full lg:max-w-6xl bg-gradient-to-r from-green-400 to-green-700 flex flex-col justify-center text-white rounded-[25px] px-8 shadow-lg cursor-pointer"
-				onClick={() => router.push('/premium')}
-			>
-				<div className="flex flex-row items-center justify-between">
-					<div className="flex justify-start space-x-6 w-[80%] items-center pb-4">
-						<span className="bg-gradient-to-b from-yellow-300 to-yellow-700 text-white rounded-full px-4 py-2 text-2xl">
-							PRO
-						</span>
-						<h3 className="font-semibold text-3xl">Upgrade to Premium</h3>
-					</div>
-					<IoIosArrowDroprightCircle className="text-white w-10 h-10" />
-				</div>
-				<p className="text-xl">Enjoy workout access without ads and restrictions</p>
-			</div>
-			<div className="lg:hidden border-t border-gray-300 w-full my-14 lg:my-0 lg:max-w-6xl"></div>
-			<div className="w-full h-[45%] mb-24 overflow-y-auto lg:max-w-6xl lg:mb-0">
-				{settings.map((setting, index) => (
-					<SettingItem
-						key={index}
-						label={setting.label}
-						icon={setting.icon}
-						onClick={() => handleSetting(setting)}
-						isLoading={loadingSetting === setting.label}
-					/>
-				))}
-				<div className="flex items-center justify-between w-full py-8 px-4">
-					<div className="flex items-center space-x-4">
-						<BsMoon className="text-gray-500 w-5 h-5" />
-						<span className="text-3xl font-medium">Dark Theme</span>
-					</div>
-					<ToggleButton isOn={false} onToggle={() => {}} />
-				</div>
-				<SettingItem
-					label="Logout"
-					icon={IoIosLogOut}
-					isRed
-					onClick={handleLogout}
-					isLoading={isLoggingOut}
-				/>
-			</div>
-		</div>
-	);
+    return (
+        <div className="flex flex-col justify-between items-center bg-gray-50 h-screen p-10 lg:pt-[10vh]">
+            <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+            />
+            <div className="h-[10%] flex justify-start items-center w-full lg:hidden">
+                <h1 className="text-5xl font-semibold pl-4">Profile</h1>
+            </div>
+            <div className="h-[30%] flex flex-col lg:justify-evenly md:justify-evenly items-center w-full lg:max-w-6xl">
+                <div className="relative w-40 h-40">
+                    <Image
+                        src={profile?.message?.profile_image || '/images/userprofile.png'}
+                        alt="Profile Picture"
+                        width={160}
+                        height={160}
+                        className="rounded-full object-cover border-4 border-white shadow-lg w-full h-full"
+                    />
+                    <div
+                        className="absolute bottom-0 right-0 bg-green-500 p-1 rounded-full cursor-pointer"
+                        onClick={handleEditImageClick}
+                    >
+                        <MdModeEditOutline className="text-white w-8 h-8 ml-1" />
+                    </div>
+                </div>
+                <h2 className="text-3xl font-semibold mt-4 truncate max-w-full text-center">
+                    {profile?.message?.name || 'Username'}
+                </h2>
+                <p className="text-gray-400 overflow-hidden text-ellipsis max-w-full text-center">
+                    {profile?.message?.email || 'user@yourdomain.com'}
+                </p>
+            </div>
+            <div
+                className="h-[12%] w-full lg:max-w-6xl bg-gradient-to-r from-green-400 to-green-700 flex flex-col justify-center text-white rounded-[25px] px-8 shadow-lg cursor-pointer"
+                onClick={() => router.push('/premium')}
+            >
+                <div className="flex flex-row items-center justify-between">
+                    <div className="flex justify-start space-x-6 w-[80%] items-center pb-4">
+                        <span className="bg-gradient-to-b from-yellow-300 to-yellow-700 text-white rounded-full px-4 py-2 text-2xl">
+                            PRO
+                        </span>
+                        <h3 className="font-semibold text-3xl">Upgrade to Premium</h3>
+                    </div>
+                    <IoIosArrowDroprightCircle className="text-white w-10 h-10" />
+                </div>
+                <p className="text-xl">Enjoy workout access without ads and restrictions</p>
+            </div>
+            <div className="lg:hidden border-t border-gray-300 w-full my-14 lg:my-0 lg:max-w-6xl"></div>
+            <div className="w-full h-[45%] mb-24 overflow-y-auto lg:max-w-6xl lg:mb-0">
+                {settings.map((setting, index) => (
+                    <SettingItem
+                        key={index}
+                        label={setting.label}
+                        icon={setting.icon}
+                        onClick={() => handleSetting(setting)}
+                        isLoading={loadingSetting === setting.label}
+                    />
+                ))}
+                <div className="flex items-center justify-between w-full py-8 px-4">
+                    <div className="flex items-center space-x-4">
+                        <BsMoon className="text-gray-500 w-5 h-5" />
+                        <span className="text-3xl font-medium">Dark Theme</span>
+                    </div>
+                    <ToggleButton isOn={false} onToggle={() => {}} />
+                </div>
+                <SettingItem
+                    label="Logout"
+                    icon={IoIosLogOut}
+                    isRed
+                    onClick={handleLogout}
+                    isLoading={isLoggingOut}
+                />
+            </div>
+        </div>
+    );
 };
 
 export default ProfilePage;

@@ -4,7 +4,7 @@ import SavedMessage from '../others/SavedMessage';
 import { useTranslation } from 'react-i18next';
 import { useSaveWorkout } from '@/app/_services/userService';
 import { FaSpinner } from 'react-icons/fa';
-
+import Image from 'next/image';
 
 interface ExerciseBannerSectionProps {
     hasRoutine: boolean;
@@ -12,11 +12,16 @@ interface ExerciseBannerSectionProps {
     savedWorkoutPlans: WorkoutPlan[];
 }
 
-
-const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutine, exercises, savedWorkoutPlans }) => {
+const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({
+    hasRoutine,
+    exercises,
+    savedWorkoutPlans,
+}) => {
     const { t } = useTranslation('global');
     const [savedMessage, setSavedMessage] = useState<string | null>(null);
-    const [savedExerciseIds, setSavedExerciseIds] = useState<string[]>(savedWorkoutPlans.map(workout => workout._id));
+    const [savedExerciseIds, setSavedExerciseIds] = useState<string[]>(
+        savedWorkoutPlans.map((workout) => workout._id),
+    );
     const { mutate: saveWorkout } = useSaveWorkout();
 
     const handleSaveWorkout = async (id: string, name: string) => {
@@ -25,7 +30,7 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
             {
                 onSuccess: (data) => {
                     if (data.status === 'success') {
-                        setSavedExerciseIds([...savedExerciseIds, id])
+                        setSavedExerciseIds([...savedExerciseIds, id]);
                         setSavedMessage(`${name} saved!`);
                         setTimeout(() => setSavedMessage(null), 3000);
                     }
@@ -38,14 +43,16 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
                     }
                     setTimeout(() => setSavedMessage(null), 3000);
                 },
-            }
+            },
         );
     };
 
     return (
         <div className="exercise-banner-section px-6 pt-10 md:px-12 lg:px-20">
             <h2 className="text-2xl font-bold mb-6 lg:text-3xl">
-                {hasRoutine ? t('home.excercisebannersection.planfortoday') : t('home.excercisebannersection.planfortoday2')}
+                {hasRoutine
+                    ? t('home.excercisebannersection.planfortoday')
+                    : t('home.excercisebannersection.planfortoday2')}
             </h2>
 
             {exercises.length > 0 ? (
@@ -72,10 +79,10 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({ hasRoutin
     );
 };
 
-const ExerciseCard: React.FC<{ 
-    exercise: WorkoutPlan, 
-    onSaveClick: (id: string, name: string) => void, 
-    isSaved: boolean 
+const ExerciseCard: React.FC<{
+    exercise: WorkoutPlan;
+    onSaveClick: (id: string, name: string) => void;
+    isSaved: boolean;
 }> = ({ exercise, onSaveClick, isSaved }) => {
     const [loading, setLoading] = useState(false);
 
@@ -89,12 +96,19 @@ const ExerciseCard: React.FC<{
         }, 500);
     };
 
+    console.log('test', exercise);
     return (
         <a href={`workouts/plan/${exercise._id}`} onClick={handleRedirect}>
-            <div
-                className="min-w-[280px] h-[350px] bg-black text-white rounded-lg relative overflow-hidden group"
-                style={{ backgroundImage: `url(${exercise.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-            >
+            <div className="min-w-[280px] h-[350px] text-white rounded-lg relative overflow-hidden group bg-gray-200">
+                {/* Optimized Image Background */}
+                <Image
+                    src={exercise.image_url}
+                    alt={exercise.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 33vw"
+                    priority={false} // set true if it's critical
+                />
                 <div className="absolute inset-0 bg-black opacity-50 group-hover:opacity-30 transition-opacity"></div>
 
                 {loading && (
@@ -117,7 +131,9 @@ const ExerciseCard: React.FC<{
                                         e.stopPropagation();
                                         onSaveClick(exercise._id, exercise.name);
                                     }}
-                                    className={`p-2 ${isSaved ? 'bg-red-500' : 'bg-gray-700'} rounded-full transition-transform transform hover:scale-110 active:scale-90`}
+                                    className={`p-2 ${
+                                        isSaved ? 'bg-red-500' : 'bg-gray-700'
+                                    } rounded-full transition-transform transform hover:scale-110 active:scale-90`}
                                     disabled={isSaved}
                                 >
                                     <AiFillHeart size={24} />

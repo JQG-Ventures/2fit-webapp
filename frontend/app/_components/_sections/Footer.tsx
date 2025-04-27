@@ -12,9 +12,7 @@ const Footer = () => {
             </div>
 
             <div className="mt-2">
-                <p className="text-xs">
-                    Powered by JQG-Ventures S.A
-                </p>
+                <p className="text-xs">Powered by JQG-Ventures S.A</p>
             </div>
         </footer>
     );

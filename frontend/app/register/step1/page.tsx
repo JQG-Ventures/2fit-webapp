@@ -3,14 +3,14 @@
 
 import React, { useState } from 'react';
 import { FaApple, FaFacebook, FaGoogle } from 'react-icons/fa';
-import { IoChevronBack, IoCalendarOutline } from "react-icons/io5";
+import { IoChevronBack, IoCalendarOutline } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import ButtonWithSpinner from '../../_components/others/ButtonWithSpinner';
 import InputWithIcon from '../../_components/form/InputWithIcon';
 // import PhoneInput from '../../_components/form/PhoneInput';
 import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/bootstrap.css'
+import 'react-phone-input-2/lib/bootstrap.css';
 import CountryInputForm from '../../_components/form/CountryInputForm';
 import countryCodes from '@/app/data/countryCodes.json';
 import { calculateAge } from '@/app/utils/formUtils';
@@ -33,7 +33,9 @@ interface ValidationErrors {
 export default function RegisterStep1() {
     const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
-    const initialBirthdate = data.birthdate ? new Date(data.birthdate).toISOString().split('T')[0] : '';
+    const initialBirthdate = data.birthdate
+        ? new Date(data.birthdate).toISOString().split('T')[0]
+        : '';
     const [countryCode, setCountryCode] = useState<string>(data.countryCode || '');
     const [phoneNumber, setPhoneNumber] = useState<string>(data.number || '');
     const [formData, setFormData] = useState<FormData>({
@@ -42,7 +44,7 @@ export default function RegisterStep1() {
         age: data.age || '',
         country: data.country || '',
         birthdate: initialBirthdate,
-        last: data.last || ''
+        last: data.last || '',
     });
     const [errors, setErrors] = useState<ValidationErrors>({});
     const router = useRouter();
@@ -51,7 +53,7 @@ export default function RegisterStep1() {
     const user_data_fields = [
         { name: 'name', label: 'Name', placeholder: t('RegisterPagestep1.name') },
         { name: 'last', label: 'Last', placeholder: t('RegisterPagestep1.last') },
-        { name: 'birthdate', label: 'Birthdate', placeholder: 'mm/dd/yyyy', type: 'date' }
+        { name: 'birthdate', label: 'Birthdate', placeholder: 'mm/dd/yyyy', type: 'date' },
     ];
 
     const validatePhone = (phone: string): boolean => {
@@ -63,7 +65,7 @@ export default function RegisterStep1() {
         let phoneCode = data.dialCode;
         let number;
         if (value.startsWith(`${data.dialCode}`)) {
-            number = value.replace(phoneCode, '').trim()
+            number = value.replace(phoneCode, '').trim();
         } else {
             number = value;
         }
@@ -96,21 +98,21 @@ export default function RegisterStep1() {
         const validationErrors: ValidationErrors = {};
 
         if (!formData.name.trim()) {
-            validationErrors.name = t("RegisterPagestep1.nameValidationFill");
+            validationErrors.name = t('RegisterPagestep1.nameValidationFill');
         }
         if (!formData.last.trim()) {
-            validationErrors.last = t("RegisterPagestep1.lastValidationFill");
+            validationErrors.last = t('RegisterPagestep1.lastValidationFill');
         }
         if (!phoneNumber.trim()) {
-            validationErrors.number = t("RegisterPagestep1.phoneValidationFill");
+            validationErrors.number = t('RegisterPagestep1.phoneValidationFill');
         } else if (!validatePhone(`+${phoneNumber}`)) {
-            validationErrors.number = t("RegisterPagestep1.phoneValidationFill");
+            validationErrors.number = t('RegisterPagestep1.phoneValidationFill');
         }
         if (!formData.birthdate) {
-            validationErrors.birthdate = t("RegisterPagestep1.birthdateValidationFill");
+            validationErrors.birthdate = t('RegisterPagestep1.birthdateValidationFill');
         }
         if (!formData.country) {
-            validationErrors.country = t("RegisterPagestep1.countryValidationFill");
+            validationErrors.country = t('RegisterPagestep1.countryValidationFill');
         }
 
         setErrors(validationErrors);
@@ -125,18 +127,18 @@ export default function RegisterStep1() {
                 age: extractedAge.toString(),
                 code_number: countryCode.replace('+', ''),
                 number: phoneNumber,
-                birthdate: formattedBirthdate
+                birthdate: formattedBirthdate,
             };
 
             try {
                 const existingUser = await fetchUserDataByNumber(formattedPhoneNumber);
                 if (existingUser) {
-                    setErrors({ number: t("RegisterPagestep1.numberRegisteredError") });
+                    setErrors({ number: t('RegisterPagestep1.numberRegisteredError') });
                     setIsSubmitting(false);
                     return;
                 }
             } catch (error) {
-                setErrors({ number: t("RegisterPagestep1.numberServerError") });
+                setErrors({ number: t('RegisterPagestep1.numberServerError') });
                 setIsSubmitting(false);
                 return;
             }
@@ -153,21 +155,24 @@ export default function RegisterStep1() {
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 items-center">
-            <div className='h-[10%] pt-20 w-full lg:max-w-3xl'>
+            <div className="h-[10%] pt-20 w-full lg:max-w-3xl">
                 <button onClick={handlePrevStep} className="text-4xl lg:hidden">
                     <IoChevronBack />
                 </button>
             </div>
-            <div className='h-[15%] flex flex-row w-full lg:max-w-3xl mb-4'>
-                <button onClick={handlePrevStep} className="hidden text-4xl lg:flex mr-14 mt-5 text-center">
+            <div className="h-[15%] flex flex-row w-full lg:max-w-3xl mb-4">
+                <button
+                    onClick={handlePrevStep}
+                    className="hidden text-4xl lg:flex mr-14 mt-5 text-center"
+                >
                     <IoChevronBack />
                 </button>
-                <h1 className='text-6xl font-semibold'>
+                <h1 className="text-6xl font-semibold">
                     {t('RegisterPagestep1.create.0')} <br />
                     {t('RegisterPagestep1.create.1')}
                 </h1>
             </div>
-            <div className='h-[60%] flex w-full items-center justify-center'>
+            <div className="h-[60%] flex w-full items-center justify-center">
                 <form className="w-full lg:max-w-3xl space-y-8">
                     {user_data_fields.map(({ name, label, placeholder, type }) => (
                         <InputWithIcon
@@ -192,7 +197,9 @@ export default function RegisterStep1() {
                         onChange={handlePhoneChange}
                         inputClass="!w-full !py-6 !border-none !bg-gray-200 !rounded-md cursor-pointer"
                     />
-                    {errors.birthdate && <p className="text-red-500 text-center">{errors.birthdate}</p>}
+                    {errors.birthdate && (
+                        <p className="text-red-500 text-center">{errors.birthdate}</p>
+                    )}
                     {errors.name && <p className="text-red-500 text-center">{errors.name}</p>}
                     {errors.last && <p className="text-red-500 text-center">{errors.last}</p>}
                     {errors.number && <p className="text-red-500 text-center">{errors.number}</p>}

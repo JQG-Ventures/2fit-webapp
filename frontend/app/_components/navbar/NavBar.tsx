@@ -2,13 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import DesktopNavBar from './DesktopNavBar';
-import MobileNavBar from './MobileNavBar'; 
+import MobileNavBar from './MobileNavBar';
 import { usePathname } from 'next/navigation';
 import { FaHome, FaDumbbell, FaRobot, FaUser } from 'react-icons/fa';
 import { useMediaQuery } from 'react-responsive';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/app/_providers/LoadingProvider';
-
 
 const NavBar: React.FC = () => {
     const { t } = useTranslation('global');
@@ -19,9 +18,12 @@ const NavBar: React.FC = () => {
     const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
     let showNavBarPaths = [];
 
-    if (isDesktopOrLaptop) {showNavBarPaths = ['/home', '/workouts', '/bot', '/profile', '/premium'];}
-    else {showNavBarPaths = ['/home', '/workouts', '/bot', '/profile'];}
-    const shouldShowNavBar = showNavBarPaths.some(path => pathname.startsWith(path));
+    if (isDesktopOrLaptop) {
+        showNavBarPaths = ['/home', '/workouts', '/bot', '/profile', '/premium'];
+    } else {
+        showNavBarPaths = ['/home', '/workouts', '/bot', '/profile'];
+    }
+    const shouldShowNavBar = showNavBarPaths.some((path) => pathname.startsWith(path));
 
     const navItems = [
         { href: '/home', label: t('Navbar.home'), icon: <FaHome /> },
@@ -47,10 +49,20 @@ const NavBar: React.FC = () => {
     if (!isClient) return null;
 
     return (
-        <div style={{ display: shouldShowNavBar ? 'block' : 'none' }} className='relative z-[50]'>
-            {isDesktopOrLaptop 
-                ? <DesktopNavBar navItems={navItems} selectedPath={selectedPath} onNavClick={handleNavClick} /> 
-                : <MobileNavBar navItems={navItems} selectedPath={selectedPath} onNavClick={handleNavClick} />}
+        <div style={{ display: shouldShowNavBar ? 'block' : 'none' }} className="relative z-[50]">
+            {isDesktopOrLaptop ? (
+                <DesktopNavBar
+                    navItems={navItems}
+                    selectedPath={selectedPath}
+                    onNavClick={handleNavClick}
+                />
+            ) : (
+                <MobileNavBar
+                    navItems={navItems}
+                    selectedPath={selectedPath}
+                    onNavClick={handleNavClick}
+                />
+            )}
         </div>
     );
 };

@@ -20,36 +20,42 @@ export const registerUser = async (data: any) => {
 
 export const sendCode = async (number: string) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/send-code`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/send-code`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    number: number,
+                }),
             },
-            body: JSON.stringify({
-                number: number
-            }),
-        });
+        );
 
-        return response.status
+        return response.status;
     } catch (error) {
-        return 500
+        return 500;
     }
 };
 
 export const verifyCode = async (number: string, code: string) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/verify-code`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/verify-code`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    number: number,
+                    code: code,
+                }),
             },
-            body: JSON.stringify({
-                number: number,
-                code: code
-            }),
-        });
+        );
 
-        return response.status
+        return response.status;
     } catch (error) {
         return 500;
     }

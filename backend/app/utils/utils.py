@@ -18,10 +18,7 @@ def build_gpt_generator_request(prompt: str) -> list:
         str: Body of the message to sent to GPT model.
     """
 
-    request_message = [{
-        "role": "user",
-        "content": prompt
-    }]
+    request_message = [{"role": "user", "content": prompt}]
 
     return request_message
 
@@ -36,9 +33,9 @@ def format_json_string(answer: str) -> str:
     Returns:
         str: Formatted string JSON for JSON encoding.
     """
-    answer = re.sub(r'(?<=\s)(\w+)(?=\s*:)', r'"\1"', answer)
+    answer = re.sub(r"(?<=\s)(\w+)(?=\s*:)", r'"\1"', answer)
     answer = re.sub(r'(?<=\w)"\s*"', r'", "', answer)
-    answer = re.sub(r',(\s*[}\]])', r'\1', answer)
+    answer = re.sub(r",(\s*[}\]])", r"\1", answer)
 
     return answer
 
@@ -55,7 +52,7 @@ def parse_answer(answer: str):
     """
     try:
         formatted_answer = format_json_string(answer)
-        json_match = re.search(r'{.*}', formatted_answer, re.DOTALL)
+        json_match = re.search(r"{.*}", formatted_answer, re.DOTALL)
 
         if json_match:
             json_string = json_match.group(0)
@@ -78,7 +75,7 @@ def generate_user_routine(user_profile: dict, fitness_level: str, plan):
         "video_url": "",
         "level": fitness_level,
         "is_active": True,
-        "workout_schedule": plan
+        "workout_schedule": plan,
     }
     logging.info(f"Workout routine for user {user_profile['_id']} generated: {plan}")
     return plan

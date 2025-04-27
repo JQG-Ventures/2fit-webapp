@@ -9,7 +9,6 @@ import useIsMobile from '../../_hooks/useIsMobile';
 import WorkoutFooter from '../../_components/workouts/WorkoutFooterStart';
 import { useTranslation } from 'react-i18next';
 
-
 const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan }) => {
     const exercises = workoutPlan.workout_schedule?.[0]?.exercises || [];
     const isMobile = useIsMobile();
@@ -20,20 +19,19 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
     let totalDurationSeconds = 0;
     let numberOfExercises = 0;
 
-
-    workoutPlan.workout_schedule?.forEach(schedule => {
-        schedule.exercises?.forEach(exercise => {
+    workoutPlan.workout_schedule?.forEach((schedule) => {
+        schedule.exercises?.forEach((exercise) => {
             const sets = exercise.sets || 0;
             const restSeconds = exercise.rest_seconds || 0;
             const setDurationSeconds = 120;
             const exerciseDurationSeconds = sets * setDurationSeconds;
             const totalRestBetweenSets = (sets - 1) * restSeconds;
-    
+
             totalDurationSeconds += exerciseDurationSeconds + totalRestBetweenSets;
         });
     });
-    
-    workoutPlan.workout_schedule?.forEach(schedule => {
+
+    workoutPlan.workout_schedule?.forEach((schedule) => {
         numberOfExercises += schedule.exercises?.length || 0;
     });
 
@@ -50,7 +48,7 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
     const handleStartClick = async () => {
         setIsSubmitting(true);
         try {
-            console.log("Workout started");
+            console.log('Workout started');
         } finally {
             setIsSubmitting(false);
         }
@@ -79,25 +77,34 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
 
             <div className="w-full border-t border-gray-300 mx-auto my-10"></div>
 
-            <div className='flex flex-row justify-between w-full px-2'>
-                <h2 className="text-black text-3xl font-semibold">{t("workouts.plan.workoutActivity")}</h2>
+            <div className="flex flex-row justify-between w-full px-2">
+                <h2 className="text-black text-3xl font-semibold">
+                    {t('workouts.plan.workoutActivity')}
+                </h2>
                 <button
-                    className='text-emerald-600 text-md hover:text-emerald-800'
-                    onClick={handleSeeAllClick}>
-                    {t("workouts.plan.seeAll")}
+                    className="text-emerald-600 text-md hover:text-emerald-800"
+                    onClick={handleSeeAllClick}
+                >
+                    {t('workouts.plan.seeAll')}
                 </button>
             </div>
 
             {isMobile && isFullScreen && (
                 <div className="fixed inset-0 bg-gray-50 z-50 p-10 flex flex-col">
-                    <div className='flex flex-row my-4'>
+                    <div className="flex flex-row my-4">
                         <button onClick={closeFullScreen} className="text-3xl">
                             <FaArrowLeft />
                         </button>
-                        <h2 className="text-4xl font-semibold ml-8">{t("workouts.plan.workoutActivity")}</h2>
+                        <h2 className="text-4xl font-semibold ml-8">
+                            {t('workouts.plan.workoutActivity')}
+                        </h2>
                     </div>
                     <div className="no-scrollbar overflow-y-auto flex-grow">
-                        <ExerciseList exercises={exercises} isMobile={true} onExerciseSelect={() => {}}/>
+                        <ExerciseList
+                            exercises={exercises}
+                            isMobile={true}
+                            onExerciseSelect={() => {}}
+                        />
                     </div>
                     <WorkoutFooter
                         onStartClick={() => handleStartClick()}
@@ -107,8 +114,16 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
             )}
 
             {!isMobile && (
-                <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={t("workouts.plan.workoutActivity")}>
-                    <ExerciseList exercises={exercises} isMobile={false} onExerciseSelect={() => {}}/>
+                <Modal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    title={t('workouts.plan.workoutActivity')}
+                >
+                    <ExerciseList
+                        exercises={exercises}
+                        isMobile={false}
+                        onExerciseSelect={() => {}}
+                    />
                 </Modal>
             )}
         </div>

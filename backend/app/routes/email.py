@@ -10,39 +10,58 @@ import logging
 
 
 logger = logging.getLogger(__name__)
-email_bp = Blueprint('email_bp', __name__)
-api = Api(email_bp, doc='/docs')
+email_bp = Blueprint("email_bp", __name__)
+api = Api(email_bp, doc="/docs")
 
 
-email_model = api.model('Email', {
-    'to': fields.String(required=True, description='Recipient email address', example='user@example.com'),
-    'subject': fields.String(description='Subject of the email'),
-    'html': fields.String(required=True, description='HTML content of the email')
-})
+email_model = api.model(
+    "Email",
+    {
+        "to": fields.String(
+            required=True,
+            description="Recipient email address",
+            example="user@example.com",
+        ),
+        "subject": fields.String(description="Subject of the email"),
+        "html": fields.String(required=True, description="HTML content of the email"),
+    },
+)
 
-success_response_model = api.model('SuccessResponse', {
-    'status': fields.String(description='Status message', example='success'),
-    'message': fields.String(description='Response message', example='Email stored and sent successfully')
-})
+success_response_model = api.model(
+    "SuccessResponse",
+    {
+        "status": fields.String(description="Status message", example="success"),
+        "message": fields.String(
+            description="Response message",
+            example="Email stored and sent successfully",
+        ),
+    },
+)
 
-error_response_model = api.model('ErrorResponse', {
-    'error': fields.String(description='Error message', example='There are missing fields')
-})
+error_response_model = api.model(
+    "ErrorResponse",
+    {"error": fields.String(description="Error message", example="There are missing fields")},
+)
 
-conflict_response_model = api.model('ConflictResponse', {
-    'status': fields.String(description='Status message', example='error'),
-    'message': fields.String(description='Conflict message', example='Email already registered')
-})
+conflict_response_model = api.model(
+    "ConflictResponse",
+    {
+        "status": fields.String(description="Status message", example="error"),
+        "message": fields.String(
+            description="Conflict message", example="Email already registered"
+        ),
+    },
+)
 
 
-@api.route('/save')
+@api.route("/save")
 class StoreEmailResource(Resource):
     @jwt_required(optional=True)
     @api.expect(email_model)
-    @api.response(200, 'Email stored and sent successfully', success_response_model)
-    @api.response(400, 'There are missing fields', error_response_model)
-    @api.response(409, 'Email already registered', conflict_response_model)
-    @api.response(500, 'Internal server error', error_response_model)
+    @api.response(200, "Email stored and sent successfully", success_response_model)
+    @api.response(400, "There are missing fields", error_response_model)
+    @api.response(409, "Email already registered", conflict_response_model)
+    @api.response(500, "Internal server error", error_response_model)
     def post(self):
         """
         Store and send an email notification.
@@ -65,16 +84,22 @@ class StoreEmailResource(Resource):
                     from_email=s.SENDGRID_FROM_EMAIL,
                     to_emails=email_address,
                     subject=email_subject,
-                    html_content=email_html_content
+                    html_content=email_html_content,
                 )
                 sendgrid_client = SendGridAPIClient(s.SENDGRID_API_KEY)
                 sendgrid_client.send(email_message)
 
                 logging.info(f"Email {email_address} was notified about registration!")
-                return {"status": "success", "message": "Email stored and sent successfully"}, 200
+                return {
+                    "status": "success",
+                    "message": "Email stored and sent successfully",
+                }, 200
 
             logging.info(f"Email {email_address} already registered!")
-            return {"status": "error", "message": "Email already registered!"}, 409
+            return {
+                "status": "error",
+                "message": "Email already registered!",
+            }, 409
         except Exception as e:
             logging.exception(f"There was an error saving the email | error: {e}")
             return {"status": "error", "message": str(e)}, 500
