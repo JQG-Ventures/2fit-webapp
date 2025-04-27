@@ -229,10 +229,10 @@ class WorkoutPlanGenerator:
         user_id: str, plan_id: str, plan_name: str, duration_weeks: int
     ):
         try:
-            user_id = ObjectId(user_id)
+            search_id = ObjectId(user_id)
             mongo.db.users.update_one(
                 {
-                    "_id": user_id,
+                    "_id": search_id,
                     "workout_history.active_plans.is_completed": False,
                 },
                 {"$set": {"workout_history.active_plans.$[].is_completed": True}},
@@ -254,11 +254,11 @@ class WorkoutPlanGenerator:
                 "progress_details": [],
             }
             mongo.db.users.update_one(
-                {"_id": user_id},
+                {"_id": search_id},
                 {"$push": {"workout_history.active_plans": active_plan}},
             )
 
-            logging.info(f"Set workout plan {plan_id} as active for user {user_id}.")
+            logging.info(f"Set workout plan {plan_id} as active for user {search_id}.")
         except Exception as e:
-            logging.error(f"Error setting active workout plan for user {user_id}: {str(e)}")
+            logging.error(f"Error setting active workout plan for user {search_id}: {str(e)}")
             raise Exception(f"Error setting active workout plan: {str(e)}")

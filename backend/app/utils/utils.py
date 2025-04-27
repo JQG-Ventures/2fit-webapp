@@ -1,10 +1,11 @@
+from bson import ObjectId
+from bson.errors import InvalidId
 from datetime import datetime
+from typing import Union
 
 import json
 import logging
 import re
-
-from bson import ObjectId
 
 
 def build_gpt_generator_request(prompt: str) -> list:
@@ -81,11 +82,11 @@ def generate_user_routine(user_profile: dict, fitness_level: str, plan):
     return plan
 
 
-def convert_to_objectid(id_value):
+def convert_to_objectid(id_value: str) -> Union[ObjectId, str]:
     """Convert string ID to ObjectId if possible."""
     try:
         return ObjectId(id_value)
-    except Exception:
+    except InvalidId:
         return id_value
 
 
