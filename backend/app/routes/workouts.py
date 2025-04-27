@@ -5,9 +5,11 @@ from marshmallow import ValidationError
 from app.models.workouts import WorkoutPlan
 from app.models.user import User
 from app.Schemas.WorkoutSchema import workout_plan_schema, workout_plans_schema
+from app.services.user_workout_service import UserWorkoutService
+from typing import Tuple, Any
+
 import logging
 
-from app.services.user_workout_service import UserWorkoutService
 
 workouts_bp = Blueprint("workouts_bp", __name__)
 api = Api(workouts_bp, doc="/docs")
@@ -83,7 +85,7 @@ class WorkoutPlanListResource(Resource):
     @api.response(201, "Workout Plan created")
     @api.response(400, "Validation Error")
     @api.response(500, "Internal Server Error")
-    def post(self):
+    def post(self) -> Tuple[dict[str, Any], int]:
         """Create a new workout plan."""
         data = request.json
         try:
@@ -99,7 +101,7 @@ class WorkoutPlanListResource(Resource):
     @api.doc("get_workout_plans")
     @api.response(200, "Success")
     @api.response(500, "Internal Server Error")
-    def get(self):
+    def get(self) -> Tuple[dict[str, Any], int]:
         """Get a workout plan list."""
         try:
             plans = WorkoutPlan.get_workout_plans()
@@ -115,7 +117,7 @@ class OneDayWorkoutPlanListResource(Resource):
     @jwt_required()
     @api.response(200, "Success")
     @api.response(500, "Internal Server Error")
-    def get(self):
+    def get(self) -> Tuple[dict[str, Any], int]:
         """Retrieve workout plans that are for one day only."""
         try:
             plans = WorkoutPlan.get_one_day_workouts()
@@ -133,7 +135,7 @@ class BulkWorkoutPlanResource(Resource):
     @api.response(201, "Workout Plans created")
     @api.response(400, "Validation Error")
     @api.response(500, "Internal Server Error")
-    def post(self):
+    def post(self) -> Tuple[dict[str, Any], int]:
         """Create multiple workout plans in bulk."""
         data = request.json
         try:
@@ -161,7 +163,7 @@ class WorkoutPlanResource(Resource):
     @api.response(200, "Success")
     @api.response(404, "Workout Plan not found")
     @api.response(500, "Internal Server Error")
-    def get(self, plan_id):
+    def get(self, plan_id: str) -> Tuple[dict[str, Any], int]:
         """Get a workout plan by its ID."""
         try:
             workout_plan = WorkoutPlan.get_workout_plan_by_id(plan_id)
@@ -181,7 +183,7 @@ class WorkoutPlanResource(Resource):
     @api.response(400, "Validation Error")
     @api.response(404, "Workout Plan not found")
     @api.response(500, "Internal Server Error")
-    def put(self, plan_id):
+    def put(self, plan_id: str) -> Tuple[dict[str, Any], int]:
         """Update a workout plan by its ID."""
         data = request.json
         try:
@@ -207,7 +209,7 @@ class WorkoutPlanResource(Resource):
     @api.response(200, "Workout Plan disabled")
     @api.response(404, "Workout Plan not found")
     @api.response(500, "Internal Server Error")
-    def delete(self, plan_id):
+    def delete(self, plan_id: str) -> Tuple[dict[str, Any], int]:
         """Delete a workout plan by its ID."""
         try:
             deleted = WorkoutPlan.delete_workout_plan(plan_id)
@@ -233,14 +235,11 @@ class UserWorkoutSavedResource(Resource):
     @api.response(200, "Success")
     @api.response(404, "Workout Plans not found")
     @api.response(500, "Internal Server Error")
-    def get(self):
+    def get(self) -> Tuple[dict[str, Any], int]:
         """Get a workout plan saved by user ID."""
         try:
             user_id = get_jwt_identity()
             workout_plan = User.get_saved_workouts(user_id)
-
-            print(workout_plan)
-            print("HDJADAJDADJ")
 
             return {"status": "success", "message": workout_plan}, 200
         except Exception as e:
@@ -252,7 +251,7 @@ class UserWorkoutSavedResource(Resource):
     @api.response(200, "Success")
     @api.response(400, "Value error")
     @api.response(500, "Internal Server Error")
-    def post(self):
+    def post(self) -> Tuple[dict[str, Any], int]:
         """Save workouts for the users by id"""
         try:
             workout_id = request.args.get("workout_id")
@@ -284,7 +283,7 @@ class UserWorkoutSavedResource(Resource):
     @api.response(200, "Success")
     @api.response(400, "Error in request")
     @api.response(500, "Internal Server Error")
-    def delete(self):
+    def delete(self) -> Tuple[dict[str, Any], int]:
         """Delete saved workouts for a user."""
         try:
             workout_id = request.args.get("workout_id")
@@ -319,7 +318,7 @@ class LibraryResource(Resource):
     @api.response(200, "Success")
     @api.response(404, "No workout plans found")
     @api.response(500, "Internal Server Error")
-    def get(self):
+    def get(self) -> Tuple[dict[str, Any], int]:
         """Fetch workout plans with the exercise count."""
         try:
             workout_plans = WorkoutPlan.get_workout_plans_with_exercise_count()
@@ -344,7 +343,7 @@ class LibraryMuscleResource(Resource):
     @api.response(200, "Success")
     @api.response(404, "No workout plans found for the specified muscle group")
     @api.response(500, "Internal Server Error")
-    def get(self, muscle_group):
+    def get(self, muscle_group: str) -> Tuple[dict[str, Any], int]:
         """Fetch workout plans by muscle group."""
         try:
             workout_plans = WorkoutPlan.get_workout_plans_by_muscle_group(muscle_group)
@@ -369,7 +368,7 @@ class WorkoutPlanByDifficultyResource(Resource):
     @api.response(200, "Success")
     @api.response(404, "No workout plans found for the specified difficulty")
     @api.response(500, "Internal Server Error")
-    def get(self, difficulty):
+    def get(self, difficulty: str) -> Tuple[dict[str, Any], int]:
         """Fetch workout plans by difficulty level."""
         try:
             workout_plans = WorkoutPlan.get_workout_plans_by_difficulty(difficulty)
@@ -393,7 +392,7 @@ class WeeklyWorkoutProgressResource(Resource):
     @api.response(200, "Weekly workout progress retrieved successfully")
     @api.response(400, "Invalid input", response_model)
     @api.response(500, "Internal server error", response_model)
-    def get(self):
+    def get(self) -> Tuple[dict[str, Any], int]:
         """
         Get the user's workout progress for the current week.
         """
@@ -414,7 +413,7 @@ class ChallengeProgressResource(Resource):
     @api.response(200, "Challenge progress retrieved successfully")
     @api.response(400, "Invalid input", response_model)
     @api.response(500, "Internal server error", response_model)
-    def get(self):
+    def get(self) -> Tuple[dict[str, Any], int]:
         """
         Get the user's progress for a specific challenge.
         """
@@ -440,7 +439,7 @@ class PopularWorkoutsResource(Resource):
     @jwt_required()
     @api.response(200, "Popular workout retrieved successfully")
     @api.response(500, "Internal server error", response_model)
-    def get(self):
+    def get(self) -> Tuple[dict[str, Any], int]:
         """Get the user's prefered workout."""
         try:
             workouts = WorkoutPlan.get_popular_workouts()
@@ -457,7 +456,7 @@ class DeleteExercisesResource(Resource):
     @api.response(200, "Workout Plan updated")
     @api.response(404, "Workout Plan not found")
     @api.response(500, "Internal Server Error")
-    def put(self, plan_id):
+    def put(self, plan_id: str) -> Tuple[dict[str, Any], int]:
         data = request.json
         try:
             updated = WorkoutPlan.delete_exercises(plan_id, data)
@@ -482,7 +481,7 @@ class UpdateExercisesResource(Resource):
     @api.response(200, "Workout Plan updated")
     @api.response(404, "Workout Plan not found")
     @api.response(500, "Internal Server Error")
-    def put(self, plan_id):
+    def put(self, plan_id: str) -> Tuple[dict[str, Any], int]:
         data = request.json
         try:
             updated = WorkoutPlan.update_exercise_ids(plan_id, data)

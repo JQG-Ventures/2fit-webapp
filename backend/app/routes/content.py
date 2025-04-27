@@ -40,7 +40,7 @@ class ContentUploadResource(Resource):
     @api.response(201, "Content uploaded successfully", upload_response_model)
     @api.response(400, "Missing required fields", error_model)
     @api.response(500, "Could not upload content", error_model)
-    def post(self):
+    def post(self) -> tuple[dict[str, str], int]:
         """
         Upload content to Azure Blob Storage.
         """
@@ -57,14 +57,19 @@ class ContentUploadResource(Resource):
             azure_service = AzureService(mongo.db)
             tags = tags.split(",")
             content_id = azure_service.upload_content(file_path, title, description, tags)
+
+            if content_id:
+                return {
+                    "message": "Content uploaded successfully",
+                    "content_id": content_id,
+                }, 201
+            return {
+                "message": "Cannot upload content to Azure Storage",
+                "content_id": "",
+            }, 400
         except Exception as e:
             logger.exception(f"There was a problem uploading the content, error: {e}")
             return {"error": "Could not upload content"}, 500
-
-        return {
-            "message": "Content uploaded successfully",
-            "content_id": content_id,
-        }, 201
 
 
 @api.route("/content")
@@ -79,7 +84,7 @@ class ContentByTagsResource(Resource):
     )
     @api.response(400, "Tags are required", error_model)
     @api.response(500, "Could not retrieve content", error_model)
-    def get(self):
+    def get(self) -> tuple[dict[str, str], int]:
         """
         Retrieve content URL by tags.
         """

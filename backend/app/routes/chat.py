@@ -2,6 +2,7 @@ from app.services.chat_service import ChatService
 from flask import Blueprint, request
 from flask_restx import Api, Resource, fields
 from openai import OpenAI
+from typing import Optional, Tuple
 
 import app.settings as s
 import logging
@@ -18,7 +19,7 @@ chat_bot_model = api.model(
 
 
 @chat_bp.before_app_request
-def before_request():
+def before_request() -> Optional[Tuple[dict, int]]:
     """
     Function to execute when each request get to the API
     and store the user id and instantiates a new
@@ -28,6 +29,7 @@ def before_request():
 
     if not user_id:
         return {"error": "User-Phone-Number header is missing"}, 400
+    return None
 
 
 @api.route("/chat")
@@ -37,7 +39,7 @@ class ChatBotResource(Resource):
     @api.response(200, "Conversation created!")
     @api.response(201, "Message sent!")
     @api.response(500, "Internal Server Error")
-    def post(self):
+    def post(self) -> tuple[dict[str, str], int]:
         """
         Continues a conversation with the chatbot.
 
@@ -64,7 +66,7 @@ class TranscribeResource(Resource):
     @api.doc("transcribe_audio")
     @api.response(200, "Transcribed successfully!")
     @api.response(500, "Internal Server Error")
-    def post(self):
+    def post(self) -> tuple[dict[str, str], int]:
         """
         Transcribe user audios.
 
@@ -76,8 +78,7 @@ class TranscribeResource(Resource):
             chat_service = ChatService(OpenAI(api_key=s.OPENAI_API_KEY))
 
             response = chat_service.transcribe_audio(audio_file)
+            return {"response": response}, 200
         except Exception as e:
             logger.exception(f"There was a problem handling the message, error: {e}")
             return {"error": "Could not handle the message"}, 500
-
-        return {"response": response}, 200

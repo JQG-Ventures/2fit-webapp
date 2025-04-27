@@ -1,5 +1,5 @@
 from azure.storage.blob import BlobServiceClient
-from typing import Optional
+from typing import Optional, BinaryIO, Any
 
 import app.settings as s
 import logging
@@ -11,7 +11,7 @@ logging.Logger.root.level = 10
 
 
 class AzureService:
-    def __init__(self, db):
+    def __init__(self, db: Any) -> None:
         self.db = db
         self.blob_service_client = BlobServiceClient.from_connection_string(
             s.AZURE_CONNECTION_STRING
@@ -80,7 +80,7 @@ class AzureService:
             return None
 
     def upload_profile_image(
-        self, file_stream, user_id: str, original_filename: str
+        self, file_stream: BinaryIO, user_id: str, original_filename: str
     ) -> Optional[str]:
         """
         Upload a profile image to Azure Blob Storage,
@@ -99,9 +99,7 @@ class AzureService:
             extension = (
                 original_filename.rsplit(".", 1)[1].lower() if "." in original_filename else "png"
             )
-            # Generate a unique filename without user_id since the folder will be the user_id
             unique_filename = f"profile_{uuid.uuid4().hex}.{extension}"
-            # Include the user_id as a folder in the blob path
             blob_path = f"{user_id}/{unique_filename}"
             blob_client = self.blob_service_client.get_blob_client(
                 container=s.AZURE_PROFILE_CONTAINER_NAME, blob=blob_path
