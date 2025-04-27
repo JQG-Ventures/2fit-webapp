@@ -142,19 +142,19 @@ class UserWorkoutService:
         Save the completed workout, update user progress, and calculate exercises left.
         """
         try:
-            user_id = convert_to_objectid(user_id)
+            search_id = convert_to_objectid(user_id)
 
             result = mongo.db.users.update_one(
-                {"_id": user_id},
+                {"_id": search_id},
                 {"$push": {"workout_history.completed_workouts": completed_workout}},
             )
 
             if result.modified_count > 0:
-                logging.info(f"Workout saved and progress updated for user {user_id}.")
+                logging.info(f"Workout saved and progress updated for user {search_id}.")
                 return
 
             logging.error(
-                f"Completed workout {completed_workout}, could not be saved for user {user_id}"
+                f"Completed workout {completed_workout}, could not be saved for user {search_id}"
             )
         except Exception as e:
             logging.error(f"Error saving completed workout: {str(e)}")
@@ -326,11 +326,11 @@ class UserWorkoutService:
         Retrieve the user's progress and exercises left in the workout plan.
         """
         try:
-            user_id = convert_to_objectid(user_id)
-            user = User.get_user_by_id(user_id)
+            search_id = convert_to_objectid(user_id)
+            user = User.get_user_by_id(search_id)
 
             if not user:
-                raise RuntimeError(f"Cannot find the user with id: {user_id}")
+                raise RuntimeError(f"Cannot find the user with id: {search_id}")
 
             active_plan = UserWorkoutService._fetch_active_plan(user, workout_plan_id)
             workout_plan = UserWorkoutService._fetch_workout_plan(workout_plan_id)
@@ -659,8 +659,8 @@ class UserWorkoutService:
         Save the workout progress for a user.
         """
         try:
-            user_id = convert_to_objectid(user_id)
-            user = User.get_user_by_id(user_id)
+            search_id = convert_to_objectid(user_id)
+            user = User.get_user_by_id(search_id)
             if not user:
                 raise Exception("User not found.")
 
@@ -824,14 +824,14 @@ class UserWorkoutService:
                 active_plan.pop("in_progress_workout", None)
                 mongo.db.users.update_one(
                     {
-                        "_id": user_id,
+                        "_id": search_id,
                         "workout_history.active_plans.workout_plan_id": workout_plan_id,
                     },
                     {"$push": {"workout_history.completed_workouts": in_progress_workout}},
                 )
                 mongo.db.users.update_one(
                     {
-                        "_id": user_id,
+                        "_id": search_id,
                         "workout_history.active_plans.workout_plan_id": workout_plan_id,
                     },
                     {
@@ -844,12 +844,12 @@ class UserWorkoutService:
 
             mongo.db.users.update_one(
                 {
-                    "_id": user_id,
+                    "_id": search_id,
                     "workout_history.active_plans.workout_plan_id": workout_plan_id,
                 },
                 {"$set": {"workout_history.active_plans.$": active_plan}},
             )
-            logging.info(f"Workout progress saved for user {user_id}.")
+            logging.info(f"Workout progress saved for user {search_id}.")
 
         except Exception as e:
             logging.error(f"Error saving workout progress: {str(e)}")

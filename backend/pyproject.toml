@@ -4,7 +4,7 @@ target-version = ["py39"]
 include = '\.pyi?$'
 exclude = '/(\.eggs|\.git|\.hg|\.mypy_cache|\.tox|\.venv|venv|env|_build|buck-out|buildc|dist)/'
 
-[mypy]
+[tool.mypy]
 plugins = [
     "pydantic.mypy"
 ]
