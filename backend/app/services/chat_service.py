@@ -92,17 +92,13 @@ class ChatService:
         Returns:
             str: GPT answers to the latest message query from user.
         """
-        messages = [
-            {"role": message["role"], "content": message["content"]}
-            for message in conversation_history
-        ]
-        completion = (
-            client.chat.completions.create(model=model, messages=messages)
-            .choices[0]
-            .message.content
-        )
+        messages = [{"role": m["role"], "content": m["content"]} for m in conversation_history]
+
+        completion_raw = client.chat.completions.create(model=model, messages=messages)
+        completion = completion_raw.choices[0].message.content or ""
+
         match = re.search(r'Bot: "(.*?)"', completion)
-        return match.group(1) if match else completion
+        return match.group(1) or completion if match else completion
 
     def transcribe_audio(self, audio_content) -> str:
         """

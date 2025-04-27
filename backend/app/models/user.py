@@ -7,7 +7,6 @@ from app.extensions import mongo
 from bson import ObjectId
 from datetime import datetime
 from marshmallow import ValidationError
-from bson.errors import InvalidId
 from app.utils.utils import convert_to_objectid
 from typing import Optional
 
@@ -21,11 +20,7 @@ class User:
     def get_user_by_id(user_id: str) -> dict | None:
         """Fetch a user by ID."""
         try:
-            try:
-                search_id = ObjectId(user_id)
-            except InvalidId:
-                search_id = user_id
-
+            search_id = convert_to_objectid(user_id)
             user = mongo.db.users.find_one({"_id": search_id})
 
             if not user:
@@ -83,11 +78,7 @@ class User:
     def update_user_data(user_id: str, data: dict) -> bool:
         """Update a user's data in the database."""
         try:
-            try:
-                search_id = ObjectId(user_id)
-            except InvalidId:
-                search_id = user_id
-
+            search_id = convert_to_objectid(user_id)
             data["updated_at"] = datetime.now()
 
             result = mongo.db.users.update_one({"_id": search_id}, {"$set": data})
@@ -103,11 +94,7 @@ class User:
     @staticmethod
     def update_user_credentials(user_id: str, email: str, password_hash: str) -> bool:
         """Update the user's credentials like email and password."""
-        try:
-            search_id = ObjectId(user_id)
-        except InvalidId:
-            search_id = user_id
-
+        search_id = convert_to_objectid(user_id)
         result = mongo.db.users.update_one(
             {"_id": search_id},
             {
@@ -126,11 +113,7 @@ class User:
         if not workout_ids:
             raise ValueError("No workout IDs provided to add.")
 
-        try:
-            search_id = ObjectId(user_id)
-        except InvalidId:
-            search_id = user_id
-
+        search_id = convert_to_objectid(user_id)
         result = mongo.db.users.update_one(
             {"_id": search_id},
             {"$addToSet": {"training_preferences.saved_workouts": {"$each": workout_ids}}},
@@ -142,11 +125,7 @@ class User:
     @staticmethod
     def delete_saved_workout(user_id: str, workout_id: str) -> bool:
         """Add a workout to the user's saved workouts."""
-        try:
-            search_id = ObjectId(user_id)
-        except InvalidId:
-            search_id = user_id
-
+        search_id = convert_to_objectid(user_id)
         result = mongo.db.users.update_one(
             {"_id": search_id},
             {"$pull": {"training_preferences.saved_workouts": workout_id}},
