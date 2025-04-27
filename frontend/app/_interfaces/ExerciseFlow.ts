@@ -32,7 +32,6 @@ export type Action =
     | { type: 'COMPLETE_WORKOUT' }
     | { type: 'SET_COMPLETE_MESSAGE'; message: string | null };
 
-
 export interface ExerciseProgress {
     exercise_id: string;
     sets_completed: number;

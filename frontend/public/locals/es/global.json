@@ -1,410 +1,402 @@
 {
-  "WelcomPage": {
-    "title1": "Bienvenido a 2Fit-AI",
-    "description1": "Mejora tu estado físico con la ayuda de la última tecnología de inteligencia artificial.",
-    "title2": "Categorías de entrenamiento",
-    "description2": "Las categorías de entrenamiento te ayudarán a ganar fuerza, ponerte en mejor forma y adoptar un estilo de vida saludable.",
-    "title3": "Entrenamientos personalizados",
-    "description3": "Con la ayuda de la IA, puedes acceder a una variedad de rutinas de entrenamiento diferentes y guardarlas en tu aplicación.",
-    "startbtn": "Empezar a entrenar",
-    "questiontxt": "Ya tienes una cuenta",
-    "signin": "Iniciar Sesión"
-  },
-  "LoginPage": {
-    "OrSignIn": "O ingresa con",
-    "emailOrPhone": "Correo electrónico o número",
-    "emailRequired": "Correo electrónico requerido",
-    "passwordRequired": "Contraseña requerida",
-    "credsError": "Email o contraseña inválidos.",
-    "unexpectedError": "Ha ocurrido un error insperado. Inténtalo de nuevo.",
-    "socialSignInError": "Inicio de sesión fallido. Inténtalo de nuevo.",
-    "loginTitle": ["Ingresa a", "tu cuenta"],
-    "forgotPassword": "¿Olvidaste tu contraseña?",
-    "signIn": "Loguearte",
-    "dontHaveAcc": "¿No tienes cuenta?",
-    "signUp": "Registro"
-  },
-  "RegisterPage": {
-    "next": "Siguiente",
-    "back": "Atras",
-    "create": ["Crea tu", "Cuenta"],
-    "email": "Correo Electrónico",
-    "policy": ["Al continuar, aceptas nuestra", "Política de Privacidad"],
-    "nextbtn": "Siguiente",
-    "signuptxt": "O regístrese con",
-    "signupquestion": "¿Tienes una cuenta?",
-    "signin": "Inicia sesión",
-    "passwordValidationError": "La contraseña debe contener mayúscula, minúscula, número, carácteres especiales, y debe ser de mínimo 8 caracteres sin espacios.",
-    "emailValidationError": "Ingresa una dirección de correo electrónico válida.",
-    "emailRegisteredError": "Este correo ya se encuentra registrado. Utiliza un correo distinto.",
-    "emailRegistrationError": "Hubo un error validando el correo. Por favor intentalo de nuevo mas tarde."
-  },
-  "RegisterPagestep1": {
-    "create": ["Crea tu", "Cuenta"],
-    "name": "Nombre",
-    "last": "Apellido",
-    "age": "Edad",
-    "phone": "Número de teléfono",
-    "nextbtn": "Siguiente",
-    "signuptxt": "O regístrese con",
-    "signupquestion": "¿Tienes una cuenta?",
-    "signin": "Inicia sesión",
-    "numberRegisteredError": "El numero ya fue registrado. Por favor ingresa otro.",
-    "numberServerError": "Hubo un error validando el numero. Intentalo mas tarde.",
-    "nameValidationFill": "Por favor llena este campo.",
-    "phoneValidationFill": "Ingresa un numero valido.",
-    "countryValidationFill": "Por favor llena este campo."
-  },
-  "RegisterPagestep3": {
-    "woman": "Mujer",
-    "man": "Hombre",
-    "title": "Cuentanos de ti",
-    "description": "Para darte una mejor experiencia necesitamos saber tu genero"
-  },
-  "RegisterPagestep4": {
-    "weight": "Perder peso",
-    "fit": "Mantenerte en forma",
-    "stronger": "Hacerte mas fuerte",
-    "muscle": "Ganar masa muscular",
-    "title": "Cual es tu meta?",
-    "description": "Elige tu principal objetivo. No te preocupes, lo podras cambiar luego"
-  },
-  "RegisterPagestep5": {
-    "title": "Cual es tu altura?",
-    "description": "Actual altura en cm. No te preoucpes, podras cambiarlo luego."
-  },
-  "RegisterPagestep6": {
-    "title": "Cual es tu peso?",
-    "description": "Actual peso en kg. No te preoucpes, podras cambiarlo luego."
-  },
-  "RegisterPagestep7": {
-    "title": "Cual es tu peso deseado?",
-    "description": "Peso deseado en kg. No te preoucpes, esto es solo una estimacion."
-  },
-  "RegisterPagestep8": {
-    "title": "Cual es tu nivel actual?",
-    "description": "Elige basado en tu actividad fisica actual. Esto nos ayudara a personalizar los planes para ti.",
-    "level": ["Escoge tu nivel de", "entrenamiento"],
-    "beginner": ["Principiante", "Quiero empezar a entrenar"],
-    "irregular": ["Entrenamiento irregular", "Entreno 1-2 veces por semana"],
-    "medium": ["Medio", "Entreno de 3-5 a la semana"],
-    "advanced": ["Avanzada", "Entreno más de 5 veces a la semana"]
-  },
-  "RegisterPagestep9": {
-    "title": "Actividades fisicas",
-    "description": "Cuales actividades practicas. Esto ayudara a mejorar nuestros resultados",
-    "activities": ["Elige tus actividades", "preferidas"],
-    "stretch": "Estiramiento",
-    "cardio": "Cardio",
-    "yoga": "Yoga",
-    "powertraining": "Entrenamiento de fuerza",
-    "dancing": "Baile"
-  },
-  "RegisterPagestep10": {
-    "title": "Frecuencia Semanal",
-    "description": "¿Qué tan seguido quieres ejercitarte? Esto nos dará la receta perfecta para ti.",
-    "days": [
-      "Lunes",
-      "Martes",
-      "Miércoles",
-      "Jueves",
-      "Viernes",
-      "Sábado",
-      "Domingo"
-    ]
-  },
-  "RegisterPagestep11": {
-    "texts": [
-      "Creamos tu plan de entrenamiento",
-      "Análizando tu perfil demográfico",
-      "Considerando tu nivel de actividad física",
-      "Teniendo en cuenta sus intereses",
-      "¡Ya casi llegamos! Finalización del plan"
-    ],
-    "errormsg": "Se ha producido un error al crear el plan de entrenamiento:( Por favor, inténtelo de nuevo.",
-    "creating": ["Estamos creando", "tu plan de entrenamiento"],
-    "homebtn": "Volver al inicio"
-  },
-  "Navbar": {
-    "home": "Inicio",
-    "workouts": "Ejercicio",
-    "bot": "Bot",
-    "profile": "Perfil"
-  },
-  "settings": {
-    "title": "Configuración",
-    "accountSettings": "Configuración de la cuenta",
-    "language": "Idioma:",
-    "save": "Guardar"
-  },
-  "profile": {
-    "title": "Perfil",
-    "edit": "Editar Perfil",
-    "notifications": "Notificaciones",
-    "security": "Seguridad",
-    "help": "Ayuda",
-    "darktheme": "Tema Oscuro",
-    "logout": "Cerrar sesión",
-    "editprofilesetting": "Editar Perfil",
-    "loadissue": "Actualmente estamos teniendo problemas... Por favor, inténtelo de nuevo más tarde.",
-    "name": "Nombre",
-    "birthdate": "Fecha de Nacimiento",
-    "email": "Correo Electrónico",
-    "country": "País",
-    "phonenumber": "Teléfono",
-    "gender": "Género",
-    "update": "Actualizar",
-    "female": "Femenino",
-    "male": "Masculino",
-    "other": "Otro",
-    "errorFetching": "Hubo un error trayendo el perfil, intentalo mas tarde!",
-    "editModalTitle": "Editar Perfil",
-    "updateProfile": {
-      "updateText": "Actualizar",
-      "success": "Perfil actualizado correctamente!",
-      "error": "Hubo un error actualizando el perfil.",
-      "errorUploadingImage": "Hubo un error subiendo la imagen"
+    "WelcomPage": {
+        "title1": "Bienvenido a 2Fit-AI",
+        "description1": "Mejora tu estado físico con la ayuda de la última tecnología de inteligencia artificial.",
+        "title2": "Categorías de entrenamiento",
+        "description2": "Las categorías de entrenamiento te ayudarán a ganar fuerza, ponerte en mejor forma y adoptar un estilo de vida saludable.",
+        "title3": "Entrenamientos personalizados",
+        "description3": "Con la ayuda de la IA, puedes acceder a una variedad de rutinas de entrenamiento diferentes y guardarlas en tu aplicación.",
+        "startbtn": "Empezar a entrenar",
+        "questiontxt": "Ya tienes una cuenta",
+        "signin": "Iniciar Sesión"
     },
-    "Notifications": {
-      "Title": "Notificaciones",
-      "GeneralNotifications": "Notificaciones Generales",
-      "AppUpdates": "Actualizaciones",
-      "NewServicesAvailable": "Nuevos Servicios Disponibles",
-      "NewTipsAvailable": "Nuevos tips disponibles",
-      "SuccessMessage": "Acción realizada correctamente",
-      "ErrorMessage": "Algo falló, por favor intenta de nuevo mas tarde!"
+    "LoginPage": {
+        "OrSignIn": "O ingresa con",
+        "emailOrPhone": "Correo electrónico o número",
+        "emailRequired": "Correo electrónico requerido",
+        "passwordRequired": "Contraseña requerida",
+        "credsError": "Email o contraseña inválidos.",
+        "unexpectedError": "Ha ocurrido un error insperado. Inténtalo de nuevo.",
+        "socialSignInError": "Inicio de sesión fallido. Inténtalo de nuevo.",
+        "loginTitle": ["Ingresa a", "tu cuenta"],
+        "forgotPassword": "¿Olvidaste tu contraseña?",
+        "signIn": "Loguearte",
+        "dontHaveAcc": "¿No tienes cuenta?",
+        "signUp": "Registro"
     },
-    "Security": {
-      "Title": "Seguridad",
-      "FaceID": "Face ID",
-      "RememberMe": "Recuerdame",
-      "TouchID": "Touch ID",
-      "GoogleAuthenticator": "Google Authenticator",
-      "ChangePassword": "Cambiar contraseña",
-      "Successfullchangepswd": "Se cambió la contraseña exitosamente",
-      "Failedchangepswd": "Algo falló, por favor intenta de nuevo mas tarde"
-    }
-  },
-  "ChangePasswordModal": {
-    "title": "Cambiar contraseña",
-    "newPassword": "Escribe tu nueva contraseña",
-    "confirmPassword": "Confirma tu nueva contraseña",
-    "cancel": "Cancelar",
-    "update": "Actualizar",
-    "updating": "Actualizando...",
-    "Successfullchangepswd": "La contraseña se ha cambiado exitosamente",
-    "Failedchangepswd": "Algo falló, por favor intenta nuevamente más tarde...",
-    "passwordRequired": "La contraseña es obligatoria.",
-    "passwordValidationError": "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas y minúsculas, un número, un carácter especial y no contener espacios.",
-    "confirmPasswordRequired": "Por favor, confirma tu contraseña.",
-    "passwordsDoNotMatch": "Las contraseñas no coinciden."
-  },
-  "upgrade": {
-    "title": "Actualizar a Premium",
-    "description": "Disfruta del acceso a los entrenamientos sin anuncios ni restricciones"
-  },
-  "chat": {
-    "openWhatsApp": "Abre tu conversacion en WhatsApp"
-  },
-  "ExerciseFlow": {
-    "ready": "¡Alístate!",
-    "completed": "¡Ejercicio completado!"
-  },
-  "RestView": {
-    "rest": "Tómate un descanso",
-    "nextEx": "Siguiente Ejercicio",
-    "skip": "Saltar descanso"
-  },
-  "ForgotPassword": {
-    "forgotPassword": "Olvidaste tu contraseña",
-    "step0": {
-      "enterEmailPrompt": "Ingresa el correo electrónico asociado con tu cuenta para restablecer tu contraseña.",
-      "emailPlaceholder": "Ingresa tu correo electrónico",
-      "userNotFound": "No se encontró un usuario con este correo electrónico.",
-      "errorOccurred": "Ocurrió un error. Por favor intenta nuevamente.",
-      "submitting": "Enviando...",
-      "continue": "Continuar"
+    "RegisterPage": {
+        "next": "Siguiente",
+        "back": "Atras",
+        "create": ["Crea tu", "Cuenta"],
+        "email": "Correo Electrónico",
+        "policy": ["Al continuar, aceptas nuestra", "Política de Privacidad"],
+        "nextbtn": "Siguiente",
+        "signuptxt": "O regístrese con",
+        "signupquestion": "¿Tienes una cuenta?",
+        "signin": "Inicia sesión",
+        "passwordValidationError": "La contraseña debe contener mayúscula, minúscula, número, carácteres especiales, y debe ser de mínimo 8 caracteres sin espacios.",
+        "emailValidationError": "Ingresa una dirección de correo electrónico válida.",
+        "emailRegisteredError": "Este correo ya se encuentra registrado. Utiliza un correo distinto.",
+        "emailRegistrationError": "Hubo un error validando el correo. Por favor intentalo de nuevo mas tarde."
     },
-    "step1": {
-      "headerTitle": "Olvidaste tu contraseña",
-      "illustrationAlt": "Ilustración de Olvidaste tu contraseña",
-      "prompt": "Selecciona los detalles de contacto que debemos usar para restablecer tu contraseña.",
-      "viaSms": "vía SMS:",
-      "viaEmail": "vía Correo electrónico:",
-      "defaultPhoneNumber": "+1 111 ******99",
-      "defaultEmail": "and***ey@tudominio.com",
-      "errorModalTitle": "Error",
-      "errorModalMessage": "Ocurrió un error. Por favor intenta nuevamente.",
-      "continueButton": {
-        "defaultText": "Continuar",
-        "loadingText": "Enviando..."
-      }
-    }
-  },
-  "home": {
-    "errorTitle": "Lo sentimos :(",
-    "error": "Hubo un problema que estamos solucionando, intentalo mas tarde!",
-    "completeRoutine": "¡Completa la rutina de hoy!",
-    "excercisebannersection": {
-      "planfortoday": "¿Cuales son los planes para hoy?",
-      "planfortoday2": "Explora los entrenamientos",
-      "noexercisemessage": "Pronto tendrás acceso a una variedad de entrenamientos para ponerte en forma, ¡mantente atento!"
+    "RegisterPagestep1": {
+        "create": ["Crea tu", "Cuenta"],
+        "name": "Nombre",
+        "last": "Apellido",
+        "age": "Edad",
+        "phone": "Número de teléfono",
+        "nextbtn": "Siguiente",
+        "signuptxt": "O regístrese con",
+        "signupquestion": "¿Tienes una cuenta?",
+        "signin": "Inicia sesión",
+        "numberRegisteredError": "El numero ya fue registrado. Por favor ingresa otro.",
+        "numberServerError": "Hubo un error validando el numero. Intentalo mas tarde.",
+        "nameValidationFill": "Por favor llena este campo.",
+        "phoneValidationFill": "Ingresa un numero valido.",
+        "countryValidationFill": "Por favor llena este campo."
     },
-    "GuidedWorkoutsSection": {
-      "guidedworkoutstitle": "Entrenamientos guiados",
-      "guidedworkoutsdescription": "Elige tu entrenamiento favorito de los planes guiados.",
-      "viewall": "Ver todo",
-      "noworkoutmessage": "No hay entrenamientos disponibles en este momento. ¡Por favor, vuelva a consultar más tarde!"
+    "RegisterPagestep3": {
+        "woman": "Mujer",
+        "man": "Hombre",
+        "title": "Cuentanos de ti",
+        "description": "Para darte una mejor experiencia necesitamos saber tu genero"
     },
-    "WorkoutLibrarySection": {
-      "WorkoutLibrarySectiontitle": "Explora nuestra biblioteca de ejercicios",
-      "WorkoutLibrarySectiondescription": "Pronto tendrás un montón de entrenamientos para ponerte en forma, ¡mantente atento!",
-      "viewall": "Ver todo",
-      "WorkoutLibrarySectiondescription2": "Descubre más entrenamientos adaptados a tus objetivos de fitness en nuestra amplia biblioteca.",
-      "openlibrary": "Abrir biblioteca de entrenamientos"
+    "RegisterPagestep4": {
+        "weight": "Perder peso",
+        "fit": "Mantenerte en forma",
+        "stronger": "Hacerte mas fuerte",
+        "muscle": "Ganar masa muscular",
+        "title": "Cual es tu meta?",
+        "description": "Elige tu principal objetivo. No te preocupes, lo podras cambiar luego"
     },
-    "SavedWorkoutsSection": {
-      "SavedWorkoutsSectiontitle": "Entrenamientos guardados",
-      "SavedWorkoutsSectiondescription": "Los ejercicios que te gustan aparecerán aquí",
-      "viewall": "Ver todo",
-      "SavedWorkoutsSectionquestion": "¿Quieres eliminar este entrenamiento de tu lista de guardados?",
-      "SavedWorkoutsSectionconfirmText": "Si, remover",
-      "SavedWorkoutsSectioncancelText": "Cancelar",
-      "SavedWorkoutsSectionrenderLoading": "Cargando planes de entrenamiento y entrenamientos guardados..."
+    "RegisterPagestep5": {
+        "title": "Cual es tu altura?",
+        "description": "Actual altura en cm. No te preoucpes, podras cambiarlo luego."
     },
-    "motivation": {
-      "main": "¡Sigue con el excelente trabajo!",
-      "base": "Alcanza tus objetivos de fitness con un entrenador personal de IA diseñado especialmente para ti.",
-      "phrases": [
-        "¡Mantente constante y los resultados llegarán!",
-        "Cada entrenamiento es un progreso, por pequeño que sea.",
-        "¡Tu único límite es el que te pones a ti mismo!",
-        "¡Haz de hoy tu mejor entrenamiento hasta ahora!",
-        "¡Mantente enfocado, mantente en forma!"
-      ],
-      "mtvnlsection": "Cerrar sección motivacional",
-      "mtvnlchatbot": "Abrir chatbot"
+    "RegisterPagestep6": {
+        "title": "Cual es tu peso?",
+        "description": "Actual peso en kg. No te preoucpes, podras cambiarlo luego."
     },
-    "greeting": {
-      "morning": "Buenos Días",
-      "afternoon": "Buenas Tardes",
-      "evening": "Buenas Noches"
+    "RegisterPagestep7": {
+        "title": "Cual es tu peso deseado?",
+        "description": "Peso deseado en kg. No te preoucpes, esto es solo una estimacion."
     },
-    "trainer": {
-      "talk": "Habla con tu entrenador",
-      "letschat": "¡Charlemos!",
-      "getyourplan": "Obtén tu plan!"
-    }
-  },
-  "workouts": {
-    "exercise": "ejercicio",
-    "left": "restante",
-    "challengeProgress": "Progreso del Challenge",
-    "weeklyRoutine": "Rutina Semanal",
-    "workoutProgress": "Progreso del plan",
-    "fetchingError": "Error trayendo la informacion",
-    "plan": {
-      "workoutAlreadySaved": "El plan ya ha sido guardado!",
-      "workoutSaved": "Plan guardado!",
-      "savingError": "Hubo un error guardando el plan, intente mas tarde.",
-      "workoutActivity": "Actividad del Plan",
-      "seeAll": "Ver todo",
-      "secs": "Segundos",
-      "start": "INICIO",
-      "rest": "Descanso",
-      "getReady": "Alistate!",
-      "startOver": "Iniciar de nuevo",
-      "previous": "Anterior",
-      "next": "Siguiente",
-      "pause": "Pausar",
-      "resume": "Resumir",
-      "skipRest": "Saltar descanso",
-      "nextExercise": "Siguiente ejercicio:",
-      "takeRest": "TOMA UN DESCANSO",
-      "congrats": "Felicidades!",
-      "completedSentence": "Haz completado esta rutina!",
-      "workouts": "Rutinas",
-      "minutes": "Minutos",
-      "goto": "Buscar otra rutina",
-      "home": "Inicio",
-      "of": "de"
+    "RegisterPagestep8": {
+        "title": "Cual es tu nivel actual?",
+        "description": "Elige basado en tu actividad fisica actual. Esto nos ayudara a personalizar los planes para ti.",
+        "level": ["Escoge tu nivel de", "entrenamiento"],
+        "beginner": ["Principiante", "Quiero empezar a entrenar"],
+        "irregular": ["Entrenamiento irregular", "Entreno 1-2 veces por semana"],
+        "medium": ["Medio", "Entreno de 3-5 a la semana"],
+        "advanced": ["Avanzada", "Entreno más de 5 veces a la semana"]
     },
-    "my-plan": {
-      "exerciseOptions": "Modifica tu rutina",
-      "deleteExercise": "Eliminar Ejericios",
-      "changeExercise": "Cambiar Ejercicio",
-      "title": "Mi plan de entrenamiento",
-      "noExercises": "No ejercicios en este día",
-      "confirm": "Confirmar"
+    "RegisterPagestep9": {
+        "title": "Actividades fisicas",
+        "description": "Cuales actividades practicas. Esto ayudara a mejorar nuestros resultados",
+        "activities": ["Elige tus actividades", "preferidas"],
+        "stretch": "Estiramiento",
+        "cardio": "Cardio",
+        "yoga": "Yoga",
+        "powertraining": "Entrenamiento de fuerza",
+        "dancing": "Baile"
     },
-    "PopularExercisesSection": {
-      "popularExerciseTitle": "Ejercicios Populares",
-      "seeDetails": "Ver Detalles",
-      "PopularSectionEmpty": "Seguimos aprendiendo de ti para darte las mejores recomendaciones!",
-      "exercises": "ejercicios",
-      "start": "Iniciar ahora"
-    }
-  },
-  "premium": {
-    "premiumTitle1": "2Fit",
-    "premiumTitle2": "Pass",
-    "continue": "Continuar",
-    "benefit1Title": "AI-Powered workout plans",
-    "benefit1Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "benefit2Title": "Personal nutrition guidance",
-    "benefit2Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "benefit3Title": "Comprehensive progress tracking",
-    "benefit3Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-  },
-  "BePremium": {
-    "title": "Sé Premium.",
-    "subtitle": "Obtén Acceso Ilimitado.",
-    "description": "Disfruta de acceso a entrenamientos sin anuncios ni restricciones.",
-    "plans": {
-      "1": {
-        "name": "1 Mes.",
-        "price": "16.99"
-      },
-      "verifyButton": {
-        "defaultText": "Verificar",
-        "loadingText": "Verificando..."
-      },
-      "incorrectCodeAlert": "Código incorrecto"
-    }
-  },
-  "step2": {
-    "verificationScreen": {
-      "headerTitle": "Verificación de Código",
-      "codeSentInfo": "El código ha sido enviado a",
-      "resendCode": {
-        "prompt": "Reenviar código en",
-        "resendButton": "Reenviar"
-      },
-      "step3": {
-        "createPasswordScreen": {
-          "headerTitle": "Crear Nueva Contraseña",
-          "imageAlt": "Ilustración de Crear Nueva Contraseña",
-          "instruction": "Crea tu nueva contraseña",
-          "newPasswordPlaceholder": "Nueva Contraseña",
-          "confirmPasswordPlaceholder": "Confirmar Contraseña",
-          "errorMessages": {
-            "passwordRequired": "Se requiere una contraseña.",
-            "passwordInvalid": "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, un número y un carácter especial.",
-            "confirmPasswordRequired": "Por favor confirma tu contraseña.",
-            "passwordsDoNotMatch": "Las contraseñas no coinciden.",
-            "apiError": "Ocurrió un error. Por favor intenta nuevamente."
-          },
-          "continueButton": {
-            "defaultText": "Continuar",
-            "loadingText": "Actualizando..."
-          },
-          "modal": {
-            "successTitle": "¡Felicidades!",
-            "successMessage": "Tu cuenta está lista para usar.",
-            "goToHomepage": "Ir a la página principal"
-          }
+    "RegisterPagestep10": {
+        "title": "Frecuencia Semanal",
+        "description": "¿Qué tan seguido quieres ejercitarte? Esto nos dará la receta perfecta para ti.",
+        "days": ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+    },
+    "RegisterPagestep11": {
+        "texts": [
+            "Creamos tu plan de entrenamiento",
+            "Análizando tu perfil demográfico",
+            "Considerando tu nivel de actividad física",
+            "Teniendo en cuenta sus intereses",
+            "¡Ya casi llegamos! Finalización del plan"
+        ],
+        "errormsg": "Se ha producido un error al crear el plan de entrenamiento:( Por favor, inténtelo de nuevo.",
+        "creating": ["Estamos creando", "tu plan de entrenamiento"],
+        "homebtn": "Volver al inicio"
+    },
+    "Navbar": {
+        "home": "Inicio",
+        "workouts": "Ejercicio",
+        "bot": "Bot",
+        "profile": "Perfil"
+    },
+    "settings": {
+        "title": "Configuración",
+        "accountSettings": "Configuración de la cuenta",
+        "language": "Idioma:",
+        "save": "Guardar"
+    },
+    "profile": {
+        "title": "Perfil",
+        "edit": "Editar Perfil",
+        "notifications": "Notificaciones",
+        "security": "Seguridad",
+        "help": "Ayuda",
+        "darktheme": "Tema Oscuro",
+        "logout": "Cerrar sesión",
+        "editprofilesetting": "Editar Perfil",
+        "loadissue": "Actualmente estamos teniendo problemas... Por favor, inténtelo de nuevo más tarde.",
+        "name": "Nombre",
+        "birthdate": "Fecha de Nacimiento",
+        "email": "Correo Electrónico",
+        "country": "País",
+        "phonenumber": "Teléfono",
+        "gender": "Género",
+        "update": "Actualizar",
+        "female": "Femenino",
+        "male": "Masculino",
+        "other": "Otro",
+        "errorFetching": "Hubo un error trayendo el perfil, intentalo mas tarde!",
+        "editModalTitle": "Editar Perfil",
+        "updateProfile": {
+            "updateText": "Actualizar",
+            "success": "Perfil actualizado correctamente!",
+            "error": "Hubo un error actualizando el perfil.",
+            "errorUploadingImage": "Hubo un error subiendo la imagen"
+        },
+        "Notifications": {
+            "Title": "Notificaciones",
+            "GeneralNotifications": "Notificaciones Generales",
+            "AppUpdates": "Actualizaciones",
+            "NewServicesAvailable": "Nuevos Servicios Disponibles",
+            "NewTipsAvailable": "Nuevos tips disponibles",
+            "SuccessMessage": "Acción realizada correctamente",
+            "ErrorMessage": "Algo falló, por favor intenta de nuevo mas tarde!"
+        },
+        "Security": {
+            "Title": "Seguridad",
+            "FaceID": "Face ID",
+            "RememberMe": "Recuerdame",
+            "TouchID": "Touch ID",
+            "GoogleAuthenticator": "Google Authenticator",
+            "ChangePassword": "Cambiar contraseña",
+            "Successfullchangepswd": "Se cambió la contraseña exitosamente",
+            "Failedchangepswd": "Algo falló, por favor intenta de nuevo mas tarde"
         }
-      }
+    },
+    "ChangePasswordModal": {
+        "title": "Cambiar contraseña",
+        "newPassword": "Escribe tu nueva contraseña",
+        "confirmPassword": "Confirma tu nueva contraseña",
+        "cancel": "Cancelar",
+        "update": "Actualizar",
+        "updating": "Actualizando...",
+        "Successfullchangepswd": "La contraseña se ha cambiado exitosamente",
+        "Failedchangepswd": "Algo falló, por favor intenta nuevamente más tarde...",
+        "passwordRequired": "La contraseña es obligatoria.",
+        "passwordValidationError": "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas y minúsculas, un número, un carácter especial y no contener espacios.",
+        "confirmPasswordRequired": "Por favor, confirma tu contraseña.",
+        "passwordsDoNotMatch": "Las contraseñas no coinciden."
+    },
+    "upgrade": {
+        "title": "Actualizar a Premium",
+        "description": "Disfruta del acceso a los entrenamientos sin anuncios ni restricciones"
+    },
+    "chat": {
+        "openWhatsApp": "Abre tu conversacion en WhatsApp"
+    },
+    "ExerciseFlow": {
+        "ready": "¡Alístate!",
+        "completed": "¡Ejercicio completado!"
+    },
+    "RestView": {
+        "rest": "Tómate un descanso",
+        "nextEx": "Siguiente Ejercicio",
+        "skip": "Saltar descanso"
+    },
+    "ForgotPassword": {
+        "forgotPassword": "Olvidaste tu contraseña",
+        "step0": {
+            "enterEmailPrompt": "Ingresa el correo electrónico asociado con tu cuenta para restablecer tu contraseña.",
+            "emailPlaceholder": "Ingresa tu correo electrónico",
+            "userNotFound": "No se encontró un usuario con este correo electrónico.",
+            "errorOccurred": "Ocurrió un error. Por favor intenta nuevamente.",
+            "submitting": "Enviando...",
+            "continue": "Continuar"
+        },
+        "step1": {
+            "headerTitle": "Olvidaste tu contraseña",
+            "illustrationAlt": "Ilustración de Olvidaste tu contraseña",
+            "prompt": "Selecciona los detalles de contacto que debemos usar para restablecer tu contraseña.",
+            "viaSms": "vía SMS:",
+            "viaEmail": "vía Correo electrónico:",
+            "defaultPhoneNumber": "+1 111 ******99",
+            "defaultEmail": "and***ey@tudominio.com",
+            "errorModalTitle": "Error",
+            "errorModalMessage": "Ocurrió un error. Por favor intenta nuevamente.",
+            "continueButton": {
+                "defaultText": "Continuar",
+                "loadingText": "Enviando..."
+            }
+        }
+    },
+    "home": {
+        "errorTitle": "Lo sentimos :(",
+        "error": "Hubo un problema que estamos solucionando, intentalo mas tarde!",
+        "completeRoutine": "¡Completa la rutina de hoy!",
+        "excercisebannersection": {
+            "planfortoday": "¿Cuales son los planes para hoy?",
+            "planfortoday2": "Explora los entrenamientos",
+            "noexercisemessage": "Pronto tendrás acceso a una variedad de entrenamientos para ponerte en forma, ¡mantente atento!"
+        },
+        "GuidedWorkoutsSection": {
+            "guidedworkoutstitle": "Entrenamientos guiados",
+            "guidedworkoutsdescription": "Elige tu entrenamiento favorito de los planes guiados.",
+            "viewall": "Ver todo",
+            "noworkoutmessage": "No hay entrenamientos disponibles en este momento. ¡Por favor, vuelva a consultar más tarde!"
+        },
+        "WorkoutLibrarySection": {
+            "WorkoutLibrarySectiontitle": "Explora nuestra biblioteca de ejercicios",
+            "WorkoutLibrarySectiondescription": "Pronto tendrás un montón de entrenamientos para ponerte en forma, ¡mantente atento!",
+            "viewall": "Ver todo",
+            "WorkoutLibrarySectiondescription2": "Descubre más entrenamientos adaptados a tus objetivos de fitness en nuestra amplia biblioteca.",
+            "openlibrary": "Abrir biblioteca de entrenamientos"
+        },
+        "SavedWorkoutsSection": {
+            "SavedWorkoutsSectiontitle": "Entrenamientos guardados",
+            "SavedWorkoutsSectiondescription": "Los ejercicios que te gustan aparecerán aquí",
+            "viewall": "Ver todo",
+            "SavedWorkoutsSectionquestion": "¿Quieres eliminar este entrenamiento de tu lista de guardados?",
+            "SavedWorkoutsSectionconfirmText": "Si, remover",
+            "SavedWorkoutsSectioncancelText": "Cancelar",
+            "SavedWorkoutsSectionrenderLoading": "Cargando planes de entrenamiento y entrenamientos guardados..."
+        },
+        "motivation": {
+            "main": "¡Sigue con el excelente trabajo!",
+            "base": "Alcanza tus objetivos de fitness con un entrenador personal de IA diseñado especialmente para ti.",
+            "phrases": [
+                "¡Mantente constante y los resultados llegarán!",
+                "Cada entrenamiento es un progreso, por pequeño que sea.",
+                "¡Tu único límite es el que te pones a ti mismo!",
+                "¡Haz de hoy tu mejor entrenamiento hasta ahora!",
+                "¡Mantente enfocado, mantente en forma!"
+            ],
+            "mtvnlsection": "Cerrar sección motivacional",
+            "mtvnlchatbot": "Abrir chatbot"
+        },
+        "greeting": {
+            "morning": "Buenos Días",
+            "afternoon": "Buenas Tardes",
+            "evening": "Buenas Noches"
+        },
+        "trainer": {
+            "talk": "Habla con tu entrenador",
+            "letschat": "¡Charlemos!",
+            "getyourplan": "Obtén tu plan!"
+        }
+    },
+    "workouts": {
+        "exercise": "ejercicio",
+        "left": "restante",
+        "challengeProgress": "Progreso del Challenge",
+        "weeklyRoutine": "Rutina Semanal",
+        "workoutProgress": "Progreso del plan",
+        "fetchingError": "Error trayendo la informacion",
+        "plan": {
+            "workoutAlreadySaved": "El plan ya ha sido guardado!",
+            "workoutSaved": "Plan guardado!",
+            "savingError": "Hubo un error guardando el plan, intente mas tarde.",
+            "workoutActivity": "Actividad del Plan",
+            "seeAll": "Ver todo",
+            "secs": "Segundos",
+            "start": "INICIO",
+            "rest": "Descanso",
+            "getReady": "Alistate!",
+            "startOver": "Iniciar de nuevo",
+            "previous": "Anterior",
+            "next": "Siguiente",
+            "pause": "Pausar",
+            "resume": "Resumir",
+            "skipRest": "Saltar descanso",
+            "nextExercise": "Siguiente ejercicio:",
+            "takeRest": "TOMA UN DESCANSO",
+            "congrats": "Felicidades!",
+            "completedSentence": "Haz completado esta rutina!",
+            "workouts": "Rutinas",
+            "minutes": "Minutos",
+            "goto": "Buscar otra rutina",
+            "home": "Inicio",
+            "of": "de"
+        },
+        "my-plan": {
+            "exerciseOptions": "Modifica tu rutina",
+            "deleteExercise": "Eliminar Ejericios",
+            "changeExercise": "Cambiar Ejercicio",
+            "title": "Mi plan de entrenamiento",
+            "noExercises": "No ejercicios en este día",
+            "confirm": "Confirmar"
+        },
+        "PopularExercisesSection": {
+            "popularExerciseTitle": "Ejercicios Populares",
+            "seeDetails": "Ver Detalles",
+            "PopularSectionEmpty": "Seguimos aprendiendo de ti para darte las mejores recomendaciones!",
+            "exercises": "ejercicios",
+            "start": "Iniciar ahora"
+        }
+    },
+    "premium": {
+        "premiumTitle1": "2Fit",
+        "premiumTitle2": "Pass",
+        "continue": "Continuar",
+        "benefit1Title": "AI-Powered workout plans",
+        "benefit1Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "benefit2Title": "Personal nutrition guidance",
+        "benefit2Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "benefit3Title": "Comprehensive progress tracking",
+        "benefit3Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    },
+    "BePremium": {
+        "title": "Sé Premium.",
+        "subtitle": "Obtén Acceso Ilimitado.",
+        "description": "Disfruta de acceso a entrenamientos sin anuncios ni restricciones.",
+        "plans": {
+            "1": {
+                "name": "1 Mes.",
+                "price": "16.99"
+            },
+            "verifyButton": {
+                "defaultText": "Verificar",
+                "loadingText": "Verificando..."
+            },
+            "incorrectCodeAlert": "Código incorrecto"
+        }
+    },
+    "step2": {
+        "verificationScreen": {
+            "headerTitle": "Verificación de Código",
+            "codeSentInfo": "El código ha sido enviado a",
+            "resendCode": {
+                "prompt": "Reenviar código en",
+                "resendButton": "Reenviar"
+            },
+            "step3": {
+                "createPasswordScreen": {
+                    "headerTitle": "Crear Nueva Contraseña",
+                    "imageAlt": "Ilustración de Crear Nueva Contraseña",
+                    "instruction": "Crea tu nueva contraseña",
+                    "newPasswordPlaceholder": "Nueva Contraseña",
+                    "confirmPasswordPlaceholder": "Confirmar Contraseña",
+                    "errorMessages": {
+                        "passwordRequired": "Se requiere una contraseña.",
+                        "passwordInvalid": "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, un número y un carácter especial.",
+                        "confirmPasswordRequired": "Por favor confirma tu contraseña.",
+                        "passwordsDoNotMatch": "Las contraseñas no coinciden.",
+                        "apiError": "Ocurrió un error. Por favor intenta nuevamente."
+                    },
+                    "continueButton": {
+                        "defaultText": "Continuar",
+                        "loadingText": "Actualizando..."
+                    },
+                    "modal": {
+                        "successTitle": "¡Felicidades!",
+                        "successMessage": "Tu cuenta está lista para usar.",
+                        "goToHomepage": "Ir a la página principal"
+                    }
+                }
+            }
+        }
     }
-  }
 }

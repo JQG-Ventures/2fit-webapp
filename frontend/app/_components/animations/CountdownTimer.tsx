@@ -10,7 +10,14 @@ interface CountdownTimerProps {
     onComplete: () => void;
 }
 
-const CountdownTimer: React.FC<CountdownTimerProps> = ({ title, duration, resetTrigger, size, strockWidth, onComplete }) => {
+const CountdownTimer: React.FC<CountdownTimerProps> = ({
+    title,
+    duration,
+    resetTrigger,
+    size,
+    strockWidth,
+    onComplete,
+}) => {
     const darkerGreenGradientColors = ['#34D399', '#10B981', '#059669', '#047857'];
 
     return (

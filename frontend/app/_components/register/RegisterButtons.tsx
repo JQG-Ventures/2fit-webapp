@@ -3,7 +3,6 @@
 import React from 'react';
 import ButtonWithSpinner from '../../_components/others/ButtonWithSpinner';
 
-
 export default function RegistrationButtons({
     handleNext,
     handlePrev,
@@ -11,7 +10,7 @@ export default function RegistrationButtons({
     isSubmittingPrev,
     prevText,
     nextText,
-    isNextDisabled
+    isNextDisabled,
 }: RegistrationButtonsProps) {
     return (
         <div className="flex flex-row items-center space-x-4 justify-between w-full lg:max-w-3xl">
@@ -19,7 +18,9 @@ export default function RegistrationButtons({
                 type="button"
                 onClick={handlePrev}
                 loading={isSubmittingPrev}
-                className={'w-full bg-black text-white py-4 rounded-full text-1xl font-semibold hover:bg-gray-800 transition duration-200 mt-4'}
+                className={
+                    'w-full bg-black text-white py-4 rounded-full text-1xl font-semibold hover:bg-gray-800 transition duration-200 mt-4'
+                }
             >
                 {prevText}
             </ButtonWithSpinner>

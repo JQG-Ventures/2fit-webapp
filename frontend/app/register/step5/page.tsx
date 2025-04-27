@@ -9,7 +9,6 @@ import RegistrationButtons from '@/app/_components/register/RegisterButtons';
 import ScrollablePicker from '@/app/_components/register/ScrollablePicker';
 import { useTranslation } from 'react-i18next';
 
-
 export default function RegisterStep5() {
     const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
@@ -31,7 +30,7 @@ export default function RegisterStep5() {
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
-            <div className='h-[20%] w-full lg:max-w-3xl'>
+            <div className="h-[20%] w-full lg:max-w-3xl">
                 <RegistrationHeader
                     title={t('RegisterPagestep5.title')}
                     description={t('RegisterPagestep5.description')}

@@ -3,7 +3,6 @@
 import { FC } from 'react';
 import CustomModal from './CustomModal';
 
-
 interface ConfirmationModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -13,14 +12,13 @@ interface ConfirmationModalProps {
     cancelText: string;
 }
 
-
 const ConfirmationModal: FC<ConfirmationModalProps> = ({
     isOpen,
     onClose,
     onConfirm,
     question,
     confirmText,
-    cancelText
+    cancelText,
 }) => {
     if (!isOpen) return null;
 

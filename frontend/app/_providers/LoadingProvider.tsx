@@ -17,7 +17,7 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const setLoading = (loading: boolean) => {
         setIsLoading(loading);
-      };
+    };
 
     const navigateWithLoading = (path: string) => {
         setLoading(true);

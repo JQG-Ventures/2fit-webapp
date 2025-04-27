@@ -3,14 +3,13 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { FaApple, FaFacebook, FaGoogle } from 'react-icons/fa';
-import { IoChevronBack } from "react-icons/io5";
+import { IoChevronBack } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRegister } from '../_components/register/RegisterProvider';
 import ButtonWithSpinner from '../_components/others/ButtonWithSpinner';
 import { fetchUserDataByEmail } from '../_services/userService';
 import { useTranslation } from 'react-i18next';
 import { signIn } from 'next-auth/react';
-
 
 function SearchParamsHandler({ setErrors, t }) {
     const searchParams = useSearchParams();
@@ -20,7 +19,7 @@ function SearchParamsHandler({ setErrors, t }) {
         if (errorParam) {
             const newErrors = {};
             if (errorParam === 'emailExistsGoogle') {
-                newErrors.email = t("RegisterPage.registeredGoogle");
+                newErrors.email = t('RegisterPage.registeredGoogle');
             } else if (errorParam === 'errorGoogle') {
                 newErrors.password = t('RegisterPage.googleError');
             } else if (errorParam === 'generalError') {
@@ -28,11 +27,10 @@ function SearchParamsHandler({ setErrors, t }) {
             }
             setErrors(newErrors);
         }
-    }, [searchParams, t]);
+    }, [searchParams, setErrors, t]);
 
     return null; // This component only runs useEffect
 }
-
 
 export default function RegisterStep1() {
     const { data, updateData } = useRegister();
@@ -40,7 +38,7 @@ export default function RegisterStep1() {
     const [formData, setFormData] = useState({
         email: data.email || '',
         password: data.password || '',
-        auth_provider: 'default'
+        auth_provider: 'default',
     });
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isChecked, setIsChecked] = useState(false);
@@ -50,7 +48,12 @@ export default function RegisterStep1() {
 
     const user_data_fields = [
         { name: 'email', label: 'Email', placeholder: t('RegisterPage.email') },
-        { name: 'password', label: 'Password', placeholder: '******************', type: 'password' }
+        {
+            name: 'password',
+            label: 'Password',
+            placeholder: '******************',
+            type: 'password',
+        },
     ];
 
     // useEffect(() => {
@@ -122,20 +125,27 @@ export default function RegisterStep1() {
         <Suspense fallback={<div>Loading...</div>}>
             <SearchParamsHandler setErrors={setErrors} t={t} />
             <div className="flex flex-col h-screen bg-white p-10 items-center">
-                <div className='h-[15%] pt-20 w-full lg:max-w-3xl'>
+                <div className="h-[15%] pt-20 w-full lg:max-w-3xl">
                     <button onClick={handlePrevStep} className="text-4xl lg:hidden">
                         <IoChevronBack />
                     </button>
                 </div>
 
-                <div className='h-[15%] flex flex-row w-full lg:max-w-3xl'>
-                    <button onClick={handlePrevStep} className="hidden text-4xl lg:flex mr-14 mt-5 text-center">
+                <div className="h-[15%] flex flex-row w-full lg:max-w-3xl">
+                    <button
+                        onClick={handlePrevStep}
+                        className="hidden text-4xl lg:flex mr-14 mt-5 text-center"
+                    >
                         <IoChevronBack />
                     </button>
-                    <h1 className='text-6xl font-semibold'>{t('RegisterPage.create.0')}<br />{t('RegisterPage.create.1')}</h1>
+                    <h1 className="text-6xl font-semibold">
+                        {t('RegisterPage.create.0')}
+                        <br />
+                        {t('RegisterPage.create.1')}
+                    </h1>
                 </div>
 
-                <div className='h-[50%] flex w-full items-center justify-center'>
+                <div className="h-[50%] flex w-full items-center justify-center">
                     <form className="w-full lg:max-w-3xl">
                         {user_data_fields.map(({ name, label, placeholder, type = 'text' }) => (
                             <div key={name} className="flex flex-wrap -mx-3 mb-6">
@@ -149,7 +159,11 @@ export default function RegisterStep1() {
                                         value={formData[name]}
                                         onChange={handleChange}
                                     />
-                                    {errors[name] && <p className="text-red-500 text-base italic">{errors[name]}</p>}
+                                    {errors[name] && (
+                                        <p className="text-red-500 text-base italic">
+                                            {errors[name]}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -162,7 +176,10 @@ export default function RegisterStep1() {
                                 onChange={() => setIsChecked(!isChecked)}
                             />
                             <label htmlFor="terms" className="ml-2 text-lg text-gray-500">
-                                {t('RegisterPage.policy.0')} <a href="#" className="text-indigo-600 underline">{t('RegisterPage.policy.1')}</a>
+                                {t('RegisterPage.policy.0')}{' '}
+                                <a href="#" className="text-indigo-600 underline">
+                                    {t('RegisterPage.policy.1')}
+                                </a>
                             </label>
                         </div>
                         <ButtonWithSpinner
@@ -182,7 +199,15 @@ export default function RegisterStep1() {
                     <div className="flex flex-row justify-evenly space-x-8">
                         {[FaApple, FaFacebook].map((Icon, idx) => (
                             <button key={idx} className="text-5xl">
-                                <Icon className={idx === 1 ? 'text-blue-600' : idx === 2 ? 'text-red-600' : ''} />
+                                <Icon
+                                    className={
+                                        idx === 1
+                                            ? 'text-blue-600'
+                                            : idx === 2
+                                              ? 'text-red-600'
+                                              : ''
+                                    }
+                                />
                             </button>
                         ))}
                         <button
@@ -196,11 +221,13 @@ export default function RegisterStep1() {
 
                 <div className="h-[5%] text-center content-center">
                     <p className="text-gray-500">
-                        {t('RegisterPage.signupquestion')} <a href="/login" className="text-indigo-600 underline">{t('RegisterPage.signin')}</a>
+                        {t('RegisterPage.signupquestion')}{' '}
+                        <a href="/login" className="text-indigo-600 underline">
+                            {t('RegisterPage.signin')}
+                        </a>
                     </p>
                 </div>
             </div>
         </Suspense>
-
     );
 }

@@ -7,35 +7,39 @@ from flask_restx import Api, Resource, fields
 import logging
 
 
-azure_bp = Blueprint('azure_bp', __name__)
-api = Api(azure_bp, doc='/docs')
+azure_bp = Blueprint("azure_bp", __name__)
+api = Api(azure_bp, doc="/docs")
 logger = logging.getLogger(__name__)
 
-content_model = api.model('Content', {
-    'file_path': fields.String(required=True, description='File path of the content to upload'),
-    'title': fields.String(required=True, description='Title of the content'),
-    'description': fields.String(required=True, description='Description of the content'),
-    'tags': fields.String(required=True, description='Comma-separated tags for the content')
-})
+content_model = api.model(
+    "Content",
+    {
+        "file_path": fields.String(required=True, description="File path of the content to upload"),
+        "title": fields.String(required=True, description="Title of the content"),
+        "description": fields.String(required=True, description="Description of the content"),
+        "tags": fields.String(required=True, description="Comma-separated tags for the content"),
+    },
+)
 
-upload_response_model = api.model('UploadResponse', {
-    'message': fields.String(description='Status message'),
-    'content_id': fields.String(description='Unique identifier of the uploaded content')
-})
+upload_response_model = api.model(
+    "UploadResponse",
+    {
+        "message": fields.String(description="Status message"),
+        "content_id": fields.String(description="Unique identifier of the uploaded content"),
+    },
+)
 
-error_model = api.model('ErrorResponse', {
-    'error': fields.String(description='Error message')
-})
+error_model = api.model("ErrorResponse", {"error": fields.String(description="Error message")})
 
 
-@api.route('/content/upload')
+@api.route("/content/upload")
 class ContentUploadResource(Resource):
     @jwt_required()
-    @role_required(['admin'])
+    @role_required(["admin"])
     @api.expect(content_model)
-    @api.response(201, 'Content uploaded successfully', upload_response_model)
-    @api.response(400, 'Missing required fields', error_model)
-    @api.response(500, 'Could not upload content', error_model)
+    @api.response(201, "Content uploaded successfully", upload_response_model)
+    @api.response(400, "Missing required fields", error_model)
+    @api.response(500, "Could not upload content", error_model)
     def post(self):
         """
         Upload content to Azure Blob Storage.
@@ -57,17 +61,24 @@ class ContentUploadResource(Resource):
             logger.exception(f"There was a problem uploading the content, error: {e}")
             return {"error": "Could not upload content"}, 500
 
-        return {"message": "Content uploaded successfully", "content_id": content_id}, 201
+        return {
+            "message": "Content uploaded successfully",
+            "content_id": content_id,
+        }, 201
 
 
-@api.route('/content')
+@api.route("/content")
 class ContentByTagsResource(Resource):
     @jwt_required()
-    @role_required(['admin'])
-    @api.param('tags', 'Comma-separated tags for filtering content', required=True)
-    @api.response(200, 'Content URL retrieved successfully', {'content_url': fields.String})
-    @api.response(400, 'Tags are required', error_model)
-    @api.response(500, 'Could not retrieve content', error_model)
+    @role_required(["admin"])
+    @api.param("tags", "Comma-separated tags for filtering content", required=True)
+    @api.response(
+        200,
+        "Content URL retrieved successfully",
+        {"content_url": fields.String},
+    )
+    @api.response(400, "Tags are required", error_model)
+    @api.response(500, "Could not retrieve content", error_model)
     def get(self):
         """
         Retrieve content URL by tags.

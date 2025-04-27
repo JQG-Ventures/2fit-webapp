@@ -9,6 +9,7 @@ from datetime import datetime
 from marshmallow import ValidationError
 from bson.errors import InvalidId
 from app.utils.utils import convert_to_objectid
+from typing import Optional
 
 
 class User:
@@ -68,8 +69,8 @@ class User:
         """Insert a new user into the database."""
 
         try:
-            data['created_at'] = datetime.now()
-            data['updated_at'] = datetime.now()
+            data["created_at"] = datetime.now()
+            data["updated_at"] = datetime.now()
 
             result = mongo.db.users.insert_one(data)
             return result.inserted_id
@@ -87,7 +88,7 @@ class User:
             except InvalidId:
                 search_id = user_id
 
-            data['updated_at'] = datetime.now()
+            data["updated_at"] = datetime.now()
 
             result = mongo.db.users.update_one({"_id": search_id}, {"$set": data})
 
@@ -109,7 +110,13 @@ class User:
 
         result = mongo.db.users.update_one(
             {"_id": search_id},
-            {"$set": {"email": email, "password_hash": password_hash, "updated_at": datetime.now()}}
+            {
+                "$set": {
+                    "email": email,
+                    "password_hash": password_hash,
+                    "updated_at": datetime.now(),
+                }
+            },
         )
         return result.modified_count > 0
 
@@ -126,10 +133,9 @@ class User:
 
         result = mongo.db.users.update_one(
             {"_id": search_id},
-            {"$addToSet": {"training_preferences.saved_workouts": {"$each": workout_ids}}}
+            {"$addToSet": {"training_preferences.saved_workouts": {"$each": workout_ids}}},
         )
-
-        if result.modified_count == 0:
+        if result.matched_count == 0:
             raise ValueError(f"Error saving workouts for user {user_id}")
         return True
 
@@ -143,7 +149,7 @@ class User:
 
         result = mongo.db.users.update_one(
             {"_id": search_id},
-            {"$pull": {"training_preferences.saved_workouts": workout_id}}
+            {"$pull": {"training_preferences.saved_workouts": workout_id}},
         )
         if result.modified_count == 0:
             raise ValueError(f"Error deleting workout for user {user_id}")
@@ -162,28 +168,31 @@ class User:
 
             saved_workouts_ids = user["training_preferences"]["saved_workouts"]
             object_ids = [ObjectId(id) for id in saved_workouts_ids]
-            workouts = mongo.db.workout_plans.find({
-                "_id": {"$in": object_ids},
-                "is_active": True
-            })
+            workouts = mongo.db.workout_plans.find({"_id": {"$in": object_ids}, "is_active": True})
 
-            return workout_plans_schema.dump(workouts)
+            return workout_plans_schema.dump(list(workouts))
         except Exception as e:
             raise RuntimeError(f"Error getting the saved workouts for user {user_id}, error {e}")
 
     @staticmethod
-    def get_user_chat_by_id(user_id: str) -> dict | None:
+    def get_user_chat_by_id(user_id: str) -> Optional[dict]:
         """Fetch a conversation by users ID."""
         try:
             user = User.get_user_by_id(user_id)
-            conversation = mongo.db.conversations.find_one({"user_id": f"user_{user['code_number']}{user['number']}"})
+
+            if not user:
+                raise RuntimeError("User does not exists")
+
+            conversation = mongo.db.conversations.find_one(
+                {"user_id": f"user_{user['code_number']}{user['number']}"}
+            )
 
             if not conversation:
                 return {}
 
             conversation = conversation_schema.dump(conversation)["messages"]
 
-            return conversation[1:] if conversation else []
+            return conversation[1:] if conversation else None
         except Exception as e:
             raise RuntimeError(f"Error fetching user conversation: {e}")
 

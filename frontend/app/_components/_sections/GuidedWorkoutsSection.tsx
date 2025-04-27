@@ -34,20 +34,29 @@ const GuidedWorkoutsSection = ({ workouts }: { workouts: any[] }) => {
     return (
         <div className="guided-workouts-section pt-6 px-4 md:px-12 lg:px-20">
             <div className="flex justify-between items-center">
-                <div className='ml-2 flex-1'>
-                    <h2 className="text-2xl mb-2 font-bold lg:text-3xl">{t('home.GuidedWorkoutsSection.guidedworkoutstitle')}</h2>
-                    <p className="text-lg text-gray-600 mb-6 lg:text-xl">{t('home.GuidedWorkoutsSection.guidedworkoutsdescription')}</p>
+                <div className="ml-2 flex-1">
+                    <h2 className="text-2xl mb-2 font-bold lg:text-3xl">
+                        {t('home.GuidedWorkoutsSection.guidedworkoutstitle')}
+                    </h2>
+                    <p className="text-lg text-gray-600 mb-6 lg:text-xl">
+                        {t('home.GuidedWorkoutsSection.guidedworkoutsdescription')}
+                    </p>
                 </div>
-                <div className='flex-none'>
-                    <button onClick={handleViewAll} className="text-blue-600 hover:underline lg:text-lg">
-                    {t('home.GuidedWorkoutsSection.viewall')}
+                <div className="flex-none">
+                    <button
+                        onClick={handleViewAll}
+                        className="text-blue-600 hover:underline lg:text-lg"
+                    >
+                        {t('home.GuidedWorkoutsSection.viewall')}
                     </button>
                 </div>
             </div>
 
             {workouts.length === 0 ? (
                 <div className="flex justify-center items-center h-48 bg-gray-100 rounded-lg">
-                    <p className="text-gray-500 text-lg lg:text-xl">{t('home.GuidedWorkoutsSection.noworkoutmessage')}</p>
+                    <p className="text-gray-500 text-lg lg:text-xl">
+                        {t('home.GuidedWorkoutsSection.noworkoutmessage')}
+                    </p>
                 </div>
             ) : (
                 <div
@@ -63,7 +72,9 @@ const GuidedWorkoutsSection = ({ workouts }: { workouts: any[] }) => {
                         >
                             <div className="absolute inset-0 bg-black opacity-50"></div>
                             <div className="absolute bottom-4 left-4 right-4">
-                                <h3 className="text-xl text-gray-200 mb-4 font-semibold lg:text-3xl">{workout.name}</h3>
+                                <h3 className="text-xl text-gray-200 mb-4 font-semibold lg:text-3xl">
+                                    {workout.name}
+                                </h3>
                                 <ul className="flex flex-wrap space-x-4 text-sm lg:text-base">
                                     {workout.muscles.map((muscle: string, idx: string) => (
                                         <li key={idx} className="bg-white px-3 py-1 rounded">

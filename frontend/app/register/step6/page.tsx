@@ -9,7 +9,6 @@ import RegistrationButtons from '@/app/_components/register/RegisterButtons';
 import HorizontalScrollablePicker from '@/app/_components/register/HorizontalScrollablePicker';
 import { useTranslation } from 'react-i18next';
 
-
 export default function RegisterStep6() {
     const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
@@ -31,13 +30,13 @@ export default function RegisterStep6() {
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
-            <div className='h-[20%] w-full lg:max-w-3xl'>
+            <div className="h-[20%] w-full lg:max-w-3xl">
                 <RegistrationHeader
                     title={t('RegisterPagestep6.title')}
                     description={t('RegisterPagestep6.description')}
                 />
             </div>
-            
+
             <div className="flex flex-col items-center justify-center h-[70%] w-full lg:max-w-3xl space-y-8">
                 <HorizontalScrollablePicker
                     value={weight}

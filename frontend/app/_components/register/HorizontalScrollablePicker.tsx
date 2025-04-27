@@ -98,7 +98,7 @@ const HorizontalScrollablePicker: React.FC<HorizontalScrollablePickerProps> = ({
     const centerValue = (value: number) => {
         if (pickerRef.current) {
             const itemElement = pickerRef.current.querySelector<HTMLDivElement>(
-                `[data-value="${value}"]`
+                `[data-value="${value}"]`,
             );
             if (itemElement) {
                 const containerWidth = pickerRef.current.clientWidth;
@@ -128,10 +128,11 @@ const HorizontalScrollablePicker: React.FC<HorizontalScrollablePickerProps> = ({
                             <div
                                 key={item}
                                 data-value={item}
-                                className={`w-[80px] h-[80px] flex-shrink-0 flex justify-center items-center text-6xl transition-transform ${value === item
-                                    ? 'text-black font-bold transform scale-110 border-black'
-                                    : 'text-gray-500'
-                                    }`}
+                                className={`w-[80px] h-[80px] flex-shrink-0 flex justify-center items-center text-6xl transition-transform ${
+                                    value === item
+                                        ? 'text-black font-bold transform scale-110 border-black'
+                                        : 'text-gray-500'
+                                }`}
                                 onClick={() => onChange(item)}
                             >
                                 {item}
