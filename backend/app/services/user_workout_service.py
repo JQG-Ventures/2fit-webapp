@@ -3,7 +3,7 @@ from app.models.user import User
 from app.models.workouts import WorkoutPlan
 from app.utils.utils import convert_to_objectid, parse_date
 from datetime import datetime, timedelta
-from typing import List, TypedDict
+from typing import List, TypedDict, Optional, Any
 
 import logging
 
@@ -24,7 +24,7 @@ class WeeklyProgress(TypedDict):
 
 class UserWorkoutService:
     @staticmethod
-    def calculate_week_number(start_date_str: str, completed_date_str: str):
+    def calculate_week_number(start_date_str: str, completed_date_str: str) -> int:
         """Calculate the week number based on start date and completed date."""
         start_date = datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M:%S.%f")
         completed_date = datetime.strptime(completed_date_str, "%Y-%m-%dT%H:%M:%S.%f")
@@ -33,7 +33,7 @@ class UserWorkoutService:
         return week_number
 
     @staticmethod
-    def _fetch_active_plan(user: dict, workout_plan_id: str):
+    def _fetch_active_plan(user: dict, workout_plan_id: str) -> Optional[dict]:
         """Retrieve the user's active workout plan."""
         active_plan = next(
             (
@@ -46,7 +46,7 @@ class UserWorkoutService:
         return active_plan
 
     @staticmethod
-    def _fetch_workout_plan(workout_plan_id: str):
+    def _fetch_workout_plan(workout_plan_id: str) -> Optional[dict]:
         """Fetch workout plan from the database."""
         workout_plan = WorkoutPlan.get_workout_plan_by_id(workout_plan_id)
         return workout_plan
@@ -57,7 +57,7 @@ class UserWorkoutService:
         completed_workout: dict,
         workout_day: dict,
         week_number: int,
-    ):
+    ) -> None:
         """Update progress details with the completed or in-progress workout."""
         progress_details = active_plan.setdefault("progress_details", [])
         day_identifier = completed_workout.get("day_of_week") or completed_workout.get(
@@ -120,7 +120,7 @@ class UserWorkoutService:
         active_plan["progress_details"] = progress_details
 
     @staticmethod
-    def _recalculate_progress(active_plan: dict, workout_plan: dict):
+    def _recalculate_progress(active_plan: dict, workout_plan: dict) -> None:
         """Recalculate the overall progress of the active plan."""
         total_scheduled_workouts = len(workout_plan.get("workout_schedule", []))
         progress_details = active_plan.get("progress_details", [])
@@ -137,7 +137,7 @@ class UserWorkoutService:
             active_plan["is_completed"] = False
 
     @staticmethod
-    def save_completed_workout(user_id: str, completed_workout: dict):
+    def save_completed_workout(user_id: str, completed_workout: dict) -> None:
         """
         Save the completed workout, update user progress, and calculate exercises left.
         """
@@ -161,7 +161,9 @@ class UserWorkoutService:
             raise
 
     @staticmethod
-    def _calculate_personalized_progress(active_plan, workout_plan):
+    def _calculate_personalized_progress(
+        active_plan: dict, workout_plan: dict
+    ) -> tuple[float, list[dict]]:
         """
         Calculate progress and exercises left
         for personalized plans, considering partial progress.
@@ -189,14 +191,14 @@ class UserWorkoutService:
         scheduled_exercises = today_scheduled_day.get("exercises", [])
         total_sets = sum(ex.get("sets", 0) for ex in scheduled_exercises)
 
-        today_progress = next(
+        today_progress: dict = next(
             (
                 dp
                 for dp in progress_details
                 if dp.get("week_number") == current_week_number
                 and dp.get("day_of_week") == today_weekday
             ),
-            None,
+            {},
         )
 
         if today_progress is None:
@@ -250,8 +252,8 @@ class UserWorkoutService:
         for scheduled_ex in scheduled_exercises:
             ex_id = scheduled_ex["exercise_id"]
             scheduled_sets = scheduled_ex.get("sets", 0)
-            progress_ex = next(
-                (ex for ex in today_progress.get("exercises", []) if ex["exercise_id"] == ex_id),
+            progress_ex: dict = next(
+                (ex for ex in today_progress.get("exercises", {}) if ex["exercise_id"] == ex_id),
                 {},
             )
             sets_completed_for_ex = progress_ex.get("sets_completed", 0)
@@ -278,7 +280,9 @@ class UserWorkoutService:
         return progress_percentage, exercises_left_for_today
 
     @staticmethod
-    def _calculate_challenge_progress(active_plan, workout_plan):
+    def _calculate_challenge_progress(
+        active_plan: dict, workout_plan: dict
+    ) -> tuple[float, list[dict]]:
         """Calculate progress and exercises left for challenge plans."""
         progress_details = active_plan.get("progress_details", [])
         total_days = len(workout_plan.get("workout_schedule", []))
@@ -302,7 +306,7 @@ class UserWorkoutService:
         if not today_scheduled_day:
             return progress_percentage, []
 
-        today_progress = next(
+        today_progress: dict = next(
             (dp for dp in progress_details if dp.get("sequence_day") == current_sequence_day),
             {},
         )
@@ -321,19 +325,26 @@ class UserWorkoutService:
         return progress_percentage, exercises_left_for_today
 
     @staticmethod
-    def get_user_progress(user_id: str, workout_plan_id: str):
+    def get_user_progress(user_id: str, workout_plan_id: str) -> dict[str, object]:
         """
         Retrieve the user's progress and exercises left in the workout plan.
         """
         try:
             search_id = convert_to_objectid(user_id)
-            user = User.get_user_by_id(search_id)
+            user = User.get_user_by_id(user_id)
 
             if not user:
                 raise RuntimeError(f"Cannot find the user with id: {search_id}")
 
             active_plan = UserWorkoutService._fetch_active_plan(user, workout_plan_id)
+
+            if not active_plan:
+                raise Exception("Active plan not found")
+
             workout_plan = UserWorkoutService._fetch_workout_plan(workout_plan_id)
+
+            if not workout_plan:
+                raise RuntimeError(f"Cannot get user workout plan: {workout_plan_id}")
 
             plan_type = workout_plan.get("plan_type", "personalized").lower()
 
@@ -366,10 +377,12 @@ class UserWorkoutService:
             raise
 
     @staticmethod
-    def _calculate_one_day_progress(active_plan, workout_plan):
+    def _calculate_one_day_progress(
+        active_plan: dict, workout_plan: dict
+    ) -> tuple[float, list[dict]]:
         """Calculate progress and exercises left for one-day workouts."""
         progress_details = active_plan.get("progress_details", [])
-        completed_exercises_ids = set()
+        completed_exercises_ids: set[str] = set()
         for dp in progress_details:
             if dp.get("is_completed"):
                 completed_exercises_ids.update(
@@ -393,7 +406,7 @@ class UserWorkoutService:
         return progress_percentage, exercises_left
 
     @staticmethod
-    def get_weekly_workout_progress(user_id: str):
+    def get_weekly_workout_progress(user_id: str) -> WeeklyProgress:
         try:
             user = User.get_user_by_id(user_id)
             if not user:
@@ -553,7 +566,7 @@ class UserWorkoutService:
             raise
 
     @staticmethod
-    def get_challenge_progress(user_id: str, challenge_id: str):
+    def get_challenge_progress(user_id: str, challenge_id: str) -> dict[str, object]:
         try:
             user = User.get_user_by_id(user_id)
             if not user:
@@ -575,7 +588,7 @@ class UserWorkoutService:
                 raise Exception("Challenge workout plan not found.")
 
             progress_details = active_plan.get("progress_details", [])
-            response = {
+            response: dict[str, Any] = {
                 "challenge_id": challenge_id,
                 "name": workout_plan.get("name"),
                 "total_days": len(workout_plan.get("workout_schedule", [])),
@@ -644,9 +657,11 @@ class UserWorkoutService:
                     }
                 )
 
-            if total_days > 0:
+            if isinstance(total_days, int) and total_days > 0:
                 response["progress"] = (completed_days / total_days) * 100
-            response["days"] = sorted(response["days"], key=lambda x: x["sequence_day"])
+
+            if isinstance(response["days"], list):
+                response["days"] = sorted(response["days"], key=lambda x: x["sequence_day"])
             return response
 
         except Exception as e:
@@ -654,7 +669,7 @@ class UserWorkoutService:
             raise
 
     @staticmethod
-    def save_workout_progress(user_id: str, workout_plan_id: str, progress_data: dict):
+    def save_workout_progress(user_id: str, workout_plan_id: str, progress_data: dict) -> None:
         """
         Save the workout progress for a user.
         """

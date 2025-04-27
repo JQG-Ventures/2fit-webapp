@@ -7,7 +7,7 @@ from app.utils.utils import build_gpt_generator_request, parse_answer
 from datetime import datetime
 from flask import request
 from openai import OpenAI
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Any
 
 import app.settings as s
 import logging
@@ -70,9 +70,9 @@ class ChatService:
         Returns:
             list[dict[str, str]]: List of messages.
         """
-        result = mongo.db.conversations.find_one({"conversation_id": conversation_id})
+        result: Any = mongo.db.conversations.find_one({"conversation_id": conversation_id})
 
-        if result:
+        if result and isinstance(result.get("messages"), list):
             return result["messages"]
 
         raise KeyError(f"Conversation not saved in Mongo for conversation_id {conversation_id}")
@@ -92,7 +92,9 @@ class ChatService:
         Returns:
             str: GPT answers to the latest message query from user.
         """
-        messages = [{"role": m["role"], "content": m["content"]} for m in conversation_history]
+        messages: list[Any] = [
+            {"role": m["role"], "content": m["content"]} for m in conversation_history
+        ]
 
         completion_raw = client.chat.completions.create(model=model, messages=messages)
         completion = completion_raw.choices[0].message.content or ""

@@ -43,7 +43,7 @@ class ExerciseListResource(Resource):
     @api.doc("get_exercises")
     @api.response(200, "Exercise retrieved")
     @api.response(500, "Internal Server Error")
-    def get(self):
+    def get(self) -> tuple[dict[str, str], int]:
         """Retrieve all exercises."""
         try:
             exercises = Exercise.get_exercises()
@@ -57,7 +57,7 @@ class ExerciseListResource(Resource):
     @api.response(201, "Exercise created")
     @api.response(400, "Validation Error")
     @api.response(500, "Internal Server Error")
-    def post(self):
+    def post(self) -> tuple[dict[str, str], int]:
         """Create a new exercise."""
         data = request.json
         try:
@@ -79,7 +79,7 @@ class BulkExerciseResource(Resource):
     @api.response(201, "Exercises created")
     @api.response(400, "Validation Error")
     @api.response(500, "Internal Server Error")
-    def post(self):
+    def post(self) -> tuple[dict[str, object], int]:
         """Create multiple exercises in bulk."""
         data = request.json
         try:
@@ -106,7 +106,7 @@ class ExerciseResource(Resource):
     @api.response(200, "Success")
     @api.response(404, "Exercise not found")
     @api.response(500, "Internal Server Error")
-    def get(self, exercise_id):
+    def get(self, exercise_id: str) -> tuple[dict[str, str], int]:
         """Get an exercise by its ID."""
         try:
             exercise = Exercise.get_exercise_by_id(exercise_id)
@@ -124,7 +124,7 @@ class ExerciseResource(Resource):
     @api.response(400, "Validation Error")
     @api.response(404, "Exercise not found")
     @api.response(500, "Internal Server Error")
-    def put(self, exercise_id):
+    def put(self, exercise_id: str) -> tuple[dict[str, str], int]:
         """Update an exercise by its ID."""
         data = request.json
         try:
@@ -148,7 +148,7 @@ class ExerciseResource(Resource):
     @api.response(200, "Exercise disabled")
     @api.response(404, "Exercise not found")
     @api.response(500, "Internal Server Error")
-    def delete(self, exercise_id):
+    def delete(self, exercise_id: str) -> tuple[dict[str, str], int]:
         """Delete an exercise by its ID."""
         try:
             deleted = Exercise.delete_exercise(exercise_id)
@@ -170,7 +170,7 @@ class ExerciseResourceSimilar(Resource):
     @api.response(200, "Success")
     @api.response(404, "Exercise not found")
     @api.response(500, "Internal Server Error")
-    def get(self, exercise_id):
+    def get(self, exercise_id: str) -> tuple[dict[str, str], int]:
         """Get a list of similar exercises by its ID."""
         try:
             exercise = Exercise.get_similar_exercises(exercise_id)

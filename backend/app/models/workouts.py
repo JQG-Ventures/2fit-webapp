@@ -6,6 +6,7 @@ from app.extensions import mongo
 from bson.objectid import ObjectId
 from datetime import datetime
 from marshmallow import ValidationError
+from typing import Optional
 
 import re
 
@@ -14,7 +15,7 @@ class WorkoutPlan:
     """CRUD operations for Workout Plans."""
 
     @staticmethod
-    def get_workout_plans():
+    def get_workout_plans() -> list[dict]:
         """Return the list of workout plans that exists"""
         try:
             result = mongo.db.workout_plans.find(
@@ -25,7 +26,7 @@ class WorkoutPlan:
             raise Exception(f"Error retrieving workout plans: {str(e)}")
 
     @staticmethod
-    def get_one_day_workouts():
+    def get_one_day_workouts() -> list[dict]:
         """Return workout plans that are for one day only."""
         try:
             result = mongo.db.workout_plans.find(
@@ -41,7 +42,7 @@ class WorkoutPlan:
             raise Exception(f"Error retrieving one-day workout plans: {str(e)}")
 
     @staticmethod
-    def get_routines():
+    def get_routines() -> list[dict]:
         """Return workout plans that are routines (weekly)."""
         try:
             result = mongo.db.workout_plans.find(
@@ -55,7 +56,7 @@ class WorkoutPlan:
             raise Exception(f"Error retrieving routines: {str(e)}")
 
     @staticmethod
-    def get_challenges():
+    def get_challenges() -> list[dict]:
         """Return workout plans that are challenges (sequence-based)."""
         try:
             result = mongo.db.workout_plans.find(
@@ -69,7 +70,7 @@ class WorkoutPlan:
             raise Exception(f"Error retrieving challenges: {str(e)}")
 
     @staticmethod
-    def create_workout_plan(data):
+    def create_workout_plan(data: dict) -> str:
         """Create a new workout plan in MongoDB with timestamps."""
         try:
             validated_data = workout_plan_schema.load(data)
@@ -89,7 +90,7 @@ class WorkoutPlan:
             raise Exception(f"Error creating workout plan: {str(e)}")
 
     @staticmethod
-    def create_bulk_workout_plans(data_list):
+    def create_bulk_workout_plans(data_list: list[dict]) -> list[str]:
         """Create multiple workout plans in MongoDB."""
         try:
             workout_plan_ids = []
@@ -114,7 +115,7 @@ class WorkoutPlan:
             raise Exception(f"Error creating bulk workout plans: {str(e)}")
 
     @staticmethod
-    def get_workout_plan_by_id(plan_id):
+    def get_workout_plan_by_id(plan_id: str) -> Optional[dict]:
         """Fetch a workout plan by its ID."""
         try:
             workout_plan = mongo.db.workout_plans.find_one({"_id": ObjectId(plan_id)})
@@ -156,7 +157,7 @@ class WorkoutPlan:
             raise Exception(f"Error retrieving workout plan: {str(e)}")
 
     @staticmethod
-    def update_workout_plan(plan_id, data):
+    def update_workout_plan(plan_id: str, data: dict) -> bool:
         """Update a workout plan by its ID and update the updated_at timestamp."""
         try:
             validated_data = workout_plan_schema.load(data)
@@ -177,7 +178,7 @@ class WorkoutPlan:
             raise Exception(f"Error updating workout plan: {str(e)}")
 
     @staticmethod
-    def delete_workout_plan(plan_id):
+    def delete_workout_plan(plan_id: str) -> bool:
         """Disable a workout plan by its ID and update the updated_at timestamp."""
         try:
             result = mongo.db.workout_plans.update_one(
@@ -195,7 +196,7 @@ class WorkoutPlan:
         return exercise is not None
 
     @staticmethod
-    def get_workout_plans_by_muscle_group(muscle_group: str) -> list | None:
+    def get_workout_plans_by_muscle_group(muscle_group: str) -> Optional[list[dict]]:
         """Retrieve workout plans by muscle group."""
         try:
             plans = list(
@@ -214,7 +215,7 @@ class WorkoutPlan:
             raise RuntimeError(f"Error fetching workout plans by muscle group: {e}")
 
     @staticmethod
-    def get_workout_plans_by_difficulty(difficulty: str) -> list | None:
+    def get_workout_plans_by_difficulty(difficulty: str) -> Optional[list[dict]]:
         """Retrieve workout plans by difficulty level."""
         try:
             plans = list(
@@ -286,7 +287,7 @@ class WorkoutPlan:
     from bson import ObjectId
 
     @staticmethod
-    def get_popular_workouts():
+    def get_popular_workouts() -> list[dict]:
         try:
             pipeline = [
                 {"$unwind": "$workout_history.completed_workouts"},
@@ -342,7 +343,7 @@ class WorkoutPlan:
             raise RuntimeError(f"Error fetching popular workout plans: {e}")
 
     @staticmethod
-    def delete_exercises(plan_id, exercises_to_delete):
+    def delete_exercises(plan_id: str, exercises_to_delete: dict[str, list[str]]) -> bool:
         workout_plan = mongo.db.workout_plans.find_one({"_id": ObjectId(plan_id)})
         if not workout_plan:
             return False
@@ -370,7 +371,9 @@ class WorkoutPlan:
         return result.modified_count > 0
 
     @staticmethod
-    def update_exercise_ids(plan_id, exercises_to_update):
+    def update_exercise_ids(
+        plan_id: str, exercises_to_update: dict[str, list[dict[str, str]]]
+    ) -> bool:
         workout_plan = mongo.db.workout_plans.find_one({"_id": ObjectId(plan_id)})
         if not workout_plan:
             return False

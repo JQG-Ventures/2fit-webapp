@@ -41,7 +41,7 @@ def format_json_string(answer: str) -> str:
     return answer
 
 
-def parse_answer(answer: str):
+def parse_answer(answer: str) -> Union[dict, None]:
     """
     Parse the string to JSON format for API return content.
 
@@ -65,7 +65,7 @@ def parse_answer(answer: str):
         return None
 
 
-def generate_user_routine(user_profile: dict, fitness_level: str, plan):
+def generate_user_routine(user_profile: dict, fitness_level: str, plan) -> dict:
     plan = {
         "name": f"Auto Plan {user_profile['name']}",
         "description": f"A workout plan for the user {user_profile['_id']}",
@@ -90,7 +90,7 @@ def convert_to_objectid(id_value: str) -> Union[ObjectId, str]:
         return id_value
 
 
-def parse_date(date_str):
+def parse_date(date_str) -> datetime:
     for fmt in ("%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S"):
         try:
             return datetime.strptime(date_str, fmt)

@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validates_schema, ValidationError
 from datetime import datetime
+from typing import Any
 
 
 class WorkoutExerciseSchema(Schema):
@@ -31,7 +32,7 @@ class WorkoutDaySchema(Schema):
     exercises = fields.List(fields.Nested(WorkoutExerciseSchema), required=True)
 
     @validates_schema
-    def validate_day(self, data, **kwargs):
+    def validate_day(self, data: dict[str, Any], **kwargs: Any) -> None:
         if not data.get("day_of_week") and not data.get("sequence_day"):
             raise ValidationError("Either day_of_week or sequence_day must be provided.")
 
