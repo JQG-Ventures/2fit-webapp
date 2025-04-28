@@ -73,7 +73,7 @@ class ChatService:
         result: Any = mongo.db.conversations.find_one({"conversation_id": conversation_id})
 
         if result and isinstance(result.get("messages"), list):
-            return result["messages"]
+            return list(result["messages"])
 
         raise KeyError(f"Conversation not saved in Mongo for conversation_id {conversation_id}")
 

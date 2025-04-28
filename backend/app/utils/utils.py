@@ -1,7 +1,7 @@
 from bson import ObjectId
 from bson.errors import InvalidId
 from datetime import datetime
-from typing import Union
+from typing import Union, Any, Dict, Optional
 
 import json
 import logging
@@ -41,7 +41,7 @@ def format_json_string(answer: str) -> str:
     return answer
 
 
-def parse_answer(answer: str) -> Union[dict, None]:
+def parse_answer(answer: str) -> Optional[Dict[str, Any]]:
     """
     Parse the string to JSON format for API return content.
 
@@ -65,7 +65,7 @@ def parse_answer(answer: str) -> Union[dict, None]:
         return None
 
 
-def generate_user_routine(user_profile: dict, fitness_level: str, plan) -> dict:
+def generate_user_routine(user_profile: dict, fitness_level: str, plan: Any) -> Dict[str, Any]:
     plan = {
         "name": f"Auto Plan {user_profile['name']}",
         "description": f"A workout plan for the user {user_profile['_id']}",
