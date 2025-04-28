@@ -21,7 +21,7 @@ class WorkoutPlan:
             result = mongo.db.workout_plans.find(
                 {"is_active": True, "plan_type": {"$ne": "personalized"}}
             )
-            return workout_plans_schema.dump(result)
+            return workout_plans_schema.dump(result)  # type: ignore[return-value]
         except Exception as e:
             raise Exception(f"Error retrieving workout plans: {str(e)}")
 
@@ -37,7 +37,7 @@ class WorkoutPlan:
                 }
             )
 
-            return workout_plans_schema.dump(result)
+            return workout_plans_schema.dump(result)  # type: ignore[return-value]
         except Exception as e:
             raise Exception(f"Error retrieving one-day workout plans: {str(e)}")
 
@@ -51,7 +51,7 @@ class WorkoutPlan:
                     "workout_schedule.sequence_day": {"$exists": False},
                 }
             )
-            return workout_plans_schema.dump(result)
+            return workout_plans_schema.dump(result)  # type: ignore[return-value]
         except Exception as e:
             raise Exception(f"Error retrieving routines: {str(e)}")
 
@@ -65,7 +65,7 @@ class WorkoutPlan:
                     "workout_schedule.day_of_week": {"$exists": False},
                 }
             )
-            return workout_plans_schema.dump(result)
+            return workout_plans_schema.dump(result)  # type: ignore[return-value]
         except Exception as e:
             raise Exception(f"Error retrieving challenges: {str(e)}")
 
@@ -210,7 +210,7 @@ class WorkoutPlan:
             )
             if not plans:
                 raise ValueError("No workout plans found for the specified muscle group")
-            return workout_plans_schema.dump(plans)
+            return workout_plans_schema.dump(plans)  # type: ignore[return-value]
         except Exception as e:
             raise RuntimeError(f"Error fetching workout plans by muscle group: {e}")
 
@@ -225,7 +225,7 @@ class WorkoutPlan:
             )
             if not plans:
                 raise ValueError("No workout plans found for the specified difficulty level")
-            return workout_plans_schema.dump(plans)
+            return workout_plans_schema.dump(plans)  # type: ignore[return-value]
         except Exception as e:
             raise RuntimeError(f"Error fetching workout plans by difficulty: {e}")
 

@@ -13,6 +13,10 @@ logging.Logger.root.level = 10
 class AzureService:
     def __init__(self, db: Any) -> None:
         self.db = db
+
+        if not s.AZURE_CONNECTION_STRING:
+            raise ValueError("AZURE_CONNECTION_STRING is not set.")
+
         self.blob_service_client = BlobServiceClient.from_connection_string(
             s.AZURE_CONNECTION_STRING
         )
@@ -35,6 +39,10 @@ class AzureService:
         try:
             content_id = str(uuid.uuid4())
             file_name = os.path.basename(file_path)
+
+            if not s.AZURE_CONTAINER_NAME:
+                raise ValueError("AZURE_CONTAINER_NAME is not set.")
+
             blob_client = self.blob_service_client.get_blob_client(
                 container=s.AZURE_CONTAINER_NAME, blob=file_name
             )
@@ -73,7 +81,7 @@ class AzureService:
         try:
             content = self.db.contents.find_one({"tags": {"$in": tags}})
             if content:
-                return content["blob_url"]
+                return str(content["blob_url"])
             return None
         except Exception as e:
             logging.exception(f"Could not get the content from DB {e}")
@@ -101,12 +109,16 @@ class AzureService:
             )
             unique_filename = f"profile_{uuid.uuid4().hex}.{extension}"
             blob_path = f"{user_id}/{unique_filename}"
+
+            if not s.AZURE_CONTAINER_NAME:
+                raise ValueError("AZURE_CONTAINER_NAME is not set.")
+
             blob_client = self.blob_service_client.get_blob_client(
                 container=s.AZURE_PROFILE_CONTAINER_NAME, blob=blob_path
             )
             file_stream.seek(0)
             blob_client.upload_blob(file_stream, overwrite=True)
-            return blob_client.url
+            return str(blob_client.url)
         except Exception as e:
             logging.exception("Error uploading profile image: %s", e)
             return None
