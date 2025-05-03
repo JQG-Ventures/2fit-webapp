@@ -45,6 +45,10 @@ class ContentUploadResource(Resource):
         Upload content to Azure Blob Storage.
         """
         data = request.json
+
+        if data is None:
+            return {"status": "error", "message": "Missing JSON body"}, 400
+
         file_path = data.get("file_path")
         title = data.get("title")
         description = data.get("description")

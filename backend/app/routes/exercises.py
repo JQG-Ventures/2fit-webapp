@@ -69,7 +69,7 @@ class ExerciseListResource(Resource):
             exercise_id = Exercise.create_exercise(validated_data)
             return {"status": "success", "message": str(exercise_id)}, 200
         except ValidationError as err:
-            return {"status": "error", "message": err.messages}, 400
+            return {"status": "error", "message": str(err.messages)}, 400
         except Exception as e:
             logging.exception(str(e))
             return {"status": "error", "message": str(e)}, 500
@@ -86,6 +86,10 @@ class BulkExerciseResource(Resource):
     def post(self) -> tuple[dict[str, object], int]:
         """Create multiple exercises in bulk."""
         data = request.json
+
+        if data is None:
+            return {"status": "error", "message": "Missing JSON body"}, 400
+
         try:
             validated_data = exercises_schema.load(data, many=True)
             exercise_ids = Exercise.create_bulk_exercises(validated_data)
@@ -97,7 +101,7 @@ class BulkExerciseResource(Resource):
             }, 201
         except ValidationError as err:
             logging.exception(f"Failed to bulk create the workouts | {err}")
-            return {"status": "error", "message": err.messages}, 400
+            return {"status": "error", "message": str(err.messages)}, 400
         except Exception as e:
             logging.exception(str(e))
             return {"status": "error", "message": str(e)}, 500
@@ -131,6 +135,10 @@ class ExerciseResource(Resource):
     def put(self, exercise_id: str) -> tuple[dict[str, str], int]:
         """Update an exercise by its ID."""
         data = request.json
+
+        if data is None:
+            return {"status": "error", "message": "Missing JSON body"}, 400
+
         try:
             validated_data = exercise_schema.load(data)
             updated = Exercise.update_exercise(exercise_id, validated_data)
@@ -142,7 +150,7 @@ class ExerciseResource(Resource):
                 }, 200
             return {"status": "error", "message": "Exercise not found"}, 404
         except ValidationError as err:
-            return {"status": "error", "message": err.messages}, 400
+            return {"status": "error", "message": str(err.messages)}, 400
         except Exception as e:
             logging.exception(str(e))
             return {"status": "error", "message": str(e)}, 500
