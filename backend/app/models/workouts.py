@@ -6,7 +6,7 @@ from app.extensions import mongo
 from bson.objectid import ObjectId
 from datetime import datetime
 from marshmallow import ValidationError
-from typing import Optional
+from typing import Optional, Any
 
 import re
 
@@ -15,7 +15,7 @@ class WorkoutPlan:
     """CRUD operations for Workout Plans."""
 
     @staticmethod
-    def get_workout_plans() -> list[dict]:
+    def get_workout_plans() -> list[dict[str, Any]]:
         """Return the list of workout plans that exists"""
         try:
             result = mongo.db.workout_plans.find(
@@ -26,7 +26,7 @@ class WorkoutPlan:
             raise Exception(f"Error retrieving workout plans: {str(e)}")
 
     @staticmethod
-    def get_one_day_workouts() -> list[dict]:
+    def get_one_day_workouts() -> list[dict[str, Any]]:
         """Return workout plans that are for one day only."""
         try:
             result = mongo.db.workout_plans.find(
@@ -42,7 +42,7 @@ class WorkoutPlan:
             raise Exception(f"Error retrieving one-day workout plans: {str(e)}")
 
     @staticmethod
-    def get_routines() -> list[dict]:
+    def get_routines() -> list[dict[str, Any]]:
         """Return workout plans that are routines (weekly)."""
         try:
             result = mongo.db.workout_plans.find(
@@ -56,7 +56,7 @@ class WorkoutPlan:
             raise Exception(f"Error retrieving routines: {str(e)}")
 
     @staticmethod
-    def get_challenges() -> list[dict]:
+    def get_challenges() -> list[dict[str, Any]]:
         """Return workout plans that are challenges (sequence-based)."""
         try:
             result = mongo.db.workout_plans.find(
@@ -70,7 +70,7 @@ class WorkoutPlan:
             raise Exception(f"Error retrieving challenges: {str(e)}")
 
     @staticmethod
-    def create_workout_plan(data: dict) -> str:
+    def create_workout_plan(data: dict[str, Any]) -> str:
         """Create a new workout plan in MongoDB with timestamps."""
         try:
             validated_data = workout_plan_schema.load(data)
@@ -90,7 +90,7 @@ class WorkoutPlan:
             raise Exception(f"Error creating workout plan: {str(e)}")
 
     @staticmethod
-    def create_bulk_workout_plans(data_list: list[dict]) -> list[str]:
+    def create_bulk_workout_plans(data_list: list[dict[str, Any]]) -> list[str]:
         """Create multiple workout plans in MongoDB."""
         try:
             workout_plan_ids = []
@@ -115,7 +115,7 @@ class WorkoutPlan:
             raise Exception(f"Error creating bulk workout plans: {str(e)}")
 
     @staticmethod
-    def get_workout_plan_by_id(plan_id: str) -> Optional[dict]:
+    def get_workout_plan_by_id(plan_id: str) -> Optional[dict[str, Any]]:
         """Fetch a workout plan by its ID."""
         try:
             workout_plan = mongo.db.workout_plans.find_one({"_id": ObjectId(plan_id)})
@@ -157,7 +157,7 @@ class WorkoutPlan:
             raise Exception(f"Error retrieving workout plan: {str(e)}")
 
     @staticmethod
-    def update_workout_plan(plan_id: str, data: dict) -> bool:
+    def update_workout_plan(plan_id: str, data: dict[str, Any]) -> bool:
         """Update a workout plan by its ID and update the updated_at timestamp."""
         try:
             validated_data = workout_plan_schema.load(data)
@@ -196,7 +196,7 @@ class WorkoutPlan:
         return exercise is not None
 
     @staticmethod
-    def get_workout_plans_by_muscle_group(muscle_group: str) -> Optional[list[dict]]:
+    def get_workout_plans_by_muscle_group(muscle_group: str) -> Optional[list[dict[str, Any]]]:
         """Retrieve workout plans by muscle group."""
         try:
             plans = list(
@@ -215,7 +215,7 @@ class WorkoutPlan:
             raise RuntimeError(f"Error fetching workout plans by muscle group: {e}")
 
     @staticmethod
-    def get_workout_plans_by_difficulty(difficulty: str) -> Optional[list[dict]]:
+    def get_workout_plans_by_difficulty(difficulty: str) -> Optional[list[dict[str, Any]]]:
         """Retrieve workout plans by difficulty level."""
         try:
             plans = list(
@@ -230,7 +230,7 @@ class WorkoutPlan:
             raise RuntimeError(f"Error fetching workout plans by difficulty: {e}")
 
     @staticmethod
-    def get_workout_plans_with_exercise_count() -> list[dict]:
+    def get_workout_plans_with_exercise_count() -> list[dict[str, Any]]:
         """
         Retrieve all workout plans with their title,
         description, image, and total exercise count.
@@ -287,7 +287,7 @@ class WorkoutPlan:
     from bson import ObjectId
 
     @staticmethod
-    def get_popular_workouts() -> list[dict]:
+    def get_popular_workouts() -> list[dict[str, Any]]:
         try:
             pipeline = [
                 {"$unwind": "$workout_history.completed_workouts"},
