@@ -47,6 +47,10 @@ class ChatBotResource(Resource):
             JSON response with the chatbots reply and status code.
         """
         data = request.json
+
+        if data is None:
+            return {"status": "error", "message": "Missing JSON body"}, 400
+
         chat_service = ChatService(OpenAI(api_key=s.OPENAI_API_KEY))
 
         try:

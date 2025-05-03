@@ -88,6 +88,10 @@ class WorkoutPlanListResource(Resource):
     def post(self) -> Tuple[dict[str, Any], int]:
         """Create a new workout plan."""
         data = request.json
+
+        if data is None:
+            return {"status": "error", "message": "Missing JSON body"}, 400
+
         try:
             validated_data = workout_plan_schema.load(data)
             workout_plan_id = WorkoutPlan.create_workout_plan(validated_data)
@@ -138,6 +142,10 @@ class BulkWorkoutPlanResource(Resource):
     def post(self) -> Tuple[dict[str, Any], int]:
         """Create multiple workout plans in bulk."""
         data = request.json
+
+        if data is None:
+            return {"status": "error", "message": "Missing JSON body"}, 400
+
         try:
             validated_data = workout_plans_schema.load(data, many=True)
             workout_plan_ids = WorkoutPlan.create_bulk_workout_plans(validated_data)
@@ -186,6 +194,10 @@ class WorkoutPlanResource(Resource):
     def put(self, plan_id: str) -> Tuple[dict[str, Any], int]:
         """Update a workout plan by its ID."""
         data = request.json
+
+        if data is None:
+            return {"status": "error", "message": "Missing JSON body"}, 400
+
         try:
             validated_data = workout_plan_schema.load(data)
             updated = WorkoutPlan.update_workout_plan(plan_id, validated_data)
@@ -458,6 +470,10 @@ class DeleteExercisesResource(Resource):
     @api.response(500, "Internal Server Error")
     def put(self, plan_id: str) -> Tuple[dict[str, Any], int]:
         data = request.json
+
+        if data is None:
+            return {"status": "error", "message": "Missing JSON body"}, 400
+
         try:
             updated = WorkoutPlan.delete_exercises(plan_id, data)
             if updated:
@@ -483,6 +499,10 @@ class UpdateExercisesResource(Resource):
     @api.response(500, "Internal Server Error")
     def put(self, plan_id: str) -> Tuple[dict[str, Any], int]:
         data = request.json
+
+        if data is None:
+            return {"status": "error", "message": "Missing JSON body"}, 400
+
         try:
             updated = WorkoutPlan.update_exercise_ids(plan_id, data)
             if updated:
