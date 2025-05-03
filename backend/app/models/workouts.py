@@ -130,7 +130,7 @@ class WorkoutPlan:
                             exercise_ids.add(ObjectId(exercise_id))
 
                 if not exercise_ids:
-                    return workout_plan
+                    return workout_plan  # type: ignore[no-any-return]
 
                 exercises = list(mongo.db.exercise.find({"_id": {"$in": list(exercise_ids)}}))
                 exercise_map = {str(ex["_id"]): exercise_schema.dump(ex) for ex in exercises}
@@ -151,7 +151,7 @@ class WorkoutPlan:
                             updated_exercises.append(ex)
                     day["exercises"] = updated_exercises
 
-                return workout_plan
+                return workout_plan  # type: ignore[no-any-return]
             return None
         except Exception as e:
             raise Exception(f"Error retrieving workout plan: {str(e)}")
@@ -171,7 +171,7 @@ class WorkoutPlan:
             result = mongo.db.workout_plans.update_one(
                 {"_id": ObjectId(plan_id)}, {"$set": validated_data}
             )
-            return result.modified_count > 0
+            return bool(result.modified_count > 0)
         except ValidationError as e:
             raise ValueError(f"Invalid data: {e.messages}")
         except Exception as e:
@@ -185,7 +185,7 @@ class WorkoutPlan:
                 {"_id": ObjectId(plan_id)},
                 {"$set": {"is_active": False, "updated_at": datetime.now()}},
             )
-            return result.modified_count > 0
+            return bool(result.modified_count > 0)
         except Exception as e:
             raise Exception(f"Error updating workout plan: {str(e)}")
 
@@ -368,7 +368,7 @@ class WorkoutPlan:
                 }
             },
         )
-        return result.modified_count > 0
+        return bool(result.modified_count > 0)
 
     @staticmethod
     def update_exercise_ids(
@@ -397,4 +397,4 @@ class WorkoutPlan:
                 }
             },
         )
-        return result.modified_count > 0
+        return bool(result.modified_count > 0)

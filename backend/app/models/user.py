@@ -26,8 +26,7 @@ class User:
             if not user:
                 raise ValueError("User_id not found")
 
-            user = user_schema.dump(user)
-            return user
+            return user_schema.dump(user)  # type: ignore[no-any-return]
         except Exception as e:
             raise RuntimeError(f"Error fetching user: {e}")
 
@@ -40,8 +39,7 @@ class User:
             if not user:
                 return None
 
-            user = user_schema.dump(user)
-            return user
+            return user_schema.dump(user)  # type: ignore[no-any-return]
         except Exception as e:
             raise RuntimeError(f"Error fetching user: {e}")
 
@@ -54,13 +52,12 @@ class User:
             if not user:
                 return None
 
-            user = user_schema.dump(user)
-            return user
+            return user_schema.dump(user)  # type: ignore[no-any-return]
         except Exception as e:
             raise RuntimeError(f"Error fetching user: {e}")
 
     @staticmethod
-    def create_new_user(data: dict) -> dict:
+    def create_new_user(data: dict) -> str:
         """Insert a new user into the database."""
 
         try:
@@ -68,7 +65,7 @@ class User:
             data["updated_at"] = datetime.now()
 
             result = mongo.db.users.insert_one(data)
-            return result.inserted_id
+            return str(result.inserted_id)
         except ValidationError as e:
             raise ValueError(f"Invalid data: {e.messages}")
         except Exception as e:
@@ -105,7 +102,7 @@ class User:
                 }
             },
         )
-        return result.modified_count > 0
+        return bool(result.modified_count > 0)
 
     @staticmethod
     def add_saved_workout(user_id: str, workout_ids: list[str]) -> bool:
@@ -149,7 +146,7 @@ class User:
             object_ids = [ObjectId(id) for id in saved_workouts_ids]
             workouts = mongo.db.workout_plans.find({"_id": {"$in": object_ids}, "is_active": True})
 
-            return workout_plans_schema.dump(list(workouts))
+            return workout_plans_schema.dump(list(workouts))  # type: ignore[no-any-return]
         except Exception as e:
             raise RuntimeError(f"Error getting the saved workouts for user {user_id}, error {e}")
 
@@ -186,7 +183,7 @@ class User:
 
             plans = user["workout_history"].get("active_plans", [])
 
-            return plans
+            return plans  # type: ignore[no-any-return]
         except ValidationError as e:
             raise ValueError(f"Invalid data: {e.messages}")
         except Exception as e:
