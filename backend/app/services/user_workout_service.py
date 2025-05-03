@@ -674,8 +674,7 @@ class UserWorkoutService:
         Save the workout progress for a user.
         """
         try:
-            search_id = convert_to_objectid(user_id)
-            user = User.get_user_by_id(search_id)
+            user = User.get_user_by_id(user_id)
             if not user:
                 raise Exception("User not found.")
 
@@ -693,6 +692,7 @@ class UserWorkoutService:
             if not day_identifier:
                 raise ValueError("Progress data must include 'day_of_week' or 'sequence_day'.")
 
+            search_id = convert_to_objectid(user_id)
             # Fetch the scheduled workout day based on the new progress data
             workout_day = next(
                 (
