@@ -57,29 +57,12 @@ def parse_answer(answer: str) -> Optional[Dict[str, Any]]:
 
         if json_match:
             json_string = json_match.group(0)
-            return json.loads(json_string)
+            return json.loads(json_string)  # type: ignore[no-any-return]
         else:
             raise ValueError("No valid JSON object found in the string.")
     except (json.JSONDecodeError, ValueError, TypeError) as e:
         logging.error(f"Error decoding JSON: {e}")
         return None
-
-
-def generate_user_routine(user_profile: dict, fitness_level: str, plan: Any) -> Dict[str, Any]:
-    plan = {
-        "name": f"Auto Plan {user_profile['name']}",
-        "description": f"A workout plan for the user {user_profile['_id']}",
-        "plan_type": "personalized",
-        "duration_weeks": 12,
-        "price": 0.0,
-        "image_url": "",
-        "video_url": "",
-        "level": fitness_level,
-        "is_active": True,
-        "workout_schedule": plan,
-    }
-    logging.info(f"Workout routine for user {user_profile['_id']} generated: {plan}")
-    return plan
 
 
 def convert_to_objectid(id_value: str) -> Union[ObjectId, str]:

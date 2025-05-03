@@ -60,6 +60,10 @@ class ExerciseListResource(Resource):
     def post(self) -> tuple[dict[str, str], int]:
         """Create a new exercise."""
         data = request.json
+
+        if data is None:
+            return {"status": "error", "message": "Missing JSON body"}, 400
+
         try:
             validated_data = exercise_schema.load(data)
             exercise_id = Exercise.create_exercise(validated_data)
