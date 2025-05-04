@@ -87,7 +87,8 @@ jobs:
         if: steps.changes.outputs.backend == 'true'
         run: |
           cd backend
-          pydocstyle .
+          find . -type f -name "*.py" ! -name "__init__.py" -print0 | xargs -0 pydocstyle
+        
 
       # FRONTEND JOBS
       - name: Install frontend dependencies

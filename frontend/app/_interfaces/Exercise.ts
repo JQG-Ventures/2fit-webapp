@@ -52,17 +52,17 @@ interface ExerciseProgress {
 
 interface ExerciseComplete {
     workout_id: string;
-    duration_seconds: number,
-    calories_burned: number,
-    exercises: ExerciseProgress[],
-    sequence_day?: string,
-    day_of_week?: string,
-    was_skipped: boolean
+    duration_seconds: number;
+    calories_burned: number;
+    exercises: ExerciseProgress[];
+    sequence_day?: string;
+    day_of_week?: string;
+    was_skipped: boolean;
 }
 
 interface WeeklyProgressData {
     days: {
-      day_of_week: string;
-      exercises: Exercise[];
+        day_of_week: string;
+        exercises: Exercise[];
     }[];
 }

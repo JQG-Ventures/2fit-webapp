@@ -1,5 +1,13 @@
 from app.extensions import mongo, ma
-from app.routes import chat_bp, azure_bp, users_bp, email_bp, auth_bp, workouts_bp, exercises_bp
+from app.routes import (
+    chat_bp,
+    azure_bp,
+    users_bp,
+    email_bp,
+    auth_bp,
+    workouts_bp,
+    exercises_bp,
+)
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -18,9 +26,9 @@ def create_app() -> Flask:
     app_instance = Flask(__name__)
 
     app_instance.config["MONGO_URI"] = f"{s.MONGO_URI}"
-    app_instance.config['JWT_SECRET_KEY'] = s.JWT_SECRET_KEY
-    app_instance.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=15)
-    app_instance.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
+    app_instance.config["JWT_SECRET_KEY"] = s.JWT_SECRET_KEY
+    app_instance.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
+    app_instance.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 
     CORS(app_instance)
     JWTManager(app_instance)
@@ -37,7 +45,7 @@ def create_app() -> Flask:
     app_instance.register_blueprint(workouts_bp, url_prefix="/api/workouts")
     app_instance.register_blueprint(exercises_bp, url_prefix="/api/exercises")
 
-    @app_instance.route('/')
+    @app_instance.route("/")
     def ping():
         return jsonify({"status": "success", "message": "pong"}), 200
 

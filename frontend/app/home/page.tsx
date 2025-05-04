@@ -39,38 +39,68 @@ const HomePage: React.FC = () => {
     const workoutPlansUrl = `/api/workouts/plans/one-day`;
     const savedWorkoutPlansUrl = `/api/workouts/saved`;
     const libraryWorkoutCountUrl = `/api/workouts/library`;
-    const activePlansUrl = `/api/workouts/weekly-progress`
+    const activePlansUrl = `/api/workouts/weekly-progress`;
 
-    const { data: workoutPlans, error: errorWorkoutPlans, isLoading: loadingWorkoutPlans, isError: workoutPlansError } =
-        useApiGet<{ status: string; message: [] }>(['workoutPlans'], workoutPlansUrl, { enabled: !sessionLoading });
-    const { data: savedWorkoutPlans, error: errorSavedPlans, isLoading: loadingSavedWorkoutPlans, isError: savedWorkoutPlansError } =
-        useApiGet<{ status: string; message: [] }>(['savedWorkoutPlans'], savedWorkoutPlansUrl, { enabled: !!userId && !sessionLoading });
-    const { data: libraryWorkouts, error: errorLibraryWorkouts, isLoading: loadingLibraryWorkouts, isError: libraryWorkoutsError } =
-        useApiGet<{ status: string; message: [] }>(['libraryWorkouts'], libraryWorkoutCountUrl, { enabled: !sessionLoading });
-    const { data: activePlans, error: errorActivePlans, isLoading: loadingActivePlans, isError: activePlansError } =
-        useApiGet<{ status: string; message: {} }>(['activePlans'], activePlansUrl, { enabled: !sessionLoading });
+    const {
+        data: workoutPlans,
+        error: errorWorkoutPlans,
+        isLoading: loadingWorkoutPlans,
+        isError: workoutPlansError,
+    } = useApiGet<{ status: string; message: [] }>(['workoutPlans'], workoutPlansUrl, {
+        enabled: !sessionLoading,
+    });
+    const {
+        data: savedWorkoutPlans,
+        error: errorSavedPlans,
+        isLoading: loadingSavedWorkoutPlans,
+        isError: savedWorkoutPlansError,
+    } = useApiGet<{ status: string; message: [] }>(['savedWorkoutPlans'], savedWorkoutPlansUrl, {
+        enabled: !sessionLoading,
+    });
+    const {
+        data: libraryWorkouts,
+        error: errorLibraryWorkouts,
+        isLoading: loadingLibraryWorkouts,
+        isError: libraryWorkoutsError,
+    } = useApiGet<{ status: string; message: [] }>(['libraryWorkouts'], libraryWorkoutCountUrl, {
+        enabled: !sessionLoading,
+    });
+    const {
+        data: activePlans,
+        error: errorActivePlans,
+        isLoading: loadingActivePlans,
+        isError: activePlansError,
+    } = useApiGet<{ status: string; message: {} }>(['activePlans'], activePlansUrl, {
+        enabled: !sessionLoading,
+    });
 
-    let isLoading = loadingWorkoutPlans || loadingSavedWorkoutPlans || loadingLibraryWorkouts || loadingActivePlans;
+    let isLoading =
+        loadingWorkoutPlans ||
+        loadingSavedWorkoutPlans ||
+        loadingLibraryWorkouts ||
+        loadingActivePlans;
 
     useEffect(() => {
         setLoading(isLoading);
-    }, [isLoading]);
+    }, [isLoading, setLoading]);
 
     const handleDeleteWorkout = async (id: string) => {
         deleteSavedWorkout(
             { queryParams: { workout_id: id } },
             {
-                onSuccess: () => { },
-                onError: (error) => console.error(error)
-            }
+                onSuccess: () => {},
+                onError: (error) => console.error(error),
+            },
         );
     };
 
     // const guidedWorkoutsUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/guided`;
     // const { data: guidedWorkouts, loading: loadingGuidedWorkouts, error: guidedWorkoutsError } = useFetch(guidedWorkoutsUrl, options);
 
-    const error = workoutPlansError || savedWorkoutPlansError || libraryWorkoutsError || activePlansError;
-    const detailedError = errorWorkoutPlans || errorSavedPlans || errorLibraryWorkouts || errorActivePlans;
+    const error =
+        workoutPlansError || savedWorkoutPlansError || libraryWorkoutsError || activePlansError;
+    const detailedError =
+        errorWorkoutPlans || errorSavedPlans || errorLibraryWorkouts || errorActivePlans;
 
     const paddingBottom = isDesktopOrLaptop ? 0 : 100 * 1.1;
 
@@ -78,20 +108,14 @@ const HomePage: React.FC = () => {
         if (detailedError!.response?.status === 401 || detailedError!.response?.status === 403) {
             return null;
         }
-        return (
-            <Modal
-                title={t("home.errorTitle")}
-                message={t("home.error")}
-                onClose={() => { }}
-            />
-        );
+        return <Modal title={t('home.errorTitle')} message={t('home.error')} onClose={() => {}} />;
     }
 
     const getTodayPendingExercise = () => {
         // @ts-ignore
         if (!activePlans?.message?.days) return null;
 
-        const today = new Date().toISOString().split("T")[0];
+        const today = new Date().toISOString().split('T')[0];
 
         // @ts-ignore
         const todayPlan = activePlans.message.days.find((day: any) => day.date === today);
@@ -106,28 +130,30 @@ const HomePage: React.FC = () => {
     const todayExercise = getTodayPendingExercise();
 
     return (
-        <Link href={`/workouts`} passHref>
-            <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom }}>
-                <div className="flex flex-col lg:flex-row lg:space-x-8">
-                    <div className={isDesktopOrLaptop ? `flex-1` : 'flex flex-row justify-between pr-6'}>
-                        <GreetingSection userName={userName || 'Guest'} />
+        <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom }}>
+            <div className="flex flex-col lg:flex-row lg:space-x-8">
+                <div
+                    className={isDesktopOrLaptop ? `flex-1` : 'flex flex-row justify-between pr-6'}
+                >
+                    <GreetingSection userName={userName || 'Guest'} />
 
-                        {!isDesktopOrLaptop &&
-                            <div className='flex justify-end items-center'>
-                                <SearchBar />
-                            </div>
-                        }
-                    </div>
-                    {isDesktopOrLaptop && (
-                        <div className="flex flex-col flex-1 mt-16 pt-10">
-                            <div className="flex-grow" />
-                            <MotivationSection isBotUser={!!userId} />
+                    {!isDesktopOrLaptop && (
+                        <div className="flex justify-end items-center">
+                            <SearchBar />
                         </div>
                     )}
                 </div>
+                {isDesktopOrLaptop && (
+                    <div className="flex flex-col flex-1 mt-16 pt-10">
+                        <div className="flex-grow" />
+                        <MotivationSection isBotUser={!!userId} />
+                    </div>
+                )}
+            </div>
 
-                <div className="space-y-12">
-                    {todayExercise &&
+            <div className="space-y-12">
+                {todayExercise && (
+                    <Link href={`/workouts`} passHref>
                         <PendingExerciseCard
                             exercise={{
                                 image_url: todayExercise.image_url,
@@ -136,25 +162,25 @@ const HomePage: React.FC = () => {
                                 difficulty: todayExercise.difficulty,
                             }}
                         />
-                    }
-                    <ExerciseBannerSection
-                        hasRoutine={!!userId}
-                        exercises={workoutPlans?.message || []}
-                        savedWorkoutPlans={savedWorkoutPlans?.message || []}
-                    />
-                    {!isDesktopOrLaptop && <MotivationSection isBotUser={!!userId} />}
-                    <WorkoutLibrarySection workouts={libraryWorkouts?.message || []} />
-                    {/* <GuidedWorkoutsSection workouts={guidedWorkouts || []} /> */}
-                    <SavedWorkoutsSection
-                        workouts={savedWorkoutPlans?.message || []}
-                        deleteWorkout={handleDeleteWorkout}
-                        emptyMessage={t('home.SavedWorkoutsSection.SavedWorkoutsSectiondescription')}
-                        sectionTitle={t('home.SavedWorkoutsSection.SavedWorkoutsSectiontitle')}
-                    />
-                    {isDesktopOrLaptop && <Footer />}
-                </div>
+                    </Link>
+                )}
+                <ExerciseBannerSection
+                    hasRoutine={!!userId}
+                    exercises={workoutPlans?.message || []}
+                    savedWorkoutPlans={savedWorkoutPlans?.message || []}
+                />
+                {!isDesktopOrLaptop && <MotivationSection isBotUser={!!userId} />}
+                <WorkoutLibrarySection workouts={libraryWorkouts?.message || []} />
+                {/* <GuidedWorkoutsSection workouts={guidedWorkouts || []} /> */}
+                <SavedWorkoutsSection
+                    workouts={savedWorkoutPlans?.message || []}
+                    deleteWorkout={handleDeleteWorkout}
+                    emptyMessage={t('home.SavedWorkoutsSection.SavedWorkoutsSectiondescription')}
+                    sectionTitle={t('home.SavedWorkoutsSection.SavedWorkoutsSectiontitle')}
+                />
+                {isDesktopOrLaptop && <Footer />}
             </div>
-        </Link>
+        </div>
     );
 };
 

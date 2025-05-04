@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { IoChevronBack } from "react-icons/io5";
+import { IoChevronBack } from 'react-icons/io5';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import { verifyCode } from '../../_services/registerService';
 

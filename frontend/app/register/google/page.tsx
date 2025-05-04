@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
@@ -21,7 +21,7 @@ export default function RegisterSocial() {
                     // @ts-ignore
                     updateData({
                         email: session.user.email!,
-                        auth_provider: 'google'
+                        auth_provider: 'google',
                     });
                     router.push('/register/step1');
                 }

@@ -15,114 +15,117 @@ import { useSaveWorkout } from '@/app/_services/userService';
 import { useLoading } from '@/app/_providers/LoadingProvider';
 import { useSession } from 'next-auth/react';
 
-
 const WorkoutPlanPage: React.FC = () => {
-	const router = useRouter();
-	const { id } = useParams();
-	const { t } = useTranslation('global');
-	const { setLoading } = useLoading();
-	const { data: session, status } = useSession();
+    const router = useRouter();
+    const { id } = useParams();
+    const { t } = useTranslation('global');
+    const { setLoading } = useLoading();
+    const { data: session, status } = useSession();
     const userId = session?.user?.id;
     const sessionLoading = status === 'loading';
-	const [savedMessage, setSavedMessage] = useState<string | null>(null);
-	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-	const [showExerciseFlow, setShowExerciseFlow] = useState<boolean>(false);
-	const { mutate: saveWorkout } = useSaveWorkout();
+    const [savedMessage, setSavedMessage] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [showExerciseFlow, setShowExerciseFlow] = useState<boolean>(false);
+    const { mutate: saveWorkout } = useSaveWorkout();
 
-	const getActivePlansUrl = `/api/workouts/plans/${id}`;
-	const { data: workoutPlan, isLoading: loadingPlans, isError: error } =
-		useApiGet<{ status: string; message: any }>([], getActivePlansUrl);
+    const getActivePlansUrl = `/api/workouts/plans/${id}`;
+    const {
+        data: workoutPlan,
+        isLoading: loadingPlans,
+        isError: error,
+    } = useApiGet<{ status: string; message: any }>([], getActivePlansUrl);
 
+    const handleSaveClick = useCallback(
+        async (planId: string) => {
+            saveWorkout(
+                { queryParams: { workout_id: planId } },
+                {
+                    onSuccess: (data) => {
+                        if (data.status === 'success') {
+                            setSavedMessage(t('workouts.plan.workoutSaved'));
+                            setTimeout(() => setSavedMessage(null), 3000);
+                        }
+                    },
+                    onError: (error: any) => {
+                        if (error.response?.status === 400) {
+                            setSavedMessage(t('workouts.plan.workoutAlreadySaved'));
+                        } else {
+                            setSavedMessage(t('workouts.plan.savingError'));
+                        }
+                        setTimeout(() => setSavedMessage(null), 3000);
+                    },
+                },
+            );
+        },
+        [t, saveWorkout],
+    );
 
+    const handleStartWorkout = useCallback(() => {
+        setIsSubmitting(true);
+        setShowExerciseFlow(true);
+    }, []);
 
-	const handleSaveClick = useCallback(async (planId: string) => {
-		saveWorkout(
-			{ queryParams: { workout_id: planId } },
-			{
-				onSuccess: (data) => {
-					if (data.status === 'success') {
-						setSavedMessage(t('workouts.plan.workoutSaved'));
-						setTimeout(() => setSavedMessage(null), 3000);
-					}
-				},
-				onError: (error: any) => {
-					if (error.response?.status === 400) {
-						setSavedMessage(t('workouts.plan.workoutAlreadySaved'));
-					} else {
-						setSavedMessage(t('workouts.plan.savingError'));
-					}
-					setTimeout(() => setSavedMessage(null), 3000);
-				},
-			}
-		);
-	}, [t, saveWorkout]);
+    const handleExerciseFlowClose = useCallback(() => {
+        setShowExerciseFlow(false);
+        setIsSubmitting(false);
+    }, []);
 
-	const handleStartWorkout = useCallback(() => {
-		setIsSubmitting(true);
-		setShowExerciseFlow(true);
-	}, []);
+    useEffect(() => {
+        if (loadingPlans) {
+            setLoading(true);
+        } else {
+            setLoading(false);
+        }
+    }, [loadingPlans, setLoading]);
 
-	const handleExerciseFlowClose = useCallback(() => {
-		setShowExerciseFlow(false);
-		setIsSubmitting(false);
-	}, []);
+    if (loadingPlans) {
+        return null;
+    }
 
-	useEffect(() => {
-		if (loadingPlans) {
-			setLoading(true);
-		} else {
-			setLoading(false);
-		}
-	}, [loadingPlans, setLoading])
+    if (error) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <p className="text-center text-red-500">{t('workouts.plan.errorLoading')}</p>
+            </div>
+        );
+    }
 
-	if (loadingPlans) {
-		return null;
-	  }
+    return (
+        <div className="bg-gray-50 w-full min-h-screen">
+            {showExerciseFlow && workoutPlan?.message ? (
+                <ExerciseFlow
+                    exercises={workoutPlan?.message.workout_schedule[0]?.exercises || []}
+                    onClose={handleExerciseFlowClose}
+                    onExerciseComplete={() => {}}
+                    workoutType="oneDay"
+                    userId={userId!}
+                    //@ts-ignore
+                    workoutPlanId={id}
+                />
+            ) : (
+                <>
+                    <div className="flex flex-col justify-center">
+                        <WorkoutHeader
+                            //@ts-ignore
+                            onSaveClick={() => handleSaveClick(id)}
+                            onBackClick={() => router.back()}
+                            imageUrl={workoutPlan?.message.image_url}
+                        />
+                        <WorkoutDetails workoutPlan={workoutPlan?.message} />
+                    </div>
 
-	if (error) {
-		return (
-			<div className="flex items-center justify-center h-screen">
-				<p className="text-center text-red-500">{t('workouts.plan.errorLoading')}</p>
-			</div>
-		);
-	}
+                    <ExerciseList
+                        exercises={workoutPlan?.message.workout_schedule[0]?.exercises || []}
+                        isMobile={true}
+                        onExerciseSelect={() => {}}
+                    />
 
-	return (
-		<div className="bg-gray-50 w-full min-h-screen">
-			{showExerciseFlow && workoutPlan?.message ? (
-				<ExerciseFlow
-					exercises={workoutPlan?.message.workout_schedule[0]?.exercises || []}
-					onClose={handleExerciseFlowClose}
-					onExerciseComplete={() => { }}
-					workoutType="oneDay"
-					userId={userId!}
-					//@ts-ignore
-					workoutPlanId={id}
-				/>
-			) : (
-				<>
-					<div className="flex flex-col justify-center">
-						<WorkoutHeader
-							//@ts-ignore
-							onSaveClick={() => handleSaveClick(id)}
-							onBackClick={() => router.back()}
-							imageUrl={workoutPlan?.message.image_url}
-						/>
-						<WorkoutDetails workoutPlan={workoutPlan?.message} />
-					</div>
-
-					<ExerciseList
-						exercises={workoutPlan?.message.workout_schedule[0]?.exercises || []}
-						isMobile={true}
-						onExerciseSelect={ () => {} }
-					/>
-
-					<WorkoutFooter onStartClick={handleStartWorkout} isSubmitting={isSubmitting} />
-					{savedMessage && <SavedMessage message={savedMessage} />}
-				</>
-			)}
-		</div>
-	);
+                    <WorkoutFooter onStartClick={handleStartWorkout} isSubmitting={isSubmitting} />
+                    {savedMessage && <SavedMessage message={savedMessage} />}
+                </>
+            )}
+        </div>
+    );
 };
 
 export default React.memo(WorkoutPlanPage);

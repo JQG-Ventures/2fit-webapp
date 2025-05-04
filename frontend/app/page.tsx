@@ -8,32 +8,31 @@ import { useTranslation } from 'react-i18next';
 
 const OPTIONS: EmblaOptionsType = { dragFree: true, loop: true };
 
-
 export default function RegisterStart() {
     const router = useRouter();
     const { t } = useTranslation('global');
 
     const IMAGES_DATA = [
-    {
-        id: 1,
-        src: '/images/onboarding-1.jpg',
-        title: t('WelcomPage.title1'),
-        caption: t('WelcomPage.description1'),
-    },
-    {
-        id: 2,
-        src: '/images/onboarding-2.jpg',
-        title: t('WelcomPage.title2'),
-        caption: t('WelcomPage.description2'),
-    },
-    {
-        id: 3,
-        src: '/images/onboarding-3.jpg',
-        title: t('WelcomPage.title3'),
-        caption: t('WelcomPage.description3'),
-    },
-];
-const SLIDES = Array.from(Array(IMAGES_DATA.length).keys());
+        {
+            id: 1,
+            src: '/images/onboarding-1.jpg',
+            title: t('WelcomPage.title1'),
+            caption: t('WelcomPage.description1'),
+        },
+        {
+            id: 2,
+            src: '/images/onboarding-2.jpg',
+            title: t('WelcomPage.title2'),
+            caption: t('WelcomPage.description2'),
+        },
+        {
+            id: 3,
+            src: '/images/onboarding-3.jpg',
+            title: t('WelcomPage.title3'),
+            caption: t('WelcomPage.description3'),
+        },
+    ];
+    const SLIDES = Array.from(Array(IMAGES_DATA.length).keys());
 
     const handleStartTraining = () => {
         router.push('/register');
@@ -54,9 +53,9 @@ const SLIDES = Array.from(Array(IMAGES_DATA.length).keys());
                         {t('WelcomPage.startbtn')}
                     </button>
                     <p className="w-full text-center text-white">
-                    {t('WelcomPage.questiontxt')}?{" "}
+                        {t('WelcomPage.questiontxt')}?{' '}
                         <a href="/login" className="underline text-green-500">
-                        {t('WelcomPage.signin')}
+                            {t('WelcomPage.signin')}
                         </a>
                     </p>
                 </div>

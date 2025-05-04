@@ -8,20 +8,20 @@ import Image from 'next/image';
 import { useDebounce } from '@/app/utils/utils';
 import { useRouter } from 'next/navigation';
 
-
 type SearchBarProps = {
     isDesktop?: boolean;
 };
 
-
 const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [filteredResults, setFilteredResults] = useState<{ name: string; type: string; image: string, id: string }[]>([]);
+    const [filteredResults, setFilteredResults] = useState<
+        { name: string; type: string; image: string; id: string }[]
+    >([]);
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [isSearchOpen, setSearchOpen] = useState(false);
     const [visibleCount, setVisibleCount] = useState(isDesktop ? 4 : 10);
     const [loadingMore, setLoadingMore] = useState(false);
-    const { t } = useTranslation("global");
+    const { t } = useTranslation('global');
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const router = useRouter();
 
@@ -29,8 +29,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
     const getExercisesUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/exercises/exercises`;
     const getPlansUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans`;
 
-    const { data: exercisesData, isLoading: loadingExercises } = useApiGet<{ status: string; message: any }>(['exercises'], getExercisesUrl);
-    const { data: plansData, isLoading: loadingPlans } = useApiGet<{ status: string; message: any }>(['plans'], getPlansUrl);
+    const { data: exercisesData, isLoading: loadingExercises } = useApiGet<{
+        status: string;
+        message: any;
+    }>(['exercises'], getExercisesUrl);
+    const { data: plansData, isLoading: loadingPlans } = useApiGet<{
+        status: string;
+        message: any;
+    }>(['plans'], getPlansUrl);
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
     const isLoading = loadingExercises || loadingPlans;
@@ -38,9 +44,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
     const handleItemClick = (id: string, type: string) => {
         setLoadingId(id);
 
-        const route = type.toLowerCase() === 'exercise'
-            ? `/exercises/${id}`
-            : `/workouts/plan/${id}`;
+        const route =
+            type.toLowerCase() === 'exercise' ? `/exercises/${id}` : `/workouts/plan/${id}`;
 
         setTimeout(() => {
             router.push(route);
@@ -49,20 +54,24 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
     };
 
     const exercises = useMemo(() => {
-        return exercisesData?.message.map((item: any) => ({
-            name: item.name,
-            type: 'Exercise',
-            image: item.image_url,
-        })) || [];
+        return (
+            exercisesData?.message.map((item: any) => ({
+                name: item.name,
+                type: 'Exercise',
+                image: item.image_url,
+            })) || []
+        );
     }, [exercisesData]);
 
     const plans = useMemo(() => {
-        return plansData?.message.map((item: any) => ({
-            name: item.name,
-            type: 'Workout Plan',
-            image: item.image_url,
-            id: item._id
-        })) || [];
+        return (
+            plansData?.message.map((item: any) => ({
+                name: item.name,
+                type: 'Workout Plan',
+                image: item.image_url,
+                id: item._id,
+            })) || []
+        );
     }, [plansData]);
 
     const allResults = useMemo(() => {
@@ -76,7 +85,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
         }
 
         const newResults = allResults.filter((result) =>
-            result.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+            result.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
         );
         setFilteredResults(newResults);
     }, [debouncedSearchTerm, allResults]);
@@ -135,9 +144,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                         type="text"
                         value={searchTerm}
                         onChange={handleInputChange}
-                        placeholder={isLoading ? t("Navbar.loading") : t("Navbar.searchText")}
-                        className={`absolute right-0 top-1/2 transform -translate-y-1/2 h-10 px-4 rounded-full bg-gray-700 text-xl text-white outline-none transition-all duration-300 ease-in-out ${isSearchOpen ? 'w-64 opacity-100' : 'w-0 opacity-0'
-                            }`}
+                        placeholder={isLoading ? t('Navbar.loading') : t('Navbar.searchText')}
+                        className={`absolute right-0 top-1/2 transform -translate-y-1/2 h-10 px-4 rounded-full bg-gray-700 text-xl text-white outline-none transition-all duration-300 ease-in-out ${
+                            isSearchOpen ? 'w-64 opacity-100' : 'w-0 opacity-0'
+                        }`}
                         onBlur={handleBlur}
                         onFocus={() => setSearchOpen(true)}
                         disabled={isLoading}
@@ -163,7 +173,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                                         onMouseDown={(e) => e.preventDefault()} // Prevents blur event from closing the search results
                                         onClick={() => handleItemClick(result.id, result.type)} // Click event now works properly
                                     >
-                                        <div className='flex flex-row space-x-4'>
+                                        <div className="flex flex-row space-x-4">
                                             {loadingId === result.id ? ( // Show loading animation if clicked
                                                 <div className="flex justify-center items-center w-full">
                                                     <FaSpinner className="text-emerald-500 text-3xl animate-spin" />
@@ -178,9 +188,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                                                         height={64}
                                                         className="w-1/4 h-full object-cover rounded-lg"
                                                     />
-                                                    <div className='w-3/4 flex flex-col justify-center'>
-                                                        <span className="font-semibold">{result.name}</span>
-                                                        <div className="text-sm text-gray-500">{result.type}</div>
+                                                    <div className="w-3/4 flex flex-col justify-center">
+                                                        <span className="font-semibold">
+                                                            {result.name}
+                                                        </span>
+                                                        <div className="text-sm text-gray-500">
+                                                            {result.type}
+                                                        </div>
                                                     </div>
                                                 </>
                                             )}
@@ -195,7 +209,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                                 </div>
                             )}
                         </div>
-
                     )}
                 </div>
             </div>
@@ -220,22 +233,28 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                         type="text"
                         value={searchTerm}
                         onChange={handleInputChange}
-                        placeholder={t("Navbar.searchText")}
+                        placeholder={t('Navbar.searchText')}
                         className="w-full p-4 text-2xl border-b-2 border-gray-400 outline-none h-[10%]"
                     />
-                    <div ref={containerRef} className="mt-4 w-full h-[85%] bg-white flex items-start justify-center overflow-y-auto">
+                    <div
+                        ref={containerRef}
+                        className="mt-4 w-full h-[85%] bg-white flex items-start justify-center overflow-y-auto"
+                    >
                         {isLoading ? (
                             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 z-10">
                                 <FaSpinner className="text-emerald-500 text-5xl animate-spin" />
                             </div>
                         ) : filteredResults.length === 0 ? (
-                            <p className="p-4 text-gray-500">{t("Navbar.startTypingSrc")}</p>
+                            <p className="p-4 text-gray-500">{t('Navbar.startTypingSrc')}</p>
                         ) : (
                             <div className="w-full rounded-lg p-4">
                                 {filteredResults.slice(0, visibleCount).map((result, index) => (
                                     <React.Fragment key={index}>
-                                        <div className="p-4 text-black hover:bg-gray-200 cursor-pointer transition-opacity duration-300" onClick={() => handleItemClick(result.id, result.type)}>
-                                            <div className='flex flex-row space-x-4'>
+                                        <div
+                                            className="p-4 text-black hover:bg-gray-200 cursor-pointer transition-opacity duration-300"
+                                            onClick={() => handleItemClick(result.id, result.type)}
+                                        >
+                                            <div className="flex flex-row space-x-4">
                                                 {loadingId === result.id ? ( // Show loading animation if clicked
                                                     <div className="flex justify-center items-center w-full">
                                                         <FaSpinner className="text-emerald-500 text-3xl animate-spin" />
@@ -250,15 +269,21 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                                                             height={64}
                                                             className="w-1/4 h-full object-cover rounded-lg"
                                                         />
-                                                        <div className='w-3/4 flex flex-col justify-center'>
-                                                            <span className="font-semibold">{result.name}</span>
-                                                            <div className="text-sm text-gray-500">{result.type}</div>
+                                                        <div className="w-3/4 flex flex-col justify-center">
+                                                            <span className="font-semibold">
+                                                                {result.name}
+                                                            </span>
+                                                            <div className="text-sm text-gray-500">
+                                                                {result.type}
+                                                            </div>
                                                         </div>
                                                     </>
                                                 )}
                                             </div>
                                         </div>
-                                        {index < visibleCount - 1 && <hr className="border-gray-300" />}
+                                        {index < visibleCount - 1 && (
+                                            <hr className="border-gray-300" />
+                                        )}
                                     </React.Fragment>
                                 ))}
                                 {loadingMore && (
@@ -270,7 +295,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                         )}
                     </div>
                     <button className="mt-4 text-red-500" onClick={() => setIsFullScreen(false)}>
-                        {t("Navbar.close")}
+                        {t('Navbar.close')}
                     </button>
                 </div>
             )}

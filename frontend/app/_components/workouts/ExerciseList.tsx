@@ -3,19 +3,18 @@
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 
-
 const ExerciseList: React.FC<{
-    exercises: Exercise[],
-    isMobile: boolean,
-    onExerciseSelect: (exercise: Exercise) => void
+    exercises: Exercise[];
+    isMobile: boolean;
+    onExerciseSelect: (exercise: Exercise) => void;
 }> = ({ exercises, isMobile, onExerciseSelect }) => {
     const { t } = useTranslation('global');
     return (
         <div className={isMobile ? 'pb-[13vh]' : ''}>
             <div className="no-scrollbar p-8 lg:max-w-3xl mx-auto">
                 {exercises.map((exercise, index) => (
-                    <div 
-                        key={index} 
+                    <div
+                        key={index}
                         className="flex items-center justify-between my-5 bg-white rounded-3xl shadow-lg h-[13vh]"
                         onClick={() => onExerciseSelect(exercise)}
                     >
@@ -29,15 +28,22 @@ const ExerciseList: React.FC<{
                             />
                         </div>
                         <div className="w-[70%] text-left ml-6">
-                            <h3 className="text-black text-4xl font-semibold mb-8 mt-4">{exercise.name}</h3>
-                            <p className="text-gray-700">{exercise.sets} sets x {exercise.reps} reps</p>
-                            <p className="text-gray-500 mb-4">{t("workouts.plan.rest")}: {exercise.rest_seconds} {t("workouts.plan.secs")}</p>
+                            <h3 className="text-black text-4xl font-semibold mb-8 mt-4">
+                                {exercise.name}
+                            </h3>
+                            <p className="text-gray-700">
+                                {exercise.sets} sets x {exercise.reps} reps
+                            </p>
+                            <p className="text-gray-500 mb-4">
+                                {t('workouts.plan.rest')}: {exercise.rest_seconds}{' '}
+                                {t('workouts.plan.secs')}
+                            </p>
                         </div>
                     </div>
                 ))}
             </div>
         </div>
-    )
+    );
 };
 
 export default ExerciseList;

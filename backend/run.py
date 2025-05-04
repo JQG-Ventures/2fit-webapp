@@ -1,3 +1,9 @@
+"""
+Entry point for running the Flask application.
+
+Initializes logging and starts the app with settings defined in `app.settings`.
+"""
+
 from app import create_app
 
 import app.settings as s
@@ -8,10 +14,8 @@ import sys
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s [%(levelname)s] %(message)s',
-        handlers=[
-            logging.StreamHandler(sys.stdout)
-        ]
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        handlers=[logging.StreamHandler(sys.stdout)],
     )
 
 app = create_app()

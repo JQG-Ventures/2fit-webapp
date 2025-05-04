@@ -11,14 +11,17 @@ export const useUpdateProfile = () => {
         setSuccess(null);
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/${userId}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(updatedProfile),
                 },
-                body: JSON.stringify(updatedProfile),
-            });
+            );
 
             if (!response.ok) {
                 const errorMsg = await response.text();
@@ -26,7 +29,7 @@ export const useUpdateProfile = () => {
             }
 
             const data = await response.json();
-            setSuccess("Profile updated successfully.");
+            setSuccess('Profile updated successfully.');
             return data;
         } catch (error: any) {
             setError(error.message || 'Error updating profile.');
