@@ -14,9 +14,7 @@ from typing import Optional
 
 
 class User:
-    """
-    User model class to interact with the user collection in MongoDB.
-    """
+    """User model class to interact with the user collection in MongoDB."""
 
     @staticmethod
     def get_user_by_id(user_id: str) -> dict | None:
@@ -61,7 +59,6 @@ class User:
     @staticmethod
     def create_new_user(data: dict) -> str:
         """Insert a new user into the database."""
-
         try:
             data["created_at"] = datetime.now()
             data["updated_at"] = datetime.now()
