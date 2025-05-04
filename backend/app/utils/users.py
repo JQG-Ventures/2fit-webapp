@@ -21,7 +21,6 @@ def validate_user_by_credentials(user: dict, password: str) -> bool:
     Returns:
         bool: True if the password matches, False otherwise.
     """
-
     try:
         hashed_password = user["password_hash"]
         return check_password_hash(hashed_password, password)
@@ -32,7 +31,7 @@ def validate_user_by_credentials(user: dict, password: str) -> bool:
 
 def roles_required(required_roles: list[str]) -> Callable[..., Callable[..., object]]:
     """
-    Decorator to restrict access to users with required roles.
+    Decorate a function to enforce role-based access control.
 
     Args:
         required_roles (list[str]): Roles allowed to access the route.

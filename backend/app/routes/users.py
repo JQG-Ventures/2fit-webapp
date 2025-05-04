@@ -162,9 +162,7 @@ class CompleteWorkoutResource(Resource):
     @api.response(400, "Invalid input", response_model)
     @api.response(500, "Internal server error", response_model)
     def post(self):
-        """
-        Save a completed workout for a user.
-        """
+        """Save a completed workout for a user."""
         try:
             user_id = get_jwt_identity()
             if not user_id:
@@ -206,9 +204,7 @@ class UserProgressResource(Resource):
     @api.response(400, "Invalid input", response_model)
     @api.response(500, "Internal server error", response_model)
     def get(self):
-        """
-        Get user progress in a workout plan.
-        """
+        """Get user progress in a workout plan."""
         try:
             user_id = get_jwt_identity()
             workout_plan_id = request.args.get("workout_plan_id")
@@ -341,9 +337,7 @@ class UserResource(Resource):
     @api.response(404, "User not found", response_model)
     @api.response(500, "Internal server error", response_model)
     def get(self):
-        """
-        Get user information by ID.
-        """
+        """Get user information by ID."""
         try:
             user_id = get_jwt_identity()
             user_info = User.get_user_by_id(user_id)
@@ -365,9 +359,7 @@ class UserResource(Resource):
     @api.response(404, "User not found", response_model)
     @api.response(500, "Internal server error", response_model)
     def put(self):
-        """
-        Update user information by ID.
-        """
+        """Update user information by ID."""
         try:
             user_id = get_jwt_identity()
             data = request.json
@@ -464,9 +456,7 @@ class VerifyCodeResource(Resource):
     @api.response(200, "Code verified successfully", response_model)
     @api.response(400, "Phone number and code are required", response_model)
     def post(self):
-        """
-        Verify the entered code against the stored code.
-        """
+        """Verify the entered code against the stored code."""
         phone_number = request.json.get("number")
         code_entered = request.json.get("code")
 
@@ -539,9 +529,7 @@ class UserByNumberResource(Resource):
     @api.response(404, "User not found", response_model)
     @api.response(500, "Internal server error", response_model)
     def get(self, number):
-        """
-        Get user information by number.
-        """
+        """Get user information by number."""
         try:
             user_info = User.get_user_by_number(number)
 
@@ -567,9 +555,7 @@ class UserByEmailResource(Resource):
     @api.response(404, "User not found", response_model)
     @api.response(500, "Internal server error", response_model)
     def get(self, email):
-        """
-        Get user information by email.
-        """
+        """Get user information by email."""
         try:
             user_info = User.get_user_by_email(email)
 
@@ -595,9 +581,7 @@ class UserResourcePlans(Resource):
     @api.response(404, "Plans not found", response_model)
     @api.response(500, "Internal server error", response_model)
     def get(self):
-        """
-        Get user information by ID.
-        """
+        """Get user information by ID."""
         try:
             user_id = get_jwt_identity()
             user_plans = User.get_current_active_plans(user_id)
@@ -620,9 +604,7 @@ class UserProfileImageResource(Resource):
     @api.response(400, "Invalid input", profile_image_response_model)
     @api.response(500, "Internal server error", profile_image_response_model)
     def post(self):
-        """
-        Upload a profile image, save it to Azure Blob Storage, and update the user's profile.
-        """
+        """Upload a profile image, save it to Azure Blob Storage, and update the user's profile."""
         try:
             user_id = get_jwt_identity()
             if not user_id:

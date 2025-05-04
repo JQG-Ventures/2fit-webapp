@@ -20,7 +20,6 @@ def build_gpt_generator_request(prompt: str) -> list:
     Returns:
         str: Body of the message to sent to GPT model.
     """
-
     request_message = [{"role": "user", "content": prompt}]
 
     return request_message
