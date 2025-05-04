@@ -1,3 +1,5 @@
+"""Defines endpoints for chatbot conversation and audio transcription using OpenAI."""
+
 from app.services.chat_service import ChatService
 from flask import Blueprint, request
 from flask_restx import Api, Resource, fields
@@ -20,10 +22,9 @@ chat_bot_model = api.model(
 
 @chat_bp.before_app_request
 def before_request() -> Optional[Tuple[dict, int]]:
-    """
-    Function to execute when each request get to the API
-    and store the user id and instantiates a new
-    OpenAI object before each request, for client request usage.
+    """Execute pre-request logic for each API call.
+
+    Stores user ID and initializes OpenAI client instance based on request headers.
     """
     user_id = f"user_{request.headers.get('User-Phone-Number')}"
 
@@ -34,6 +35,10 @@ def before_request() -> Optional[Tuple[dict, int]]:
 
 @api.route("/chat")
 class ChatBotResource(Resource):
+    """
+    Handles user interaction with the chatbot, including message handling and response generation.
+    """
+
     @api.expect(chat_bot_model)
     @api.doc("chat_with_bot")
     @api.response(200, "Conversation created!")
@@ -67,6 +72,8 @@ class ChatBotResource(Resource):
 
 @api.route("/transcribe")
 class TranscribeResource(Resource):
+    """Handles transcription of audio messages using OpenAI Whisper."""
+
     @api.doc("transcribe_audio")
     @api.response(200, "Transcribed successfully!")
     @api.response(500, "Internal Server Error")

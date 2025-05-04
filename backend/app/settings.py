@@ -1,6 +1,8 @@
 """
-Settings file to manage the env variables or variables
-used around the solution in runtime
+Settings file to manage environment variables.
+
+Used to configure environment-dependent values for runtime such as API keys,
+database URIs, and external service integrations (OpenAI, Azure, etc.).
 """
 
 from dotenv import load_dotenv

@@ -1,3 +1,7 @@
+"""
+Defines authentication endpoints for user registration, login, token refresh, and Google login.
+"""
+
 from flask import Blueprint, request
 from flask_restx import Api, Resource, fields
 from flask_jwt_extended import (
@@ -158,6 +162,8 @@ google_login_model = api.model(
 
 @api.route("/register")
 class RegisterResource(Resource):
+    """Handles user registration."""
+
     @api.expect(user_registration_model)
     @api.doc("register_user")
     @api.response(200, "User was registered successfully!")
@@ -202,6 +208,8 @@ class RegisterResource(Resource):
 
 @api.route("/login")
 class LoginResource(Resource):
+    """Handles user login and JWT token generation."""
+
     @api.expect(login_model)
     @api.doc("login_user")
     @api.response(200, "Login successful")
@@ -264,6 +272,8 @@ class LoginResource(Resource):
 
 @api.route("/refresh-token")
 class RefreshTokenResource(Resource):
+    """Handles refreshing access tokens using a valid refresh token."""
+
     @api.doc("refresh_token")
     @api.response(200, "Token refreshed")
     @api.response(500, "Internal Server Error")
@@ -293,6 +303,8 @@ class RefreshTokenResource(Resource):
 
 @api.route("/google")
 class GoogleAuthResource(Resource):
+    """Handles initial Google auth to check if user already exists."""
+
     @api.doc("google_auth")
     @api.response(200, "Login successful")
     @api.response(400, "Missing profile data")
@@ -333,7 +345,10 @@ class GoogleAuthResource(Resource):
 
 @api.route("/google-login")
 class GoogleLoginResource(Resource):
+    """Handles Google login using an ID token."""
+
     def post(self):
+        """Login an existing Google-registered user using a Google ID token."""
         data = request.json
         google_id_token = data.get("id_token")
         if not google_id_token:

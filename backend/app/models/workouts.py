@@ -1,3 +1,5 @@
+"""Model for workout plan operations using MongoDB and Marshmallow schemas."""
+
 from __future__ import annotations
 
 from app.Schemas.WorkoutSchema import workout_plan_schema, workout_plans_schema
@@ -16,7 +18,7 @@ class WorkoutPlan:
 
     @staticmethod
     def get_workout_plans() -> list[dict[str, Any]]:
-        """Return the list of workout plans that exists"""
+        """Return the list of workout plans that exists."""
         try:
             result = mongo.db.workout_plans.find(
                 {"is_active": True, "plan_type": {"$ne": "personalized"}}
@@ -232,8 +234,7 @@ class WorkoutPlan:
     @staticmethod
     def get_workout_plans_with_exercise_count() -> list[dict[str, Any]]:
         """
-        Retrieve all workout plans with their title,
-        description, image, and total exercise count.
+        Retrieve all workout plans with their title, description, image, and total exercise count.
         """
         try:
             pipeline = [
@@ -284,10 +285,9 @@ class WorkoutPlan:
         except Exception as e:
             raise RuntimeError(f"Error fetching workout plans: {e}")
 
-    from bson import ObjectId
-
     @staticmethod
     def get_popular_workouts() -> list[dict[str, Any]]:
+        """Retrieve the most popular workout plans based on user completions."""
         try:
             pipeline = [
                 {"$unwind": "$workout_history.completed_workouts"},
@@ -344,6 +344,7 @@ class WorkoutPlan:
 
     @staticmethod
     def delete_exercises(plan_id: str, exercises_to_delete: dict[str, list[str]]) -> bool:
+        """Remove exercises from a workout plan based on the specified day and exercise IDs."""
         workout_plan = mongo.db.workout_plans.find_one({"_id": ObjectId(plan_id)})
         if not workout_plan:
             return False
@@ -374,6 +375,7 @@ class WorkoutPlan:
     def update_exercise_ids(
         plan_id: str, exercises_to_update: dict[str, list[dict[str, str]]]
     ) -> bool:
+        """Update exercise IDs in a workout plan according to given replacements per day."""
         workout_plan = mongo.db.workout_plans.find_one({"_id": ObjectId(plan_id)})
         if not workout_plan:
             return False

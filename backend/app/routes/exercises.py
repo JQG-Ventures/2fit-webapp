@@ -1,3 +1,5 @@
+"""Defines API routes for managing exercises, including CRUD and similarity features."""
+
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 from flask_restx import Api, Resource, fields
@@ -38,6 +40,8 @@ exercise_model = api.model(
 
 @api.route("/exercises")
 class ExerciseListResource(Resource):
+    """Handles creating and retrieving all exercises."""
+
     method_decorators = [jwt_required()]
 
     @api.doc("get_exercises")
@@ -77,6 +81,8 @@ class ExerciseListResource(Resource):
 
 @api.route("/exercises/bulk")
 class BulkExerciseResource(Resource):
+    """Handles bulk creation of exercises."""
+
     @api.doc("create_bulk_exercises")
     @jwt_required()
     @api.expect([exercise_model])
@@ -109,6 +115,8 @@ class BulkExerciseResource(Resource):
 
 @api.route("/exercises/<string:exercise_id>")
 class ExerciseResource(Resource):
+    """Handles retrieving, updating, and deleting a single exercise by ID."""
+
     @api.doc("get_exercise_by_id")
     @jwt_required()
     @api.response(200, "Success")
@@ -177,6 +185,8 @@ class ExerciseResource(Resource):
 
 @api.route("/similar-exercises/<string:exercise_id>")
 class ExerciseResourceSimilar(Resource):
+    """Provides a list of similar exercises given an exercise ID."""
+
     @api.doc("get_similar_exercise_by_id")
     @jwt_required()
     @api.response(200, "Success")

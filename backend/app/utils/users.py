@@ -1,3 +1,5 @@
+"""Utility functions for user authentication and role validation."""
+
 from __future__ import annotations
 from werkzeug.security import check_password_hash
 from functools import wraps
@@ -10,7 +12,8 @@ import logging
 
 def validate_user_by_credentials(user: dict, password: str) -> bool:
     """
-    Validate user credentials
+    Validate user credentials.
+
     Args:
         user (dict): User data from db
         password (str): User password
@@ -28,6 +31,16 @@ def validate_user_by_credentials(user: dict, password: str) -> bool:
 
 
 def roles_required(required_roles: list[str]) -> Callable[..., Callable[..., object]]:
+    """
+    Decorator to restrict access to users with required roles.
+
+    Args:
+        required_roles (list[str]): Roles allowed to access the route.
+
+    Returns:
+        Callable: Wrapped function with role-based access control.
+    """
+
     def decorator(fn: Callable[..., object]) -> Callable[..., object]:
         @wraps(fn)
         def wrapper(*args: object, **kwargs: object) -> Optional[object]:

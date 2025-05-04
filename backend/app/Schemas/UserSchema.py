@@ -1,3 +1,5 @@
+"""Schemas for user data, preferences, workouts, and automation tracking."""
+
 from marshmallow import Schema, fields, validate
 from datetime import datetime
 
@@ -157,7 +159,7 @@ class UserSchema(Schema):
     )
     fitness_goal = fields.String(
         required=True,
-        alidate=validate.OneOf(["weight", "keep", "strength", "muscle"]),
+        validate=validate.OneOf(["weight", "keep", "strength", "muscle"]),
     )
     fitness_level = fields.String(
         required=True,

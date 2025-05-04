@@ -1,3 +1,5 @@
+"""Service for handling Azure Blob Storage operations."""
+
 from azure.storage.blob import BlobServiceClient
 from typing import Optional, BinaryIO, Any
 
@@ -11,7 +13,15 @@ logging.Logger.root.level = 10
 
 
 class AzureService:
+    """Service class for Azure Blob Storage interaction and content handling."""
+
     def __init__(self, db: Any) -> None:
+        """
+        Initialize AzureService with a database instance and blob service client.
+
+        Args:
+            db (Any): MongoDB database instance.
+        """
         self.db = db
 
         if not s.AZURE_CONNECTION_STRING:
@@ -91,9 +101,10 @@ class AzureService:
         self, file_stream: BinaryIO, user_id: str, original_filename: str
     ) -> Optional[str]:
         """
-        Upload a profile image to Azure Blob Storage,
-        saving it under a folder named after the user_id,
-        and return the blob URL.
+        Upload a profile image to Azure Blob Storage.
+
+        Saves the image under a folder named after the user ID
+        and returns the blob URL.
 
         Args:
             file_stream: The file stream of the image.

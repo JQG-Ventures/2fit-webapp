@@ -1,3 +1,5 @@
+"""Routes for uploading and retrieving content from Azure Blob Storage."""
+
 from app.extensions import mongo
 from app.services.azure_service import AzureService
 from flask_jwt_extended import jwt_required
@@ -34,6 +36,8 @@ error_model = api.model("ErrorResponse", {"error": fields.String(description="Er
 
 @api.route("/content/upload")
 class ContentUploadResource(Resource):
+    """Resource for uploading content to Azure Blob Storage."""
+
     @jwt_required()
     @role_required(["admin"])
     @api.expect(content_model)
@@ -41,9 +45,7 @@ class ContentUploadResource(Resource):
     @api.response(400, "Missing required fields", error_model)
     @api.response(500, "Could not upload content", error_model)
     def post(self) -> tuple[dict[str, str], int]:
-        """
-        Upload content to Azure Blob Storage.
-        """
+        """Upload content to Azure Blob Storage."""
         data = request.json
 
         if data is None:
@@ -78,6 +80,8 @@ class ContentUploadResource(Resource):
 
 @api.route("/content")
 class ContentByTagsResource(Resource):
+    """Resource for retrieving content by tags from Azure Blob Storage."""
+
     @jwt_required()
     @role_required(["admin"])
     @api.param("tags", "Comma-separated tags for filtering content", required=True)
@@ -89,9 +93,7 @@ class ContentByTagsResource(Resource):
     @api.response(400, "Tags are required", error_model)
     @api.response(500, "Could not retrieve content", error_model)
     def get(self) -> tuple[dict[str, str], int]:
-        """
-        Retrieve content URL by tags.
-        """
+        """Retrieve content URL by tags."""
         tags = request.args.get("tags")
 
         if not tags:
