@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaSpinner } from 'react-icons/fa';
 
-
 interface PopularExercisesSectionProps {
     workouts: any[];
 }
@@ -17,7 +16,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
     image,
     exercises,
     startText,
-    workoutId
+    workoutId,
 }) => {
     const [isLoading, setIsLoading] = useState(false);
 
@@ -26,9 +25,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
     };
 
     return (
-        <div
-            className="bg-white p-10 rounded-xl shadow-md mb-6 lg:mb-0 lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl active:scale-95"
-        >
+        <div className="bg-white p-10 rounded-xl shadow-md mb-6 lg:mb-0 lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl active:scale-95">
             <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-300 ease-in-out"
                 style={{ backgroundImage: `url(${image})` }}
@@ -50,7 +47,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
                         onClick={handleClick}
                     >
                         {isLoading ? (
-                            <FaSpinner className="animate-spin h-6 w-6 border-4 border-white border-t-transparent rounded-full"/>
+                            <FaSpinner className="animate-spin h-6 w-6 border-4 border-white border-t-transparent rounded-full" />
                         ) : (
                             startText
                         )}
@@ -64,11 +61,13 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
 const PopularExercisesSection: React.FC<PopularExercisesSectionProps> = ({ workouts }) => {
     const displayedWorkoutsCol = workouts.slice(0, 3);
     const { t } = useTranslation('global');
-    
+
     return (
         <div className="w-full my-16 md:px-12 lg:px-20">
-            <div className='flex flex-row justify-between'>
-                <h2 className="text-3xl font-bold mb-8 lg:text-3xl">{t('workouts.PopularExercisesSection.popularExerciseTitle')}</h2>
+            <div className="flex flex-row justify-between">
+                <h2 className="text-3xl font-bold mb-8 lg:text-3xl">
+                    {t('workouts.PopularExercisesSection.popularExerciseTitle')}
+                </h2>
                 <span>{t('workouts.PopularExercisesSection.seeDetails')}</span>
             </div>
 

@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 const SavedMessage: React.FC<{ message: string }> = ({ message }) => {
     return (
@@ -8,6 +8,6 @@ const SavedMessage: React.FC<{ message: string }> = ({ message }) => {
             </div>
         </div>
     );
-}
+};
 
 export default SavedMessage;

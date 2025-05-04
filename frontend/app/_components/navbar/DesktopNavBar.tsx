@@ -39,8 +39,11 @@ const DesktopNavBar: React.FC<DesktopNavBarProps> = ({ navItems, selectedPath, o
                                 key={item.href}
                                 href={item.href}
                                 onClick={() => onNavClick(item.href)}
-                                className={`flex items-center gap-3 p-4 py-6 transition-colors duration-300 ease-in-out ${isActive ? 'bg-green-600 text-white' : 'text-gray-300 hover:bg-gray-700'
-                                    }`}
+                                className={`flex items-center gap-3 p-4 py-6 transition-colors duration-300 ease-in-out ${
+                                    isActive
+                                        ? 'bg-green-600 text-white'
+                                        : 'text-gray-300 hover:bg-gray-700'
+                                }`}
                             >
                                 {React.cloneElement(item.icon, { className: 'h-7 w-7' })}
                                 {item.label}

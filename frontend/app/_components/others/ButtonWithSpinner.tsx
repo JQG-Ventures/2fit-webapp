@@ -23,8 +23,9 @@ const ButtonWithSpinner: React.FC<ButtonWithSpinnerProps> = ({
             type={type}
             onClick={!loading ? onClick : undefined}
             disabled={disabled || loading}
-            className={`${className} flex items-center justify-center ${loading ? 'cursor-not-allowed opacity-50' : ''
-                }`}
+            className={`${className} flex items-center justify-center ${
+                loading ? 'cursor-not-allowed opacity-50' : ''
+            }`}
         >
             {children}
             {loading && <FaSpinner className="ml-4 animate-spin" />}

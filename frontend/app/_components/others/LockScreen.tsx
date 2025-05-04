@@ -1,8 +1,11 @@
 import React from 'react';
 import { FaUnlock } from 'react-icons/fa';
 
-
-const LockScreen: React.FC<{message: string, buttonText: string, onButtonClick: () => void}> = ({ message, buttonText, onButtonClick }) => {
+const LockScreen: React.FC<{ message: string; buttonText: string; onButtonClick: () => void }> = ({
+    message,
+    buttonText,
+    onButtonClick,
+}) => {
     return (
         <div className="absolute inset-0 flex flex-col justify-between items-center bg-gradient-to-b from-gray-800 to-black opacity-90 p-8">
             <div className="flex-1 flex justify-center items-center">

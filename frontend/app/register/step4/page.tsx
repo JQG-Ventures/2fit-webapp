@@ -40,8 +40,8 @@ export default function RegisterStep4() {
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
-            <div className='h-[20%] w-full lg:max-w-3xl'>
-                <RegistrationHeader 
+            <div className="h-[20%] w-full lg:max-w-3xl">
+                <RegistrationHeader
                     title={t('RegisterPagestep4.title')}
                     description={t('RegisterPagestep4.description')}
                 />
@@ -56,7 +56,10 @@ export default function RegisterStep4() {
                                 ${selectedGoal === goal.value ? 'bg-black text-white scale-105 shadow-lg' : 'bg-white text-black hover:scale-105 hover:shadow-md border-gray-300'}`}
                             onClick={() => handleGoalSelection(goal.value)}
                         >
-                            <span role="img" aria-label={goal.label} className="mr-4">{goal.icon}</span> {goal.label}
+                            <span role="img" aria-label={goal.label} className="mr-4">
+                                {goal.icon}
+                            </span>{' '}
+                            {goal.label}
                         </button>
                     ))}
                 </div>

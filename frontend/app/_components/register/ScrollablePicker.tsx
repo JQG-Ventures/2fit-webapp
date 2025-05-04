@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 interface ScrollablePickerProps {
     value: number;
@@ -9,11 +9,27 @@ interface ScrollablePickerProps {
 const ScrollablePicker: React.FC<ScrollablePickerProps> = ({ value, onChange, range }) => {
     const pickerRef = useRef<HTMLDivElement | null>(null);
 
+    const centerValue = useCallback(
+        (value: number) => {
+            if (pickerRef.current) {
+                const itemHeight = 80;
+                const targetIndex = range.indexOf(value);
+                const targetScrollPosition =
+                    targetIndex * itemHeight - pickerRef.current.clientHeight / 2 + itemHeight / 2;
+                pickerRef.current.scrollTo({
+                    top: targetScrollPosition,
+                    behavior: 'smooth',
+                });
+            }
+        },
+        [range],
+    );
+
     useEffect(() => {
         if (pickerRef.current) {
             centerValue(value);
         }
-    }, [value]);
+    }, [centerValue, value]);
 
     const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
         const containerHeight = event.currentTarget.clientHeight;
@@ -21,23 +37,10 @@ const ScrollablePicker: React.FC<ScrollablePickerProps> = ({ value, onChange, ra
         const itemHeight = 80;
 
         const centeredIndex = Math.round(
-            (scrollPosition + containerHeight / 2 - itemHeight / 2) / itemHeight
+            (scrollPosition + containerHeight / 2 - itemHeight / 2) / itemHeight,
         );
         const newValue = range[Math.min(range.length - 1, Math.max(0, centeredIndex))];
         onChange(newValue);
-    };
-
-    const centerValue = (value: number) => {
-        if (pickerRef.current) {
-            const itemHeight = 80;
-            const targetIndex = range.indexOf(value);
-            const targetScrollPosition =
-                targetIndex * itemHeight - pickerRef.current.clientHeight / 2 + itemHeight / 2;
-            pickerRef.current.scrollTo({
-                top: targetScrollPosition,
-                behavior: 'smooth',
-            });
-        }
     };
 
     return (
@@ -53,10 +56,11 @@ const ScrollablePicker: React.FC<ScrollablePickerProps> = ({ value, onChange, ra
                     {range.map((item) => (
                         <div
                             key={item}
-                            className={`h-[80px] flex justify-center items-center transition-colors ${value === item
+                            className={`h-[80px] flex justify-center items-center transition-colors ${
+                                value === item
                                     ? 'text-black font-bold text-6xl border-t-4 border-b-4 border-black'
                                     : 'text-gray-500 text-4xl'
-                                }`}
+                            }`}
                             onClick={() => centerValue(item)}
                         >
                             {item}

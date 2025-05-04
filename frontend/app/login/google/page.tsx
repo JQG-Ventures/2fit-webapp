@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useSession, signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from 'react';
+import { useSession, signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function GoogleLoginCallback() {
     const router = useRouter();
@@ -12,12 +12,12 @@ export default function GoogleLoginCallback() {
     const [hasSentRequest, setHasSentRequest] = useState(false);
 
     useEffect(() => {
-        if (status === "loading" || hasSentRequest) {
+        if (status === 'loading' || hasSentRequest) {
             return;
         }
 
-        if (status === "unauthenticated") {
-            setError("No authenticated session found");
+        if (status === 'unauthenticated') {
+            setError('No authenticated session found');
             setLoading(false);
             return;
         }
@@ -28,23 +28,29 @@ export default function GoogleLoginCallback() {
             try {
                 // @ts-ignore
                 if (!session?.googleIdToken) {
-                    setError("Missing Google ID Token");
+                    setError('Missing Google ID Token');
                     setLoading(false);
                     return;
                 }
 
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/google-login`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    // @ts-ignore
-                    body: JSON.stringify({ id_token: session?.googleIdToken }),
-                });
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/google-login`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        // @ts-ignore
+                        body: JSON.stringify({ id_token: session?.googleIdToken }),
+                    },
+                );
 
                 if (!res.ok) {
-                    const errorMessage = res.status === 404 ? "Invalid user"
-                        : res.status === 400 ? "User not registered with Google"
-                        : "There was a login error, try again later";
-                    
+                    const errorMessage =
+                        res.status === 404
+                            ? 'Invalid user'
+                            : res.status === 400
+                              ? 'User not registered with Google'
+                              : 'There was a login error, try again later';
+
                     setError(errorMessage);
                     setLoading(false);
                     return;
@@ -52,26 +58,26 @@ export default function GoogleLoginCallback() {
 
                 const data = await res.json();
 
-                await signIn("flaskgoogle", {
+                await signIn('flaskgoogle', {
                     access_token: data.message.access_token,
                     refresh_token: data.message.refresh_token,
                     expires_at: data.message.expires_at,
                     user_id: data.message.user_id,
                     user_name: data.message.name,
-                    redirect: false
+                    redirect: false,
                 });
 
                 router.push('/home');
             } catch {
-                setError("Network error");
+                setError('Network error');
                 setLoading(false);
             }
         }
 
         handleGoogleLogin();
-    }, [status, session, hasSentRequest]);
+    }, [status, session, hasSentRequest, router]);
 
-    if (status === "loading" || loading) {
+    if (status === 'loading' || loading) {
         return (
             <div className="flex items-center justify-center h-screen">
                 <p>Verifying Google login...</p>
@@ -84,7 +90,7 @@ export default function GoogleLoginCallback() {
             <div className="flex flex-col items-center justify-center h-screen">
                 <p className="text-red-500 mb-4">{error}</p>
                 <button
-                    onClick={() => router.push("/login")}
+                    onClick={() => router.push('/login')}
                     className="bg-black text-white px-6 py-3 rounded-md"
                 >
                     Go back to Login

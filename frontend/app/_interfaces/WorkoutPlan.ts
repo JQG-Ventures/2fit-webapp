@@ -15,8 +15,15 @@ interface WorkoutPlan {
 }
 
 interface WorkoutDay {
-    day_of_week?: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday' | '';
+    day_of_week?:
+        | 'monday'
+        | 'tuesday'
+        | 'wednesday'
+        | 'thursday'
+        | 'friday'
+        | 'saturday'
+        | 'sunday'
+        | '';
     sequence_day?: number;
     exercises: Exercise[];
 }
-

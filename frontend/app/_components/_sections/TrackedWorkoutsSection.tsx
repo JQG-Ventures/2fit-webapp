@@ -21,9 +21,13 @@ const TrackedWorkoutsSection = ({ workouts }: { workouts: any[] }) => {
                         onMouseEnter={() => setHoveredIndex(index)}
                         onMouseLeave={() => setHoveredIndex(null)}
                     >
-                        <p className="mb-2 font-semibold text-gray-700 lg:text-lg">{daysOfWeek[index]}</p>
+                        <p className="mb-2 font-semibold text-gray-700 lg:text-lg">
+                            {daysOfWeek[index]}
+                        </p>
                         <div className="flex justify-center items-center w-12 h-12 relative">
-                            {workout.status === 'notCompleted' && <FaTimes className="text-red-500 text-lg" />}
+                            {workout.status === 'notCompleted' && (
+                                <FaTimes className="text-red-500 text-lg" />
+                            )}
                             {workout.status === 'inProgress' && (
                                 <CircularProgressbar
                                     value={workout.progress}

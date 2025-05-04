@@ -3,20 +3,20 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface RegisterData {
-    email: string,
-    fitness_goal: string,
-    fitness_level: string,
-    gender: string,
-    height: number,
-    last: string,
-    name: string,
-    number: string,
-    password: string,
-    training_days_per_week: string[]
-    target_weight: 0,
-    weight: number,
-    workout_type: string[],
-    auth_provider: string
+    email: string;
+    fitness_goal: string;
+    fitness_level: string;
+    gender: string;
+    height: number;
+    last: string;
+    name: string;
+    number: string;
+    password: string;
+    training_days_per_week: string[];
+    target_weight: 0;
+    weight: number;
+    workout_type: string[];
+    auth_provider: string;
 }
 
 interface RegisterContextType {
@@ -42,8 +42,6 @@ export const RegisterProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <RegisterContext.Provider value={{ data, updateData }}>
-            {children}
-        </RegisterContext.Provider>
+        <RegisterContext.Provider value={{ data, updateData }}>{children}</RegisterContext.Provider>
     );
 };

@@ -19,7 +19,7 @@ const WorkoutFooter: React.FC<WorkoutFooterProps> = ({ onStartClick, isSubmittin
                 loading={isSubmitting}
                 className="bg-gradient-to-r from-emerald-400 to-emerald-600 w-[90%] text-white px-6 py-8 rounded-full text-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out lg:max-w-screen-md"
             >
-                {t("workouts.plan.start")}
+                {t('workouts.plan.start')}
             </ButtonWithSpinner>
         </div>
     );

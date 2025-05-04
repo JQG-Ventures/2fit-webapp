@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { AiFillHeart, AiOutlineClose } from 'react-icons/ai';
 import ConfirmationModal from '../modals/confirmationModal';
 import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 
 interface Workout {
     _id: string;
@@ -22,13 +23,13 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
     workouts,
     deleteWorkout,
     emptyMessage,
-    sectionTitle
+    sectionTitle,
 }) => {
     const { t } = useTranslation('global');
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
     const [savedWorkouts, setSavedWorkouts] = useState<Workout[]>(workouts);
-    
+    console.log(workouts, savedWorkouts);
 
     const handleHeartClick = (workout: Workout) => {
         setSelectedWorkout(workout);
@@ -38,7 +39,9 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
     const handleConfirm = async () => {
         if (selectedWorkout) {
             await deleteWorkout(selectedWorkout._id);
-            setSavedWorkouts(prevWorkouts => prevWorkouts.filter(workout => workout._id !== selectedWorkout._id));
+            setSavedWorkouts((prevWorkouts) =>
+                prevWorkouts.filter((workout) => workout._id !== selectedWorkout._id),
+            );
             setModalOpen(false);
             setSelectedWorkout(null);
         } else {
@@ -52,39 +55,53 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
         setSelectedWorkout(null);
     };
 
-    const workoutItems = useMemo(() => (
-        savedWorkouts.map((workout) => (
-            <div
-                key={workout._id}
-                className="relative w-44 h-44 bg-white rounded-lg flex-shrink-0 transition-transform transform hover:scale-110 hover:shadow-lg active:scale-95 lg:w-56 lg:h-56 xl:w-64 xl:h-64"
-            >
-                <img
-                    src={workout.image_url}
-                    alt={workout.name}
-                    className="object-cover w-full h-full rounded-lg transition-opacity duration-300 ease-in-out"
-                />
-                <div className="absolute bottom-0 left-0 p-2 bg-opacity-75 bg-gray-800 text-white w-full rounded-b-lg transition-opacity duration-300 ease-in-out">
-                    <p className="text-lg truncate">{workout.name}</p>
+    useEffect(() => {
+        setSavedWorkouts(workouts);
+    }, [workouts]);
+
+    const workoutItems = useMemo(
+        () =>
+            savedWorkouts.map((workout) => (
+                <div
+                    key={workout._id}
+                    className="relative w-44 h-44 bg-white rounded-lg flex-shrink-0 transition-transform transform hover:scale-110 hover:shadow-lg active:scale-95 lg:w-56 lg:h-56 xl:w-64 xl:h-64"
+                >
+                    <Image
+                        className="object-cover w-full h-full rounded-lg transition-opacity duration-300 ease-in-out"
+                        src={workout.image_url}
+                        width={600}
+                        height={800}
+                        alt={workout.name}
+                    />
+                    <div className="absolute bottom-0 left-0 p-2 bg-opacity-75 bg-gray-800 text-white w-full rounded-b-lg transition-opacity duration-300 ease-in-out">
+                        <p className="text-lg truncate">{workout.name}</p>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                        <button
+                            onClick={() => handleHeartClick(workout)}
+                            className={`text-white p-1 rounded-full transition-transform transform ${
+                                selectedWorkout?._id === workout._id ? 'bg-red-600' : 'bg-gray-800'
+                            }`}
+                        >
+                            {selectedWorkout?._id === workout._id ? (
+                                <AiOutlineClose size={24} />
+                            ) : (
+                                <AiFillHeart size={24} />
+                            )}
+                        </button>
+                    </div>
                 </div>
-                <div className="absolute top-2 right-2">
-                    <button
-                        onClick={() => handleHeartClick(workout)}
-                        className={`text-white p-1 rounded-full transition-transform transform ${
-                            selectedWorkout === workout ? 'bg-red-600' : 'bg-gray-800'
-                        }`}
-                    >
-                        {selectedWorkout === workout ? <AiOutlineClose size={24} /> : <AiFillHeart size={24} />}
-                    </button>
-                </div>
-            </div>
-        ))
-    ), [savedWorkouts, selectedWorkout]);
+            )),
+        [savedWorkouts, selectedWorkout],
+    );
 
     return (
         <div className="bg-white p-4 rounded-lg">
             <div className="flex justify-between items-center mb-8 px-2">
                 <h2 className="text-4xl font-bold text-gray-800">{sectionTitle}</h2>
-                <a href="#" className="text-blue-600 hover:underline text-lg lg:text-2xl">{t('home.SavedWorkoutsSection.viewall')}</a>
+                <a href="#" className="text-blue-600 hover:underline text-lg lg:text-2xl">
+                    {t('home.SavedWorkoutsSection.viewall')}
+                </a>
             </div>
 
             {savedWorkouts.length === 0 ? (

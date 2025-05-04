@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
 import RegistrationHeader from '../../_components/register/RegistrationHeader';
 import RegistrationButtons from '@/app/_components/register/RegisterButtons';
-import { CgGenderFemale, CgGenderMale } from "react-icons/cg";
+import { CgGenderFemale, CgGenderMale } from 'react-icons/cg';
 import { useTranslation } from 'react-i18next';
 
 export default function RegisterStep3() {
@@ -19,7 +19,7 @@ export default function RegisterStep3() {
 
     const genders = [
         { id: 0, label: t('RegisterPagestep3.woman'), value: 'f', Icon: CgGenderFemale },
-        { id: 1, label: t('RegisterPagestep3.man'), value: 'm', Icon: CgGenderMale }
+        { id: 1, label: t('RegisterPagestep3.man'), value: 'm', Icon: CgGenderMale },
     ];
 
     const handleGenderSelection = (genderValue) => {
@@ -39,7 +39,7 @@ export default function RegisterStep3() {
 
     return (
         <div className="flex flex-col h-screen bg-white p-10 lg:items-center">
-            <div className='h-[20%] w-full lg:max-w-3xl'>
+            <div className="h-[20%] w-full lg:max-w-3xl">
                 <RegistrationHeader
                     title={t('RegisterPagestep3.title')}
                     description={t('RegisterPagestep3.description')}
@@ -55,7 +55,7 @@ export default function RegisterStep3() {
                             ${selectedGender === value ? 'bg-black text-white border-black' : 'bg-gray-300 text-gray-700 border-gray-300'}`}
                             onClick={() => handleGenderSelection(value)}
                         >
-                            <Icon className='text-8xl' />
+                            <Icon className="text-8xl" />
                             <span className="mt-2 text-2xl">{label}</span>
                         </button>
                     ))}
