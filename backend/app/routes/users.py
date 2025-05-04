@@ -196,7 +196,7 @@ class CompleteWorkoutResource(Resource):
 
 @api.route("/workouts/progress")
 class UserProgressResource(Resource):
-    "Handles retrieving and updating user workout progress."
+    """Handles retrieving and updating user workout progress."""
 
     @api.param("workout_plan_id", "ID of the workout plan", required=True)
     @jwt_required()
@@ -233,9 +233,7 @@ class UserProgressResource(Resource):
     @api.response(400, "Invalid input", response_model)
     @api.response(500, "Internal server error", response_model)
     def post(self):
-        """
-        Save progress of a workout session for a user.
-        """
+        """Save progress of a workout session for a user."""
         try:
             user_id = get_jwt_identity()
             workout_plan_id = request.args.get("workout_plan_id")
@@ -294,7 +292,7 @@ motivational_messages_response_model = api.model(
 
 @api.route("/messages/motivational")
 class MotivationalMessagesResource(Resource):
-    "Generates motivational messages for the user."
+    """Generates motivational messages for the user."""
 
     @api.response(
         200,
@@ -303,9 +301,7 @@ class MotivationalMessagesResource(Resource):
     )
     @api.response(500, "Could not handle the message", response_model)
     def post(self):
-        """
-        Get motivational messages.
-        """
+        """Get motivational messages."""
         try:
             chat_service = ChatService(OpenAI(api_key=s.OPENAI_API_KEY))
             response = chat_service.generate_motivational_phrases()
@@ -328,7 +324,7 @@ class MotivationalMessagesResource(Resource):
 
 @api.route("/profile")
 class UserResource(Resource):
-    "Handles profile-related operations for a user."
+    """Handles profile-related operations for a user."""
 
     method_decorators = [jwt_required()]
 
@@ -394,7 +390,7 @@ send_code_model = api.model(
 
 @api.route("/send-code")
 class SendCodeResource(Resource):
-    "Sends verification codes via SMS."
+    """Sends verification codes via SMS."""
 
     @api.expect(send_code_model)
     @api.response(200, "Verification code sent successfully", response_model)
@@ -450,7 +446,7 @@ verify_code_model = api.model(
 
 @api.route("/verify-code")
 class VerifyCodeResource(Resource):
-    "Verifies user-entered authentication codes."
+    """Verifies user-entered authentication codes."""
 
     @api.expect(verify_code_model)
     @api.response(200, "Code verified successfully", response_model)
@@ -494,7 +490,7 @@ conversation_response_model = api.model(
 
 @api.route("/conversation")
 class UserConversationResource(Resource):
-    "Retrieves chatbot conversation history for the user."
+    """Retrieves chatbot conversation history for the user."""
 
     @api.doc("get_conversation_by_user_id")
     @jwt_required()
@@ -523,7 +519,7 @@ class UserConversationResource(Resource):
 
 @api.route("/by-number/<string:number>")
 class UserByNumberResource(Resource):
-    "Fetches user information using phone number."
+    """Fetches user information using phone number."""
 
     @api.response(200, "User information retrieved successfully", user_response_model)
     @api.response(404, "User not found", response_model)
@@ -548,7 +544,7 @@ class UserByNumberResource(Resource):
 
 @api.route("/by-email/<string:email>")
 class UserByEmailResource(Resource):
-    "Fetches user information using email address."
+    """Fetches user information using email address."""
 
     @api.response(200, "User information retrieved successfully", user_response_model)
     @api.response(200, "User information retrieved successfully", user_response_model)
@@ -574,7 +570,7 @@ class UserByEmailResource(Resource):
 
 @api.route("/active-plans")
 class UserResourcePlans(Resource):
-    "Retrieves active workout plans for the user."
+    """Retrieves active workout plans for the user."""
 
     @jwt_required()
     @api.response(200, "User plans retrieved successfully", response_model)
@@ -597,7 +593,7 @@ class UserResourcePlans(Resource):
 
 @api.route("/profile/image")
 class UserProfileImageResource(Resource):
-    "Handles uploading and saving user profile images."
+    """Handles uploading and saving user profile images."""
 
     @jwt_required()
     @api.response(200, "Profile image updated successfully", profile_image_response_model)

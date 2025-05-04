@@ -1,5 +1,6 @@
 """
-Defines authentication endpoints for user registration, login, token refresh, and Google login.
+Defines authentication endpoints for user registration,
+login, token refresh, and Google login.
 """
 
 from flask import Blueprint, request
