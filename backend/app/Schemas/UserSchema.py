@@ -40,7 +40,7 @@ class PreferencesSchema(Schema):
     preferences = fields.List(fields.String(), missing=[])
 
 
-class NotificationsSchema(Schema):
+class SecuritySettingsSchema(Schema):
     """Schema for user notifications."""
 
     general = fields.Boolean(missing=True)
@@ -51,6 +51,14 @@ class NotificationsSchema(Schema):
     reminders = fields.Boolean(missing=True)
 
 
+class NotificationsSchema(Schema):
+    """Schema for user security settings."""
+
+    face_id = fields.Boolean(missing=True)
+    remember_me = fields.Boolean(missing=True)
+    touch_id = fields.Boolean(missing=True)
+
+
 class SettingsSchema(Schema):
     """Schema for user settings."""
 
@@ -59,6 +67,9 @@ class SettingsSchema(Schema):
     )
     nutrition_enabled = fields.Boolean(missing=False)
     language_preference = fields.String(missing="es")
+    security_settings = fields.Nested(
+        SecuritySettingsSchema, missing=lambda: SecuritySettingsSchema().load({})
+    )
 
 
 class ExecutedExerciseSchema(Schema):
