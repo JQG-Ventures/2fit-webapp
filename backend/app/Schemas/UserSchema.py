@@ -41,7 +41,7 @@ class PreferencesSchema(Schema):
 
 
 class NotificationsSchema(Schema):
-    """Schema for user notifications"""
+    """Schema for user notifications."""
 
     general = fields.Boolean(missing=True)
     updates = fields.Boolean(missing=True)

@@ -1,3 +1,5 @@
+"""Defines email API endpoints for users."""
+
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 from flask_restx import Api, Resource, fields
@@ -56,6 +58,8 @@ conflict_response_model = api.model(
 
 @api.route("/save")
 class StoreEmailResource(Resource):
+    """Save email for user."""
+
     @jwt_required(optional=True)
     @api.expect(email_model)
     @api.response(200, "Email stored and sent successfully", success_response_model)
@@ -63,9 +67,7 @@ class StoreEmailResource(Resource):
     @api.response(409, "Email already registered", conflict_response_model)
     @api.response(500, "Internal server error", error_response_model)
     def post(self):
-        """
-        Store and send an email notification.
-        """
+        """Store and send an email notification."""
         request_data = request.json
         email_address = request_data.get("to")
         email_subject = request_data.get("subject")

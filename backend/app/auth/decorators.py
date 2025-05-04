@@ -7,7 +7,7 @@ from app.extensions import mongo
 
 
 def role_required(required_roles):
-    """Decorator to enforce access based on user roles.
+    """Decorate to enforce access based on user roles.
 
     Args:
         required_roles (list[str]): List of allowed roles.
