@@ -233,10 +233,7 @@ class WorkoutPlan:
 
     @staticmethod
     def get_workout_plans_with_exercise_count() -> list[dict[str, Any]]:
-        """
-        Retrieve all workout plans with their title, description,
-        image, and total exercise count.
-        """
+        """Retrieve all workout plans with plan description."""
         try:
             pipeline = [
                 {
