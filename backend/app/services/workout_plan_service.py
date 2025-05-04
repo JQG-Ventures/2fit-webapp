@@ -1,3 +1,5 @@
+"""Service to dynamically generate personalized workout plans for users."""
+
 from bson import ObjectId
 from app.extensions import mongo
 from app.models.workouts import WorkoutPlan
@@ -10,6 +12,8 @@ import random
 
 
 class WorkoutPlanGenerator:
+    """Handles logic for generating and assigning personalized workout plans."""
+
     EXERCISE_COUNT_BY_LEVEL = {
         "beginner": {"min": 5, "max": 6},
         "intermediate": {"min": 6, "max": 8},
@@ -41,10 +45,12 @@ class WorkoutPlanGenerator:
 
     @staticmethod
     def get_exercise_list():
+        """Fetch all exercises from the database."""
         return list(mongo.db.exercise.find({}))
 
     @staticmethod
     def map_user_level(fitness_level: str) -> str:
+        """Map the user-provided fitness level to a normalized internal level."""
         return {
             "beginner": "beginner",
             "irregular": "beginner",
@@ -54,6 +60,7 @@ class WorkoutPlanGenerator:
 
     @staticmethod
     def get_intensity_settings(level: str, fitness_goal: str) -> dict:
+        """Determine sets, reps, and rest duration based on level and fitness goal."""
         base_settings: dict[str, Any] = {
             "beginner": {"sets": 2, "reps": [12, 15], "rest": 60},
             "intermediate": {"sets": 3, "reps": [8, 12], "rest": 90},
@@ -79,6 +86,7 @@ class WorkoutPlanGenerator:
 
     @staticmethod
     def determine_plan_duration(user_profile: dict) -> int:
+        """Determine plan duration in weeks based on user's goal and experience level."""
         fitness_goal = user_profile["fitness_goal"]
         fitness_level = user_profile["fitness_level"]
 
@@ -94,6 +102,7 @@ class WorkoutPlanGenerator:
 
     @staticmethod
     def calculate_splits(days_available, fitness_goal):
+        """Calculate the weekly muscle group split based on days available and goal."""
         if days_available >= 5:
             return [
                 ["chest", "shoulders", "triceps", "cardio"],
@@ -115,9 +124,9 @@ class WorkoutPlanGenerator:
     @staticmethod
     def generate_day_routine(muscle_groups, exercises, settings, level, cardio=False):
         """
-        Generates a structured routine for a specific day,
-        including sets, reps, and rest for each exercise.
-        Dynamically allocates exercises based on level and available muscle groups.
+        Generate a structured routine for a single day.
+
+        Includes selection of strength/cardio exercises and assigns sets/reps/rest.
         """
         exercise_range = WorkoutPlanGenerator.EXERCISE_COUNT_BY_LEVEL[level]
         total_exercises = random.randint(exercise_range["min"], exercise_range["max"])
@@ -180,6 +189,7 @@ class WorkoutPlanGenerator:
 
     @staticmethod
     def generate_workout_plan(user_profile: dict):
+        """Create a new personalized workout plan and assign it to the user."""
         db_exercises = WorkoutPlanGenerator.get_exercise_list()
         level = WorkoutPlanGenerator.map_user_level(user_profile["fitness_level"])
         settings = WorkoutPlanGenerator.get_intensity_settings(level, user_profile["fitness_goal"])
@@ -228,6 +238,7 @@ class WorkoutPlanGenerator:
     def set_active_workout_plan_for_user(
         user_id: str, plan_id: str, plan_name: str, duration_weeks: int
     ):
+        """Mark the generated plan as active for the user and update their history."""
         try:
             search_id = ObjectId(user_id)
             mongo.db.users.update_one(

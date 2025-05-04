@@ -1,3 +1,5 @@
+"""Utility functions for GPT request building, JSON parsing, and date formatting."""
+
 from bson import ObjectId
 from bson.errors import InvalidId
 from datetime import datetime
@@ -73,7 +75,20 @@ def convert_to_objectid(id_value: str) -> Union[ObjectId, str]:
         return id_value
 
 
-def parse_date(date_str) -> datetime:
+def parse_date(date_str: str) -> datetime:
+    """Parse a date string into a datetime object.
+
+    Supports ISO format with or without microseconds.
+
+    Args:
+        date_str (str): Date string to parse.
+
+    Returns:
+        datetime: Parsed datetime object.
+
+    Raises:
+        ValueError: If the format is invalid.
+    """
     for fmt in ("%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S"):
         try:
             return datetime.strptime(date_str, fmt)

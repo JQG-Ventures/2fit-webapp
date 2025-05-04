@@ -1,3 +1,5 @@
+"""User model with CRUD operations and MongoDB integrations."""
+
 from __future__ import annotations
 
 from app.Schemas.ConversationSchema import conversation_schema
@@ -174,7 +176,7 @@ class User:
 
     @staticmethod
     def get_current_active_plans(user_id: str) -> list:
-        """Get the list of active plans for the user"""
+        """Get the list of active plans for the user."""
         try:
             user = User.get_user_by_id(user_id)
 

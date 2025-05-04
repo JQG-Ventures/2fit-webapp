@@ -1,3 +1,5 @@
+"""API routes for managing workout plans, progress tracking, and workout libraries."""
+
 from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restx import Api, Resource, fields
@@ -78,6 +80,8 @@ response_model = api.model(
 
 @api.route("/plans")
 class WorkoutPlanListResource(Resource):
+    """Resource for listing and creating workout plans."""
+
     method_decorators = [jwt_required()]
 
     @api.expect(workout_plan_model)
@@ -117,6 +121,8 @@ class WorkoutPlanListResource(Resource):
 
 @api.route("/plans/one-day")
 class OneDayWorkoutPlanListResource(Resource):
+    """Resource for retrieving one-day workout plans."""
+
     @api.doc("get_one_day_workout_plans")
     @jwt_required()
     @api.response(200, "Success")
@@ -133,6 +139,8 @@ class OneDayWorkoutPlanListResource(Resource):
 
 @api.route("/plans/bulk")
 class BulkWorkoutPlanResource(Resource):
+    """Resource for bulk-creating workout plans."""
+
     @api.doc("create_bulk_workout_plans")
     @jwt_required()
     @api.expect([workout_plan_model])
@@ -165,6 +173,8 @@ class BulkWorkoutPlanResource(Resource):
 
 @api.route("/plans/<string:plan_id>")
 class WorkoutPlanResource(Resource):
+    """Resource for retrieving, updating, and deleting a single workout plan."""
+
     method_decorators = [jwt_required()]
 
     @api.doc("get_workout_plan_by_id")
@@ -241,6 +251,8 @@ class WorkoutPlanResource(Resource):
 
 @api.route("/saved")
 class UserWorkoutSavedResource(Resource):
+    """Resource for managing saved workout plans by user."""
+
     method_decorators = [jwt_required()]
 
     @api.doc("get_saved_workouts_by_user_id")
@@ -264,7 +276,7 @@ class UserWorkoutSavedResource(Resource):
     @api.response(400, "Value error")
     @api.response(500, "Internal Server Error")
     def post(self) -> Tuple[dict[str, Any], int]:
-        """Save workouts for the users by id"""
+        """Save workouts for the user by ID."""
         try:
             workout_id = request.args.get("workout_id")
 
@@ -325,6 +337,8 @@ class UserWorkoutSavedResource(Resource):
 
 @api.route("/library")
 class LibraryResource(Resource):
+    """Resource for fetching workout plans in the public library."""
+
     @api.doc("get_workout_plans_with_exercise_count")
     @jwt_required()
     @api.response(200, "Success")
@@ -350,6 +364,8 @@ class LibraryResource(Resource):
 
 @api.route("/library/muscle_group/<string:muscle_group>")
 class LibraryMuscleResource(Resource):
+    """Resource for fetching library workouts by muscle group."""
+
     @api.doc("get_workout_plans_by_muscle_group")
     @jwt_required()
     @api.response(200, "Success")
@@ -375,6 +391,8 @@ class LibraryMuscleResource(Resource):
 
 @api.route("/library/difficulty/<string:difficulty>")
 class WorkoutPlanByDifficultyResource(Resource):
+    """Resource for fetching workout plans by difficulty level."""
+
     @api.doc("get_workout_plans_by_difficulty")
     @jwt_required()
     @api.response(200, "Success")
@@ -400,14 +418,14 @@ class WorkoutPlanByDifficultyResource(Resource):
 
 @api.route("/weekly-progress")
 class WeeklyWorkoutProgressResource(Resource):
+    """Resource for retrieving the user's weekly workout progress."""
+
     @jwt_required()
     @api.response(200, "Weekly workout progress retrieved successfully")
     @api.response(400, "Invalid input", response_model)
     @api.response(500, "Internal server error", response_model)
     def get(self) -> Tuple[dict[str, Any], int]:
-        """
-        Get the user's workout progress for the current week.
-        """
+        """Get the user's workout progress for the current week."""
         try:
             user_id = get_jwt_identity()
             progress = UserWorkoutService.get_weekly_workout_progress(user_id)
@@ -420,15 +438,15 @@ class WeeklyWorkoutProgressResource(Resource):
 
 @api.route("/challenge-progress")
 class ChallengeProgressResource(Resource):
+    """Resource for retrieving challenge progress of a user."""
+
     @api.param("challenge_id", "ID of the challenge", required=True)
     @jwt_required()
     @api.response(200, "Challenge progress retrieved successfully")
     @api.response(400, "Invalid input", response_model)
     @api.response(500, "Internal server error", response_model)
     def get(self) -> Tuple[dict[str, Any], int]:
-        """
-        Get the user's progress for a specific challenge.
-        """
+        """Get the user's progress for a specific challenge."""
         try:
             user_id = get_jwt_identity()
             challenge_id = request.args.get("challenge_id")
@@ -448,6 +466,8 @@ class ChallengeProgressResource(Resource):
 
 @api.route("/popular")
 class PopularWorkoutsResource(Resource):
+    """Resource for fetching popular workouts among users."""
+
     @jwt_required()
     @api.response(200, "Popular workout retrieved successfully")
     @api.response(500, "Internal server error", response_model)
@@ -464,11 +484,14 @@ class PopularWorkoutsResource(Resource):
 
 @api.route("/plans/<string:plan_id>/delete-exercises")
 class DeleteExercisesResource(Resource):
+    """Resource for deleting exercises from a workout plan."""
+
     @jwt_required()
     @api.response(200, "Workout Plan updated")
     @api.response(404, "Workout Plan not found")
     @api.response(500, "Internal Server Error")
     def put(self, plan_id: str) -> Tuple[dict[str, Any], int]:
+        """Delete exercises from a workout plan."""
         data = request.json
 
         if data is None:
@@ -493,11 +516,14 @@ class DeleteExercisesResource(Resource):
 
 @api.route("/plans/<string:plan_id>/update-exercises")
 class UpdateExercisesResource(Resource):
+    """Resource for updating exercise IDs in a workout plan."""
+
     @jwt_required()
     @api.response(200, "Workout Plan updated")
     @api.response(404, "Workout Plan not found")
     @api.response(500, "Internal Server Error")
     def put(self, plan_id: str) -> Tuple[dict[str, Any], int]:
+        """Update exercise IDs in a workout plan."""
         data = request.json
 
         if data is None:

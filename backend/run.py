@@ -1,3 +1,9 @@
+"""
+Entry point for running the Flask application.
+
+Initializes logging and starts the app with settings defined in `app.settings`.
+"""
+
 from app import create_app
 
 import app.settings as s

@@ -1,3 +1,5 @@
+"""Model for managing CRUD operations on exercises stored in MongoDB."""
+
 from __future__ import annotations
 
 from app.Schemas.ExerciseSchema import exercise_schema, exercises_schema
@@ -12,7 +14,7 @@ class Exercise:
 
     @staticmethod
     def get_exercises():
-        """Return the list of workout plans that exists"""
+        """Return the list of workout plans that exist."""
         try:
             result = mongo.db.exercise.find({"is_active": True})
             return exercises_schema.dump(result)
@@ -87,8 +89,9 @@ class Exercise:
     @staticmethod
     def get_similar_exercises(exercise_id):
         """
-        Fetch exercises similar to the given exercise
-        based on muscle_group and category.
+        Fetch exercises similar to the given exercise.
+
+        Similarity is based on muscle group and category.
         """
         try:
             exercise = mongo.db.exercise.find_one({"_id": ObjectId(exercise_id), "is_active": True})

@@ -1,3 +1,5 @@
+"""Service for managing user workout plans and tracking workout progress."""
+
 from app.extensions import mongo
 from app.models.user import User
 from app.models.workouts import WorkoutPlan
@@ -9,6 +11,8 @@ import logging
 
 
 class DayProgress(TypedDict):
+    """Represents a single day's workout progress with completion and exercise details."""
+
     day_of_week: str
     date: str
     is_completed: bool
@@ -16,6 +20,8 @@ class DayProgress(TypedDict):
 
 
 class WeeklyProgress(TypedDict):
+    """Represents a week's workout progress including individual day data and summary."""
+
     week_start_date: str
     week_end_date: str
     progress: float
@@ -23,6 +29,8 @@ class WeeklyProgress(TypedDict):
 
 
 class UserWorkoutService:
+    """Service class that handles workout tracking, progress calculation, and updates."""
+
     @staticmethod
     def calculate_week_number(start_date_str: str, completed_date_str: str) -> int:
         """Calculate the week number based on start date and completed date."""
@@ -138,9 +146,7 @@ class UserWorkoutService:
 
     @staticmethod
     def save_completed_workout(user_id: str, completed_workout: dict) -> None:
-        """
-        Save the completed workout, update user progress, and calculate exercises left.
-        """
+        """Save the completed workout and update user progress."""
         try:
             search_id = convert_to_objectid(user_id)
 
@@ -165,8 +171,9 @@ class UserWorkoutService:
         active_plan: dict, workout_plan: dict
     ) -> tuple[float, list[dict]]:
         """
-        Calculate progress and exercises left
-        for personalized plans, considering partial progress.
+        Calculate progress and exercises left.
+
+        This is for personalized plans, considering ongoing and partial completions.
         """
         progress_details = active_plan.get("progress_details", [])
         today = datetime.now()
@@ -326,9 +333,7 @@ class UserWorkoutService:
 
     @staticmethod
     def get_user_progress(user_id: str, workout_plan_id: str) -> dict[str, object]:
-        """
-        Retrieve the user's progress and exercises left in the workout plan.
-        """
+        """Retrieve the user's progress and remaining exercises in a workout plan."""
         try:
             search_id = convert_to_objectid(user_id)
             user = User.get_user_by_id(user_id)
@@ -407,6 +412,7 @@ class UserWorkoutService:
 
     @staticmethod
     def get_weekly_workout_progress(user_id: str) -> WeeklyProgress:
+        """Return weekly workout progress summary and completion details for the user."""
         try:
             user = User.get_user_by_id(user_id)
             if not user:
@@ -567,6 +573,7 @@ class UserWorkoutService:
 
     @staticmethod
     def get_challenge_progress(user_id: str, challenge_id: str) -> dict[str, object]:
+        """Get detailed progress of a user for a specific challenge workout plan."""
         try:
             user = User.get_user_by_id(user_id)
             if not user:
@@ -670,9 +677,7 @@ class UserWorkoutService:
 
     @staticmethod
     def save_workout_progress(user_id: str, workout_plan_id: str, progress_data: dict) -> None:
-        """
-        Save the workout progress for a user.
-        """
+        """Save the workout progress for a user including partial or completed states."""
         try:
             user = User.get_user_by_id(user_id)
             if not user:

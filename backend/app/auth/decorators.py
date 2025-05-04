@@ -1,3 +1,5 @@
+"""Custom authentication decorators for role-based access control."""
+
 from functools import wraps
 from flask import jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -5,6 +7,15 @@ from app.extensions import mongo
 
 
 def role_required(required_roles):
+    """Decorator to enforce access based on user roles.
+
+    Args:
+        required_roles (list[str]): List of allowed roles.
+
+    Returns:
+        Callable: Decorated view function restricted to the specified roles.
+    """
+
     def decorator(fn):
         @wraps(fn)
         @jwt_required()

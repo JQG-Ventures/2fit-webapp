@@ -1,3 +1,5 @@
+"""Service layer for managing chat interactions using OpenAI and MongoDB."""
+
 from app.extensions import mongo
 from app.utils.prompts import (
     assistant_instructions_v2,
@@ -18,20 +20,28 @@ logging.Logger.root.level = 10
 
 
 class ChatService:
+    """Service class to handle chat logic, GPT integration, and conversation persistence."""
+
     def __init__(self, openai_client: OpenAI):
+        """
+        Initialize the ChatService.
+
+        Args:
+            openai_client (OpenAI): OpenAI client instance used for generating responses.
+        """
         self.openai_client = openai_client
 
     def handle_message(self, user_message: Optional[str]) -> Tuple[str, bool]:
         """
-        Handles incoming user messages, interacting with
-        the OpenAI API and updating the conversation.
+        Handle incoming user messages.
+
+        Interacts with the OpenAI API and updates the user conversation in MongoDB.
 
         Args:
             user_message (str): The user's message.
 
         Returns:
-            tuple: The response from the chatbot
-            and a boolean indicating if this is a new conversation.
+            tuple: The GPT response and a boolean indicating if it’s a new conversation.
         """
         if not user_message:
             return "No message received", False
@@ -126,16 +136,13 @@ class ChatService:
     @staticmethod
     def update_conversation(user_id: str, conversation_id: str, message: str, role: str) -> None:
         """
-        Updates the conversation with a new message.
+        Update the conversation with a new message.
 
         Args:
             conversation_id (str): The ID of the conversation.
             user_id (str): The ID of the user.
             message (str): The message content.
-            role (str): The role of the message sender ("user" or "assistant").
-
-        Returns:
-            None
+            role (str): The sender role ("user" or "assistant").
         """
         current_time = datetime.utcnow()
 

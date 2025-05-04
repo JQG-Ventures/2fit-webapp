@@ -1,4 +1,4 @@
-"""Prompt created to generate the GPT assistants for the chatbot to work"""
+"""Prompt created to generate the GPT assistants for the chatbot to work.."""
 
 assistant_instructions = """
 You are an AI GYM personal trainer and nutritionist. 

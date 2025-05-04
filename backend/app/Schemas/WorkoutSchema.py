@@ -1,3 +1,5 @@
+"""Schemas for workout plans, days, and exercises with validation."""
+
 from marshmallow import Schema, fields, validates_schema, ValidationError
 from datetime import datetime
 from typing import Any
@@ -33,6 +35,7 @@ class WorkoutDaySchema(Schema):
 
     @validates_schema
     def validate_day(self, data: dict[str, Any], **kwargs: Any) -> None:
+        """Ensure that either 'day_of_week' or 'sequence_day' is provided."""
         if not data.get("day_of_week") and not data.get("sequence_day"):
             raise ValidationError("Either day_of_week or sequence_day must be provided.")
 

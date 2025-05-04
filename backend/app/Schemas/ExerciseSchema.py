@@ -1,3 +1,5 @@
+"""Schema for validating exercise-related fields and structure."""
+
 from marshmallow import Schema, fields
 
 

@@ -1,3 +1,5 @@
+"""Defines user-related API endpoints for workouts, profiles, authentication codes, and more."""
+
 from random import random
 
 from twilio.base.exceptions import TwilioRestException
@@ -152,6 +154,8 @@ profile_image_response_model = api.model(
 
 @api.route("/workouts/complete")
 class CompleteWorkoutResource(Resource):
+    """Handles saving completed workout data for a user."""
+
     @api.expect(completed_workout_model)
     @jwt_required()
     @api.response(200, "Workout saved successfully", response_model)
@@ -194,6 +198,8 @@ class CompleteWorkoutResource(Resource):
 
 @api.route("/workouts/progress")
 class UserProgressResource(Resource):
+    "Handles retrieving and updating user workout progress."
+
     @api.param("workout_plan_id", "ID of the workout plan", required=True)
     @jwt_required()
     @api.response(200, "Progress retrieved successfully", progress_success_response_model)
@@ -292,6 +298,8 @@ motivational_messages_response_model = api.model(
 
 @api.route("/messages/motivational")
 class MotivationalMessagesResource(Resource):
+    "Generates motivational messages for the user."
+
     @api.response(
         200,
         "Motivational messages retrieved successfully",
@@ -324,6 +332,8 @@ class MotivationalMessagesResource(Resource):
 
 @api.route("/profile")
 class UserResource(Resource):
+    "Handles profile-related operations for a user."
+
     method_decorators = [jwt_required()]
 
     @api.doc("get_user_profile_by_id")
@@ -392,14 +402,14 @@ send_code_model = api.model(
 
 @api.route("/send-code")
 class SendCodeResource(Resource):
+    "Sends verification codes via SMS."
+
     @api.expect(send_code_model)
     @api.response(200, "Verification code sent successfully", response_model)
     @api.response(400, "Phone number is required", response_model)
     @api.response(500, "Error sending verification code", response_model)
     def post(self):
-        """
-        Send verification code to user phone number.
-        """
+        """Send verification code to user phone number."""
         phone_number = request.json.get("number")
         if not phone_number:
             return {
@@ -448,6 +458,8 @@ verify_code_model = api.model(
 
 @api.route("/verify-code")
 class VerifyCodeResource(Resource):
+    "Verifies user-entered authentication codes."
+
     @api.expect(verify_code_model)
     @api.response(200, "Code verified successfully", response_model)
     @api.response(400, "Phone number and code are required", response_model)
@@ -492,6 +504,8 @@ conversation_response_model = api.model(
 
 @api.route("/conversation")
 class UserConversationResource(Resource):
+    "Retrieves chatbot conversation history for the user."
+
     @api.doc("get_conversation_by_user_id")
     @jwt_required()
     @api.response(
@@ -519,6 +533,8 @@ class UserConversationResource(Resource):
 
 @api.route("/by-number/<string:number>")
 class UserByNumberResource(Resource):
+    "Fetches user information using phone number."
+
     @api.response(200, "User information retrieved successfully", user_response_model)
     @api.response(404, "User not found", response_model)
     @api.response(500, "Internal server error", response_model)
@@ -544,6 +560,8 @@ class UserByNumberResource(Resource):
 
 @api.route("/by-email/<string:email>")
 class UserByEmailResource(Resource):
+    "Fetches user information using email address."
+
     @api.response(200, "User information retrieved successfully", user_response_model)
     @api.response(200, "User information retrieved successfully", user_response_model)
     @api.response(404, "User not found", response_model)
@@ -570,6 +588,8 @@ class UserByEmailResource(Resource):
 
 @api.route("/active-plans")
 class UserResourcePlans(Resource):
+    "Retrieves active workout plans for the user."
+
     @jwt_required()
     @api.response(200, "User plans retrieved successfully", response_model)
     @api.response(404, "Plans not found", response_model)
@@ -593,6 +613,8 @@ class UserResourcePlans(Resource):
 
 @api.route("/profile/image")
 class UserProfileImageResource(Resource):
+    "Handles uploading and saving user profile images."
+
     @jwt_required()
     @api.response(200, "Profile image updated successfully", profile_image_response_model)
     @api.response(400, "Invalid input", profile_image_response_model)
