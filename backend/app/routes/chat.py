@@ -36,7 +36,8 @@ def before_request() -> Optional[Tuple[dict, int]]:
 @api.route("/chat")
 class ChatBotResource(Resource):
     """
-    Handles user interaction with the chatbot, including message handling and response generation.
+    Handles user interaction with the chatbot,
+    xincluding message handling and response generation.
     """
 
     @api.expect(chat_bot_model)
