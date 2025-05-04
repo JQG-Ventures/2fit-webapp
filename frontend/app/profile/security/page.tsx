@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import ToggleButton from '../../_components/profile/togglebutton';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa';
@@ -11,7 +11,7 @@ import ChangePasswordModal from '../../_components/profile/ChangePasswordModal';
 import Modal from '../../_components/profile/modal';
 import LoadingScreen from '../../_components/animations/LoadingScreen';
 import { useLoading } from '../../_providers/LoadingProvider';
-import { useResetPassword } from '../../_services/userService';
+import { useResetPassword, useUpdateProfile } from '../../_services/userService';
 
 interface SecurityItemProps {
     label: string;
@@ -40,12 +40,14 @@ const Security: React.FC = () => {
 
     const resetPassword = useResetPassword();
 
-    const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
+    const getProfileUrl = '/api/users/profile';
     const {
         data: userData,
         isLoading,
         isError,
     } = useApiGet<{ status: string; message: any }>([], getProfileUrl);
+
+    const updateSecuritySettings = useUpdateProfile();
 
     const [securitySettings, setSecuritySettings] = useState({
         faceID: false,
@@ -58,6 +60,16 @@ const Security: React.FC = () => {
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
     const [passwordUpdateError, setPasswordUpdateError] = useState('');
 
+    const securityItems = useMemo(
+        () => [
+            { label: t('profile.Security.FaceID'), key: 'face_id' },
+            { label: t('profile.Security.RememberMe'), key: 'remember_me' },
+            { label: t('profile.Security.TouchID'), key: 'touch_id' },
+            { label: t('profile.Security.GoogleAuthenticator'), hasArrow: true },
+        ],
+        [t],
+    );
+
     useEffect(() => {
         setLoading(isLoading);
         if (userData?.message?.settings?.security) {
@@ -69,12 +81,35 @@ const Security: React.FC = () => {
         }
     }, [isLoading, setLoading, userData]);
 
-    const handleToggle = (key: keyof typeof securitySettings) => {
-        setSecuritySettings((prevSettings) => ({
-            ...prevSettings,
-            [key]: !prevSettings[key],
-        }));
-    };
+    const handleToggle = useCallback(
+        async (type: keyof typeof securitySettings) => {
+            const previousState = securitySettings[type];
+            const newStatus = !previousState;
+            const updatedSecuritySettings = { ...securitySettings, [type]: newStatus };
+
+            setSecuritySettings(updatedSecuritySettings);
+
+            try {
+                const updatedProfile = {
+                    settings: {
+                        security_settings: {
+                            ...updatedSecuritySettings,
+                        },
+                        notifications: userData?.message.settings.notifications,
+                        nutrition_enabled: userData?.message.settings.nutrition_enabled,
+                        language_preference: userData?.message.settings.language_preference,
+                    },
+                };
+
+                const response = await updateSecuritySettings.mutateAsync(updatedProfile);
+            } catch (error) {
+                console.error(error);
+                setSecuritySettings({ ...securitySettings, [type]: previousState });
+                setErrorMessage(t('profile.Notifications.ErrorMessage'));
+            }
+        },
+        [securitySettings, userData, updateSecuritySettings, t],
+    );
 
     const handlePasswordChangeSubmit = async (newPassword: string) => {
         try {
@@ -91,6 +126,7 @@ const Security: React.FC = () => {
             setSuccessMessage(response.message);
             setIsChangePasswordModalOpen(false);
         } catch (error) {
+            console.error(error);
             setPasswordUpdateError(t('profile.Security.Failedchangepswd'));
         }
     };
@@ -105,13 +141,6 @@ const Security: React.FC = () => {
             />
         );
     }
-
-    const securityItems = [
-        { label: t('profile.Security.FaceID'), key: 'faceID' },
-        { label: t('profile.Security.RememberMe'), key: 'rememberMe' },
-        { label: t('profile.Security.TouchID'), key: 'touchID' },
-        { label: t('profile.Security.GoogleAuthenticator'), hasArrow: true },
-    ];
 
     return (
         <div className="flex flex-col justify-between items-center bg-white h-screen p-14 lg:pt-[10vh]">

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa';
 import ToggleButton from '../../_components/profile/togglebutton';
@@ -40,6 +40,16 @@ const Notification: React.FC = () => {
 
     const updateNotifications = useUpdateProfile();
 
+    const notificationItems = useMemo(
+        () => [
+            { label: t('profile.Notifications.GeneralNotifications'), key: 'general' },
+            { label: t('profile.Notifications.AppUpdates'), key: 'updates' },
+            { label: t('profile.Notifications.NewServicesAvailable'), key: 'services' },
+            { label: t('profile.Notifications.NewTipsAvailable'), key: 'tips' },
+        ],
+        [t],
+    );
+
     const [notifications, setNotifications] = useState({
         general: false,
         updates: false,
@@ -62,30 +72,34 @@ const Notification: React.FC = () => {
         }
     }, [isLoading, setLoading, userData]);
 
-    const handleToggle = async (type: keyof typeof notifications) => {
-        const previousState = notifications[type];
-        const newStatus = !previousState;
-        const updatedNotifications = { ...notifications, [type]: newStatus };
+    const handleToggle = useCallback(
+        async (type: keyof typeof notifications) => {
+            const previousState = notifications[type];
+            const newStatus = !previousState;
+            const updatedNotifications = { ...notifications, [type]: newStatus };
 
-        setNotifications(updatedNotifications);
+            setNotifications(updatedNotifications);
 
-        try {
-            const updatedProfile = {
-                settings: {
-                    notifications: {
-                        ...updatedNotifications,
+            try {
+                const updatedProfile = {
+                    settings: {
+                        notifications: {
+                            ...updatedNotifications,
+                        },
+                        security_settings: userData?.message.settings.security_settings,
+                        nutrition_enabled: userData?.message.settings.nutrition_enabled,
+                        language_preference: userData?.message.settings.language_preference,
                     },
-                    nutrition_enabled: userData?.message.settings.nutrition_enabled,
-                    language_preference: userData?.message.settings.language_preference,
-                },
-            };
+                };
 
-            const response = await updateNotifications.mutateAsync(updatedProfile);
-        } catch (error) {
-            setNotifications({ ...notifications, [type]: previousState });
-            setErrorMessage(t('profile.Notifications.ErrorMessage'));
-        }
-    };
+                const response = await updateNotifications.mutateAsync(updatedProfile);
+            } catch (error) {
+                setNotifications({ ...notifications, [type]: previousState });
+                setErrorMessage(t('profile.Notifications.ErrorMessage'));
+            }
+        },
+        [notifications, userData, updateNotifications, t],
+    );
 
     if (isLoading) return <LoadingScreen />;
     if (isError) {
@@ -97,13 +111,6 @@ const Notification: React.FC = () => {
             />
         );
     }
-
-    const notificationItems = [
-        { label: t('profile.Notifications.GeneralNotifications'), key: 'general' },
-        { label: t('profile.Notifications.AppUpdates'), key: 'updates' },
-        { label: t('profile.Notifications.NewServicesAvailable'), key: 'services' },
-        { label: t('profile.Notifications.NewTipsAvailable'), key: 'tips' },
-    ];
 
     return (
         <div className="flex flex-col justify-between items-center bg-white h-screen p-14 lg:pt-[10vh]">
