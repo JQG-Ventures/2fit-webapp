@@ -75,7 +75,11 @@ class ChallengeListResource(Resource):
     @api.response(201, "Challenge created")
     def post(self) -> Tuple[dict[str, Any], int]:
         try:
-            data = request.json
+            data = request.get_json()
+
+            if data is None:
+                return {"status": "error", "message": "Body JSON requerido"}, 400
+
             challenge = challenge_schema.load(data)
             challenge_id = ChallengeModel.create(challenge)
             return {"status": "success", "message": str(challenge_id)}, 201
@@ -106,7 +110,11 @@ class ChallengeResource(Resource):
     @api.response(200, "Challenge updated")
     def put(self, challenge_id: str) -> Tuple[dict[str, Any], int]:
         try:
-            data = request.json
+            data = request.get_json()
+
+            if data is None:
+                return {"status": "error", "message": "Body JSON requerido"}, 400
+
             challenge_data = challenge_schema.load(data)
             updated = ChallengeModel.update(challenge_id, challenge_data)
             if updated:

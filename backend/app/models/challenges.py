@@ -101,7 +101,7 @@ class ChallengeModel:
                         updated_exercises.append(enriched)
                 day["exercises"] = updated_exercises
 
-            return challenge
+            return ChallengeSchema.load(challenge)  # type: ignore[arg-type]
         except Exception as e:
             logging.exception(f"Error fetching challenge by ID, error {e}")
             raise
@@ -122,7 +122,7 @@ class ChallengeModel:
             data = ChallengeSchema.dump(challenge)
             data["updated_at"] = datetime.now().isoformat()
             result = mongo.db.challenges.update_one({"_id": ObjectId(challenge_id)}, {"$set": data})
-            return result.modified_count > 0
+            return bool(result.modified_count > 0)
         except Exception as e:
             logging.exception(f"Error updating challenge, error {e}")
             raise
@@ -134,7 +134,7 @@ class ChallengeModel:
                 {"_id": ObjectId(challenge_id)},
                 {"$set": {"is_active": False, "updated_at": datetime.now().isoformat()}},
             )
-            return result.modified_count > 0
+            return bool(result.modified_count > 0)
         except Exception as e:
             logging.exception(f"Error deleting challenge, error {e}")
             raise
