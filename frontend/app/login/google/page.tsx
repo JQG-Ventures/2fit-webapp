@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 export default function GoogleLoginCallback() {
+    const { t } = useTranslation('global');
     const router = useRouter();
     const { data: session, status } = useSession();
     const [error, setError] = useState<string | null>(null);
@@ -46,10 +48,10 @@ export default function GoogleLoginCallback() {
                 if (!res.ok) {
                     const errorMessage =
                         res.status === 404
-                            ? 'Invalid user'
+                            ? t('LoginPage.InvalidUser')
                             : res.status === 400
-                              ? 'User not registered with Google'
-                              : 'There was a login error, try again later';
+                              ? t('LoginPage.NotRegisteredGoogle')
+                              : t('LoginPage.googleError');
 
                     setError(errorMessage);
                     setLoading(false);
@@ -75,12 +77,12 @@ export default function GoogleLoginCallback() {
         }
 
         handleGoogleLogin();
-    }, [status, session, hasSentRequest, router]);
+    }, [status, session, hasSentRequest, router, t]);
 
     if (status === 'loading' || loading) {
         return (
             <div className="flex items-center justify-center h-screen">
-                <p>Verifying Google login...</p>
+                <p>{t('LoginPage.GoogleVerification')}</p>
             </div>
         );
     }
@@ -93,7 +95,7 @@ export default function GoogleLoginCallback() {
                     onClick={() => router.push('/login')}
                     className="bg-black text-white px-6 py-3 rounded-md"
                 >
-                    Go back to Login
+                    {t('LoginPage.BackToLogin')}
                 </button>
             </div>
         );

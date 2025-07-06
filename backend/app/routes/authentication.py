@@ -1,5 +1,13 @@
-"""Defines auth endpoints for user registration, login, token refresh, and Google login."""
+"""
+Defines authentication endpoints for.
 
+- User registration and login
+- Token refresh and Google authentication
+- Storing OneSignal player IDs for push notifications
+"""
+
+from app.Schemas.onesignal import PlayerIDSchema
+from app.models.notification_device import NotificationDevice
 from flask import Blueprint, request
 from flask_restx import Api, Resource, fields
 from flask_jwt_extended import (
@@ -20,6 +28,9 @@ import app.settings as s
 from app.utils.users import validate_user_by_credentials
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+from app.extensions import mongo
+
+from datetime import datetime
 
 
 auth_bp = Blueprint("auth_bp", __name__)
@@ -402,3 +413,56 @@ class GoogleLoginResource(Resource):
                 "status": "error",
                 "message": f"Could not handle Google login, {e}",
             }, 500
+
+
+@api.route("/notifications/player-id")
+class PlayerIDResource(Resource):
+    """Handles saving OneSignal player IDs for push notifications."""
+
+    method_decorators = [jwt_required()]
+    schema = PlayerIDSchema()
+
+    @api.doc("save_player_id")
+    @api.response(200, "Player ID saved successfully")
+    @api.response(400, "Invalid input")
+    @api.response(500, "Internal Server Error")
+    def post(self):
+        """
+        Save or update a OneSignal Player ID for push notifications.
+
+        Body:
+            JSON with "player_id" and "platform".
+
+        Returns:
+            Success message if stored or updated.
+        """
+        try:
+            raw_data = request.get_json()
+            data = self.schema.load(raw_data)
+
+            user_id = get_jwt_identity()
+            player_id = data["player_id"]
+            platform = data["platform"]
+
+            existing = mongo.db.notification_devices.find_one(
+                {
+                    "user_id": user_id,
+                    "player_id": player_id,
+                }
+            )
+
+            if existing:
+                mongo.db.notification_devices.update_one(
+                    {"_id": existing["_id"]}, {"$set": {"last_used": datetime.utcnow()}}
+                )
+            else:
+                device = NotificationDevice(user_id=user_id, player_id=player_id, platform=platform)
+                mongo.db.notification_devices.insert_one(device.to_dict())
+
+            return {"status": "success", "message": "Player ID saved"}, 200
+
+        except ValidationError as ve:
+            return {"status": "error", "message": ve.messages}, 400
+        except Exception as e:
+            logger.exception(f"Error saving player ID, error {e}")
+            return {"status": "error", "message": "Failed to save player ID"}, 500

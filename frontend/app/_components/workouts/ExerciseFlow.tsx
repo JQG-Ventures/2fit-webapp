@@ -1,17 +1,22 @@
-import React, { useReducer, useEffect, useCallback, useState } from 'react';
+import React, { useReducer, useEffect, useCallback, useState, useMemo } from 'react';
 import CountdownTimer from '../animations/CountdownTimer';
 import ExerciseView from './ExerciseView';
 import RestView from './RestView';
 import CompleteView from './CompleteView';
 import { useTranslation } from 'react-i18next';
-import { useSendProgressToBackend, useSendCompleteToBackend } from '../../_services/userService';
+import {
+    useSendProgressToBackend,
+    useSendCompleteToBackend,
+    useSendChallengeProgress,
+    useSendChallengeComplete,
+} from '@/app/_services/userService';
 import { Action, ExerciseFlowProps, State, ExerciseProgress } from '@/app/_interfaces/ExerciseFlow';
+import ConfirmationModal from '../modals/confirmationModal';
 
 const initialState: State = {
     currentExerciseIndex: 0,
     currentSet: 1,
     isRest: false,
-    isCountdown: true,
     isCompleted: false,
     restDuration: 0,
     nextExerciseDetails: null,
@@ -19,58 +24,63 @@ const initialState: State = {
     exercisesProgress: [],
     exerciseStartTime: null,
     workoutStartTime: null,
+    previousStateBeforeRest: null,
+    exerciseTimerKey: Date.now(),
 };
 
 const formatDuration = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-
-    if (hours === 0) {
-        return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-    }
-
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    return hours === 0
+        ? `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+        : `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 };
 
 const reducer = (state: State, action: Action): State => {
     switch (action.type) {
-        case 'END_COUNTDOWN':
-            return {
-                ...state,
-                isCountdown: false,
-                workoutStartTime: state.workoutStartTime || Date.now(),
-                exerciseStartTime: Date.now(),
-            };
         case 'START_REST':
             return {
                 ...state,
                 isRest: true,
                 restDuration: action.restDuration!,
                 nextExerciseDetails: action.nextExercise!,
+                previousStateBeforeRest: {
+                    exerciseIndex: state.currentExerciseIndex,
+                    set: state.currentSet,
+                },
             };
         case 'START_EXERCISE':
             return {
                 ...state,
                 isRest: false,
-                currentSet: action.currentSet!,
-                exerciseStartTime: state.exerciseStartTime ?? Date.now(),
+                currentSet: action.currentSet,
+                workoutStartTime: state.workoutStartTime || Date.now(),
+                exerciseStartTime: Date.now(),
+                previousStateBeforeRest: null,
             };
         case 'COMPLETE_EXERCISE':
             return { ...state, exerciseStartTime: null };
         case 'SET_EXERCISE_INDEX':
-            return { ...state, currentExerciseIndex: action.index! };
+            return { ...state, currentExerciseIndex: action.index };
         case 'SET_CURRENT_SET':
-            return { ...state, currentSet: action.set! };
+            return { ...state, currentSet: action.set };
         case 'ADD_EXERCISE_PROGRESS':
             return {
                 ...state,
-                exercisesProgress: [...state.exercisesProgress, action.progress!],
+                exercisesProgress: [...state.exercisesProgress, action.progress],
             };
         case 'COMPLETE_WORKOUT':
             return { ...state, isCompleted: true };
         case 'SET_COMPLETE_MESSAGE':
-            return { ...state, completeMessage: action.message! };
+            return { ...state, completeMessage: action.message };
+        case 'CLEAR_PREVIOUS_STATE':
+            return { ...state, previousStateBeforeRest: null };
+        case 'RESET_EXERCISE_TIMER':
+            return {
+                ...state,
+                exerciseTimerKey: Date.now(),
+            };
         default:
             return state;
     }
@@ -83,16 +93,18 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
     workoutType,
     userId,
     workoutPlanId,
+    sequenceDay,
 }) => {
+    console.log('Deubging Exercise flow', exercises, workoutType, workoutPlanId);
     const { t } = useTranslation('global');
     const [state, dispatch] = useReducer(reducer, initialState);
     const [formattedDuration, setFormattedDuration] = useState<string>('');
+    const [showExitConfirmModal, setShowExitConfirmModal] = useState(false);
 
     const {
         currentExerciseIndex,
         currentSet,
         isRest,
-        isCountdown,
         isCompleted,
         restDuration,
         nextExerciseDetails,
@@ -100,26 +112,44 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
         exercisesProgress,
         exerciseStartTime,
         workoutStartTime,
+        exerciseTimerKey,
     } = state;
 
     const totalExercises = exercises.length;
-    const currentExercise = exercises[currentExerciseIndex];
-    const totalSets = currentExercise?.sets || 1;
+    const currentExercise = useMemo(
+        () => exercises[currentExerciseIndex],
+        [exercises, currentExerciseIndex],
+    );
+    const totalSets = useMemo(() => currentExercise?.sets || 1, [currentExercise]);
     const defaultRestSeconds = currentExercise?.rest_seconds || 60;
+
+    // Hooks para workout y challenge:
     const { mutate: sendProgress } = useSendProgressToBackend();
     const { mutate: completeWorkout } = useSendCompleteToBackend();
+    const { mutate: sendChallengeProgress } = useSendChallengeProgress();
+    const { mutate: completeChallenge } = useSendChallengeComplete();
+
+    const totalExpectedSets = exercises.reduce((acc, ex) => acc + ex.sets, 0);
+    const totalCompletedSets = state.exercisesProgress.reduce(
+        (acc, ex) => acc + ex.sets_completed,
+        0,
+    );
+
+    const getWorkoutProgressPercent = () => {
+        return Math.floor((totalCompletedSets / totalExpectedSets) * 100);
+    };
 
     const updateExerciseProgress = useCallback(() => {
         if (exerciseStartTime === null) return;
 
-        const exerciseDuration = Math.floor((Date.now() - exerciseStartTime) / 1000);
+        const elapsed = Math.floor((Date.now() - exerciseStartTime) / 1000);
         const repsCompleted = Array(totalSets).fill(currentExercise.reps);
 
         const exerciseProgress: ExerciseProgress = {
             exercise_id: currentExercise.exercise_id!,
             sets_completed: totalSets,
             reps_completed: repsCompleted,
-            duration_seconds: exerciseDuration,
+            duration_seconds: elapsed,
             calories_burned: 0,
             is_completed: true,
         };
@@ -127,6 +157,30 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
         dispatch({ type: 'ADD_EXERCISE_PROGRESS', progress: exerciseProgress });
         dispatch({ type: 'COMPLETE_EXERCISE' });
 
+        if (workoutType === 'challenge') {
+            console.log('currentExercise', currentExercise);
+            // Parsea workoutPlanId como “challengeId” (puedes pasarlo directamente desde el componente padre)
+            const challenge_id = workoutPlanId;
+            const sequence_day = Number(sequenceDay);
+
+            sendChallengeProgress(
+                {
+                    queryParams: { challenge_id },
+                    body: {
+                        sequence_day,
+                        exercises: [exerciseProgress],
+                    },
+                },
+                {
+                    onSuccess: () => {
+                        onExerciseComplete(exerciseProgress.exercise_id);
+                    },
+                    onError: (err) => console.error('Error guardando progreso challenge:', err),
+                },
+            );
+        }
+
+        // Si es un “myPlan” => POST a /workouts/progress
         if (workoutType === 'myPlan') {
             const payload = {
                 exercises: [exerciseProgress],
@@ -140,11 +194,12 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
                     body: payload,
                 },
                 {
-                    onSuccess: (response) => console.log('Progress saved:', response),
-                    onError: (error) => console.error('Error saving progress:', error.message),
+                    onSuccess: () => {
+                        onExerciseComplete(exerciseProgress.exercise_id!);
+                    },
+                    onError: (error) => console.error('Error guardando progreso workout:', error),
                 },
             );
-            onExerciseComplete(currentExercise.exercise_id!);
         }
     }, [
         exerciseStartTime,
@@ -152,6 +207,8 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
         currentExercise,
         workoutType,
         workoutPlanId,
+        sequenceDay,
+        sendChallengeProgress,
         onExerciseComplete,
         sendProgress,
     ]);
@@ -170,7 +227,6 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
         } else {
             if (!isRest) {
                 updateExerciseProgress();
-
                 if (currentExerciseIndex < totalExercises - 1) {
                     dispatch({
                         type: 'START_REST',
@@ -201,88 +257,78 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
     ]);
 
     const handleBack = useCallback(() => {
-        if (isRest) {
-            if (currentSet > 1) {
-                dispatch({ type: 'SET_CURRENT_SET', set: currentSet - 1 });
-                dispatch({ type: 'START_EXERCISE', currentSet: currentSet - 1 });
-            } else if (currentExerciseIndex > 0) {
-                const previousExercise = exercises[currentExerciseIndex - 1];
-                dispatch({ type: 'SET_EXERCISE_INDEX', index: currentExerciseIndex - 1 });
-                dispatch({ type: 'SET_CURRENT_SET', set: previousExercise.sets });
-                dispatch({ type: 'START_REST', restDuration: 120, nextExercise: currentExercise });
-            } else {
-                onClose();
-            }
-        } else {
-            if (currentSet > 1) {
-                dispatch({ type: 'SET_CURRENT_SET', set: currentSet - 1 });
-                dispatch({
-                    type: 'START_REST',
-                    restDuration: defaultRestSeconds,
-                    nextExercise: null,
-                });
-            } else if (currentExerciseIndex > 0) {
-                const previousExercise = exercises[currentExerciseIndex - 1];
-                dispatch({ type: 'SET_EXERCISE_INDEX', index: currentExerciseIndex - 1 });
-                dispatch({ type: 'SET_CURRENT_SET', set: previousExercise.sets });
-                dispatch({ type: 'START_REST', restDuration: 120, nextExercise: currentExercise });
-            } else {
-                onClose();
-            }
-        }
-    }, [
-        isRest,
-        currentSet,
-        currentExerciseIndex,
-        exercises,
-        defaultRestSeconds,
-        currentExercise,
-        onClose,
-    ]);
+        setShowExitConfirmModal(true);
+    }, []);
 
     useEffect(() => {
-        if (!isRest && !isCountdown && exerciseStartTime === null) {
+        if (!isRest && exerciseStartTime === null) {
             dispatch({ type: 'START_EXERCISE', currentSet });
         }
-    }, [isRest, isCountdown, exerciseStartTime, currentSet]);
+    }, [isRest, exerciseStartTime, currentSet]);
 
     useEffect(() => {
         if (isCompleted) {
-            const totalWorkoutDuration = workoutStartTime
+            const totalDuration = workoutStartTime
                 ? Math.floor((Date.now() - workoutStartTime) / 1000)
                 : 0;
-            setFormattedDuration(formatDuration(totalWorkoutDuration));
+            setFormattedDuration(formatDuration(totalDuration));
 
-            if (workoutType === 'myPlan') {
-                dispatch({ type: 'SET_COMPLETE_MESSAGE', message: t('ExerciseFlow.completed') });
-                const timer = setTimeout(() => {
-                    dispatch({ type: 'SET_COMPLETE_MESSAGE', message: null });
-                    onClose();
-                }, 2500);
-                return () => clearTimeout(timer);
-            } else if (workoutType === 'oneDay') {
+            if (workoutType === 'challenge') {
+                const challenge_id = workoutPlanId;
+                const sequence_day = Number(sequenceDay);
+                const payload = {
+                    challenge_id,
+                    sequence_day,
+                    exercises: exercisesProgress,
+                };
+                completeChallenge(
+                    { body: payload },
+                    {
+                        onSuccess: () => {
+                            dispatch({
+                                type: 'SET_COMPLETE_MESSAGE',
+                                message: t('ExerciseFlow.completed'),
+                            });
+                            const timer = setTimeout(() => {
+                                dispatch({ type: 'SET_COMPLETE_MESSAGE', message: null });
+                                onClose();
+                            }, 2500);
+                            return () => clearTimeout(timer);
+                        },
+                        onError: (error) => console.error('Error completando challenge:', error),
+                    },
+                );
+            }
+
+            if (workoutType === 'oneDay') {
                 const payload = {
                     workout_id: workoutPlanId,
-                    duration_seconds: totalWorkoutDuration,
+                    duration_seconds: totalDuration,
                     calories_burned: 0,
                     exercises: exercisesProgress,
                     sequence_day: '1',
                     was_skipped: false,
                 };
-
                 completeWorkout(
+                    { body: payload },
                     {
-                        body: payload,
-                    },
-                    {
-                        onSuccess: (response) => console.log('Workout completed:', response),
-                        onError: (error) =>
-                            console.error('Error completing workout:', error.message),
+                        onSuccess: () => {
+                            dispatch({
+                                type: 'SET_COMPLETE_MESSAGE',
+                                message: t('ExerciseFlow.completed'),
+                            });
+                            const timer = setTimeout(() => {
+                                dispatch({ type: 'SET_COMPLETE_MESSAGE', message: null });
+                                onClose();
+                            }, 2500);
+                            return () => clearTimeout(timer);
+                        },
+                        onError: (error) => console.error('Error completando workout:', error),
                     },
                 );
+            }
 
-                dispatch({ type: 'SET_COMPLETE_MESSAGE', message: t('ExerciseFlow.completed') });
-            } else {
+            if (workoutType === 'myPlan') {
                 dispatch({ type: 'SET_COMPLETE_MESSAGE', message: t('ExerciseFlow.completed') });
                 const timer = setTimeout(() => {
                     dispatch({ type: 'SET_COMPLETE_MESSAGE', message: null });
@@ -295,12 +341,15 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
         isCompleted,
         workoutType,
         onClose,
+        exercises,
         exercisesProgress,
         t,
-        userId,
         workoutPlanId,
         workoutStartTime,
         completeWorkout,
+        completeChallenge,
+        currentExerciseIndex,
+        sequenceDay,
     ]);
 
     if (isCompleted) {
@@ -316,30 +365,13 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
         return (
             <>
                 {completeMessage && (
-                    <div
-                        className="fixed inset-0 flex items-center justify-center pointer-events-none"
-                        style={{ zIndex: 100 }}
-                    >
+                    <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-[100]">
                         <div className="bg-green-500 text-white text-lg p-8 rounded-lg shadow-2xl pointer-events-auto">
                             {completeMessage}
                         </div>
                     </div>
                 )}
             </>
-        );
-    }
-
-    if (isCountdown) {
-        return (
-            <div className="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
-                <CountdownTimer
-                    title={t('ExerciseFlow.ready')}
-                    duration={5}
-                    size={240}
-                    strockWidth={16}
-                    onComplete={() => dispatch({ type: 'END_COUNTDOWN' })}
-                />
-            </div>
         );
     }
 
@@ -351,9 +383,15 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
                     onNext={handleNext}
                     onBack={handleBack}
                     nextExercise={nextExerciseDetails!}
+                    exercises={exercises}
+                    currentExerciseIndex={
+                        currentSet < totalSets ? currentExerciseIndex : currentExerciseIndex + 1
+                    }
+                    currentSet={currentSet < totalSets ? currentSet + 1 : 1}
                 />
             ) : (
                 <ExerciseView
+                    key={exerciseTimerKey}
                     exercise={{
                         ...currentExercise,
                         currentSet,
@@ -361,8 +399,23 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
                     }}
                     onNext={handleNext}
                     onBack={handleBack}
+                    currentExerciseIndex={currentExerciseIndex}
+                    exercises={exercises}
+                    currentSet={currentSet}
                 />
             )}
+
+            <ConfirmationModal
+                isOpen={showExitConfirmModal}
+                onClose={() => {
+                    setShowExitConfirmModal(false);
+                    onClose();
+                }}
+                onConfirm={() => setShowExitConfirmModal(false)}
+                question={`${getWorkoutProgressPercent()}${t('ExerciseFlow.exitConfirmation')}`}
+                confirmText={t('ExerciseFlow.exitCancel')}
+                cancelText={t('ExerciseFlow.exitConfirm')}
+            />
         </div>
     );
 };

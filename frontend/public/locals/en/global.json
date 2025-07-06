@@ -25,7 +25,11 @@
         "signUp": "Sign Up",
         "googleUserError": "No registered user, please sign up!",
         "googleError": "There was an error with Google, try again later...",
-        "googleAuthError": "User not registered with Google"
+        "googleAuthError": "User not registered with Google",
+        "InvalidUser": "User not registered, please sign up!",
+        "NotRegisteredGoogle": "User not registered with Google, please sign up!",
+        "GoogleVerification": "Verifying Google login...",
+        "BackToLogin": "Go back to login"
     },
     "RegisterPage": {
         "registeredGoogle": "Account already registered, please login.",
@@ -302,6 +306,22 @@
         "weeklyRoutine": "Weekly routine",
         "workoutProgress": "Workout progress",
         "fetchingError": "Error fetching progress",
+        "continue": "Continue",
+        "challenges": {
+            "title": "Challenges",
+            "schedule": "Schedule",
+            "week": "Week",
+            "rest": "Rest",
+            "workout": "Workout",
+            "equipment": "Equipment",
+            "startChallenge": "Start Challenge",
+            "day": "Day",
+            "of": "de",
+            "all": "All",
+            "days": "days",
+            "activeChallenges": "Active Challenges",
+            "continueChallenge": "Continue challenge"
+        },
         "plan": {
             "workoutAlreadySaved": "Workout already saved!",
             "workoutSaved": "Workout Saved!",
@@ -309,11 +329,12 @@
             "workoutActivity": "Workout Activity",
             "seeAll": "See All",
             "secs": "Seconds",
-            "start": "START",
+            "start": "Start",
             "rest": "Rest",
             "getReady": "Get Ready!",
             "startOver": "Start Over",
             "previous": "Previous",
+            "exercises": "Exercises",
             "next": "Next",
             "pause": "Pause",
             "resume": "Resume",
@@ -346,7 +367,12 @@
     },
     "ExerciseFlow": {
         "ready": "Get Ready!",
-        "completed": "Exercise completed!"
+        "completed": "Exercise completed!",
+        "complete": "Complete exercise",
+        "exitConfirmation": "% Completed Do you wanna exit?",
+        "exitConfirm": "Exit",
+        "exitCancel": "Continue",
+        "restIndicator": "Rest"
     },
     "RestView": {
         "rest": "Take a rest",

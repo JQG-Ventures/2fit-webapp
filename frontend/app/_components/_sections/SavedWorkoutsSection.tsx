@@ -29,7 +29,6 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
     const [savedWorkouts, setSavedWorkouts] = useState<Workout[]>(workouts);
-    console.log(workouts, savedWorkouts);
 
     const handleHeartClick = (workout: Workout) => {
         setSelectedWorkout(workout);

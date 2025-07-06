@@ -178,3 +178,52 @@ export const updatePassword = async (contact: string, code: string, newPassword:
         throw error;
     }
 };
+
+export const useRegisterPlayerId = () => {
+    return useApiPost<
+        {
+            body: { player_id: string; platform: 'web' | 'ios' | 'android' };
+        },
+        { status: string; message: string }
+    >('/api/auth/notifications/player-id');
+};
+
+export const useSendChallengeProgress = () => {
+    return useApiPost<
+        {
+            queryParams: { challenge_id: string };
+            body: {
+                sequence_day: number;
+                exercises: {
+                    exercise_id: string;
+                    sets_completed: number;
+                    reps_completed: number[];
+                    duration_seconds: number;
+                    calories_burned: number;
+                    is_completed: boolean;
+                }[];
+            };
+        },
+        { status: string; message: string }
+    >('/api/challenges/challenges/progress');
+};
+
+export const useSendChallengeComplete = () => {
+    return useApiPost<
+        {
+            body: {
+                challenge_id: string;
+                sequence_day: number;
+                exercises: {
+                    exercise_id: string;
+                    sets_completed: number;
+                    reps_completed: number[];
+                    duration_seconds: number;
+                    calories_burned: number;
+                    is_completed: boolean;
+                }[];
+            };
+        },
+        { status: string; message: string }
+    >('/api/challenges/challenges/complete');
+};

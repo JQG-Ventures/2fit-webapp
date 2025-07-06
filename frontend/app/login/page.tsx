@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FaApple, FaFacebook, FaGoogle } from 'react-icons/fa';
 import { IoChevronBack } from 'react-icons/io5';
 import { FiMail, FiLock } from 'react-icons/fi';
-import { useSession, signIn } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import ButtonWithSpinner from '../_components/others/ButtonWithSpinner';
 import InputWithIcon from '../_components/form/InputWithIcon';
 import { IconType } from 'react-icons';

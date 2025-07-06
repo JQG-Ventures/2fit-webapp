@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 import ChangePasswordModal from '../../_components/profile/ChangePasswordModal';
 import Modal from '../../_components/profile/modal';
 import LoadingScreen from '../../_components/animations/LoadingScreen';
-import { useLoading } from '../../_providers/LoadingProvider';
 import { useResetPassword, useUpdateProfile } from '../../_services/userService';
 
 interface SecurityItemProps {
@@ -36,7 +35,6 @@ const SecurityItem: React.FC<SecurityItemProps> = ({ label, hasArrow = false, is
 const Security: React.FC = () => {
     const router = useRouter();
     const { t } = useTranslation('global');
-    const { setLoading } = useLoading();
 
     const resetPassword = useResetPassword();
 
@@ -69,17 +67,6 @@ const Security: React.FC = () => {
         ],
         [t],
     );
-
-    useEffect(() => {
-        setLoading(isLoading);
-        if (userData?.message?.settings?.security) {
-            setSecuritySettings({
-                faceID: userData.message.settings.security.faceID,
-                rememberMe: userData.message.settings.security.rememberMe,
-                touchID: userData.message.settings.security.touchID,
-            });
-        }
-    }, [isLoading, setLoading, userData]);
 
     const handleToggle = useCallback(
         async (type: keyof typeof securitySettings) => {

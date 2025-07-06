@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { AiFillHeart, AiOutlineReload } from 'react-icons/ai';
 import SavedMessage from '../others/SavedMessage';
@@ -96,7 +98,6 @@ const ExerciseCard: React.FC<{
         }, 500);
     };
 
-    console.log('test', exercise);
     return (
         <a href={`workouts/plan/${exercise._id}`} onClick={handleRedirect}>
             <div className="min-w-[280px] h-[350px] text-white rounded-lg relative overflow-hidden group bg-gray-200">

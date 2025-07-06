@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -10,33 +11,21 @@ import { useApiGet } from '../utils/apiClient';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useSendMessage } from '../_services/userService';
 import { useTranslation } from 'react-i18next';
-import { useLoading } from '../_providers/LoadingProvider';
 
 const Chat: React.FC = () => {
     const router = useRouter();
     const { t } = useTranslation('global');
-    const { setLoading } = useLoading();
 
     const getChatUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/conversation`;
-    const {
-        data: conversationData,
-        isLoading: loading,
-        isError: error,
-    } = useApiGet<{ status: string; message: any }>(['conversationData'], getChatUrl);
+    const { data: conversationData, isError: error } = useApiGet<{ status: string; message: any }>(
+        ['conversationData'],
+        getChatUrl,
+    );
     const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
-    const {
-        data: profile,
-        isLoading: loadingProfile,
-        isError: profileError,
-    } = useApiGet<{ status: string; message: any }>(['profileData'], getProfileUrl);
-
-    useEffect(() => {
-        if (loading || loadingProfile) {
-            setLoading(true);
-        } else {
-            setLoading(false);
-        }
-    }, [loadingProfile, loading, setLoading]);
+    const { data: profile } = useApiGet<{ status: string; message: any }>(
+        ['profileData'],
+        getProfileUrl,
+    );
 
     const { mutate: sendMessage } = useSendMessage(
         `${profile?.message.code_number}${profile?.message.number}`,
@@ -102,14 +91,20 @@ const Chat: React.FC = () => {
                     </button>
                     <h1 className="text-5xl text-white font-semibold">2Fit.AI Coach</h1>
                 </div>
-                <button>
-                    <FaWhatsapp
-                        onClick={() =>
-                            window.open(`https://wa.me/${50670340514}?text=Hey 2Fit bot!`, '_blank')
+                <button
+                    onClick={() => {
+                        if (typeof window !== 'undefined') {
+                            window.open(
+                                `https://wa.me/${50670340514}?text=Hey 2Fit bot!`,
+                                '_blank',
+                            );
                         }
+                    }}
+                >
+                    <FaWhatsapp
                         className="text-white w-12 h-12"
                         title={`${t('chat.openWhatsApp')}`}
-                    ></FaWhatsapp>
+                    />
                 </button>
             </div>
             <div className="h-[90%] flex flex-col justify-between items-center w-full">

@@ -8,26 +8,22 @@ import Image from 'next/image';
 import ToggleButton from '../_components/profile/togglebutton';
 import { MdModeEditOutline } from 'react-icons/md';
 import { BsMoon } from 'react-icons/bs';
-import Modal from '../_components/profile/modal';
 import SettingItem from '../_components/others/SettingItem';
 import { CiUser, CiBellOn, CiLock, CiCircleQuestion } from 'react-icons/ci';
 import { useApiGet } from '../utils/apiClient';
 import { useTranslation } from 'react-i18next';
-import { useLoading } from '../_providers/LoadingProvider';
 import { useUploadProfileImage } from '../_services/userService';
 
 const ProfilePage: React.FC = () => {
     const { t } = useTranslation('global');
     const router = useRouter();
-    const { setLoading } = useLoading();
 
     const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
-    const {
-        data: profile,
-        isLoading: loadingProfile,
-        isError: profileError,
-        refetch,
-    } = useApiGet<{ status: string; message: any }>([], getProfileUrl);
+    const { data: profile, refetch } = useApiGet<{ status: string; message: any }>(
+        ['user-profile'],
+        getProfileUrl,
+        { suspense: true },
+    );
 
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [loadingSetting, setLoadingSetting] = useState<string | null>(null);
@@ -45,10 +41,6 @@ const ProfilePage: React.FC = () => {
         ],
         [],
     );
-
-    useEffect(() => {
-        setLoading(loadingProfile);
-    }, [loadingProfile, setLoading]);
 
     const handleLogout = useCallback(async () => {
         setIsLoggingOut(true);
@@ -95,20 +87,6 @@ const ProfilePage: React.FC = () => {
         },
         [refetch, t, updateProfileImage],
     );
-
-    if (profileError || imageError) {
-        return (
-            <Modal
-                title="Error"
-                message={imageError ? imageError : t('profile.errorFetching')}
-                onClose={() => router.push('/home')}
-            />
-        );
-    }
-
-    if (loadingProfile) {
-        return null;
-    }
 
     return (
         <div className="flex flex-col justify-between items-center bg-gray-50 h-screen p-10 lg:pt-[10vh]">

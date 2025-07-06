@@ -36,12 +36,14 @@ axiosInstance.interceptors.response.use(
             if (!session?.user?.token) {
                 const excludedRoutes = ['/login', '/re-auth', '/register', '/login/google'];
 
-                if (
-                    window.location.pathname !== '/' &&
-                    !excludedRoutes.some((route) => window.location.pathname === route) &&
-                    !window.location.pathname.startsWith('/register/')
-                ) {
-                    window.location.href = '/re-auth';
+                if (typeof window !== 'undefined') {
+                    if (
+                        window.location.pathname !== '/' &&
+                        !excludedRoutes.some((route) => window.location.pathname === route) &&
+                        !window.location.pathname.startsWith('/register/')
+                    ) {
+                        window.location.href = '/re-auth';
+                    }
                 }
 
                 return new Promise(() => {});

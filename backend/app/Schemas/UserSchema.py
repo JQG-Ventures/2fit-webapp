@@ -96,6 +96,27 @@ class ExecutedWorkoutSchema(Schema):
     was_skipped = fields.Boolean(missing=False)
 
 
+class ExecutedChallengeSchema(Schema):
+    """Schema para tracking de un día completado en un challenge."""
+
+    challenge_id = fields.String(required=True)
+    sequence_day = fields.Integer(required=True)
+    date = fields.String(required=True)
+    duration_seconds = fields.Integer(required=True)
+    calories_burned = fields.Float(required=True)
+    exercises = fields.List(fields.Nested(ExecutedExerciseSchema), required=True)
+    was_skipped = fields.Boolean(missing=False)
+
+
+class ActiveChallengeSchema(Schema):
+    """Schema para un challenge activo (tal como aparece en 'active_challenges')."""
+
+    challenge_id = fields.String(required=True)
+    date = fields.String(required=True)
+    sequence_day = fields.Integer(required=True)
+    exercises = fields.List(fields.Nested(ExecutedExerciseSchema), missing=[])
+
+
 class DayProgressSchema(Schema):
     """Schema to track progress for a workout day."""
 
@@ -107,7 +128,7 @@ class DayProgressSchema(Schema):
 
 
 class ActiveWorkoutPlanSchema(Schema):
-    """Schema for tracking active workout plans for a user."""
+    """Schema for tracking active workout plans for un usuario."""
 
     workout_plan_id = fields.String(required=True)
     workout_name = fields.String(required=True)
@@ -133,10 +154,12 @@ class AutomationDataSchema(Schema):
 
 
 class WorkoutHistorySchema(Schema):
-    """Schema to track the history of completed workouts."""
+    """Schema to track la historia de workouts y challenges de un usuario."""
 
     completed_workouts = fields.List(fields.Nested(ExecutedWorkoutSchema), missing=[])
     active_plans = fields.List(fields.Nested(ActiveWorkoutPlanSchema), missing=[])
+    active_challenges = fields.List(fields.Nested(ActiveChallengeSchema), missing=[])
+    completed_challenges = fields.List(fields.Nested(ExecutedChallengeSchema), missing=[])
 
 
 class UserSchema(Schema):

@@ -41,3 +41,8 @@ CORS_ORIGINS = os.getenv("CORS_ORIGINS", "").split(",")
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "")
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+
+REDIS_HOST = os.getenv("REDIS_HOST", "redis://localhost:6379/0")
+
+ONESIGNAL_APP_ID = os.getenv("ONESIGNAL_APP_ID", "")
+ONESIGNAL_REST_API_KEY = os.getenv("ONESIGNAL_REST_API_KEY", "")

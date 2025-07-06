@@ -30,9 +30,7 @@ const PremiumPage = () => {
         else if (step === 'plans') setStep('benefits');
     };
 
-    const onPayPlan = (cardId: string, planId: string) => {
-        console.log(cardId, planId);
-    };
+    const onPayPlan = (cardId: string, planId: string) => {};
 
     return (
         <div className="">

@@ -8,7 +8,7 @@ interface WorkoutPlan {
     image_url: string;
     video_url: string;
     workout_schedule: WorkoutDay[];
-    level: 'beginner' | 'intermediate' | 'advanced';
+    level: string;
     created_at: string; // ISO date string
     updated_at: string; // ISO date string
     is_active: boolean;
