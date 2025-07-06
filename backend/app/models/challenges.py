@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional, Union, cast
 from bson import ObjectId
 from app.extensions import mongo
 from marshmallow_dataclass import class_schema
@@ -100,8 +100,7 @@ class ChallengeModel:
                         }
                         updated_exercises.append(enriched)
                 day["exercises"] = updated_exercises
-
-            return ChallengeSchema.load(challenge)  # type: ignore[arg-type]
+            return cast(Challenge, ChallengeSchema.load(challenge))
         except Exception as e:
             logging.exception(f"Error fetching challenge by ID, error {e}")
             raise
