@@ -19,3 +19,7 @@ flask[async]
 flask-restx
 pytest
 google-auth
+marshmallow-dataclass==8.7.1
+celery==5.5.2
+redis==6.1.0
+types-requests==2.32.4.20250611

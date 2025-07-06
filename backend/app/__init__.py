@@ -7,6 +7,7 @@ from app.routes import (
     auth_bp,
     workouts_bp,
     exercises_bp,
+    challenges_bp,
 )
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -44,6 +45,7 @@ def create_app() -> Flask:
     app_instance.register_blueprint(auth_bp, url_prefix="/api/auth")
     app_instance.register_blueprint(workouts_bp, url_prefix="/api/workouts")
     app_instance.register_blueprint(exercises_bp, url_prefix="/api/exercises")
+    app_instance.register_blueprint(challenges_bp, url_prefix="/api/challenges")
 
     @app_instance.route("/")
     def ping():

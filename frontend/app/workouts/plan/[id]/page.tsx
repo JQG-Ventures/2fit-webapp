@@ -6,23 +6,19 @@ import WorkoutHeader from '@/app/_components/workouts/WorkoutHeader';
 import WorkoutDetails from '@/app/_components/workouts/WorkoutDetails';
 import WorkoutFooter from '@/app/_components/workouts/WorkoutFooterStart';
 import ExerciseList from '@/app/_components/workouts/ExerciseList';
-import LoadingScreen from '@/app/_components/animations/LoadingScreen';
 import SavedMessage from '@/app/_components/others/SavedMessage';
 import { useTranslation } from 'react-i18next';
 import ExerciseFlow from '@/app/_components/workouts/ExerciseFlow';
 import { useApiGet } from '@/app/utils/apiClient';
 import { useSaveWorkout } from '@/app/_services/userService';
-import { useLoading } from '@/app/_providers/LoadingProvider';
 import { useSession } from 'next-auth/react';
 
 const WorkoutPlanPage: React.FC = () => {
     const router = useRouter();
     const { id } = useParams();
     const { t } = useTranslation('global');
-    const { setLoading } = useLoading();
-    const { data: session, status } = useSession();
+    const { data: session } = useSession();
     const userId = session?.user?.id;
-    const sessionLoading = status === 'loading';
     const [savedMessage, setSavedMessage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [showExerciseFlow, setShowExerciseFlow] = useState<boolean>(false);
@@ -69,18 +65,6 @@ const WorkoutPlanPage: React.FC = () => {
         setShowExerciseFlow(false);
         setIsSubmitting(false);
     }, []);
-
-    useEffect(() => {
-        if (loadingPlans) {
-            setLoading(true);
-        } else {
-            setLoading(false);
-        }
-    }, [loadingPlans, setLoading]);
-
-    if (loadingPlans) {
-        return null;
-    }
 
     if (error) {
         return (

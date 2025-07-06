@@ -11,21 +11,19 @@ import SavedWorkoutsSection from '../_components/_sections/SavedWorkoutsSection'
 import Footer from '../_components/_sections/Footer';
 import { useTranslation } from 'react-i18next';
 import { useDeleteWorkout } from '../_services/userService';
-import { useLoading } from '../_providers/LoadingProvider';
-import Modal from '../_components/profile/modal';
 import { useSession } from 'next-auth/react';
 import PendingExerciseCard from '../_components/workouts/my-plan/PendingExerciseCard';
 import Link from 'next/link';
+import OneSignalInitializer from '../_components/others/OneSignalInitializer';
+import { useRouter } from 'next/navigation';
+import ChallengeProgressWidget from '../_components/workouts/challenges/ChallengeProgressWidget';
 
 const HomePage: React.FC = () => {
     const { t } = useTranslation('global');
-    const { setLoading } = useLoading();
-    const { data: session, status } = useSession();
-
+    const { data: session } = useSession();
     const userId = session?.user?.id;
     // @ts-ignore
     const userName = session?.user?.userName;
-    const sessionLoading = status === 'loading';
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
     const { mutate: deleteSavedWorkout } = useDeleteWorkout();
 
@@ -40,49 +38,28 @@ const HomePage: React.FC = () => {
     const savedWorkoutPlansUrl = `/api/workouts/saved`;
     const libraryWorkoutCountUrl = `/api/workouts/library`;
     const activePlansUrl = `/api/workouts/weekly-progress`;
+    const getActivePlansUrl = `/api/users/active-plans`;
 
-    const {
-        data: workoutPlans,
-        error: errorWorkoutPlans,
-        isLoading: loadingWorkoutPlans,
-        isError: workoutPlansError,
-    } = useApiGet<{ status: string; message: [] }>(['workoutPlans'], workoutPlansUrl, {
-        enabled: !sessionLoading,
-    });
-    const {
-        data: savedWorkoutPlans,
-        error: errorSavedPlans,
-        isLoading: loadingSavedWorkoutPlans,
-        isError: savedWorkoutPlansError,
-    } = useApiGet<{ status: string; message: [] }>(['savedWorkoutPlans'], savedWorkoutPlansUrl, {
-        enabled: !sessionLoading,
-    });
-    const {
-        data: libraryWorkouts,
-        error: errorLibraryWorkouts,
-        isLoading: loadingLibraryWorkouts,
-        isError: libraryWorkoutsError,
-    } = useApiGet<{ status: string; message: [] }>(['libraryWorkouts'], libraryWorkoutCountUrl, {
-        enabled: !sessionLoading,
-    });
-    const {
-        data: activePlans,
-        error: errorActivePlans,
-        isLoading: loadingActivePlans,
-        isError: activePlansError,
-    } = useApiGet<{ status: string; message: {} }>(['activePlans'], activePlansUrl, {
-        enabled: !sessionLoading,
-    });
-
-    let isLoading =
-        loadingWorkoutPlans ||
-        loadingSavedWorkoutPlans ||
-        loadingLibraryWorkouts ||
-        loadingActivePlans;
-
-    useEffect(() => {
-        setLoading(isLoading);
-    }, [isLoading, setLoading]);
+    const { data: workoutPlans } = useApiGet<{ status: string; message: [] }>(
+        ['workoutPlans'],
+        workoutPlansUrl,
+    );
+    const { data: savedWorkoutPlans } = useApiGet<{ status: string; message: [] }>(
+        ['savedWorkoutPlans'],
+        savedWorkoutPlansUrl,
+    );
+    const { data: libraryWorkouts } = useApiGet<{ status: string; message: [] }>(
+        ['libraryWorkouts'],
+        libraryWorkoutCountUrl,
+    );
+    const { data: activePlans } = useApiGet<{ status: string; message: {} }>(
+        ['activePlans'],
+        activePlansUrl,
+    );
+    const { data: userActivePlans } = useApiGet<{ status: string; message: [] }>(
+        ['userActivePlans'],
+        getActivePlansUrl,
+    );
 
     const handleDeleteWorkout = async (id: string) => {
         deleteSavedWorkout(
@@ -94,31 +71,72 @@ const HomePage: React.FC = () => {
         );
     };
 
+    const [challengeProgressData, setChallengeProgressData] = useState<any[]>([]);
+    const [loadingChallengeProgress, setLoadingChallengeProgress] = useState(true);
+    const [errorChallengeProgress, setErrorChallengeProgress] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchChallengeProgress = async () => {
+            if (!userActivePlans?.message?.length) {
+                setLoadingChallengeProgress(false);
+                return;
+            }
+            setLoadingChallengeProgress(true);
+
+            try {
+                // @ts-ignore
+                const token = session?.user?.token;
+                const challengePlans = userActivePlans.message.filter(
+                    (plan: any) => plan.plan_type === 'challenge',
+                );
+
+                const promises = challengePlans.map(async (plan: any) => {
+                    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/challenges/challenges/progress?challenge_id=${plan.id}`;
+                    const res = await fetch(url, {
+                        method: 'GET',
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    const json = await res.json();
+                    if (!res.ok) {
+                        console.error(json.message || t('workouts.fetchingError'));
+                        return null;
+                    }
+                    return {
+                        id: plan.id,
+                        plan_type: 'challenge',
+                        name: plan.name,
+                        progressData: json.message as any,
+                    };
+                });
+
+                const results = await Promise.all(promises);
+                setChallengeProgressData(results);
+            } catch (err: any) {
+                setErrorChallengeProgress(err.message);
+                return null;
+            } finally {
+                setLoadingChallengeProgress(false);
+            }
+        };
+
+        fetchChallengeProgress();
+    }, [userActivePlans, session, t]);
+
     // const guidedWorkoutsUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/guided`;
     // const { data: guidedWorkouts, loading: loadingGuidedWorkouts, error: guidedWorkoutsError } = useFetch(guidedWorkoutsUrl, options);
-
-    const error =
-        workoutPlansError || savedWorkoutPlansError || libraryWorkoutsError || activePlansError;
-    const detailedError =
-        errorWorkoutPlans || errorSavedPlans || errorLibraryWorkouts || errorActivePlans;
-
     const paddingBottom = isDesktopOrLaptop ? 0 : 100 * 1.1;
-
-    if (error) {
-        if (detailedError!.response?.status === 401 || detailedError!.response?.status === 403) {
-            return null;
-        }
-        return <Modal title={t('home.errorTitle')} message={t('home.error')} onClose={() => {}} />;
-    }
 
     const getTodayPendingExercise = () => {
         // @ts-ignore
         if (!activePlans?.message?.days) return null;
 
-        const today = new Date().toISOString().split('T')[0];
-
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
         // @ts-ignore
-        const todayPlan = activePlans.message.days.find((day: any) => day.date === today);
+        const todayPlan = activePlans.message.days.find((day: any) => day.date === todayStr);
 
         if (todayPlan) {
             return todayPlan.exercises.find((exercise: any) => !exercise.is_completed);
@@ -128,9 +146,19 @@ const HomePage: React.FC = () => {
     };
 
     const todayExercise = getTodayPendingExercise();
+    const router = useRouter();
+
+    const handleContinue = (planId: string, planType: string) => {
+        if (planType === 'personalized') {
+            router.push(`/workouts/my-plan/${planId}`);
+        } else if (planType === 'challenge') {
+            router.push(`/workouts/challenges/${planId}`);
+        }
+    };
 
     return (
         <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom }}>
+            <OneSignalInitializer />
             <div className="flex flex-col lg:flex-row lg:space-x-8">
                 <div
                     className={isDesktopOrLaptop ? `flex-1` : 'flex flex-row justify-between pr-6'}
@@ -170,6 +198,15 @@ const HomePage: React.FC = () => {
                     savedWorkoutPlans={savedWorkoutPlans?.message || []}
                 />
                 {!isDesktopOrLaptop && <MotivationSection isBotUser={!!userId} />}
+
+                {!loadingChallengeProgress && (
+                    <div className="p-4">
+                        <ChallengeProgressWidget
+                            progressData={challengeProgressData}
+                            onContinue={handleContinue}
+                        />
+                    </div>
+                )}
                 <WorkoutLibrarySection workouts={libraryWorkouts?.message || []} />
                 {/* <GuidedWorkoutsSection workouts={guidedWorkouts || []} /> */}
                 <SavedWorkoutsSection

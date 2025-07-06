@@ -8,7 +8,6 @@ import Modal from '../../_components/profile/modal';
 import LoadingScreen from '../../_components/animations/LoadingScreen';
 import { useApiGet } from '../../utils/apiClient';
 import { useTranslation } from 'react-i18next';
-import { useLoading } from '../../_providers/LoadingProvider';
 import { useUpdateProfile } from '../../_services/userService';
 
 interface NotificationItemProps {
@@ -29,7 +28,6 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ label, isOn, onTogg
 const Notification: React.FC = () => {
     const router = useRouter();
     const { t } = useTranslation('global');
-    const { setLoading } = useLoading();
 
     const getProfileUrl = '/api/users/profile';
     const {
@@ -58,19 +56,6 @@ const Notification: React.FC = () => {
     });
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-    useEffect(() => {
-        setLoading(isLoading);
-        if (userData?.message?.settings?.notifications) {
-            setNotifications({
-                general: userData.message.settings.notifications.general,
-                updates: userData.message.settings.notifications.updates,
-                services: userData.message.settings.notifications.services,
-                tips: userData.message.settings.notifications.tips,
-            });
-        }
-    }, [isLoading, setLoading, userData]);
 
     const handleToggle = useCallback(
         async (type: keyof typeof notifications) => {

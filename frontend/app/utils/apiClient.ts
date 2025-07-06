@@ -13,14 +13,18 @@ import { AxiosError } from 'axios';
 interface UseApiGetOptions<T>
     extends Omit<UseQueryOptions<T, AxiosError, T, QueryKey>, 'queryKey' | 'queryFn'> {
     axiosConfig?: Record<string, any>;
+    suspense?: boolean;
 }
 
 export function useApiGet<T>(key: string[], url: string, options?: UseApiGetOptions<T>) {
-    const { axiosConfig, ...queryOptions } = options || {};
+    const { axiosConfig, suspense = false, ...queryOptions } = options || {};
 
     return useQuery<T, AxiosError>({
         queryKey: key,
         queryFn: async () => {
+            console.groupCollapsed('→ GET', url);
+            console.trace();
+            console.groupEnd();
             const response = await axiosInstance.get<T>(url, axiosConfig);
             return response.data;
         },

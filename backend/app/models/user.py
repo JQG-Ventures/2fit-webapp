@@ -180,9 +180,29 @@ class User:
             if not user:
                 raise ValueError(f"User with ID {user_id} not found!")
 
-            plans = user["workout_history"].get("active_plans", [])
+            result: list[dict] = []
 
-            return plans  # type: ignore[no-any-return]
+            for plan in user.get("workout_history", {}).get("active_plans", []):
+                result.append(
+                    {
+                        "id": plan["workout_plan_id"],
+                        "type": "plan",
+                        "name": plan.get("workout_name", ""),
+                        "plan_type": plan.get("plan_type", "personalized"),
+                    }
+                )
+
+            for ch in user.get("workout_history", {}).get("active_challenges", []):
+                result.append(
+                    {
+                        "id": ch["challenge_id"],
+                        "type": "challenge",
+                        "name": "Test",
+                        "plan_type": "challenge",
+                    }
+                )
+
+            return result
         except ValidationError as e:
             raise ValueError(f"Invalid data: {e.messages}")
         except Exception as e:

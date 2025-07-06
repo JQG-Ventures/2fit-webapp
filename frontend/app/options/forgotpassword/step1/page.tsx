@@ -9,10 +9,8 @@ import { MdSms, MdEmail } from 'react-icons/md';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import LoadingScreen from '../../../_components/animations/LoadingScreen';
-import Modal from '../../../_components/profile/modal';
 import { useTranslation } from 'react-i18next';
 import { useApiGet } from '../../../utils/apiClient';
-import { useLoading } from '../../../_providers/LoadingProvider';
 
 interface OptionItemProps {
     icon: React.ComponentType<{ className?: string }>;
@@ -51,25 +49,20 @@ const ForgotPassword: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const userId = searchParams.get('userId');
-    const { setLoading } = useLoading();
 
     const userApiUrl = userId
         ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/by-email/${userId}`
         : '';
-    const {
-        data: userData,
-        isLoading,
-        isError,
-    } = useApiGet<{ status: string; message: any }>(['user', userId!], userApiUrl, {
-        enabled: !!userId,
-    });
+    const { data: userData, isLoading } = useApiGet<{ status: string; message: any }>(
+        ['user', userId!],
+        userApiUrl,
+        {
+            enabled: !!userId,
+        },
+    );
 
     const [selectedOption, setSelectedOption] = useState<'sms' | 'email' | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    useEffect(() => {
-        setLoading(isLoading);
-    }, [isLoading, setLoading]);
 
     useEffect(() => {
         if (!userId) {

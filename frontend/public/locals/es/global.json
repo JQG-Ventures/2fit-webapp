@@ -22,7 +22,11 @@
         "forgotPassword": "¿Olvidaste tu contraseña?",
         "signIn": "Loguearte",
         "dontHaveAcc": "¿No tienes cuenta?",
-        "signUp": "Registro"
+        "signUp": "Registro",
+        "InvalidUser": "Usuario no registrado, por favor registrate!",
+        "NotRegisteredGoogle": "Usuario no registrado con Google, por favor inicia sesion!",
+        "GoogleVerification": "Verificando inicio de sesión con Google...",
+        "BackToLogin": "De vuelta al login"
     },
     "RegisterPage": {
         "next": "Siguiente",
@@ -200,7 +204,12 @@
     },
     "ExerciseFlow": {
         "ready": "¡Alístate!",
-        "completed": "¡Ejercicio completado!"
+        "completed": "¡Ejercicio completado!",
+        "complete": "Completar ejercicio",
+        "exitConfirmation": "% Completado ¿De verdad quieres salir?",
+        "exitConfirm": "Salir",
+        "exitCancel": "Continuar",
+        "restIndicator": "Descanso"
     },
     "RestView": {
         "rest": "Tómate un descanso",
@@ -295,6 +304,22 @@
         "weeklyRoutine": "Rutina Semanal",
         "workoutProgress": "Progreso del plan",
         "fetchingError": "Error trayendo la informacion",
+        "continue": "Continuar",
+        "challenges": {
+            "title": "Retos",
+            "schedule": "Calendario",
+            "week": "Semana",
+            "rest": "Descanso",
+            "workout": "Rutina",
+            "equipment": "Equipamiento",
+            "startChallenge": "Iniciar reto",
+            "continueChallenge": "Continuar reto",
+            "day": "Día",
+            "of": "de",
+            "all": "Todos",
+            "days": "días",
+            "activeChallenges": "Retos Activos"
+        },
         "plan": {
             "workoutAlreadySaved": "El plan ya ha sido guardado!",
             "workoutSaved": "Plan guardado!",
@@ -302,11 +327,12 @@
             "workoutActivity": "Actividad del Plan",
             "seeAll": "Ver todo",
             "secs": "Segundos",
-            "start": "INICIO",
+            "start": "Inicio",
             "rest": "Descanso",
             "getReady": "Alistate!",
             "startOver": "Iniciar de nuevo",
             "previous": "Anterior",
+            "exercises": "Ejercicios",
             "next": "Siguiente",
             "pause": "Pausar",
             "resume": "Resumir",

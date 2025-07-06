@@ -26,6 +26,7 @@ const MobileNavBar: React.FC<MobileNavBarProps> = ({ navItems, selectedPath, onN
         '/profile/notification',
         '/profile/security',
         '/profile/premium',
+        '/workouts/challenges',
     ];
     const [previousPath, setPreviousPath] = useState<string>(pathname);
 

@@ -3,11 +3,14 @@
 from app.extensions import mongo
 from app.models.user import User
 from app.models.workouts import WorkoutPlan
-from app.utils.utils import convert_to_objectid, parse_date
+from app.utils.utils import convert_to_objectid
 from datetime import datetime, timedelta
-from typing import List, TypedDict, Optional, Any
+from typing import List, TypedDict, Optional
 
 import logging
+
+from app.models.challenges import ChallengeModel
+from app.types.challenge_types import ChallengeProgress
 
 
 class DayProgress(TypedDict):
@@ -500,25 +503,20 @@ class UserWorkoutService:
                 )
 
                 is_completed = day_progress.get("is_completed", False)
-
-                # Collect exercises completed from progress_details
                 completed_exercises_ids = {
                     ex["exercise_id"]
                     for ex in day_progress.get("exercises", [])
                     if ex.get("is_completed")
                 }
 
-                # Determine the specific day_date for this day of the week
                 day_date = (start_of_week + timedelta(days=days_of_week.index(day_name))).date()
 
-                # Check in_progress_workout only if the date matches this specific day_date
                 if in_progress_workout and in_progress_workout.get("day_of_week") == day_name:
                     in_progress_date_str = in_progress_workout.get("date")
                     if in_progress_date_str:
                         in_progress_date = datetime.strptime(
                             in_progress_date_str, "%Y-%m-%dT%H:%M:%S.%f"
                         )
-                        # Only consider in_progress_workout if it's for the current day's date
                         if in_progress_date.date() == day_date:
                             for ex in in_progress_workout.get("exercises", []):
                                 if ex.get("is_completed"):
@@ -572,107 +570,124 @@ class UserWorkoutService:
             raise
 
     @staticmethod
-    def get_challenge_progress(user_id: str, challenge_id: str) -> dict[str, object]:
-        """Get detailed progress of a user for a specific challenge workout plan."""
+    def get_challenge_progress(user_id: str, challenge_id: str) -> ChallengeProgress:
+        """Obtiene el progreso detallado de un usuario para un challenge."""
         try:
             user = User.get_user_by_id(user_id)
             if not user:
-                raise Exception("User not found.")
+                raise Exception("Usuario no encontrado.")
 
-            active_plan = next(
-                (
-                    plan
-                    for plan in user.get("workout_history", {}).get("active_plans", [])
-                    if plan["workout_plan_id"] == challenge_id and not plan.get("is_completed")
-                ),
+            history = user.get("workout_history", {})
+            active_list = history.get("active_challenges", [])
+            completed_list = history.get("completed_challenges", [])
+
+            active_challenge = next(
+                (ch for ch in active_list if ch.get("challenge_id") == challenge_id),
                 None,
             )
-            if not active_plan:
-                raise Exception("Active challenge plan not found for user.")
+            completed_by_day = {
+                ch.get("sequence_day"): ch
+                for ch in completed_list
+                if ch.get("challenge_id") == challenge_id
+            }
 
-            workout_plan = WorkoutPlan.get_workout_plan_by_id(challenge_id)
+            if not active_challenge and not completed_by_day:
+                raise Exception("No hay ningún challenge iniciado ni completado por este usuario.")
+
+            workout_plan = ChallengeModel.get_by_id(challenge_id)
             if not workout_plan:
-                raise Exception("Challenge workout plan not found.")
+                raise Exception("Challenge no encontrado en la colección de challenges.")
 
-            progress_details = active_plan.get("progress_details", [])
-            response: dict[str, Any] = {
+            total_days = len(workout_plan.workout_schedule)
+            response: ChallengeProgress = {
                 "challenge_id": challenge_id,
-                "name": workout_plan.get("name"),
-                "total_days": len(workout_plan.get("workout_schedule", [])),
+                "name": workout_plan.name,
+                "total_days": total_days,
                 "progress": 0.0,
                 "days": [],
             }
-            completed_days = 0
-            total_days = response["total_days"]
-            today = datetime.now().date()
-            start_date_str = active_plan.get("start_date")
-            start_date = parse_date(start_date_str)
 
-            for day in workout_plan.get("workout_schedule", []):
-                sequence_day = day.get("sequence_day")
-                if not sequence_day:
+            if active_challenge:
+                start_date = datetime.fromisoformat(active_challenge.get("date")).date()
+            else:
+                first_completed = min(completed_by_day.values(), key=lambda x: x["sequence_day"])
+                seq = first_completed["sequence_day"]
+                completed_date = datetime.fromisoformat(first_completed.get("date")).date()
+                start_date = completed_date - timedelta(days=seq - 1)
+
+            today = datetime.now().date()
+            completed_count = 0
+
+            for day_def in workout_plan.workout_schedule:
+                seq = day_def.sequence_day
+                if seq is None:
                     continue
 
-                day_date = (start_date + timedelta(days=sequence_day - 1)).date()
-                day_progress: dict = next(
-                    (dp for dp in progress_details if dp.get("sequence_day") == sequence_day),
-                    {},
-                )
-                is_completed = day_progress.get("is_completed", False)
+                day_date = start_date + timedelta(days=seq - 1)
 
-                if is_completed:
+                if seq in completed_by_day:
+                    day_progress = completed_by_day[seq]
+                    is_completed = True
                     status = "completed"
-                    completed_days += 1
+                    completed_count += 1
+                    exercises_done = {
+                        ex["exercise_id"]
+                        for ex in day_progress.get("exercises", [])
+                        if ex.get("is_completed")
+                    }
                 else:
-                    if day_date < today:
-                        status = "failed"
-                    elif day_date == today:
+                    is_completed = False
+
+                    if active_challenge and active_challenge.get("sequence_day") == seq:
                         status = "in_progress"
+                        exercises_done = {
+                            ex["exercise_id"]
+                            for ex in active_challenge.get("exercises", [])
+                            if ex.get("is_completed")
+                        }
                     else:
-                        status = "pending"
+                        if day_date < today:
+                            status = "failed"
+                        elif day_date == today:
+                            status = "in_progress"
+                        else:
+                            status = "pending"
+                        exercises_done = set()
 
-                completed_exercises_ids = {
-                    ex["exercise_id"] for ex in day_progress.get("exercises", [])
-                }
-                exercises = []
-                for exercise in day.get("exercises", []):
-                    exercise_id = exercise.get("exercise_id") or exercise.get("exerciseId")
-                    exercise_info = exercise.get("details")
-                    if not exercise_info:
-                        continue
-
-                    is_exercise_completed = exercise_id in completed_exercises_ids
-                    exercises.append(
+                exercises_list = []
+                for ex_def in day_def.exercises:
+                    ex_id = ex_def.exercise_id
+                    detail = ex_def.details
+                    exercises_list.append(
                         {
-                            "exercise_id": exercise_id,
-                            "name": exercise_info.get("name"),
-                            "sets": exercise.get("sets"),
-                            "reps": exercise.get("reps"),
-                            "rest_seconds": exercise.get("rest_seconds"),
-                            "image_url": exercise_info.get("image_url"),
-                            "is_completed": is_exercise_completed,
+                            "exercise_id": ex_id,
+                            "name": detail.name,
+                            "sets": ex_def.sets,
+                            "reps": ex_def.reps,
+                            "rest_seconds": ex_def.rest_seconds,
+                            "image_url": detail.image_url,
+                            "is_completed": ex_id in exercises_done,
                         }
                     )
 
                 response["days"].append(
                     {
-                        "sequence_day": sequence_day,
+                        "sequence_day": seq,
                         "date": day_date.isoformat(),
                         "is_completed": is_completed,
                         "status": status,
-                        "exercises": exercises,
+                        "exercises": exercises_list,
                     }
                 )
 
-            if isinstance(total_days, int) and total_days > 0:
-                response["progress"] = (completed_days / total_days) * 100
+            if total_days:
+                response["progress"] = (completed_count / total_days) * 100
 
-            if isinstance(response["days"], list):
-                response["days"] = sorted(response["days"], key=lambda x: x["sequence_day"])
+            response["days"].sort(key=lambda d: d["sequence_day"])
             return response
 
         except Exception as e:
-            logging.error(f"Error getting challenge progress: {str(e)}")
+            logging.error(f"Error obteniendo progreso challenge: {e}")
             raise
 
     @staticmethod

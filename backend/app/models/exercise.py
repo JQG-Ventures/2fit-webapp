@@ -1,12 +1,28 @@
 """Model for managing CRUD operations on exercises stored in MongoDB."""
 
-from __future__ import annotations
+from dataclasses import dataclass, field
+from typing import Optional, List
 
 from app.Schemas.ExerciseSchema import exercise_schema, exercises_schema
 from app.extensions import mongo
 from bson.objectid import ObjectId
 from datetime import datetime
 from marshmallow import ValidationError
+
+
+@dataclass
+class ExerciseData:
+    _id: Optional[str] = None
+    name: str = ""
+    description: Optional[str] = None
+    category: Optional[List[str]] = field(default_factory=list)
+    muscle_group: Optional[List[str]] = field(default_factory=list)
+    equipment: Optional[List[str]] = field(default_factory=list)
+    video_url: Optional[str] = None
+    image_url: Optional[str] = None
+    is_active: bool = True
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
 
 
 class Exercise:

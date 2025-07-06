@@ -5,6 +5,7 @@ from .email import email_bp
 from .authentication import auth_bp
 from .workouts import workouts_bp
 from .exercises import exercises_bp
+from .challenges import challenges_bp
 
 __all__ = [
     "chat_bp",
@@ -14,4 +15,5 @@ __all__ = [
     "email_bp",
     "auth_bp",
     "workouts_bp",
+    "challenges_bp",
 ]

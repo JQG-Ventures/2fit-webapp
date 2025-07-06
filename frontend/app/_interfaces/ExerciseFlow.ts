@@ -5,13 +5,13 @@ export interface ExerciseFlowProps {
     workoutType: string;
     userId: string;
     workoutPlanId: string;
+    sequenceDay?: number;
 }
 
 export interface State {
     currentExerciseIndex: number;
     currentSet: number;
     isRest: boolean;
-    isCountdown: boolean;
     isCompleted: boolean;
     restDuration: number;
     nextExerciseDetails: Exercise | null;
@@ -19,6 +19,8 @@ export interface State {
     exercisesProgress: ExerciseProgress[];
     exerciseStartTime: number | null;
     workoutStartTime: number | null;
+    previousStateBeforeRest: { exerciseIndex: number; set: number } | null;
+    exerciseTimerKey: number;
 }
 
 export type Action =
@@ -30,6 +32,9 @@ export type Action =
     | { type: 'SET_CURRENT_SET'; set: number }
     | { type: 'ADD_EXERCISE_PROGRESS'; progress: ExerciseProgress }
     | { type: 'COMPLETE_WORKOUT' }
+    | { type: 'CLEAR_PREVIOUS_STATE' }
+    | { type: 'RESET_COUNTDOWN' }
+    | { type: 'RESET_EXERCISE_TIMER' }
     | { type: 'SET_COMPLETE_MESSAGE'; message: string | null };
 
 export interface ExerciseProgress {
