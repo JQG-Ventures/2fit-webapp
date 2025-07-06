@@ -1,3 +1,11 @@
+"""
+Routes for managing workout challenges and tracking user progress.
+
+This module defines the API endpoints for creating, retrieving, updating,
+deleting, and tracking progress for workout challenges. It uses Flask-RESTx
+for route definitions and integrates with challenge-related services and models.
+"""
+
 from datetime import datetime
 from app.services.user_challenge_service import UserChallengeService
 from app.services.user_workout_service import UserWorkoutService
@@ -60,9 +68,17 @@ challenge_model = api.model(
 
 @api.route("/challenges")
 class ChallengeListResource(Resource):
+    """Handles listing and creation of workout challenges."""
+
     @api.doc("get_all_challenges")
     @api.response(200, "Success")
     def get(self) -> Tuple[dict[str, Any], int]:
+        """
+        Retrieve all active challenges.
+
+        Returns:
+            A tuple containing the response dict and HTTP status code.
+        """
         try:
             challenges = ChallengeModel.get_all()
             return {"status": "success", "message": challenges_schema.dump(challenges)}, 200
@@ -74,6 +90,15 @@ class ChallengeListResource(Resource):
     @api.expect(challenge_model, validate=True)
     @api.response(201, "Challenge created")
     def post(self) -> Tuple[dict[str, Any], int]:
+        """
+        Create a new workout challenge.
+
+        Expects:
+            JSON body matching the challenge schema.
+
+        Returns:
+            A tuple with the new challenge ID and HTTP status code.
+        """
         try:
             data = request.get_json()
 
@@ -92,10 +117,21 @@ class ChallengeListResource(Resource):
 
 @api.route("/challenges/<string:challenge_id>")
 class ChallengeResource(Resource):
+    """Handles retrieval, update, and deletion of a specific challenge by ID."""
+
     @api.doc("get_challenge_by_id")
     @api.response(200, "Success")
     @api.response(404, "Not found")
     def get(self, challenge_id: str) -> Tuple[dict[str, Any], int]:
+        """
+        Retrieve a challenge by its ID.
+
+        Args:
+            challenge_id: The ID of the challenge to retrieve.
+
+        Returns:
+            The challenge data or a 404 error if not found.
+        """
         try:
             challenge = ChallengeModel.get_by_id(challenge_id)
             if challenge:
@@ -109,6 +145,15 @@ class ChallengeResource(Resource):
     @api.expect(challenge_model)
     @api.response(200, "Challenge updated")
     def put(self, challenge_id: str) -> Tuple[dict[str, Any], int]:
+        """
+        Update a challenge by its ID.
+
+        Args:
+            challenge_id: The ID of the challenge to update.
+
+        Returns:
+            Success or 404 error depending on update result.
+        """
         try:
             data = request.get_json()
 
@@ -129,6 +174,15 @@ class ChallengeResource(Resource):
     @api.doc("delete_challenge")
     @api.response(200, "Challenge deleted")
     def delete(self, challenge_id: str) -> Tuple[dict[str, Any], int]:
+        """
+        Soft delete (deactivate) a challenge by its ID.
+
+        Args:
+            challenge_id: The ID of the challenge to delete.
+
+        Returns:
+            Success or 404 error depending on deletion result.
+        """
         try:
             deleted = ChallengeModel.delete(challenge_id)
             if deleted:
@@ -149,6 +203,15 @@ class UserChallengeProgressResource(Resource):
     @api.response(400, "Faltan parámetros", response_model=None)
     @api.response(500, "Error interno", response_model=None)
     def get(self):
+        """
+        Retrieve the current user's progress for a specific challenge.
+
+        Query Parameters:
+            challenge_id: The challenge ID to retrieve progress for.
+
+        Returns:
+            The progress data or an error message.
+        """
         try:
             user_id = get_jwt_identity()
             challenge_id = request.args.get("challenge_id")
@@ -169,6 +232,15 @@ class UserChallengeProgressResource(Resource):
     @api.response(400, "Invalid input")
     @api.response(500, "Internal server error")
     def post(self):
+        """
+        Save the user's partial progress for a specific challenge day.
+
+        Body:
+            JSON with keys: sequence_day, exercises (list of performed exercises).
+
+        Returns:
+            A success or error response.
+        """
         try:
             user_id = get_jwt_identity()
             challenge_id = request.args.get("challenge_id")
@@ -205,6 +277,15 @@ class CompleteChallengeResource(Resource):
     @api.response(400, "Invalid input")
     @api.response(500, "Internal server error")
     def post(self):
+        """
+        Mark a challenge as fully completed by the user.
+
+        Body:
+            JSON with challenge_id, sequence_day, and exercises.
+
+        Returns:
+            Success or error message.
+        """
         try:
             user_id = get_jwt_identity()
             if not user_id:

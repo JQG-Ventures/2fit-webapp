@@ -1,3 +1,11 @@
+"""
+Service for handling user progress in workout challenges.
+
+Provides methods to:
+- Save partial progress for a challenge day
+- Move completed challenge days from active to completed
+"""
+
 from app.extensions import mongo
 from app.utils.utils import convert_to_objectid
 
@@ -8,13 +16,27 @@ logger = logging.getLogger(__name__)
 
 
 class UserChallengeService:
+    """
+    Handles the logic for updating a user's challenge progress.
+
+    This service updates the `workout_history` field in the user document,
+    including both active and completed challenge states.
+    """
 
     @staticmethod
     def save_challenge_progress(user_id: str, challenge_id: str, progress_data: dict) -> None:
         """
-        Save the partial progress of a day in a challenge for a user
-        - If exist an in_progress_challenge for same challenge_id, date, sequence day and exercises
-        - If not create one
+        Save or update the user's partial progress for a challenge day.
+
+        Logic:
+        - If an entry exists in `active_challenges` for same challenge ID, sequence_day, and date,
+        it updates the exercise stats (sets, reps, duration, etc.).
+        - Otherwise, it creates a new active challenge progress entry.
+
+        Args:
+            user_id (str): The ID of the user.
+            challenge_id (str): The ID of the challenge.
+            progress_data (dict): Data with keys: date, sequence_day, and a list of exercises.
         """
         try:
             user_obj_id = convert_to_objectid(user_id)
@@ -88,9 +110,18 @@ class UserChallengeService:
     @staticmethod
     def save_completed_challenge(user_id: str, completed_data: dict) -> None:
         """
-        Guarda un challenge day completo:
-        - Lo mueve de active_challenges a completed_challenges en workout_history del usuario.
-        - Agrega campos extras (duration total, calorías, etc) si lo deseas.
+        Mark a challenge day as completed for a user.
+
+        Moves the entry from `active_challenges` to `completed_challenges`
+        in the user's `workout_history`.
+
+        It also calculates:
+        - Total duration (seconds)
+        - Total calories burned
+
+        Args:
+            user_id (str): The ID of the user.
+            completed_data (dict): Must include challenge_id, sequence_day, date, and exercises.
         """
         try:
             user_obj_id = convert_to_objectid(user_id)

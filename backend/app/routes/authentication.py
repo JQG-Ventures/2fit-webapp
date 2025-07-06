@@ -1,4 +1,7 @@
-"""Defines auth endpoints for user registration, login, token refresh, and Google login."""
+"""
+Defines authentication endpoints for user registration, login, token refresh,
+Google authentication, and storing OneSignal player IDs for push notifications.
+"""
 
 from app.Schemas.onesignal import PlayerIDSchema
 from app.models.notification_device import NotificationDevice
@@ -421,6 +424,15 @@ class PlayerIDResource(Resource):
     @api.response(400, "Invalid input")
     @api.response(500, "Internal Server Error")
     def post(self):
+        """
+        Save or update a OneSignal Player ID for push notifications.
+
+        Body:
+            JSON with "player_id" and "platform".
+
+        Returns:
+            Success message if stored or updated.
+        """
         try:
             raw_data = request.get_json()
             data = self.schema.load(raw_data)

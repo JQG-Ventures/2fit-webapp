@@ -1,3 +1,7 @@
+"""
+Module to contain the logic for notifications to the frontend
+"""
+
 from app.celery import celery_app
 from app.extensions import mongo
 from datetime import datetime
@@ -8,6 +12,7 @@ import requests
 
 @celery_app.task(name="send_water_reminder")
 def send_water_reminder():
+    """Notification reminder for water"""
     print("Running water reminder task...")
 
     devices = mongo.db.notification_devices.find({})

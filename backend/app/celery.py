@@ -1,3 +1,11 @@
+"""
+Configures Celery for asynchronous task execution within a Flask application context.
+
+Includes:
+- Initialization of the Celery app with Redis as broker and backend.
+- Integration with Flask app context to allow usage of app-level extensions like MongoDB.
+"""
+
 from celery import Celery
 
 import app.settings as s
@@ -14,11 +22,20 @@ celery_app.conf.update(
 
 def init_celery(app):
     """
-    Binds Flask app context to Celery so extensions like mongo can be used.
+    Binds the Flask application context to Celery tasks.
+
+    This allows tasks to access Flask-specific extensions (e.g., database, config).
+
+    Args:
+        app: The Flask application instance to bind to Celery.
     """
     celery_app.conf.update(app.config)
 
     class ContextTask(celery_app.Task):
+        """
+        Custom Celery Task that runs within the Flask application context.
+        """
+
         def __call__(self, *args, **kwargs):
             with app.app_context():
                 return self.run(*args, **kwargs)

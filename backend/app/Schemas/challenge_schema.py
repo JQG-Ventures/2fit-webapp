@@ -1,3 +1,12 @@
+"""
+Defines Marshmallow schemas for validating and serializing challenge-based workout plans.
+
+Includes schemas for:
+- Individual exercises within a challenge day
+- Daily challenge structure
+- Entire challenge metadata
+"""
+
 from marshmallow import Schema, fields
 from datetime import datetime
 

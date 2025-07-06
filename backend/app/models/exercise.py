@@ -12,6 +12,23 @@ from marshmallow import ValidationError
 
 @dataclass
 class ExerciseData:
+    """
+    Represents metadata for a physical exercise.
+
+    Attributes:
+        _id (Optional[str]): The unique identifier of the exercise (MongoDB ObjectId as string).
+        name (str): The name of the exercise.
+        description (Optional[str]): A brief description of the exercise.
+        category (Optional[List[str]]): Tags or categories associated with the exercise.
+        muscle_group (Optional[List[str]]): Targeted muscle groups.
+        equipment (Optional[List[str]]): Required equipment to perform the exercise.
+        video_url (Optional[str]): URL to a video demonstration.
+        image_url (Optional[str]): URL to an image or thumbnail.
+        is_active (bool): Indicates if the exercise is currently active.
+        created_at (Optional[str]): ISO timestamp when the exercise was created.
+        updated_at (Optional[str]): ISO timestamp of the last update.
+    """
+
     _id: Optional[str] = None
     name: str = ""
     description: Optional[str] = None
