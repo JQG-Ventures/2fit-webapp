@@ -1,6 +1,9 @@
 """
-Defines authentication endpoints for user registration, login, token refresh,
-Google authentication, and storing OneSignal player IDs for push notifications.
+Defines authentication endpoints for:
+
+- User registration and login
+- Token refresh and Google authentication
+- Storing OneSignal player IDs for push notifications
 """
 
 from app.Schemas.onesignal import PlayerIDSchema

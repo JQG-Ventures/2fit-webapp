@@ -11,8 +11,7 @@ from marshmallow import Schema, fields, validate
 
 class PlayerIDSchema(Schema):
     """
-    Schema for validating the player ID and platform data when registering
-    a device for push notifications.
+    Schema for validating the player ID and platform data when registering a device.
 
     Fields:
         player_id (str): OneSignal player ID (required, minimum 5 characters).

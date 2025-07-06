@@ -1,7 +1,4 @@
-"""
-Defines the NotificationDevice data model used for storing OneSignal player IDs
-linked to user accounts for push notifications.
-"""
+"""Defines the NotificationDevice data model used for storing OneSignal linked to user accounts."""
 
 from dataclasses import dataclass, field
 from datetime import datetime

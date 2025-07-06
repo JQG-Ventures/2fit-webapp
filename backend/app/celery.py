@@ -32,9 +32,7 @@ def init_celery(app):
     celery_app.conf.update(app.config)
 
     class ContextTask(celery_app.Task):
-        """
-        Custom Celery Task that runs within the Flask application context.
-        """
+        """Custom Celery Task that runs within the Flask application context."""
 
         def __call__(self, *args, **kwargs):
             with app.app_context():

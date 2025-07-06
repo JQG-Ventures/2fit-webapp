@@ -175,13 +175,13 @@ class ChallengeResource(Resource):
     @api.response(200, "Challenge deleted")
     def delete(self, challenge_id: str) -> Tuple[dict[str, Any], int]:
         """
-        Soft delete (deactivate) a challenge by its ID.
+        Marks a challenge as inactive instead of deleting it from the database.
 
         Args:
-            challenge_id: The ID of the challenge to delete.
+            challenge_id: The ID of the challenge to deactivate.
 
         Returns:
-            Success or 404 error depending on deletion result.
+            True if the challenge was updated, False otherwise.
         """
         try:
             deleted = ChallengeModel.delete(challenge_id)
