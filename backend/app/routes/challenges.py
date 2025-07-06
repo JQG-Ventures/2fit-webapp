@@ -175,7 +175,7 @@ class ChallengeResource(Resource):
     @api.response(200, "Challenge deleted")
     def delete(self, challenge_id: str) -> Tuple[dict[str, Any], int]:
         """
-        Marks a challenge as inactive instead of deleting it from the database.
+        Mark a challenge as inactive instead of deleting it from the database.
 
         Args:
             challenge_id: The ID of the challenge to deactivate.

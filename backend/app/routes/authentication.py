@@ -1,5 +1,5 @@
 """
-Defines authentication endpoints for:
+Defines authentication endpoints for.
 
 - User registration and login
 - Token refresh and Google authentication
