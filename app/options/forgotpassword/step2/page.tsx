@@ -120,7 +120,7 @@ const VerificationScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col justify-between items-center bg-white h-screen p-14">
-      <div className="h-[10%] flex flex-row justify-left space-x-8 items-center w-full max-w-3xl">
+      {/* <div className="h-[10%] flex flex-row justify-left space-x-8 items-center w-full max-w-3xl">
         <button onClick={() => router.back()} className="text-gray-700">
           <IoIosArrowBack className="text-3xl cursor-pointer" />
         </button>
@@ -168,7 +168,7 @@ const VerificationScreen: React.FC = () => {
                 "ForgotPassword.step2.verificationScreen.verifyButton.defaultText"
               )}
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

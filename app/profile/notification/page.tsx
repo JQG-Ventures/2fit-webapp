@@ -71,8 +71,8 @@ const Notification: React.FC = () => {
           notifications: {
             ...updatedNotifications,
           },
-          nutrition_enabled: userData.message.settings.nutrition_enabled,
-          language_preference: userData.message.settings.language_preference,
+          nutrition_enabled: userData!.message.settings.nutrition_enabled,
+          language_preference: userData!.message.settings.language_preference,
         },
       };
   

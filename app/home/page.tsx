@@ -91,10 +91,14 @@ const HomePage: React.FC = () => {
         // @ts-ignore
         if (!activePlans?.message?.days) return null;
 
-        const today = new Date().toISOString().split("T")[0];
+        const todayLocal = new Date();
+        const offset = todayLocal.getTimezoneOffset();
+        const localDate = new Date(todayLocal.getTime() - offset * 60000)
+            .toISOString()
+            .split("T")[0];
 
         // @ts-ignore
-        const todayPlan = activePlans.message.days.find((day: any) => day.date === today);
+        const todayPlan = activePlans.message.days.find((day: any) => day.date === localDate);
 
         if (todayPlan) {
             return todayPlan.exercises.find((exercise: any) => !exercise.is_completed);

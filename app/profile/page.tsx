@@ -34,10 +34,10 @@ const ProfilePage: React.FC = () => {
 	// Memoize static settings array
 	const settings = useMemo(
 		() => [
-			{ label: 'Edit Profile', icon: CiUser, path: '/profile/edit' },
-			{ label: 'Notifications', icon: CiBellOn, path: '/profile/notification' },
-			{ label: 'Security', icon: CiLock, path: '/profile/security' },
-			{ label: 'Help', icon: CiCircleQuestion, path: '/profile/help' },
+			{ label: t("profile.edit"), icon: CiUser, path: '/profile/edit' },
+			{ label: t("profile.notifications"), icon: CiBellOn, path: '/profile/notification' },
+			{ label: t("profile.security"), icon: CiLock, path: '/profile/security' },
+			{ label: t("profile.help"), icon: CiCircleQuestion, path: '/profile/help' },
 		],
 		[]
 	);
@@ -116,15 +116,15 @@ const ProfilePage: React.FC = () => {
 				className='hidden'
 			/>
 			<div className="h-[10%] flex justify-start items-center w-full lg:hidden">
-				<h1 className="text-5xl font-semibold pl-4">Profile</h1>
+				<h1 className="text-5xl font-semibold pl-4">{t('Navbar.profile')}</h1>
 			</div>
-			<div className="h-[30%] flex flex-col lg:justify-evenly md:justify-evenly items-center w-full lg:max-w-6xl">
+			<div className="h-[30%] flex flex-col justify-center lg:justify-evenly md:justify-evenly items-center w-full lg:max-w-6xl p-6">
 				<div className="relative w-40 h-40">
 					<Image
 						src={profile?.message?.profile_image || '/images/userprofile.png'}
 						alt="Profile Picture"
-						width={160}
-						height={160}
+						width={200}
+						height={200}
 						className="rounded-full object-cover border-4 border-white shadow-lg w-full h-full"
 					/>
 					<div
@@ -142,7 +142,7 @@ const ProfilePage: React.FC = () => {
 				</p>
 			</div>
 			<div
-				className="h-[12%] w-full lg:max-w-6xl bg-gradient-to-r from-green-400 to-green-700 flex flex-col justify-center text-white rounded-[25px] px-8 shadow-lg cursor-pointer"
+				className="h-[12%] w-full lg:max-w-6xl bg-gradient-to-r from-green-400 to-green-700 flex flex-col justify-center text-white rounded-[25px] p-8 shadow-lg cursor-pointer"
 				onClick={() => router.push('/premium')}
 			>
 				<div className="flex flex-row items-center justify-between">
@@ -150,11 +150,11 @@ const ProfilePage: React.FC = () => {
 						<span className="bg-gradient-to-b from-yellow-300 to-yellow-700 text-white rounded-full px-4 py-2 text-2xl">
 							PRO
 						</span>
-						<h3 className="font-semibold text-3xl">Upgrade to Premium</h3>
+						<h3 className="font-semibold text-3xl">{t('upgrade.title')}</h3>
 					</div>
 					<IoIosArrowDroprightCircle className="text-white w-10 h-10" />
 				</div>
-				<p className="text-xl">Enjoy workout access without ads and restrictions</p>
+				<p className="text-xl">{t('upgrade.description')}</p>
 			</div>
 			<div className="lg:hidden border-t border-gray-300 w-full my-14 lg:my-0 lg:max-w-6xl"></div>
 			<div className="w-full h-[45%] mb-24 overflow-y-auto lg:max-w-6xl lg:mb-0">

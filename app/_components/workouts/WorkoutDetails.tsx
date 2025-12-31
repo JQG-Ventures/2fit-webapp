@@ -17,6 +17,7 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
     let totalDurationSeconds = 0;
     let numberOfExercises = 0;
 
@@ -97,7 +98,9 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
                         <h2 className="text-4xl font-semibold ml-8">{t("workouts.plan.workoutActivity")}</h2>
                     </div>
                     <div className="no-scrollbar overflow-y-auto flex-grow">
-                        <ExerciseList exercises={exercises} isMobile={true} onExerciseSelect={() => {}}/>
+                        <ExerciseList exercises={exercises} isMobile={true} onExerciseSelect={() => setIsExerciseModalOpen(true)} 
+                        exerciseModalOpen={isExerciseModalOpen}
+                        setExerciseModalOpen={setIsExerciseModalOpen}/>
                     </div>
                     <WorkoutFooter
                         onStartClick={() => handleStartClick()}
@@ -108,7 +111,13 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
 
             {!isMobile && (
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={t("workouts.plan.workoutActivity")}>
-                    <ExerciseList exercises={exercises} isMobile={false} onExerciseSelect={() => {}}/>
+                    <ExerciseList 
+                        exercises={exercises} 
+                        isMobile={false} 
+                        onExerciseSelect={() => setIsExerciseModalOpen(true)} 
+                        exerciseModalOpen={isExerciseModalOpen}
+                        setExerciseModalOpen={setIsExerciseModalOpen}
+                    />
                 </Modal>
             )}
         </div>

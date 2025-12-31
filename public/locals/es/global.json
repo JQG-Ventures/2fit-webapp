@@ -22,9 +22,13 @@
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "signIn": "Loguearte",
     "dontHaveAcc": "¿No tienes cuenta?",
-    "signUp": "Registro"
+    "signUp": "Registro",
+    "googleUserError": "Este usuario no esta registrado, por favor registrate!",
+    "googleError": "Hubo un error con Google, intentalo mas tarde...",
+    "googleAuthError": "Usuario no registrado con Google"
   },
   "RegisterPage": {
+    "registeredGoogle": "Esta cuenta ya fue registrada, por favor logueate.",
     "next": "Siguiente",
     "back": "Atras",
     "create": ["Crea tu", "Cuenta"],
@@ -37,7 +41,8 @@
     "passwordValidationError": "La contraseña debe contener mayúscula, minúscula, número, carácteres especiales, y debe ser de mínimo 8 caracteres sin espacios.",
     "emailValidationError": "Ingresa una dirección de correo electrónico válida.",
     "emailRegisteredError": "Este correo ya se encuentra registrado. Utiliza un correo distinto.",
-    "emailRegistrationError": "Hubo un error validando el correo. Por favor intentalo de nuevo mas tarde."
+    "emailRegistrationError": "Hubo un error validando el correo. Por favor intentalo de nuevo mas tarde.",
+    "googleError": "Hubo un error contactando a Google, intentalo mas tarde!"
   },
   "RegisterPagestep1": {
     "create": ["Crea tu", "Cuenta"],
@@ -53,7 +58,8 @@
     "numberServerError": "Hubo un error validando el numero. Intentalo mas tarde.",
     "nameValidationFill": "Por favor llena este campo.",
     "phoneValidationFill": "Ingresa un numero valido.",
-    "countryValidationFill": "Por favor llena este campo."
+    "countryValidationFill": "Por favor llena este campo.",
+    "birthdateValidationFill": "Por favor ingresa una fecha valida."
   },
   "RegisterPagestep3": {
     "woman": "Mujer",
@@ -129,7 +135,11 @@
     "home": "Inicio",
     "workouts": "Ejercicio",
     "bot": "Bot",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "startTypingSrc": "Intenta ingresar tus ejercicios",
+    "close": "Cerrar",
+    "searchText": "Buscar ejercicios...",
+    "loading": "Cargando..."
   },
   "settings": {
     "title": "Configuración",
@@ -349,27 +359,28 @@
     "premiumTitle1": "2Fit",
     "premiumTitle2": "Pass",
     "continue": "Continuar",
-    "benefit1Title": "AI-Powered workout plans",
+    "benefit1Title": "Planes potenciados por IA",
     "benefit1Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "benefit2Title": "Personal nutrition guidance",
+    "benefit2Title": "Guia nutricional personalizada",
     "benefit2Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "benefit3Title": "Comprehensive progress tracking",
-    "benefit3Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-  },
-  "BePremium": {
+    "benefit3Title": "Analisis e seguimiento de tu progreso",
+    "benefit3Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     "title": "Sé Premium.",
     "subtitle": "Obtén Acceso Ilimitado.",
     "description": "Disfruta de acceso a entrenamientos sin anuncios ni restricciones.",
+    "passSubtitle": "1 semana gratis - $24.99/mes",
+    "passDesc": "Libere su máximo potencial de fitness con una membresía diseñada para guiarlo y apoyarlo en cada paso del camino.",
+    "note": "Paga una vez, cancela en cualquier momento",
     "plans": {
       "1": {
-        "name": "1 Mes.",
-        "price": "16.99"
+        "name": "1 Mes."
       },
-      "verifyButton": {
-        "defaultText": "Verificar",
-        "loadingText": "Verificando..."
+      "2": {
+        "name": "6 Meses."
       },
-      "incorrectCodeAlert": "Código incorrecto"
+      "3": {
+        "name": "12 Meses."
+      }
     }
   },
   "step2": {
@@ -380,31 +391,48 @@
         "prompt": "Reenviar código en",
         "resendButton": "Reenviar"
       },
-      "step3": {
-        "createPasswordScreen": {
-          "headerTitle": "Crear Nueva Contraseña",
-          "imageAlt": "Ilustración de Crear Nueva Contraseña",
-          "instruction": "Crea tu nueva contraseña",
-          "newPasswordPlaceholder": "Nueva Contraseña",
-          "confirmPasswordPlaceholder": "Confirmar Contraseña",
-          "errorMessages": {
-            "passwordRequired": "Se requiere una contraseña.",
-            "passwordInvalid": "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, un número y un carácter especial.",
-            "confirmPasswordRequired": "Por favor confirma tu contraseña.",
-            "passwordsDoNotMatch": "Las contraseñas no coinciden.",
-            "apiError": "Ocurrió un error. Por favor intenta nuevamente."
-          },
-          "continueButton": {
-            "defaultText": "Continuar",
-            "loadingText": "Actualizando..."
-          },
-          "modal": {
-            "successTitle": "¡Felicidades!",
-            "successMessage": "Tu cuenta está lista para usar.",
-            "goToHomepage": "Ir a la página principal"
-          }
-        }
+      "verifyButton": {
+        "defaultText": "Verificar",
+        "loadingText": "Verificando..."
+      },
+      "incorrectCodeAlert": "Codigo incorrecto"
+    }
+  },
+  "step3": {
+    "createPasswordScreen": {
+      "headerTitle": "Crear Nueva Contraseña",
+      "imageAlt": "Ilustración de Crear Nueva Contraseña",
+      "instruction": "Crea tu nueva contraseña",
+      "newPasswordPlaceholder": "Nueva Contraseña",
+      "confirmPasswordPlaceholder": "Confirmar Contraseña",
+      "errorMessages": {
+        "passwordRequired": "Se requiere una contraseña.",
+        "passwordInvalid": "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, un número y un carácter especial.",
+        "confirmPasswordRequired": "Por favor confirma tu contraseña.",
+        "passwordsDoNotMatch": "Las contraseñas no coinciden.",
+        "apiError": "Ocurrió un error. Por favor intenta nuevamente."
+      },
+      "continueButton": {
+        "defaultText": "Continuar",
+        "loadingText": "Actualizando..."
+      },
+      "modal": {
+        "successTitle": "¡Felicidades!",
+        "successMessage": "Tu cuenta está lista para usar.",
+        "goToHomepage": "Ir a la página principal"
       }
     }
+  },
+  "exercise": {
+    "level": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado"
+    },
+    "summary": "Detalles",
+    "history": "Historial",
+    "instructions": "Indicaciones",
+    "noHistory": "Sin historial de ejercicio",
+    "noHistoryDesc": "Cuando registres un entrenamiento con este ejercicio, tu historial aparecerá aquí."
   }
 }

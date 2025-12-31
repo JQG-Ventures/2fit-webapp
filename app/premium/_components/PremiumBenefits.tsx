@@ -42,8 +42,8 @@ const PremiumBenefits: React.FC<PremiumBenefitsProps> = ({ isPremium, onContinue
             </div>
 
             <div className="h-[20%] flex flex-col w-full justify-end space-y-6 lg:max-w-3xl">
-                <h1 className="text-4xl">1 week free - $24.99/mo</h1>
-                <p>Unlock your ultimate fitness potential with a membership designed to guide and support you every step of the way.</p>
+                <h1 className="text-4xl">{t('premium.passSubtitle')}</h1>
+                <p>{t('premium.passDesc')}</p>
             </div>
 
             <div className="h-[60%] flex flex-col justify-center items-center w-full lg:max-w-3xl">

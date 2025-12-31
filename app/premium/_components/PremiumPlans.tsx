@@ -43,7 +43,7 @@ const PlanCard = ({
 				<div className="flex flex-row justify-between w-full">
 					<div className="flex flex-col space-y-2 items-start justify-between">
 						<h2 className="font-semibold text-3xl">{t(plan.name)}</h2>
-						<p className="text-lg text-gray-600">{t("BePremium.note")}</p>
+						<p className="text-lg text-gray-600">{t("premium.note")}</p>
 					</div>
 					<div className="flex items-center">
 						<h2 className="font-semibold text-4xl text-gray-800">
@@ -78,12 +78,12 @@ const PremiumPlans: React.FC<PremiumPlansProps> = ({ selectedPlan, setSelectedPl
 				<div className="relative z-10 p-6 h-full flex items-center flex-col">
 					<div className="h-[45%] lg:max-w-3xl flex flex-col items-center justify-end space-y-8 pb-10 md:pb-6 md:pt-10">
 						<h6 className="text-7xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-green-800">
-							{t("BePremium.title")}
+							{t("premium.title")}
 						</h6>
 						<h2 className="text-5xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-green-800">
-							{t("BePremium.subtitle")}
+							{t("premium.subtitle")}
 						</h2>
-						<p className="text-3xl text-gray-900">{t("BePremium.description")}</p>
+						<p className="text-3xl text-center text-gray-900">{t("premium.description")}</p>
 					</div>
 
 					<div className="h-[40%] lg:max-w-3xl w-full flex flex-col justify-center space-y-5">
@@ -104,7 +104,7 @@ const PremiumPlans: React.FC<PremiumPlansProps> = ({ selectedPlan, setSelectedPl
 							className={`w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-4 rounded-full text-2xl font-semibold shadow-lg py-8 flex items-center justify-center ${!selectedPlan ? "opacity-50 cursor-not-allowed" : ""
 								}`}
 						>
-							{t("BePremium.checkout")}
+							{t("premium.continue")}
 						</button>
 					</div>
 				</div>

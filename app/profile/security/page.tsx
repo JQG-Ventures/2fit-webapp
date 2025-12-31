@@ -16,8 +16,8 @@ import { useResetPassword } from '../../_services/userService';
 interface SecurityItemProps {
 	label: string;
 	hasArrow?: boolean;
-	isOn?: boolean;
-	onToggle?: () => void;
+	isOn: boolean;
+	onToggle: () => void;
 }
 
 const SecurityItem: React.FC<SecurityItemProps> = ({ label, hasArrow = false, isOn, onToggle }) => (
@@ -106,10 +106,10 @@ const Security: React.FC = () => {
 	return (
 		<div className="flex flex-col justify-between items-center bg-white h-screen p-14 lg:pt-[10vh]">
 			{errorMessage && (
-				<Modal message={t('profile.Security.Failedchangepswd')} onClose={() => setErrorMessage(null)} />
+				<Modal title='Security' message={t('profile.Security.Failedchangepswd')} onClose={() => setErrorMessage(null)} />
 			)}
 			{successMessage && (
-				<Modal message={t('profile.Security.Successfullchangepswd')} onClose={() => setSuccessMessage(null)} />
+				<Modal title='Security' message={t('profile.Security.Successfullchangepswd')} onClose={() => setSuccessMessage(null)} />
 			)}
 
 			<div className="h-[12%] flex flex-row justify-left space-x-8 items-center w-full lg:max-w-3xl">
@@ -126,14 +126,16 @@ const Security: React.FC = () => {
 						label={item.label}
 						hasArrow={item.hasArrow}
 						isOn={
-							item.hasArrow
-								? undefined
-								: securitySettings[item.key as keyof typeof securitySettings]
+							item.hasArrow!
+							// 	? () => {}
+							// 	: securitySettings[item.key as keyof typeof securitySettings]
 						}
+						// fix this
 						onToggle={
-							item.hasArrow
-								? undefined
-								: () => handleToggle(item.key as keyof typeof securitySettings)
+							() => {}
+							// item.hasArrow
+							// 	? undefined
+							// 	: () => {} handleToggle(item.key as keyof typeof securitySettings)
 						}
 					/>
 				))}

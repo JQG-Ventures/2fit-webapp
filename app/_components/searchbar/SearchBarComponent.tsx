@@ -208,7 +208,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                 <button
                     onClick={() => setIsFullScreen(true)}
                     aria-label="Search"
-                    className="transform -translate-y-1/2 text-gray-500 focus:outline-none"
+                    className="mt-14 ml-10 transform -translate-y-1/2 text-gray-500 focus:outline-none"
                 >
                     <FaSearch size={20} />
                 </button>
