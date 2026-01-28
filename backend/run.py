@@ -4,6 +4,10 @@ Entry point for running the Flask application.
 Initializes logging and starts the app with settings defined in `app.settings`.
 """
 
+import warnings
+warnings.filterwarnings("ignore", module="urllib3")
+warnings.filterwarnings("ignore", message=".*marshmallow_dataclass.*ObjectId.*")
+
 from app import create_app
 
 import app.settings as s
@@ -22,4 +26,4 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(debug=s.DEBUG, port=5000)
+    app.run(debug=s.DEBUG, port=5001)

@@ -7,29 +7,16 @@ import { FaArrowLeft, FaTrash, FaPaperPlane } from 'react-icons/fa';
 import ChatComponent from '../_components/chat/Conversation';
 import LockScreen from '../_components/others/LockScreen';
 import Modal from '../_components/profile/modal';
-import { useApiGet } from '../utils/apiClient';
-import { FaWhatsapp } from 'react-icons/fa';
-import { useSendMessage } from '../_services/userService';
+import { useSendAgentMessage, useGetAgentConversation, useClearAgentConversation } from '../_services/userService';
 import { useTranslation } from 'react-i18next';
 
 const Chat: React.FC = () => {
     const router = useRouter();
     const { t } = useTranslation('global');
 
-    const getChatUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/conversation`;
-    const { data: conversationData, isError: error } = useApiGet<{ status: string; message: any }>(
-        ['conversationData'],
-        getChatUrl,
-    );
-    const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
-    const { data: profile } = useApiGet<{ status: string; message: any }>(
-        ['profileData'],
-        getProfileUrl,
-    );
-
-    const { mutate: sendMessage } = useSendMessage(
-        `${profile?.message.code_number}${profile?.message.number}`,
-    );
+    const { data: conversationData, isError: error, refetch: refetchConversation } = useGetAgentConversation();
+    const { mutate: sendMessage, isPending: isSending } = useSendAgentMessage();
+    const { mutate: clearConversation } = useClearAgentConversation();
 
     const [isPremium, setIsPremium] = useState(true);
     const [messages, setMessages] = useState<any[]>([]);
@@ -38,14 +25,19 @@ const Chat: React.FC = () => {
 
     useEffect(() => {
         if (Array.isArray(conversationData?.message)) {
-            setMessages(conversationData.message);
+            const formattedMessages = conversationData.message.map((msg: any) => ({
+                timestamp: msg.timestamp || new Date().toISOString(),
+                role: msg.role,
+                content: msg.content,
+            }));
+            setMessages(formattedMessages);
         } else {
             setMessages([]);
         }
     }, [conversationData]);
 
     const handleSendMessage = () => {
-        if (!newMessage.trim()) return;
+        if (!newMessage.trim() || isSending) return;
 
         const userMessage = {
             timestamp: new Date().toISOString(),
@@ -54,33 +46,59 @@ const Chat: React.FC = () => {
         };
 
         setMessages((prev: any) => [...prev, userMessage]);
+        const messageToSend = newMessage;
         setNewMessage('');
         setIsBotTyping(true);
 
         sendMessage(
-            { body: { message: newMessage } },
+            { body: { message: messageToSend } },
             {
                 onSuccess: (response) => {
                     const botMessage = {
                         timestamp: new Date().toISOString(),
-                        role: 'bot',
-                        content: response.response,
+                        role: 'assistant',
+                        content: response.message,
                     };
 
                     setMessages((prev) => [...prev, botMessage]);
                     setIsBotTyping(false);
+                    refetchConversation();
                 },
-                onError: (error) => {
-                    console.error('Error sending message:', error.message);
+                onError: (error: any) => {
+                    console.error('Error sending message:', error);
                     setIsBotTyping(false);
+                    const errorMessage = {
+                        timestamp: new Date().toISOString(),
+                        role: 'assistant',
+                        content: 'I apologize, but I encountered an error. Please try again.',
+                    };
+                    setMessages((prev) => [...prev, errorMessage]);
                 },
             },
         );
     };
 
-    if (error) {
-        return <Modal title="Error" message={error} onClose={() => router.push('/home')} />;
-    }
+    const handleClearHistory = () => {
+        clearConversation(
+            {},
+            {
+                onSuccess: () => {
+                    setMessages([]);
+                    refetchConversation();
+                },
+                onError: (error) => {
+                    console.error('Error clearing conversation:', error);
+                },
+            },
+        );
+    };
+
+    useEffect(() => {
+        if (error) {
+            // Handle error in effect to avoid setState during render
+            console.error('Error loading conversation:', error);
+        }
+    }, [error]);
 
     return (
         <div className="flex flex-col justify-between items-center bg-[#1A1A1A] h-screen p-14 lg:pt-[10vh] relative">
@@ -91,21 +109,6 @@ const Chat: React.FC = () => {
                     </button>
                     <h1 className="text-5xl text-white font-semibold">2Fit.AI Coach</h1>
                 </div>
-                <button
-                    onClick={() => {
-                        if (typeof window !== 'undefined') {
-                            window.open(
-                                `https://wa.me/${50670340514}?text=Hey 2Fit bot!`,
-                                '_blank',
-                            );
-                        }
-                    }}
-                >
-                    <FaWhatsapp
-                        className="text-white w-12 h-12"
-                        title={`${t('chat.openWhatsApp')}`}
-                    />
-                </button>
             </div>
             <div className="h-[90%] flex flex-col justify-between items-center w-full">
                 {isPremium ? (
@@ -123,7 +126,10 @@ const Chat: React.FC = () => {
                     />
                 )}
                 <div className="h-[15%] flex flex-col w-full max-w-3xl">
-                    <div className="flex items-center text-gray-400 cursor-pointer p-4 space-x-4 hover:text-white">
+                    <div
+                        onClick={handleClearHistory}
+                        className="flex items-center text-gray-400 cursor-pointer p-4 space-x-4 hover:text-white"
+                    >
                         <FaTrash className="text-2xl" />
                         <span className="text-2xl">Clear history</span>
                     </div>
@@ -137,7 +143,8 @@ const Chat: React.FC = () => {
                         />
                         <button
                             onClick={handleSendMessage}
-                            className="bg-green-500 text-white p-8 rounded-full focus:outline-none hover:bg-green-600"
+                            disabled={isSending || !newMessage.trim()}
+                            className="bg-gray-700 text-white p-8 rounded-full focus:outline-none hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-600 transition-colors"
                         >
                             <FaPaperPlane className="w-full h-full" />
                         </button>

@@ -7,7 +7,6 @@ Flask_JWT_Extended==4.6.0
 flask_marshmallow==1.2.1
 Flask_PyMongo==2.3.0
 marshmallow==3.22.0
-openai==1.47.0
 PyJWT==2.9.0
 pymongo==4.9.1
 python-dotenv==1.0.1
@@ -23,3 +22,12 @@ marshmallow-dataclass==8.7.1
 celery==5.5.2
 redis==6.1.0
 types-requests==2.32.4.20250611
+openai==1.58.1
+langchain-openai==0.2.14
+langchain>=0.3.0,<0.5.0
+langchain-core>=0.3.0,<0.4.0
+langchain-community>=0.3.0,<0.4.0
+langgraph>=0.2.0
+faiss-cpu==1.7.4
+pydantic==2.9.0
+httpx<0.28

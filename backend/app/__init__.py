@@ -1,3 +1,7 @@
+import warnings
+warnings.filterwarnings("ignore", message=".*urllib3.*OpenSSL.*")
+warnings.filterwarnings("ignore", message=".*marshmallow_dataclass.*ObjectId.*")
+
 from app.extensions import mongo, ma
 from app.routes import (
     chat_bp,
@@ -9,6 +13,7 @@ from app.routes import (
     exercises_bp,
     challenges_bp,
 )
+from app.routes.agent_chat import agent_chat_bp
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -39,6 +44,7 @@ def create_app() -> Flask:
 
     app_instance.secret_key = s.SECRET_KEY
     app_instance.register_blueprint(chat_bp, url_prefix="/api")
+    app_instance.register_blueprint(agent_chat_bp, url_prefix="/api")
     app_instance.register_blueprint(azure_bp, url_prefix="/api/azure")
     app_instance.register_blueprint(users_bp, url_prefix="/api/users")
     app_instance.register_blueprint(email_bp, url_prefix="/api/mail")

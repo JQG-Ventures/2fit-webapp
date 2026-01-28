@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import './Conversation.css';
 import { FaArrowDown } from 'react-icons/fa';
 
@@ -77,11 +79,57 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ conversationData, isBotTy
                                     <div
                                         className={`${
                                             msg.role === 'user'
-                                                ? 'bg-green-500 text-white'
-                                                : 'bg-gray-700 text-white'
-                                        } w-full max-w-md md:max-w-md lg:max-w-lg p-3 rounded-lg mb-2`}
+                                                ? 'bg-gray-800 text-white border border-gray-700'
+                                                : 'bg-gray-700 text-white border border-gray-600'
+                                        } w-full max-w-md md:max-w-md lg:max-w-lg p-5 rounded-xl mb-3 markdown-content shadow-sm`}
                                     >
-                                        {msg.content}
+                                        {msg.role === 'assistant' ? (
+                                            <ReactMarkdown
+                                                remarkPlugins={[remarkGfm]}
+                                                components={{
+                                                    p: ({ node, ...props }) => (
+                                                        <p className="mb-2 last:mb-0" {...props} />
+                                                    ),
+                                                    ul: ({ node, ...props }) => (
+                                                        <ul className="list-disc list-inside mb-2 space-y-1" {...props} />
+                                                    ),
+                                                    ol: ({ node, ...props }) => (
+                                                        <ol className="list-decimal list-inside mb-2 space-y-1" {...props} />
+                                                    ),
+                                                    li: ({ node, ...props }) => (
+                                                        <li className="ml-4" {...props} />
+                                                    ),
+                                                    strong: ({ node, ...props }) => (
+                                                        <strong className="font-bold text-white" {...props} />
+                                                    ),
+                                                    em: ({ node, ...props }) => (
+                                                        <em className="italic" {...props} />
+                                                    ),
+                                                    h1: ({ node, ...props }) => (
+                                                        <h1 className="text-xl font-bold mb-2 mt-4 first:mt-0" {...props} />
+                                                    ),
+                                                    h2: ({ node, ...props }) => (
+                                                        <h2 className="text-lg font-semibold mb-2 mt-3 first:mt-0" {...props} />
+                                                    ),
+                                                    h3: ({ node, ...props }) => (
+                                                        <h3 className="text-base font-semibold mb-1 mt-2 first:mt-0" {...props} />
+                                                    ),
+                                                    code: ({ node, inline, ...props }: any) =>
+                                                        inline ? (
+                                                            <code className="bg-gray-800 px-1 py-0.5 rounded text-sm" {...props} />
+                                                        ) : (
+                                                            <code className="block bg-gray-800 p-2 rounded text-sm overflow-x-auto mb-2" {...props} />
+                                                        ),
+                                                    blockquote: ({ node, ...props }) => (
+                                                        <blockquote className="border-l-4 border-green-400 pl-4 italic my-2" {...props} />
+                                                    ),
+                                                }}
+                                            >
+                                                {msg.content}
+                                            </ReactMarkdown>
+                                        ) : (
+                                            <span>{msg.content}</span>
+                                        )}
                                     </div>
                                 </div>
                             ))}
@@ -96,7 +144,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ conversationData, isBotTy
                     {showScrollButton && (
                         <button
                             onClick={scrollToBottom}
-                            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 focus:outline-none"
+                            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white p-4 rounded-full shadow-lg hover:bg-gray-600 focus:outline-none border border-gray-600 transition-colors"
                         >
                             <FaArrowDown className="w-6 h-6" />
                         </button>

@@ -1,4 +1,4 @@
-import { useApiDelete, useApiPost, useApiPut } from '../utils/apiClient';
+import { useApiDelete, useApiGet, useApiPost, useApiPut } from '../utils/apiClient';
 
 export const fetchUserDataByNumber = async (number: string) => {
     try {
@@ -127,6 +127,21 @@ export const useSendMessage = (userPhoneNumber: string) => {
         undefined,
         { 'User-Phone-Number': userPhoneNumber },
     );
+};
+
+export const useSendAgentMessage = () => {
+    return useApiPost<
+        { body: { message: string } },
+        { message: string; recommendations: string[]; follow_up_question: string | null }
+    >('/api/agent/chat');
+};
+
+export const useGetAgentConversation = () => {
+    return useApiGet<{ status: string; message: any[] }>(['agentConversation'], '/api/agent/conversation');
+};
+
+export const useClearAgentConversation = () => {
+    return useApiPost<{}, { status: string; message: string }>('/api/agent/conversation/clear');
 };
 
 export const useResetPassword = () => {

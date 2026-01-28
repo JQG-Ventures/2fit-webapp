@@ -34,7 +34,10 @@ class WorkoutPlan:
             result = mongo.db.workout_plans.find(
                 {
                     "workout_schedule": {"$size": 1},
-                    "workout_schedule.day_of_week": {"$exists": False},
+                    "$or": [
+                        {"workout_schedule.day_of_week": {"$exists": False}},
+                        {"workout_schedule.day_of_week": ""},
+                    ],
                     "workout_schedule.sequence_day": {"$exists": False},
                 }
             )

@@ -63,7 +63,7 @@ class Challenge:
     Represents a complete workout challenge.
 
     Attributes:
-        _id (Optional[Union[str, ObjectId]]): MongoDB document ID.
+        _id (Optional[str]): MongoDB document ID as string.
         name (str): Name of the challenge.
         description (str): Description of the challenge.
         plan_type (str): Plan category (e.g., "challenge").
@@ -81,7 +81,7 @@ class Challenge:
         updated_at (str): Timestamp of last update.
     """
 
-    _id: Optional[Union[str, ObjectId]]
+    _id: Optional[str]
     name: str
     description: str
     plan_type: str
