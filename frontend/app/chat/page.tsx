@@ -7,14 +7,22 @@ import { FaArrowLeft, FaTrash, FaPaperPlane } from 'react-icons/fa';
 import ChatComponent from '../_components/chat/Conversation';
 import LockScreen from '../_components/others/LockScreen';
 import Modal from '../_components/profile/modal';
-import { useSendAgentMessage, useGetAgentConversation, useClearAgentConversation } from '../_services/userService';
+import {
+    useSendAgentMessage,
+    useGetAgentConversation,
+    useClearAgentConversation,
+} from '../_services/userService';
 import { useTranslation } from 'react-i18next';
 
 const Chat: React.FC = () => {
     const router = useRouter();
     const { t } = useTranslation('global');
 
-    const { data: conversationData, isError: error, refetch: refetchConversation } = useGetAgentConversation();
+    const {
+        data: conversationData,
+        isError: error,
+        refetch: refetchConversation,
+    } = useGetAgentConversation();
     const { mutate: sendMessage, isPending: isSending } = useSendAgentMessage();
     const { mutate: clearConversation } = useClearAgentConversation();
 
@@ -144,7 +152,7 @@ const Chat: React.FC = () => {
                         <button
                             onClick={handleSendMessage}
                             disabled={isSending || !newMessage.trim()}
-                            className="bg-gray-700 text-white p-8 rounded-full focus:outline-none hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-600 transition-colors"
+                            className="bg-green-700 text-white p-8 rounded-full focus:outline-none hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed border border-green-600 transition-colors"
                         >
                             <FaPaperPlane className="w-full h-full" />
                         </button>
