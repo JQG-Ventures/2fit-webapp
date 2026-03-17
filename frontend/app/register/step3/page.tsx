@@ -1,4 +1,3 @@
-//@ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
@@ -8,6 +7,8 @@ import RegistrationHeader from '../../_components/register/RegistrationHeader';
 import RegistrationButtons from '@/app/_components/register/RegisterButtons';
 import { CgGenderFemale, CgGenderMale } from 'react-icons/cg';
 import { useTranslation } from 'react-i18next';
+import type { Gender } from '@/app/_types/register';
+import type { IconType } from 'react-icons';
 
 export default function RegisterStep3() {
     const { t } = useTranslation('global');
@@ -15,14 +16,15 @@ export default function RegisterStep3() {
     const router = useRouter();
     const [isSubmittingNext, setIsSubmittingNext] = useState(false);
     const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
-    const [selectedGender, setSelectedGender] = useState(data.gender || null);
+    const initialGender = data.gender === 'm' || data.gender === 'f' ? data.gender : null;
+    const [selectedGender, setSelectedGender] = useState<Gender | null>(initialGender);
 
-    const genders = [
+    const genders: Array<{ id: number; label: string; value: Gender; Icon: IconType }> = [
         { id: 0, label: t('RegisterPagestep3.woman'), value: 'f', Icon: CgGenderFemale },
         { id: 1, label: t('RegisterPagestep3.man'), value: 'm', Icon: CgGenderMale },
     ];
 
-    const handleGenderSelection = (genderValue) => {
+    const handleGenderSelection = (genderValue: Gender) => {
         setSelectedGender(genderValue);
         updateData({ gender: genderValue });
     };

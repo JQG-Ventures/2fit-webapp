@@ -7,16 +7,28 @@ import { FaSearch, FaSpinner } from 'react-icons/fa';
 import Image from 'next/image';
 import { useDebounce } from '@/app/utils/utils';
 import { useRouter } from 'next/navigation';
+import type { ApiResponse } from '@/app/_types/api';
 
 type SearchBarProps = {
     isDesktop?: boolean;
 };
 
+type SearchResultKind = 'exercise' | 'plan';
+
+interface SearchResult {
+    id: string;
+    kind: SearchResultKind;
+    typeLabel: string;
+    name: string;
+    image: string;
+}
+
+type SearchableExercise = Pick<Exercise, '_id' | 'exercise_id' | 'name' | 'image_url'>;
+type SearchablePlan = Pick<WorkoutPlan, '_id' | 'name' | 'image_url'>;
+
 const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [filteredResults, setFilteredResults] = useState<
-        { name: string; type: string; image: string; id: string }[]
-    >([]);
+    const [filteredResults, setFilteredResults] = useState<SearchResult[]>([]);
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [isSearchOpen, setSearchOpen] = useState(false);
     const [visibleCount, setVisibleCount] = useState(isDesktop ? 4 : 10);
@@ -29,23 +41,21 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
     const getExercisesUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/exercises/exercises`;
     const getPlansUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/plans`;
 
-    const { data: exercisesData, isLoading: loadingExercises } = useApiGet<{
-        status: string;
-        message: any;
-    }>(['exercises'], getExercisesUrl);
-    const { data: plansData, isLoading: loadingPlans } = useApiGet<{
-        status: string;
-        message: any;
-    }>(['plans'], getPlansUrl);
+    const { data: exercisesData, isLoading: loadingExercises } = useApiGet<
+        ApiResponse<SearchableExercise[]>
+    >(['exercises'], getExercisesUrl);
+    const { data: plansData, isLoading: loadingPlans } = useApiGet<ApiResponse<SearchablePlan[]>>(
+        ['plans'],
+        getPlansUrl,
+    );
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
     const isLoading = loadingExercises || loadingPlans;
 
-    const handleItemClick = (id: string, type: string) => {
+    const handleItemClick = (id: string, kind: SearchResultKind) => {
         setLoadingId(id);
 
-        const route =
-            type.toLowerCase() === 'exercise' ? `/exercises/${id}` : `/workouts/plan/${id}`;
+        const route = kind === 'exercise' ? `/exercises/${id}` : `/workouts/plan/${id}`;
 
         setTimeout(() => {
             router.push(route);
@@ -53,30 +63,41 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
         }, 500);
     };
 
-    const exercises = useMemo(() => {
+    const exercises = useMemo<SearchResult[]>(() => {
         return (
-            exercisesData?.message.map((item: any) => ({
-                name: item.name,
-                type: 'Exercise',
-                image: item.image_url,
-            })) || []
+            exercisesData?.message.flatMap((item) => {
+                const id = item._id ?? item.exercise_id;
+
+                if (!id) {
+                    return [];
+                }
+
+                return [
+                    {
+                        id,
+                        kind: 'exercise',
+                        typeLabel: 'Exercise',
+                        name: item.name,
+                        image: item.image_url,
+                    },
+                ];
+            }) ?? []
         );
     }, [exercisesData]);
 
-    const plans = useMemo(() => {
+    const plans = useMemo<SearchResult[]>(() => {
         return (
-            plansData?.message.map((item: any) => ({
-                name: item.name,
-                type: 'Workout Plan',
-                image: item.image_url,
+            plansData?.message.map((item) => ({
                 id: item._id,
-            })) || []
+                kind: 'plan',
+                typeLabel: 'Workout Plan',
+                name: item.name,
+                image: item.image_url,
+            })) ?? []
         );
     }, [plansData]);
 
-    const allResults = useMemo(() => {
-        return [...exercises, ...plans];
-    }, [exercises, plans]);
+    const allResults = useMemo<SearchResult[]>(() => [...exercises, ...plans], [exercises, plans]);
 
     useEffect(() => {
         if (debouncedSearchTerm.trim() === '') {
@@ -167,11 +188,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                             onScroll={handleScroll}
                         >
                             {filteredResults.slice(0, visibleCount).map((result, index) => (
-                                <React.Fragment key={index}>
+                                <React.Fragment key={`${result.kind}-${result.id}`}>
                                     <div
                                         className="p-4 text-black text-lg hover:bg-gray-200 cursor-pointer rounded-md transition-opacity duration-300 relative"
                                         onMouseDown={(e) => e.preventDefault()} // Prevents blur event from closing the search results
-                                        onClick={() => handleItemClick(result.id, result.type)} // Click event now works properly
+                                        onClick={() => handleItemClick(result.id, result.kind)} // Click event now works properly
                                     >
                                         <div className="flex flex-row space-x-4">
                                             {loadingId === result.id ? ( // Show loading animation if clicked
@@ -183,7 +204,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                                                     <Image
                                                         src={result.image}
                                                         alt={result.name}
-                                                        layout="intrinsic"
                                                         width={64}
                                                         height={64}
                                                         className="w-1/4 h-full object-cover rounded-lg"
@@ -193,7 +213,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                                                             {result.name}
                                                         </span>
                                                         <div className="text-sm text-gray-500">
-                                                            {result.type}
+                                                            {result.typeLabel}
                                                         </div>
                                                     </div>
                                                 </>
@@ -249,10 +269,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                         ) : (
                             <div className="w-full rounded-lg p-4">
                                 {filteredResults.slice(0, visibleCount).map((result, index) => (
-                                    <React.Fragment key={index}>
+                                    <React.Fragment key={`${result.kind}-${result.id}`}>
                                         <div
                                             className="p-4 text-black hover:bg-gray-200 cursor-pointer transition-opacity duration-300"
-                                            onClick={() => handleItemClick(result.id, result.type)}
+                                            onClick={() => handleItemClick(result.id, result.kind)}
                                         >
                                             <div className="flex flex-row space-x-4">
                                                 {loadingId === result.id ? ( // Show loading animation if clicked
@@ -264,7 +284,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                                                         <Image
                                                             src={result.image}
                                                             alt={result.name}
-                                                            layout="intrinsic"
                                                             width={64}
                                                             height={64}
                                                             className="w-1/4 h-full object-cover rounded-lg"
@@ -274,7 +293,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                                                                 {result.name}
                                                             </span>
                                                             <div className="text-sm text-gray-500">
-                                                                {result.type}
+                                                                {result.typeLabel}
                                                             </div>
                                                         </div>
                                                     </>

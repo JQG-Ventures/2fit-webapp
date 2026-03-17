@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -7,12 +6,18 @@ import { useRegister } from '../../_components/register/RegisterProvider';
 import { registerUser } from '../../_services/registerService';
 import { useTranslation } from 'react-i18next';
 import { signIn, useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
+import type { ApiResponse } from '@/app/_types/api';
+import type { AuthApiTokenMessage } from '@/app/_types/auth';
+import { parseJson } from '@/app/utils/http';
+import { buildRegisterPayload } from '@/app/utils/register';
 
 export default function RegisterStep11() {
     const { t } = useTranslation('global');
     const router = useRouter();
     const { data } = useRegister();
-    const { data: session } = useSession();
+    const { data: sessionData } = useSession();
+    const session = sessionData as Session | null;
     const [textIndex, setTextIndex] = useState(0);
     const [showText, setShowText] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
@@ -42,9 +47,8 @@ export default function RegisterStep11() {
             hasRegistered.current = true;
 
             try {
-                delete data['countryCode'];
-
-                const registerResult = await registerUser(data);
+                const registrationPayload = buildRegisterPayload(data);
+                const registerResult = await registerUser(registrationPayload);
 
                 if (!registerResult || registerResult?.status === 'error') {
                     setErrorMessage(t('RegisterPagestep11.errormsg'));
@@ -52,9 +56,9 @@ export default function RegisterStep11() {
                     return;
                 }
 
-                if (data.auth_provider === 'default') {
-                    const password = data.password;
-                    const email = data.email;
+                if (registrationPayload.auth_provider === 'default') {
+                    const password = registrationPayload.password;
+                    const email = registrationPayload.email;
                     const response = await signIn('credentials', {
                         email,
                         password,
@@ -71,8 +75,9 @@ export default function RegisterStep11() {
                     setTimeout(() => {
                         router.push('/home');
                     }, 3000);
-                } else if (data.auth_provider === 'google') {
-                    const googleIdToken = session?.googleIdToken;
+                } else if (registrationPayload.auth_provider === 'google') {
+                    const googleIdToken =
+                        typeof session?.googleIdToken === 'string' ? session.googleIdToken : null;
 
                     if (!googleIdToken) {
                         setErrorMessage('No Google ID token available. Please sign in again.');
@@ -88,19 +93,19 @@ export default function RegisterStep11() {
                         },
                     );
                     if (!res.ok) {
-                        const errData = await res.json();
+                        const errData = await parseJson<ApiResponse<string>>(res);
                         setErrorMessage(errData?.message || 'Could not complete Google login');
                         setIsLoading(false);
                         return;
                     }
-                    const data = await res.json();
+                    const googleLoginData = await parseJson<ApiResponse<AuthApiTokenMessage>>(res);
 
                     await signIn('flaskgoogle', {
-                        access_token: data.message.access_token,
-                        refresh_token: data.message.refresh_token,
-                        expires_at: data.message.expires_at,
-                        user_id: data.message.user_id,
-                        user_name: data.message.name,
+                        access_token: googleLoginData.message.access_token,
+                        refresh_token: googleLoginData.message.refresh_token,
+                        expires_at: googleLoginData.message.expires_at,
+                        user_id: googleLoginData.message.user_id,
+                        user_name: googleLoginData.message.name,
                         redirect: false,
                     });
 
@@ -108,7 +113,7 @@ export default function RegisterStep11() {
                         router.push('/home');
                     }, 3000);
                 }
-            } catch (error) {
+            } catch {
                 setErrorMessage(t('RegisterPagestep11.errormsg'));
                 setIsLoading(false);
             }

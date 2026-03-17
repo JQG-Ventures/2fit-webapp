@@ -1,147 +1,23 @@
-"""Model for managing CRUD operations on exercises stored in MongoDB."""
+from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Optional, List
+from sqlalchemy import Boolean, String, Text
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.orm import Mapped, mapped_column
 
-from app.Schemas.ExerciseSchema import exercise_schema, exercises_schema
-from app.extensions import mongo
-from bson.objectid import ObjectId
-from datetime import datetime
-from marshmallow import ValidationError
+from app.models.base import BaseModel
 
 
-@dataclass
-class ExerciseData:
-    """
-    Represents metadata for a physical exercise.
+class Exercise(BaseModel):
+    __tablename__ = "exercises"
 
-    Attributes:
-        _id (Optional[str]): The unique identifier of the exercise (MongoDB ObjectId as string).
-        name (str): The name of the exercise.
-        description (Optional[str]): A brief description of the exercise.
-        category (Optional[List[str]]): Tags or categories associated with the exercise.
-        muscle_group (Optional[List[str]]): Targeted muscle groups.
-        equipment (Optional[List[str]]): Required equipment to perform the exercise.
-        video_url (Optional[str]): URL to a video demonstration.
-        image_url (Optional[str]): URL to an image or thumbnail.
-        is_active (bool): Indicates if the exercise is currently active.
-        created_at (Optional[str]): ISO timestamp when the exercise was created.
-        updated_at (Optional[str]): ISO timestamp of the last update.
-    """
-
-    _id: Optional[str] = None
-    name: str = ""
-    description: Optional[str] = None
-    category: Optional[List[str]] = field(default_factory=list)
-    muscle_group: Optional[List[str]] = field(default_factory=list)
-    equipment: Optional[List[str]] = field(default_factory=list)
-    video_url: Optional[str] = None
-    image_url: Optional[str] = None
-    is_active: bool = True
-    created_at: Optional[str] = None
-    updated_at: Optional[str] = None
-
-
-class Exercise:
-    """CRUD operations for Exercise."""
-
-    @staticmethod
-    def get_exercises():
-        """Return the list of workout plans that exist."""
-        try:
-            result = mongo.db.exercise.find({"is_active": True})
-            return exercises_schema.dump(result)
-        except Exception as e:
-            raise Exception(f"Error retrieving exercises: {str(e)}")
-
-    @staticmethod
-    def create_exercise(data):
-        """Create a new exercise in MongoDB with timestamps."""
-        try:
-            validated_data = exercise_schema.load(data)
-            validated_data["created_at"] = datetime.now()
-            validated_data["updated_at"] = datetime.now()
-            result = mongo.db.exercise.insert_one(data)
-            return str(result.inserted_id)
-        except ValidationError as e:
-            raise ValueError(f"Invalid data: {e.messages}")
-        except Exception as e:
-            raise Exception(f"Error creating exercise: {str(e)}")
-
-    @staticmethod
-    def create_bulk_exercises(data_list):
-        """Create multiple exercises in MongoDB."""
-        try:
-            for data in data_list:
-                data["created_at"] = datetime.now()
-                data["updated_at"] = datetime.now()
-            result = mongo.db.exercise.insert_many(data_list)
-            return [str(inserted_id) for inserted_id in result.inserted_ids]
-        except Exception as e:
-            raise Exception(f"Error creating bulk exercises: {str(e)}")
-
-    @staticmethod
-    def get_exercise_by_id(exercise_id):
-        """Fetch an exercise by its ID."""
-        try:
-            exercise = mongo.db.exercise.find_one({"_id": ObjectId(exercise_id)})
-            if exercise:
-                return exercise_schema.dump(exercise)
-            return None
-        except Exception as e:
-            raise Exception(f"Error retrieving exercise: {str(e)}")
-
-    @staticmethod
-    def update_exercise(exercise_id, data):
-        """Update an exercise by its ID and update the updated_at timestamp."""
-        try:
-            validated_data = exercise_schema.load(data)
-            validated_data["updated_at"] = datetime.utcnow()
-
-            result = mongo.db.exercise.update_one(
-                {"_id": ObjectId(exercise_id)}, {"$set": validated_data}
-            )
-            return result.modified_count > 0
-        except ValidationError as e:
-            raise ValueError(f"Invalid data: {e.messages}")
-        except Exception as e:
-            raise Exception(f"Error updating exercise: {str(e)}")
-
-    @staticmethod
-    def delete_exercise(exercise_id):
-        """Disable an exercise by its ID and update the updated_at timestamp."""
-        try:
-            result = mongo.db.exercise.update_one(
-                {"_id": ObjectId(exercise_id)},
-                {"$set": {"is_active": False, "updated_at": datetime.now()}},
-            )
-            return result.modified_count > 0
-        except Exception as e:
-            raise Exception(f"Error updating exercise: {str(e)}")
-
-    @staticmethod
-    def get_similar_exercises(exercise_id):
-        """
-        Fetch exercises similar to the given exercise.
-
-        Similarity is based on muscle group and category.
-        """
-        try:
-            exercise = mongo.db.exercise.find_one({"_id": ObjectId(exercise_id), "is_active": True})
-            if not exercise:
-                return []
-
-            similar_exercises = mongo.db.exercise.find(
-                {
-                    "$and": [
-                        {"_id": {"$ne": ObjectId(exercise_id)}},
-                        {"category": exercise["category"]},
-                        {"muscle_group": {"$in": exercise["muscle_group"]}},
-                        {"is_active": True},
-                    ]
-                }
-            )
-
-            return exercises_schema.dump(similar_exercises)
-        except Exception as e:
-            raise Exception(f"Error retrieving similar exercises: {str(e)}")
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    category: Mapped[str] = mapped_column(String(20), nullable=False)
+    image_url: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    video_url: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    muscle_group: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    difficulty: Mapped[str] = mapped_column(String(20), nullable=False, default="beginner")
+    equipment: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    instructions: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    contradictions: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)

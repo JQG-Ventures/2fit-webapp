@@ -15,28 +15,52 @@ import { Pagination } from 'swiper/modules';
 import './workouts.css';
 import { useApiGet } from '../utils/apiClient';
 import { useSession } from 'next-auth/react';
+import type { ApiResponse } from '../_types/api';
+import { parseJson } from '../utils/http';
+
+interface ActivePlanSummary {
+    id: string;
+    name: string;
+    plan_type: WorkoutPlan['plan_type'];
+}
+
+interface WorkoutProgressSummary {
+    progress: number;
+    exercises_left?: Exercise[];
+}
+
+interface PlanProgressCard {
+    id: string;
+    plan_type: WorkoutPlan['plan_type'];
+    name: string;
+    progressData: WorkoutProgressSummary;
+}
+
+interface AppSession {
+    user?: {
+        token?: string | null;
+    };
+}
 
 export default function Workouts() {
     const { t } = useTranslation('global');
     const router = useRouter();
     const [isClicked, setIsClicked] = useState(false);
-    const { data: session, status } = useSession();
-    // @ts-ignore
-    const token = session?.user?.token;
+    const { data: sessionData } = useSession();
+    const session = sessionData as AppSession | null;
+    const token = session?.user?.token ?? null;
     const getActivePlansUrl = `/api/users/active-plans`;
     const getPopularWorkoutsUrl = `/api/workouts/popular`;
-    const { data: activePlansResponse, isError: errorActivePlans } = useApiGet<{
-        status: string;
-        message: any[];
-    }>(['activePlans'], getActivePlansUrl);
+    const { data: activePlansResponse, isError: errorActivePlans } = useApiGet<
+        ApiResponse<ActivePlanSummary[]>
+    >(['activePlans'], getActivePlansUrl);
     const {
         data: popularWorkoutResponse,
         isLoading: loadingPopularWorkouts,
         isError: errorPopularWorkouts,
-    } = useApiGet<{ status: string; message: any[] }>(['popularWorkouts'], getPopularWorkoutsUrl);
+    } = useApiGet<ApiResponse<WorkoutPlan[]>>(['popularWorkouts'], getPopularWorkoutsUrl);
 
-    const [progressData, setProgressData] = useState<any[]>([]);
-    const [loadingProgressData, setLoadingProgressData] = useState(true);
+    const [progressData, setProgressData] = useState<PlanProgressCard[]>([]);
     const [errorProgressData, setErrorProgressData] = useState<string | null>(null);
     const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
 
@@ -47,46 +71,51 @@ export default function Workouts() {
             }
 
             try {
-                const progressPromises = activePlansResponse.message.map(async (plan) => {
-                    if (plan.plan_type === 'challenge') {
-                        const progressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/challenges/challenges/progress?challenge_id=${plan.id}`;
+                const progressPromises: Promise<PlanProgressCard>[] =
+                    activePlansResponse.message.map(async (plan): Promise<PlanProgressCard> => {
+                        if (plan.plan_type === 'challenge') {
+                            const progressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/challenges/challenges/progress?challenge_id=${plan.id}`;
+                            const response = await fetch(progressUrl, {
+                                method: 'GET',
+                                headers: { Authorization: `Bearer ${token}` },
+                            });
+                            const jsonData =
+                                await parseJson<ApiResponse<WorkoutProgressSummary>>(response);
+                            if (!response.ok) {
+                                console.error(t('workouts.fetchingError'));
+                            }
+                            return {
+                                id: plan.id,
+                                plan_type: 'challenge',
+                                name: plan.name,
+                                progressData: jsonData.message,
+                            };
+                        }
+
+                        const progressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/workouts/progress?workout_plan_id=${plan.id}`;
                         const response = await fetch(progressUrl, {
                             method: 'GET',
                             headers: { Authorization: `Bearer ${token}` },
                         });
-                        const jsonData = await response.json();
+                        const jsonData =
+                            await parseJson<ApiResponse<WorkoutProgressSummary>>(response);
                         if (!response.ok) {
-                            console.error(jsonData.message || t('workouts.fetchingError'));
+                            console.error(t('workouts.fetchingError'));
                         }
                         return {
                             id: plan.id,
-                            plan_type: 'challenge',
+                            plan_type: plan.plan_type,
                             name: plan.name,
                             progressData: jsonData.message,
                         };
-                    }
-
-                    const progressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/workouts/progress?workout_plan_id=${plan.id}`;
-                    const response = await fetch(progressUrl, {
-                        method: 'GET',
-                        headers: { Authorization: `Bearer ${token}` },
                     });
-                    const jsonData = await response.json();
-                    if (!response.ok) {
-                        console.error(jsonData.message || t('workouts.fetchingError'));
-                    }
-                    return {
-                        id: plan.id,
-                        plan_type: plan.plan_type,
-                        name: plan.name,
-                        progressData: jsonData.message,
-                    };
-                });
 
                 const progressResults = await Promise.all(progressPromises);
                 setProgressData(progressResults);
-            } catch (error: any) {
-                setErrorProgressData(error.message);
+            } catch (error) {
+                setErrorProgressData(
+                    error instanceof Error ? error.message : t('workouts.fetchingError'),
+                );
             }
         };
 
@@ -130,7 +159,7 @@ export default function Workouts() {
                 pagination={{ clickable: true }}
                 className="h-[15vh] w-full overflow-hidden rounded-3xl shadow-xl lg:max-w-3xl"
             >
-                {progressData.map((plan: any) => (
+                {progressData.map((plan) => (
                     <SwiperSlide key={plan.id} className="flex justify-center items-center">
                         <div
                             className={`cursor-pointer flex flex-row justify-center items-center w-full h-full rounded-3xl bg-black px-6 

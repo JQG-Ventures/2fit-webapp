@@ -1,4 +1,14 @@
-export async function getSimilarExercises(exercise_id: string, token: any) {
+import type { ApiResponse } from '../_types/api';
+import { parseJson } from '../utils/http';
+
+export async function getSimilarExercises(
+    exercise_id: string,
+    token: string | null,
+): Promise<Exercise[] | null> {
+    if (!token) {
+        return null;
+    }
+
     try {
         const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/exercises/similar-exercises/${exercise_id}`,
@@ -18,7 +28,7 @@ export async function getSimilarExercises(exercise_id: string, token: any) {
             throw new Error('Failed to get similar exercises');
         }
 
-        const data = await response.json();
+        const data = await parseJson<ApiResponse<Exercise[]>>(response);
         return data.message;
     } catch (error) {
         console.error(`Error fetching similar exercises for exercise id ${exercise_id}`, error);

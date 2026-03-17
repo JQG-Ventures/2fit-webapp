@@ -1,179 +1,147 @@
-"""
-Service for handling user progress in workout challenges.
-
-Provides methods to:
-- Save partial progress for a challenge day
-- Move completed challenge days from active to completed
-"""
-
-from app.extensions import mongo
-from app.utils.utils import convert_to_objectid
+from __future__ import annotations
 
 import logging
+import uuid
+from datetime import datetime
+from typing import Any
 
+from app.extensions import db
+from app.repositories.progress_repository import (
+    ActiveChallengeRepository,
+    CompletedChallengeDayRepository,
+)
 
 logger = logging.getLogger(__name__)
+Payload = dict[str, Any]
 
 
 class UserChallengeService:
-    """
-    Handles the logic for updating a user's challenge progress.
-
-    This service updates the `workout_history` field in the user document,
-    including both active and completed challenge states.
-    """
+    _active_repo = ActiveChallengeRepository()
+    _completed_repo = CompletedChallengeDayRepository()
 
     @staticmethod
-    def save_challenge_progress(user_id: str, challenge_id: str, progress_data: dict) -> None:
-        """
-        Save or update the user's partial progress for a challenge day.
-
-        Logic:
-        - If an entry exists in `active_challenges` for same challenge ID, sequence_day, and date,
-        it updates the exercise stats (sets, reps, duration, etc.).
-        - Otherwise, it creates a new active challenge progress entry.
-
-        Args:
-            user_id (str): The ID of the user.
-            challenge_id (str): The ID of the challenge.
-            progress_data (dict): Data with keys: date, sequence_day, and a list of exercises.
-        """
+    def save_challenge_progress(user_id: str, challenge_id: str, progress_data: Payload) -> None:
         try:
-            user_obj_id = convert_to_objectid(user_id)
-            challenge_obj_id = convert_to_objectid(challenge_id)
+            user_uuid = uuid.UUID(user_id)
+            challenge_uuid = uuid.UUID(challenge_id)
+            repo = ActiveChallengeRepository()
 
-            user_doc = mongo.db.users.find_one({"_id": user_obj_id})
-            if not user_doc:
-                raise Exception("Usuario no encontrado.")
+            active = repo.get_for_user(user_uuid, challenge_uuid)
 
-            active_challenges = user_doc.get("workout_history", {}).get("active_challenges", [])
-            in_prog = None
-
-            for ch in active_challenges:
-                if ch.get("challenge_id") == challenge_obj_id:
-                    in_prog = ch
-                    break
-
-            if in_prog:
-                if (
-                    in_prog.get("sequence_day") == progress_data["sequence_day"]
-                    and in_prog.get("date") == progress_data["date"]
-                ):
-                    existing_exs = {ex["exercise_id"]: ex for ex in in_prog.get("exercises", [])}
-                    new_exs = {ex["exercise_id"]: ex for ex in progress_data["exercises"]}
-
-                    for ex_id, ex_data in new_exs.items():
-                        if ex_id in existing_exs:
-                            exist = existing_exs[ex_id]
-                            exist["sets_completed"] = max(
-                                exist.get("sets_completed", 0),
-                                ex_data.get("sets_completed", 0),
-                            )
-                            exist["reps_completed"] = exist.get("reps_completed", []) + ex_data.get(
-                                "reps_completed", []
-                            )
-                            exist["duration_seconds"] = exist.get(
-                                "duration_seconds", 0
-                            ) + ex_data.get("duration_seconds", 0)
-                            exist["calories_burned"] = exist.get(
-                                "calories_burned", 0
-                            ) + ex_data.get("calories_burned", 0)
-                            exist["is_completed"] = exist.get("is_completed", False) or ex_data.get(
-                                "is_completed", False
-                            )
-                        else:
-                            existing_exs[ex_id] = ex_data
-
-                    in_prog["exercises"] = list(existing_exs.values())
-                else:
-                    in_prog["date"] = progress_data["date"]
-                    in_prog["sequence_day"] = progress_data["sequence_day"]
-                    in_prog["exercises"] = progress_data["exercises"]
-            else:
-                new_in_prog = {
-                    "challenge_id": challenge_obj_id,
-                    "date": progress_data["date"],
-                    "sequence_day": progress_data["sequence_day"],
-                    "exercises": progress_data["exercises"],
-                }
-                active_challenges.append(new_in_prog)
-
-            mongo.db.users.update_one(
-                {"_id": user_obj_id},
-                {"$set": {"workout_history.active_challenges": active_challenges}},
+            incoming_date_str = progress_data.get("date", "")
+            incoming_date = (
+                datetime.fromisoformat(incoming_date_str) if incoming_date_str else datetime.now()
             )
 
-        except Exception as e:
-            logger.error(f"Error en save_challenge_progress: {e}")
+            if active:
+                same_day = active.sequence_day == progress_data["sequence_day"]
+                same_date = active.date.date() == incoming_date.date() if active.date else False
+                if same_day and same_date:
+                    existing_map = {str(ex.exercise_id): ex for ex in active.exercises}
+                    for ex_data in progress_data.get("exercises", []):
+                        ex_id = ex_data["exercise_id"]
+                        if ex_id in existing_map:
+                            ex = existing_map[ex_id]
+                            ex.sets_completed = max(
+                                ex.sets_completed, ex_data.get("sets_completed", 0)
+                            )
+                            ex.reps_completed = ex.reps_completed + ex_data.get(
+                                "reps_completed", []
+                            )
+                            ex.duration_seconds += ex_data.get("duration_seconds", 0)
+                            ex.calories_burned += ex_data.get("calories_burned", 0)
+                            ex.is_completed = ex.is_completed or ex_data.get("is_completed", False)
+                        else:
+                            repo.add_exercise(
+                                active.id,
+                                uuid.UUID(ex_id),
+                                sets_completed=ex_data.get("sets_completed", 0),
+                                reps_completed=ex_data.get("reps_completed", []),
+                                duration_seconds=ex_data.get("duration_seconds", 0),
+                                calories_burned=ex_data.get("calories_burned", 0),
+                                is_completed=ex_data.get("is_completed", False),
+                            )
+                else:
+                    active.date = incoming_date
+                    active.sequence_day = progress_data["sequence_day"]
+                    for ex in active.exercises:
+                        db.session.delete(ex)
+                    db.session.flush()
+                    for ex_data in progress_data.get("exercises", []):
+                        repo.add_exercise(
+                            active.id,
+                            uuid.UUID(ex_data["exercise_id"]),
+                            sets_completed=ex_data.get("sets_completed", 0),
+                            reps_completed=ex_data.get("reps_completed", []),
+                            duration_seconds=ex_data.get("duration_seconds", 0),
+                            calories_burned=ex_data.get("calories_burned", 0),
+                            is_completed=ex_data.get("is_completed", False),
+                        )
+            else:
+                active = repo.create(
+                    user_id=user_uuid,
+                    challenge_id=challenge_uuid,
+                    date=incoming_date,
+                    sequence_day=progress_data["sequence_day"],
+                )
+                for ex_data in progress_data.get("exercises", []):
+                    repo.add_exercise(
+                        active.id,
+                        uuid.UUID(ex_data["exercise_id"]),
+                        sets_completed=ex_data.get("sets_completed", 0),
+                        reps_completed=ex_data.get("reps_completed", []),
+                        duration_seconds=ex_data.get("duration_seconds", 0),
+                        calories_burned=ex_data.get("calories_burned", 0),
+                        is_completed=ex_data.get("is_completed", False),
+                    )
+
+            db.session.flush()
+        except Exception:
             raise
 
     @staticmethod
-    def save_completed_challenge(user_id: str, completed_data: dict) -> None:
-        """
-        Mark a challenge day as completed for a user.
-
-        Moves the entry from `active_challenges` to `completed_challenges`
-        in the user's `workout_history`.
-
-        It also calculates:
-        - Total duration (seconds)
-        - Total calories burned
-
-        Args:
-            user_id (str): The ID of the user.
-            completed_data (dict): Must include challenge_id, sequence_day, date, and exercises.
-        """
+    def save_completed_challenge(user_id: str, completed_data: Payload) -> None:
         try:
-            user_obj_id = convert_to_objectid(user_id)
-            challenge_id = completed_data["challenge_id"]
-            sequence_day = completed_data["sequence_day"]
-            exercises = completed_data["exercises"]
-
-            user_doc = mongo.db.users.find_one({"_id": user_obj_id})
-            if not user_doc:
-                raise Exception("Usuario no encontrado.")
-
-            active_challenges = user_doc.get("workout_history", {}).get("active_challenges", [])
-            completed_challenges_list = user_doc.get("workout_history", {}).get(
-                "completed_challenges", []
-            )
-            in_prog = None
-
-            for ch in active_challenges:
-                if ch.get("challenge_id") == challenge_id:
-                    in_prog = ch
-                    break
+            user_uuid = uuid.UUID(user_id)
+            challenge_uuid = uuid.UUID(completed_data["challenge_id"])
+            exercises = completed_data.get("exercises", [])
 
             total_duration = sum(ex.get("duration_seconds", 0) for ex in exercises)
             total_calories = sum(ex.get("calories_burned", 0) for ex in exercises)
 
-            completed_entry = {
-                "challenge_id": challenge_id,
-                "sequence_day": sequence_day,
-                "date": completed_data["date"],
-                "duration_seconds": total_duration,
-                "calories_burned": total_calories,
-                "exercises": exercises,
-                "was_skipped": False,
-            }
-
-            completed_challenges_list.append(completed_entry)
-
-            if in_prog:
-                active_challenges = [
-                    ch for ch in active_challenges if ch.get("challenge_id") != challenge_id
-                ]
-
-            mongo.db.users.update_one(
-                {"_id": user_obj_id},
+            completed_repo = CompletedChallengeDayRepository()
+            exercises_data = [
                 {
-                    "$set": {
-                        "workout_history.active_challenges": active_challenges,
-                        "workout_history.completed_challenges": completed_challenges_list,
-                    }
+                    "exercise_id": ex["exercise_id"],
+                    "sets_completed": ex.get("sets_completed", 0),
+                    "reps_completed": ex.get("reps_completed", []),
+                    "duration_seconds": ex.get("duration_seconds", 0),
+                    "calories_burned": ex.get("calories_burned", 0),
+                    "is_completed": ex.get("is_completed", True),
+                }
+                for ex in exercises
+            ]
+
+            completed_repo.save(
+                user_id=user_uuid,
+                challenge_id=challenge_uuid,
+                day_data={
+                    "sequence_day": completed_data["sequence_day"],
+                    "date": datetime.fromisoformat(completed_data["date"])
+                    if isinstance(completed_data.get("date"), str)
+                    else (completed_data.get("date") or datetime.now()),
+                    "duration_seconds": total_duration,
+                    "calories_burned": total_calories,
+                    "was_skipped": False,
                 },
+                exercises_data=exercises_data,
             )
 
-        except Exception as e:
-            logger.error(f"Error en save_completed_challenge: {e}")
+            active_repo = ActiveChallengeRepository()
+            active = active_repo.get_for_user(user_uuid, challenge_uuid)
+            if active:
+                db.session.delete(active)
+
+            db.session.flush()
+        except Exception:
             raise

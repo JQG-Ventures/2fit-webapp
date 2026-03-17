@@ -12,7 +12,7 @@ type RawChallenge = {
         sequence_day: number;
         name: string;
         is_rest: boolean;
-        exercises: any[];
+        exercises: Exercise[];
     }[];
     equipment: string[];
 };

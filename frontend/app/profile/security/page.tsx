@@ -11,6 +11,8 @@ import ChangePasswordModal from '../../_components/profile/ChangePasswordModal';
 import Modal from '../../_components/profile/modal';
 import LoadingScreen from '../../_components/animations/LoadingScreen';
 import { useResetPassword, useUpdateProfile } from '../../_services/userService';
+import type { ApiResponse } from '../../_types/api';
+import type { AppUserProfile } from '../../_types/profile';
 
 interface SecurityItemProps {
     label: string;
@@ -43,14 +45,14 @@ const Security: React.FC = () => {
         data: userData,
         isLoading,
         isError,
-    } = useApiGet<{ status: string; message: any }>([], getProfileUrl);
+    } = useApiGet<ApiResponse<AppUserProfile>>([], getProfileUrl);
 
     const updateSecuritySettings = useUpdateProfile();
 
     const [securitySettings, setSecuritySettings] = useState({
-        faceID: false,
-        rememberMe: false,
-        touchID: false,
+        face_id: false,
+        remember_me: false,
+        touch_id: false,
     });
 
     const [errorMessage, setErrorMessage] = useState<React.ReactNode | null>(null);
@@ -68,6 +70,19 @@ const Security: React.FC = () => {
         [t],
     );
 
+    useEffect(() => {
+        const storedSecuritySettings =
+            userData?.message.settings?.security_settings ??
+            userData?.message.settings?.notifications ??
+            {};
+
+        setSecuritySettings({
+            face_id: storedSecuritySettings.face_id ?? false,
+            remember_me: storedSecuritySettings.remember_me ?? false,
+            touch_id: storedSecuritySettings.touch_id ?? false,
+        });
+    }, [userData]);
+
     const handleToggle = useCallback(
         async (type: keyof typeof securitySettings) => {
             const previousState = securitySettings[type];
@@ -82,13 +97,14 @@ const Security: React.FC = () => {
                         security_settings: {
                             ...updatedSecuritySettings,
                         },
-                        notifications: userData?.message.settings.notifications,
-                        nutrition_enabled: userData?.message.settings.nutrition_enabled,
-                        language_preference: userData?.message.settings.language_preference,
+                        notifications: userData?.message.settings?.notifications ?? {},
+                        nutrition_enabled: userData?.message.settings?.nutrition_enabled ?? false,
+                        language_preference:
+                            userData?.message.settings?.language_preference ?? 'es',
                     },
                 };
 
-                const response = await updateSecuritySettings.mutateAsync(updatedProfile);
+                await updateSecuritySettings.mutateAsync(updatedProfile);
             } catch (error) {
                 console.error(error);
                 setSecuritySettings({ ...securitySettings, [type]: previousState });
@@ -100,7 +116,7 @@ const Security: React.FC = () => {
 
     const handlePasswordChangeSubmit = async (newPassword: string) => {
         try {
-            const email = userData?.message?.email;
+            const email = userData?.message.email;
 
             if (!email) {
                 throw new Error('User data is incomplete');

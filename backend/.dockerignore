@@ -1,3 +1,11 @@
-.github/*
+.env
+.env.*
 .git
+.github
+.mypy_cache
+.pytest_cache
+.venv
+__pycache__
+*.pyc
 audio.ogg
+venv

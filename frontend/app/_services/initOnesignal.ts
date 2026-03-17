@@ -1,6 +1,16 @@
 declare global {
+    interface OneSignalApi {
+        initialized?: boolean;
+        _initCalled?: boolean;
+        init(config: { appId: string; allowLocalhostAsSecureOrigin: boolean }): void;
+        push(callback: () => void | Promise<void>): void;
+        getNotificationPermission(): Promise<string>;
+        showSlidedownPrompt(): Promise<void>;
+        getUserId(): Promise<string | null>;
+    }
+
     interface Window {
-        OneSignal: any;
+        OneSignal: OneSignalApi;
         OneSignalInitialized?: boolean;
     }
 }
@@ -35,7 +45,7 @@ export const initializeOneSignal = async (
     await loadOneSignalScript();
 
     if (!window.OneSignal || typeof window.OneSignal !== 'function') {
-        window.OneSignal = window.OneSignal || [];
+        window.OneSignal = (window.OneSignal || []) as unknown as OneSignalApi;
     }
 
     await new Promise<void>((resolve) => {

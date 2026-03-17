@@ -1,4 +1,34 @@
+import type { ApiResponse, ApiStatusResponse } from '../_types/api';
+import type { AuthApiTokenMessage, AuthTokenState } from '../_types/auth';
+import { parseJson } from '../utils/http';
 import { useApiDelete, useApiPost, useApiPut } from '../utils/apiClient';
+
+interface UserLookup {
+    _id?: string;
+    email?: string;
+    number?: string;
+    code_number?: string;
+    name?: string;
+    last?: string;
+}
+
+interface ChatResponse {
+    message: string;
+    response: string;
+}
+
+interface ProfileUpdatePayload {
+    name?: string;
+    email?: string;
+    birthdate?: string;
+    country?: string;
+    gender?: string;
+    code_number?: string;
+    number?: string;
+    profile_image?: string;
+}
+
+type RefreshTokenResponse = ApiResponse<AuthApiTokenMessage>;
 
 export const fetchUserDataByNumber = async (number: string) => {
     try {
@@ -11,7 +41,7 @@ export const fetchUserDataByNumber = async (number: string) => {
             }
             throw new Error('Error fetching user profile');
         }
-        const data = await res.json();
+        const data = await parseJson<ApiResponse<UserLookup>>(res);
         return data.message;
     } catch (error) {
         console.error('Error fetching user profile:', error);
@@ -30,7 +60,7 @@ export const fetchUserDataByEmail = async (email: string) => {
             }
             throw new Error('Error fetching user profile');
         }
-        const data = await res.json();
+        const data = await parseJson<ApiResponse<UserLookup>>(res);
         return data.message;
     } catch (error) {
         console.error('Error fetching user profile:', error);
@@ -49,7 +79,7 @@ export async function checkUserInBackend(email: string) {
         if (!res.ok) {
             return null;
         }
-        const data = await res.json();
+        const data = await parseJson<ApiResponse<UserLookup>>(res);
         return data?.message;
     } catch (error) {
         console.error('Error checking user in backend:', error);
@@ -57,7 +87,11 @@ export async function checkUserInBackend(email: string) {
     }
 }
 
-export async function refreshAccessToken(token: any) {
+export async function refreshAccessToken(token: AuthTokenState): Promise<AuthTokenState> {
+    if (!token.refreshToken) {
+        return { ...token, error: 'RefreshAccessTokenError' };
+    }
+
     try {
         const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/refresh-token`,
@@ -74,7 +108,7 @@ export async function refreshAccessToken(token: any) {
             throw new Error('Failed to refresh access token');
         }
 
-        const refreshed = await response.json();
+        const refreshed = await parseJson<RefreshTokenResponse>(response);
         const newAccess = refreshed.message.access_token;
         const newExp = refreshed.message.expires_at * 1000;
 
@@ -83,7 +117,7 @@ export async function refreshAccessToken(token: any) {
             accessToken: newAccess,
             accessTokenExpires: newExp,
         };
-    } catch (error) {
+    } catch {
         return { ...token, error: 'RefreshAccessTokenError' };
     }
 }
@@ -94,55 +128,52 @@ export const useSendProgressToBackend = () => {
             queryParams: { workout_plan_id: string };
             body: { exercises: ExerciseProgress[]; day_of_week: string };
         },
-        { status: string; message: string }
+        ApiStatusResponse
     >('/api/users/workouts/progress');
 };
 
 export const useSendCompleteToBackend = () => {
-    return useApiPost<{ body: ExerciseComplete }, { status: string; message: string }>(
+    return useApiPost<{ body: ExerciseComplete }, ApiStatusResponse>(
         '/api/users/workouts/complete',
     );
 };
 
 export const useSaveWorkout = () => {
-    return useApiPost<{ queryParams: { workout_id: string } }, { status: string; message: string }>(
+    return useApiPost<{ queryParams: { workout_id: string } }, ApiStatusResponse>(
         '/api/workouts/saved',
     );
 };
 
 export const useDeleteWorkout = () => {
-    return useApiDelete<
-        { queryParams: { workout_id: string } },
-        { status: string; message: string }
-    >('/api/workouts/saved');
-};
-
-export const useEditProfile = () => {
-    return useApiPut<any, { status: string; message: string }>('/api/users/profile');
-};
-
-export const useSendMessage = (userPhoneNumber: string) => {
-    return useApiPost<{ body: { message: string } }, { message: string; response: string }>(
-        '/api/chat',
-        undefined,
-        { 'User-Phone-Number': userPhoneNumber },
+    return useApiDelete<{ queryParams: { workout_id: string } }, ApiStatusResponse>(
+        '/api/workouts/saved',
     );
 };
 
+export const useEditProfile = () => {
+    return useApiPut<ProfileUpdatePayload, ApiStatusResponse>('/api/users/profile');
+};
+
+export const useSendMessage = (userPhoneNumber: string) => {
+    return useApiPost<{ body: { message: string } }, ChatResponse>('/api/chat', undefined, {
+        'User-Phone-Number': userPhoneNumber,
+    });
+};
+
 export const useResetPassword = () => {
-    return useApiPut<{ email: string; password: string }, { status: string; message: string }>(
+    return useApiPut<{ email: string; password: string }, ApiStatusResponse>(
         '/api/users/reset-password',
     );
 };
 
 export const useUpdateProfile = () => {
-    return useApiPut<{ settings: object }, { status: string; message: string }>(
+    return useApiPut<{ settings: Record<string, unknown> }, ApiStatusResponse>(
         '/api/users/profile',
     );
 };
 
 export const useUploadProfileImage = () => {
-    return useApiPost<{ body: FormData }, { status: string; message: string; url: string }>(
+    return useApiPost<{ body: FormData }, ApiStatusResponse & { url: string }>(
         '/api/users/profile/image',
         undefined,
         { 'Content-Type': 'multipart/form-data' },
@@ -169,11 +200,11 @@ export const updatePassword = async (contact: string, code: string, newPassword:
         );
 
         if (!res.ok) {
-            const errorData = await res.json();
+            const errorData = await parseJson<ApiStatusResponse>(res);
             throw new Error(errorData.message || 'Error updating password.');
         }
 
-        return await res.json();
+        return await parseJson<ApiStatusResponse>(res);
     } catch (error) {
         throw error;
     }
@@ -184,7 +215,7 @@ export const useRegisterPlayerId = () => {
         {
             body: { player_id: string; platform: 'web' | 'ios' | 'android' };
         },
-        { status: string; message: string }
+        ApiStatusResponse
     >('/api/auth/notifications/player-id');
 };
 
@@ -204,7 +235,7 @@ export const useSendChallengeProgress = () => {
                 }[];
             };
         },
-        { status: string; message: string }
+        ApiStatusResponse
     >('/api/challenges/challenges/progress');
 };
 
@@ -224,6 +255,6 @@ export const useSendChallengeComplete = () => {
                 }[];
             };
         },
-        { status: string; message: string }
+        ApiStatusResponse
     >('/api/challenges/challenges/complete');
 };

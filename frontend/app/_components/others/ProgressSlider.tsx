@@ -1,20 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 const ProgressBar: React.FC<{ percentage: number }> = ({ percentage }) => {
-    const pathRef = useRef<any>(null);
+    const pathRef = useRef<SVGPathElement | null>(null);
     const [pathLength, setPathLength] = useState<number>(1);
-
-    useEffect(() => {
-        if (pathRef.current) {
-            setPathLength(pathRef?.current.getTotalLength());
-        }
-    }, []);
+    const [pointPosition, setPointPosition] = useState({ x: 150, y: 10 });
 
     const boundedPercentage = Math.min(Math.max(percentage, 0), 100);
+
+    useEffect(() => {
+        const path = pathRef.current;
+        if (!path) {
+            return;
+        }
+
+        const totalLength = path.getTotalLength();
+        const progressLength = (boundedPercentage / 100) * totalLength;
+        const point = path.getPointAtLength(progressLength);
+
+        setPathLength(totalLength);
+        setPointPosition({ x: point.x, y: point.y });
+    }, [boundedPercentage]);
+
     const progressLength = (boundedPercentage / 100) * pathLength;
-    const pointPosition = pathRef.current
-        ? pathRef.current.getPointAtLength(progressLength)
-        : { x: 150, y: 10 };
 
     return (
         <div className="relative flex items-center justify-center w-full h-full">

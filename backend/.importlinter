@@ -1,0 +1,43 @@
+[importlinter]
+root_package = app
+
+[importlinter:contract:no-routes-from-lower-layers]
+name = Lower layers must not import routes
+type = forbidden
+source_modules =
+    app.models
+    app.repositories
+    app.services
+    app.schemas
+    app.types
+    app.utils
+forbidden_modules =
+    app.routes
+
+[importlinter:contract:no-services-from-models]
+name = Models must not import services
+type = forbidden
+source_modules =
+    app.models
+forbidden_modules =
+    app.services
+
+[importlinter:contract:no-models-from-schemas-types-utils]
+name = Schemas, types and utils must not import models
+type = forbidden
+source_modules =
+    app.schemas
+    app.types
+    app.utils
+forbidden_modules =
+    app.models
+
+[importlinter:contract:no-services-from-schemas-types-utils]
+name = Schemas, types and utils must not import services
+type = forbidden
+source_modules =
+    app.schemas
+    app.types
+    app.utils
+forbidden_modules =
+    app.services

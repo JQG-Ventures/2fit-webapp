@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './Conversation.css';
 import { FaArrowDown } from 'react-icons/fa';
+import type { ChatMessage } from '@/app/_types/chat';
 
 interface ChatComponentProps {
-    conversationData: { message: any };
+    conversationData: { message: ChatMessage[] };
     isBotTyping: boolean;
 }
 
@@ -18,7 +19,7 @@ const TypingIndicator: React.FC = () => {
 };
 
 const ChatComponent: React.FC<ChatComponentProps> = ({ conversationData, isBotTyping }) => {
-    const hasMessages = conversationData.message && conversationData.message.length > 0;
+    const hasMessages = conversationData.message.length > 0;
     const suggestions = [
         'I need a workout plan',
         'How can I lose fat',
@@ -69,7 +70,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ conversationData, isBotTy
                         className="flex-1 overflow-y-auto px-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent"
                     >
                         <div className="flex flex-col space-y-2">
-                            {conversationData.message.map((msg: any, index: number) => (
+                            {conversationData.message.map((msg, index: number) => (
                                 <div
                                     key={index}
                                     className={`w-full flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}

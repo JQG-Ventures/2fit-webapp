@@ -1,4 +1,3 @@
-//@ts-nocheck
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
@@ -10,14 +9,28 @@ import ButtonWithSpinner from '../_components/others/ButtonWithSpinner';
 import { fetchUserDataByEmail } from '../_services/userService';
 import { useTranslation } from 'react-i18next';
 import { signIn } from 'next-auth/react';
+import type { AuthProvider } from '../_types/register';
 
-function SearchParamsHandler({ setErrors, t }) {
+interface SearchParamsHandlerProps {
+    setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+    t: (key: string) => string;
+}
+
+type RegisterEntryField = 'email' | 'password';
+
+interface RegisterEntryFormState {
+    email: string;
+    password: string;
+    auth_provider: AuthProvider;
+}
+
+function SearchParamsHandler({ setErrors, t }: SearchParamsHandlerProps) {
     const searchParams = useSearchParams();
 
     useEffect(() => {
         const errorParam = searchParams.get('error');
         if (errorParam) {
-            const newErrors = {};
+            const newErrors: Record<string, string> = {};
             if (errorParam === 'emailExistsGoogle') {
                 newErrors.email = t('RegisterPage.registeredGoogle');
             } else if (errorParam === 'errorGoogle') {
@@ -35,7 +48,7 @@ function SearchParamsHandler({ setErrors, t }) {
 export default function RegisterStep1() {
     const { data, updateData } = useRegister();
     const { t } = useTranslation('global');
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<RegisterEntryFormState>({
         email: data.email || '',
         password: data.password || '',
         auth_provider: 'default',
@@ -46,7 +59,12 @@ export default function RegisterStep1() {
     const router = useRouter();
     // const searchParams = useSearchParams();
 
-    const user_data_fields = [
+    const user_data_fields: Array<{
+        name: RegisterEntryField;
+        label: string;
+        placeholder: string;
+        type?: string;
+    }> = [
         { name: 'email', label: 'Email', placeholder: t('RegisterPage.email') },
         {
             name: 'password',
@@ -76,7 +94,8 @@ export default function RegisterStep1() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const fieldName = name as RegisterEntryField;
+        setFormData((prevData) => ({ ...prevData, [fieldName]: value }));
     };
 
     const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.toLowerCase());

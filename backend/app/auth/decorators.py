@@ -1,57 +1,37 @@
-"""Custom authentication decorators for role-based access control."""
+from __future__ import annotations
 
+import uuid
 from functools import wraps
+from typing import Callable
+
 from flask import jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.extensions import mongo
+from flask_jwt_extended import get_jwt_identity, jwt_required
+
+from app.repositories.user_repository import UserRepository
 
 
-def role_required(required_roles):
-    """Decorate to enforce access based on user roles.
-
-    Args:
-        required_roles (list[str]): List of allowed roles.
-
-    Returns:
-        Callable: Decorated view function restricted to the specified roles.
-    """
-
-    def decorator(fn):
+def role_required(
+    required_roles: list[str],
+) -> Callable[[Callable[..., object]], Callable[..., object]]:
+    def decorator(fn: Callable[..., object]) -> Callable[..., object]:
         @wraps(fn)
         @jwt_required()
-        def decorated_function(*args, **kwargs):
+        def decorated_function(*args: object, **kwargs: object) -> object:
             try:
-                jwt_data = get_jwt_identity()
-                if not isinstance(jwt_data, str):
-                    return (
-                        jsonify({"status": "error", "message": "Invalid JWT data"}),
-                        401,
-                    )
+                user_id = get_jwt_identity()
+                if not isinstance(user_id, str):
+                    return jsonify({"status": "error", "message": "Invalid JWT data"}), 401
 
-                user_id = jwt_data
+                repo = UserRepository()
+                user = repo.get_by_id(uuid.UUID(user_id))
 
-                user = mongo.db["users"].find_one({"number": user_id})
+                if not user:
+                    return jsonify({"status": "error", "message": "User not found"}), 404
 
-                if user:
-                    user_roles = user.get("roles", [])
-                else:
-                    return (
-                        jsonify({"status": "error", "message": "User not found"}),
-                        404,
-                    )
-
-                if any(role in user_roles for role in required_roles):
+                if any(role in user.roles for role in required_roles):
                     return fn(*args, **kwargs)
-                else:
-                    return (
-                        jsonify(
-                            {
-                                "status": "error",
-                                "message": "Insufficient permissions",
-                            }
-                        ),
-                        403,
-                    )
+
+                return jsonify({"status": "error", "message": "Insufficient permissions"}), 403
             except Exception as e:
                 return jsonify({"status": "error", "message": str(e)}), 500
 

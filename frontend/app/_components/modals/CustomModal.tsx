@@ -1,11 +1,11 @@
 'use client';
 
-import { FC } from 'react';
+import type { FC, ReactNode } from 'react';
 
 interface ConfirmationModalProps {
     isOpen: boolean;
     handleCloseModal: () => void;
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 const CustomModal: FC<ConfirmationModalProps> = ({ isOpen, handleCloseModal, children }) => {

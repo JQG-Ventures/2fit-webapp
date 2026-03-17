@@ -1,209 +1,132 @@
-"""User model with CRUD operations and MongoDB integrations."""
-
 from __future__ import annotations
 
-from app.Schemas.ConversationSchema import conversation_schema
-from app.Schemas.UserSchema import user_schema
-from app.Schemas.WorkoutSchema import workout_plans_schema
-from app.extensions import mongo
-from bson import ObjectId
-from datetime import datetime
-from marshmallow import ValidationError
-from app.utils.utils import convert_to_objectid
-from typing import Optional
+import uuid
+from datetime import date
+from typing import TYPE_CHECKING, Optional
+
+from sqlalchemy import Boolean, Date, Float, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.models.base import BaseModel
+
+if TYPE_CHECKING:
+    from app.models.conversation import Conversation
+    from app.models.notification import NotificationDevice
+    from app.models.progress import (
+        ActiveChallenge,
+        ActivePlan,
+        CompletedChallengeDay,
+        CompletedWorkout,
+        SavedWorkout,
+    )
 
 
-class User:
-    """User model class to interact with the user collection in MongoDB."""
+class User(BaseModel):
+    __tablename__ = "users"
+    __table_args__ = (UniqueConstraint("code_number", "number", name="uq_user_code_number"),)
 
-    @staticmethod
-    def get_user_by_id(user_id: str) -> dict | None:
-        """Fetch a user by ID."""
-        try:
-            search_id = convert_to_objectid(user_id)
-            user = mongo.db.users.find_one({"_id": search_id})
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    last: Mapped[str] = mapped_column(String(100), nullable=False)
+    age: Mapped[int] = mapped_column(Integer, nullable=False)
+    birthdate: Mapped[date] = mapped_column(Date, nullable=False)
+    code_number: Mapped[str] = mapped_column(String(10), nullable=False)
+    country: Mapped[str] = mapped_column(String(100), nullable=False)
+    number: Mapped[str] = mapped_column(String(20), unique=True, nullable=False, index=True)
+    gender: Mapped[str] = mapped_column(String(1), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    password_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    roles: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=["user"])
+    height: Mapped[int] = mapped_column(Integer, nullable=False)
+    weight: Mapped[int] = mapped_column(Integer, nullable=False)
+    target_weight: Mapped[int] = mapped_column(Integer, nullable=False)
+    profile_image: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    auth_provider: Mapped[str] = mapped_column(String(20), nullable=False, default="default")
+    fitness_goal: Mapped[str] = mapped_column(String(20), nullable=False)
+    fitness_level: Mapped[str] = mapped_column(String(20), nullable=False)
 
-            if not user:
-                raise ValueError("User_id not found")
+    preferred_muscle_groups: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    equipment: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    available_days: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    workout_types: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
 
-            return user_schema.dump(user)  # type: ignore[no-any-return]
-        except Exception as e:
-            raise RuntimeError(f"Error fetching user: {e}")
+    preference: Mapped[Optional[UserPreference]] = relationship(
+        back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
+    settings: Mapped[Optional[UserSettings]] = relationship(
+        back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
+    automation_data: Mapped[Optional[UserAutomationData]] = relationship(
+        back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
+    saved_workouts: Mapped[list[SavedWorkout]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    active_plans: Mapped[list[ActivePlan]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    completed_workouts: Mapped[list[CompletedWorkout]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    active_challenges: Mapped[list[ActiveChallenge]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    completed_challenge_days: Mapped[list[CompletedChallengeDay]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    notification_devices: Mapped[list[NotificationDevice]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    conversations: Mapped[list[Conversation]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
 
-    @staticmethod
-    def get_user_by_number(user_number: str) -> dict | None:
-        """Fetch a user by their phone number."""
-        try:
-            user = mongo.db.users.find_one({"number": user_number})
 
-            if not user:
-                return None
+class UserPreference(BaseModel):
+    __tablename__ = "user_preferences"
 
-            return user_schema.dump(user)  # type: ignore[no-any-return]
-        except Exception as e:
-            raise RuntimeError(f"Error fetching user: {e}")
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
+    )
+    water_consumption: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    dietary_restrictions: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    dietary_goals: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    preferences: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
 
-    @staticmethod
-    def get_user_by_email(email: str) -> dict | None:
-        """Fetch a user by their email."""
-        try:
-            user = mongo.db.users.find_one({"email": email})
+    user: Mapped[User] = relationship(back_populates="preference")
 
-            if not user:
-                return None
 
-            return user_schema.dump(user)  # type: ignore[no-any-return]
-        except Exception as e:
-            raise RuntimeError(f"Error fetching user: {e}")
+class UserSettings(BaseModel):
+    __tablename__ = "user_settings"
 
-    @staticmethod
-    def create_new_user(data: dict) -> str:
-        """Insert a new user into the database."""
-        try:
-            data["created_at"] = datetime.now()
-            data["updated_at"] = datetime.now()
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
+    )
+    notification_general: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    notification_updates: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    notification_services: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    notification_tips: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    notification_bot: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    notification_reminders: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    nutrition_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    language_preference: Mapped[str] = mapped_column(String(10), nullable=False, default="es")
+    security_face_id: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    security_remember_me: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    security_touch_id: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-            result = mongo.db.users.insert_one(data)
-            return str(result.inserted_id)
-        except ValidationError as e:
-            raise ValueError(f"Invalid data: {e.messages}")
-        except Exception as e:
-            raise Exception(f"Error creating user: {str(e)}")
+    user: Mapped[User] = relationship(back_populates="settings")
 
-    @staticmethod
-    def update_user_data(user_id: str, data: dict) -> bool:
-        """Update a user's data in the database."""
-        try:
-            search_id = convert_to_objectid(user_id)
-            data["updated_at"] = datetime.now()
 
-            result = mongo.db.users.update_one({"_id": search_id}, {"$set": data})
+class UserAutomationData(BaseModel):
+    __tablename__ = "user_automation_data"
 
-            if result.modified_count == 0:
-                raise ValueError("Error updating user data")
-            return True
-        except ValidationError as e:
-            raise ValueError(f"Invalid data: {e.messages}")
-        except Exception as e:
-            raise Exception(f"Error updating workout plan: {str(e)}")
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
+    )
+    profile_complete: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    message_sent: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    greetings_sent: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    created_by_bot: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    last_motivational_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
-    @staticmethod
-    def update_user_credentials(user_id: str, email: str, password_hash: str) -> bool:
-        """Update the user's credentials like email and password."""
-        search_id = convert_to_objectid(user_id)
-        result = mongo.db.users.update_one(
-            {"_id": search_id},
-            {
-                "$set": {
-                    "email": email,
-                    "password_hash": password_hash,
-                    "updated_at": datetime.now(),
-                }
-            },
-        )
-        return bool(result.modified_count > 0)
-
-    @staticmethod
-    def add_saved_workout(user_id: str, workout_ids: list[str]) -> bool:
-        """Add a workout to the user's saved workouts."""
-        if not workout_ids:
-            raise ValueError("No workout IDs provided to add.")
-
-        search_id = convert_to_objectid(user_id)
-        result = mongo.db.users.update_one(
-            {"_id": search_id},
-            {"$addToSet": {"training_preferences.saved_workouts": {"$each": workout_ids}}},
-        )
-        if result.matched_count == 0:
-            raise ValueError(f"Error saving workouts for user {user_id}")
-        return True
-
-    @staticmethod
-    def delete_saved_workout(user_id: str, workout_id: str) -> bool:
-        """Add a workout to the user's saved workouts."""
-        search_id = convert_to_objectid(user_id)
-        result = mongo.db.users.update_one(
-            {"_id": search_id},
-            {"$pull": {"training_preferences.saved_workouts": workout_id}},
-        )
-        if result.modified_count == 0:
-            raise ValueError(f"Error deleting workout for user {user_id}")
-        return True
-
-    @staticmethod
-    def get_saved_workouts(user_id: str) -> list:
-        """Fetch a list of saved workouts for the user."""
-        try:
-            search_id = convert_to_objectid(user_id)
-
-            user = mongo.db.users.find_one({"_id": search_id})
-
-            if not user:
-                raise ValueError(f"User with id {search_id} not found!")
-
-            saved_workouts_ids = user["training_preferences"]["saved_workouts"]
-            object_ids = [ObjectId(id) for id in saved_workouts_ids]
-            workouts = mongo.db.workout_plans.find({"_id": {"$in": object_ids}, "is_active": True})
-
-            return workout_plans_schema.dump(list(workouts))  # type: ignore[no-any-return]
-        except Exception as e:
-            raise RuntimeError(f"Error getting the saved workouts for user {user_id}, error {e}")
-
-    @staticmethod
-    def get_user_chat_by_id(user_id: str) -> Optional[dict]:
-        """Fetch a conversation by users ID."""
-        try:
-            user = User.get_user_by_id(user_id)
-
-            if not user:
-                raise RuntimeError("User does not exists")
-
-            conversation = mongo.db.conversations.find_one(
-                {"user_id": f"user_{user['code_number']}{user['number']}"}
-            )
-
-            if not conversation:
-                return {}
-
-            conversation = conversation_schema.dump(conversation)["messages"]
-
-            return conversation[1:] if conversation else None
-        except Exception as e:
-            raise RuntimeError(f"Error fetching user conversation: {e}")
-
-    @staticmethod
-    def get_current_active_plans(user_id: str) -> list:
-        """Get the list of active plans for the user."""
-        try:
-            user = User.get_user_by_id(user_id)
-
-            if not user:
-                raise ValueError(f"User with ID {user_id} not found!")
-
-            result: list[dict] = []
-
-            for plan in user.get("workout_history", {}).get("active_plans", []):
-                result.append(
-                    {
-                        "id": plan["workout_plan_id"],
-                        "type": "plan",
-                        "name": plan.get("workout_name", ""),
-                        "plan_type": plan.get("plan_type", "personalized"),
-                    }
-                )
-
-            for ch in user.get("workout_history", {}).get("active_challenges", []):
-                result.append(
-                    {
-                        "id": ch["challenge_id"],
-                        "type": "challenge",
-                        "name": "Test",
-                        "plan_type": "challenge",
-                    }
-                )
-
-            return result
-        except ValidationError as e:
-            raise ValueError(f"Invalid data: {e.messages}")
-        except Exception as e:
-            raise Exception(f"Error getting user plans: {str(e)}")
+    user: Mapped[User] = relationship(back_populates="automation_data")

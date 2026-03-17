@@ -13,13 +13,16 @@ import { CiUser, CiBellOn, CiLock, CiCircleQuestion } from 'react-icons/ci';
 import { useApiGet } from '../utils/apiClient';
 import { useTranslation } from 'react-i18next';
 import { useUploadProfileImage } from '../_services/userService';
+import Modal from '../_components/profile/modal';
+import type { ApiResponse } from '../_types/api';
+import type { AppUserProfile } from '../_types/profile';
 
 const ProfilePage: React.FC = () => {
     const { t } = useTranslation('global');
     const router = useRouter();
 
     const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
-    const { data: profile, refetch } = useApiGet<{ status: string; message: any }>(
+    const { data: profile, refetch } = useApiGet<ApiResponse<AppUserProfile>>(
         ['user-profile'],
         getProfileUrl,
         { suspense: true },
@@ -51,9 +54,9 @@ const ProfilePage: React.FC = () => {
     }, []);
 
     const handleSetting = useCallback(
-        async (setting: { label: string; path?: string }) => {
+        async (setting: Setting) => {
             setLoadingSetting(setting.label);
-            router.push(setting.path!);
+            router.push(setting.path);
         },
         [router],
     );
@@ -90,6 +93,9 @@ const ProfilePage: React.FC = () => {
 
     return (
         <div className="flex flex-col justify-between items-center bg-gray-50 h-screen p-10 lg:pt-[10vh]">
+            {imageError ? (
+                <Modal title="Error" message={imageError} onClose={() => setImageError('')} />
+            ) : null}
             <input
                 type="file"
                 accept="image/*"

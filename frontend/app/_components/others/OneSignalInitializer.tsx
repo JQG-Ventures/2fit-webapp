@@ -6,11 +6,17 @@ import { useSession } from 'next-auth/react';
 import { useRegisterPlayerId } from '../../_services/userService';
 import { initializeOneSignal } from '../../_services/initOnesignal';
 
+interface AppSession {
+    user?: {
+        token?: string | null;
+    };
+}
+
 const OneSignalInitializer = () => {
-    const { data: session, status } = useSession();
+    const { data: sessionData, status } = useSession();
+    const session = sessionData as AppSession | null;
     const { mutateAsync: registerOneSignalPlayerId } = useRegisterPlayerId();
-    // @ts-ignore
-    const token = session?.user?.token;
+    const token = session?.user?.token ?? null;
 
     useEffect(() => {
         if (!token || status !== 'authenticated') return;

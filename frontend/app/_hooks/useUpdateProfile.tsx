@@ -1,11 +1,17 @@
 import { useState } from 'react';
 
+type UpdateProfilePayload = Partial<UserProfile>;
+
 export const useUpdateProfile = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
 
-    const updateProfile = async (userId: string, updatedProfile: object, token: string) => {
+    const updateProfile = async (
+        userId: string,
+        updatedProfile: UpdateProfilePayload,
+        token: string,
+    ): Promise<unknown | null> => {
         setLoading(true);
         setError(null);
         setSuccess(null);
@@ -28,11 +34,10 @@ export const useUpdateProfile = () => {
                 throw new Error(errorMsg || 'Failed to update profile.');
             }
 
-            const data = await response.json();
             setSuccess('Profile updated successfully.');
-            return data;
-        } catch (error: any) {
-            setError(error.message || 'Error updating profile.');
+            return (await response.json()) as unknown;
+        } catch (error: unknown) {
+            setError(error instanceof Error ? error.message : 'Error updating profile.');
             return null;
         } finally {
             setLoading(false);

@@ -4,12 +4,13 @@ flasgger==0.9.7.1
 Flask==3.0.3
 Flask_Cors==5.0.0
 Flask_JWT_Extended==4.6.0
-flask_marshmallow==1.2.1
-Flask_PyMongo==2.3.0
-marshmallow==3.22.0
+flask-sqlalchemy==3.1.1
+SQLAlchemy==2.0.36
+alembic==1.14.1
+pydantic==2.10.4
+psycopg2-binary==2.9.10
 openai==1.47.0
 PyJWT==2.9.0
-pymongo==4.9.1
 python-dotenv==1.0.1
 bcrypt==4.2.0
 sendgrid==6.11.0
@@ -19,7 +20,6 @@ flask[async]
 flask-restx
 pytest
 google-auth
-marshmallow-dataclass==8.7.1
 celery==5.5.2
 redis==6.1.0
 types-requests==2.32.4.20250611

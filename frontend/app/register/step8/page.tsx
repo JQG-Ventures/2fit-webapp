@@ -1,4 +1,3 @@
-//@ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
@@ -7,12 +6,13 @@ import { useRegister } from '../../_components/register/RegisterProvider';
 import RegistrationHeader from '../../_components/register/RegistrationHeader';
 import RegistrationButtons from '@/app/_components/register/RegisterButtons';
 import { useTranslation } from 'react-i18next';
+import type { FitnessLevel } from '@/app/_types/register';
 
 interface Level {
     id: number;
     title: string;
     description: string;
-    value: string;
+    value: FitnessLevel;
 }
 
 export default function RegisterStep8() {
@@ -20,7 +20,7 @@ export default function RegisterStep8() {
     const { data, updateData } = useRegister();
     const [isSubmittingNext, setIsSubmittingNext] = useState(false);
     const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
-    const [selectedLevel, setSelectedLevel] = useState<string>(data.fitness_level || '');
+    const [selectedLevel, setSelectedLevel] = useState<FitnessLevel | ''>(data.fitness_level || '');
     const router = useRouter();
 
     const levels: Level[] = [
@@ -50,7 +50,7 @@ export default function RegisterStep8() {
         },
     ];
 
-    const handleTrainingLevel = (levelValue: string) => {
+    const handleTrainingLevel = (levelValue: FitnessLevel) => {
         setSelectedLevel(levelValue);
         updateData({ fitness_level: levelValue });
     };

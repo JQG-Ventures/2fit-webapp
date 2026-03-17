@@ -1,27 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-interface RegisterData {
-    email: string;
-    fitness_goal: string;
-    fitness_level: string;
-    gender: string;
-    height: number;
-    last: string;
-    name: string;
-    number: string;
-    password: string;
-    training_days_per_week: string[];
-    target_weight: 0;
-    weight: number;
-    workout_type: string[];
-    auth_provider: string;
-}
+import React, { createContext, useContext, useState, type ReactNode } from 'react';
+import type { RegisterDraft } from '@/app/_types/register';
+import { createInitialRegisterData } from '@/app/utils/register';
 
 interface RegisterContextType {
-    data: RegisterData;
-    updateData: (newData: RegisterData) => void;
+    data: RegisterDraft;
+    updateData: (newData: RegisterDraft) => void;
 }
 
 const RegisterContext = createContext<RegisterContextType | undefined>(undefined);
@@ -35,9 +20,9 @@ export const useRegister = () => {
 };
 
 export const RegisterProvider = ({ children }: { children: ReactNode }) => {
-    const [data, setData] = useState<RegisterData>({} as RegisterData);
+    const [data, setData] = useState<RegisterDraft>(createInitialRegisterData());
 
-    const updateData = (newData: RegisterData) => {
+    const updateData = (newData: RegisterDraft) => {
         setData((prevData) => ({ ...prevData, ...newData }));
     };
 

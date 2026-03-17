@@ -6,12 +6,12 @@ Includes:
 - Integration with Flask app context to allow usage of app-level extensions like MongoDB.
 """
 
-from celery import Celery
+from celery import Celery, Task
+from flask import Flask
 
 import app.settings as s
 
-
-celery_app = Celery("app", broker=s.REDIS_HOST, backend=s.REDIS_HOST)
+celery_app = Celery("app", broker=s.REDIS_URL, backend=s.REDIS_URL)
 
 celery_app.conf.update(
     task_serializer="json",
@@ -20,7 +20,7 @@ celery_app.conf.update(
 )
 
 
-def init_celery(app):
+def init_celery(app: Flask) -> None:
     """
     Binds the Flask application context to Celery tasks.
 
@@ -31,10 +31,10 @@ def init_celery(app):
     """
     celery_app.conf.update(app.config)
 
-    class ContextTask(celery_app.Task):
+    class ContextTask(Task):
         """Custom Celery Task that runs within the Flask application context."""
 
-        def __call__(self, *args, **kwargs):
+        def __call__(self, *args: object, **kwargs: object) -> object:
             with app.app_context():
                 return self.run(*args, **kwargs)
 

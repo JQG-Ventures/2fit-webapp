@@ -1,4 +1,8 @@
-export const registerUser = async (data: any) => {
+import type { ApiStatusResponse } from '../_types/api';
+import type { RegisterData } from '../_types/register';
+import { parseJson } from '../utils/http';
+
+export const registerUser = async (data: RegisterData): Promise<ApiStatusResponse> => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/register`, {
             method: 'POST',
@@ -12,7 +16,7 @@ export const registerUser = async (data: any) => {
             throw new Error('Failed to register user');
         }
 
-        return await response.json();
+        return await parseJson<ApiStatusResponse>(response);
     } catch (error) {
         throw error;
     }
@@ -34,7 +38,7 @@ export const sendCode = async (number: string) => {
         );
 
         return response.status;
-    } catch (error) {
+    } catch {
         return 500;
     }
 };

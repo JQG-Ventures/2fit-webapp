@@ -1,53 +1,26 @@
-"""Routes for uploading and retrieving content from Azure Blob Storage."""
+from __future__ import annotations
 
-from app.extensions import mongo
-from app.services.azure_service import AzureService
-from flask_jwt_extended import jwt_required
-from app.auth.decorators import role_required
-from flask import Blueprint, request
-from flask_restx import Api, Resource, fields
 import logging
 
+from flask import Blueprint, request
+from flask_jwt_extended import jwt_required
+from flask_restx import Api, Resource
+
+from app.auth.decorators import role_required
+from app.extensions import db
+from app.services.azure_service import AzureService
 
 azure_bp = Blueprint("azure_bp", __name__)
 api = Api(azure_bp, doc="/docs")
 logger = logging.getLogger(__name__)
 
-content_model = api.model(
-    "Content",
-    {
-        "file_path": fields.String(required=True, description="File path of the content to upload"),
-        "title": fields.String(required=True, description="Title of the content"),
-        "description": fields.String(required=True, description="Description of the content"),
-        "tags": fields.String(required=True, description="Comma-separated tags for the content"),
-    },
-)
-
-upload_response_model = api.model(
-    "UploadResponse",
-    {
-        "message": fields.String(description="Status message"),
-        "content_id": fields.String(description="Unique identifier of the uploaded content"),
-    },
-)
-
-error_model = api.model("ErrorResponse", {"error": fields.String(description="Error message")})
-
 
 @api.route("/content/upload")
 class ContentUploadResource(Resource):
-    """Resource for uploading content to Azure Blob Storage."""
-
     @jwt_required()
     @role_required(["admin"])
-    @api.expect(content_model)
-    @api.response(201, "Content uploaded successfully", upload_response_model)
-    @api.response(400, "Missing required fields", error_model)
-    @api.response(500, "Could not upload content", error_model)
     def post(self) -> tuple[dict[str, str], int]:
-        """Upload content to Azure Blob Storage."""
         data = request.json
-
         if data is None:
             return {"status": "error", "message": "Missing JSON body"}, 400
 
@@ -60,55 +33,38 @@ class ContentUploadResource(Resource):
             return {"error": "Missing required fields"}, 400
 
         try:
-            azure_service = AzureService(mongo.db)
-            tags = tags.split(",")
-            content_id = azure_service.upload_content(file_path, title, description, tags)
+            azure_service = AzureService()
+            tags_list = tags.split(",")
+            content_id = azure_service.upload_content(file_path, title, description, tags_list)
 
             if content_id:
-                return {
-                    "message": "Content uploaded successfully",
-                    "content_id": content_id,
-                }, 201
-            return {
-                "message": "Cannot upload content to Azure Storage",
-                "content_id": "",
-            }, 400
+                db.session.commit()
+                return {"message": "Content uploaded successfully", "content_id": content_id}, 201
+            return {"message": "Cannot upload content to Azure Storage", "content_id": ""}, 400
         except Exception as e:
-            logger.exception(f"There was a problem uploading the content, error: {e}")
+            db.session.rollback()
+            logger.exception(f"Content upload error: {e}")
             return {"error": "Could not upload content"}, 500
 
 
 @api.route("/content")
 class ContentByTagsResource(Resource):
-    """Resource for retrieving content by tags from Azure Blob Storage."""
-
     @jwt_required()
     @role_required(["admin"])
-    @api.param("tags", "Comma-separated tags for filtering content", required=True)
-    @api.response(
-        200,
-        "Content URL retrieved successfully",
-        {"content_url": fields.String},
-    )
-    @api.response(400, "Tags are required", error_model)
-    @api.response(500, "Could not retrieve content", error_model)
     def get(self) -> tuple[dict[str, str], int]:
-        """Retrieve content URL by tags."""
         tags = request.args.get("tags")
-
         if not tags:
             return {"error": "Tags are required"}, 400
 
         tags_list = tags.split(",")
 
         try:
-            azure_service = AzureService(mongo.db)
+            azure_service = AzureService()
             content_url = azure_service.get_content_by_tags(tags_list)
         except Exception as e:
-            logger.exception(f"There was a problem retrieving the content, error: {e}")
+            logger.exception(f"Content retrieval error: {e}")
             return {"error": "Could not retrieve content"}, 500
 
         if content_url:
             return {"content_url": content_url}, 200
-        else:
-            return {"message": "Content not found"}, 404
+        return {"message": "Content not found"}, 404

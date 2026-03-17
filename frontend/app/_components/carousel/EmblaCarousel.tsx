@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { EmblaCarouselType, EmblaEventType, EmblaOptionsType } from 'embla-carousel';
+import type { EmblaCarouselType, EmblaEventType, EmblaOptionsType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-react';
 import { DotButton, useDotButton } from './EmblaCarouselDotButton';
 import Image from 'next/image';
@@ -8,7 +8,7 @@ const TWEEN_FACTOR_BASE = 0.2;
 
 type PropType = {
     slides: number[];
-    image_data: any[];
+    image_data: CarouselSlide[];
     options?: EmblaOptionsType;
 };
 
@@ -62,6 +62,10 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
 
                 const translate = diffToTarget * (-1 * tweenFactor.current) * 100;
                 const tweenNode = tweenNodes.current[slideIndex];
+
+                if (tweenNode) {
+                    tweenNode.style.transform = `translateX(${translate}%)`;
+                }
             });
         });
     }, []);
@@ -124,3 +128,9 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
 };
 
 export default EmblaCarousel;
+
+interface CarouselSlide {
+    src: string;
+    title: string;
+    caption: string;
+}

@@ -18,7 +18,18 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
     strockWidth,
     onComplete,
 }) => {
-    const darkerGreenGradientColors = ['#34D399', '#10B981', '#059669', '#047857'];
+    const darkerGreenGradientColors: [`#${string}`, `#${string}`, `#${string}`, `#${string}`] = [
+        '#34D399',
+        '#10B981',
+        '#059669',
+        '#047857',
+    ];
+    const colorTransitionTimes: [number, number, number, number] = [
+        duration,
+        Math.max(Math.floor(duration * 0.66), 1),
+        Math.max(Math.floor(duration * 0.33), 1),
+        0,
+    ];
 
     return (
         <div className="flex flex-col h-[100%] justify-evenly items-center">
@@ -34,8 +45,8 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
                     duration={duration}
                     size={size}
                     strokeWidth={strockWidth}
-                    // @ts-ignore - Skipping type checking for colors
                     colors={darkerGreenGradientColors}
+                    colorsTime={colorTransitionTimes}
                     trailColor="#E6E6E6"
                     onComplete={() => {
                         onComplete();

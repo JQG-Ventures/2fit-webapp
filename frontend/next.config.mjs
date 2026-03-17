@@ -1,12 +1,13 @@
+import nextI18NextConfig from './next-i18next.config.js';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'standalone',
-    typescript: { ignoreBuildErrors: true },
-    reactStrictMode: true,
-    experimental: {
-        appDir: true,
-        // No static export expected
+    i18n: nextI18NextConfig.i18n,
+    images: {
+        domains: ['2fitcontentstorage.blob.core.windows.net'],
     },
+    output: 'standalone',
+    reactStrictMode: true,
     async headers() {
         return [
             {

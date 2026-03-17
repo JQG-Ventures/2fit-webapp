@@ -17,13 +17,50 @@ import Link from 'next/link';
 import OneSignalInitializer from '../_components/others/OneSignalInitializer';
 import { useRouter } from 'next/navigation';
 import ChallengeProgressWidget from '../_components/workouts/challenges/ChallengeProgressWidget';
+import type { ApiResponse } from '../_types/api';
+import { parseJson } from '../utils/http';
+
+interface ActiveUserPlan {
+    id: string;
+    name: string;
+    plan_type: WorkoutPlan['plan_type'];
+}
+
+interface WeeklyProgressDay {
+    date: string;
+    exercises: Exercise[];
+}
+
+interface WeeklyProgressMessage {
+    progress: number;
+    exercises_left?: Exercise[];
+    days?: WeeklyProgressDay[];
+}
+
+interface ChallengePlanWithProgress {
+    id: string;
+    plan_type: 'challenge';
+    name: string;
+    progressData: ChallengeProgress | null;
+}
+
+interface AppSession {
+    user?: {
+        id?: string | null;
+        userId?: string | null;
+        userName?: string | null;
+        name?: string | null;
+        token?: string | null;
+    };
+}
 
 const HomePage: React.FC = () => {
     const { t } = useTranslation('global');
-    const { data: session } = useSession();
-    const userId = session?.user?.id;
-    // @ts-ignore
-    const userName = session?.user?.userName;
+    const { data: sessionData } = useSession();
+    const session = sessionData as AppSession | null;
+    const userId = session?.user?.id ?? session?.user?.userId;
+    const userName = session?.user?.userName ?? session?.user?.name ?? 'Guest';
+    const token = session?.user?.token ?? null;
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
     const { mutate: deleteSavedWorkout } = useDeleteWorkout();
 
@@ -40,23 +77,23 @@ const HomePage: React.FC = () => {
     const activePlansUrl = `/api/workouts/weekly-progress`;
     const getActivePlansUrl = `/api/users/active-plans`;
 
-    const { data: workoutPlans } = useApiGet<{ status: string; message: [] }>(
+    const { data: workoutPlans } = useApiGet<ApiResponse<WorkoutPlan[]>>(
         ['workoutPlans'],
         workoutPlansUrl,
     );
-    const { data: savedWorkoutPlans } = useApiGet<{ status: string; message: [] }>(
+    const { data: savedWorkoutPlans } = useApiGet<ApiResponse<WorkoutPlan[]>>(
         ['savedWorkoutPlans'],
         savedWorkoutPlansUrl,
     );
-    const { data: libraryWorkouts } = useApiGet<{ status: string; message: [] }>(
+    const { data: libraryWorkouts } = useApiGet<ApiResponse<WorkoutPlan[]>>(
         ['libraryWorkouts'],
         libraryWorkoutCountUrl,
     );
-    const { data: activePlans } = useApiGet<{ status: string; message: {} }>(
+    const { data: activePlans } = useApiGet<ApiResponse<WeeklyProgressMessage>>(
         ['activePlans'],
         activePlansUrl,
     );
-    const { data: userActivePlans } = useApiGet<{ status: string; message: [] }>(
+    const { data: userActivePlans } = useApiGet<ApiResponse<ActiveUserPlan[]>>(
         ['userActivePlans'],
         getActivePlansUrl,
     );
@@ -71,9 +108,10 @@ const HomePage: React.FC = () => {
         );
     };
 
-    const [challengeProgressData, setChallengeProgressData] = useState<any[]>([]);
+    const [challengeProgressData, setChallengeProgressData] = useState<ChallengePlanWithProgress[]>(
+        [],
+    );
     const [loadingChallengeProgress, setLoadingChallengeProgress] = useState(true);
-    const [errorChallengeProgress, setErrorChallengeProgress] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchChallengeProgress = async () => {
@@ -84,50 +122,53 @@ const HomePage: React.FC = () => {
             setLoadingChallengeProgress(true);
 
             try {
-                // @ts-ignore
-                const token = session?.user?.token;
                 const challengePlans = userActivePlans.message.filter(
-                    (plan: any) => plan.plan_type === 'challenge',
+                    (plan): plan is ActiveUserPlan & { plan_type: 'challenge' } =>
+                        plan.plan_type === 'challenge',
                 );
 
-                const promises = challengePlans.map(async (plan: any) => {
-                    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/challenges/challenges/progress?challenge_id=${plan.id}`;
-                    const res = await fetch(url, {
-                        method: 'GET',
-                        headers: { Authorization: `Bearer ${token}` },
-                    });
-                    const json = await res.json();
-                    if (!res.ok) {
-                        console.error(json.message || t('workouts.fetchingError'));
-                        return null;
-                    }
-                    return {
-                        id: plan.id,
-                        plan_type: 'challenge',
-                        name: plan.name,
-                        progressData: json.message as any,
-                    };
-                });
+                const promises: Promise<ChallengePlanWithProgress | null>[] = challengePlans.map(
+                    async (plan): Promise<ChallengePlanWithProgress | null> => {
+                        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/challenges/challenges/progress?challenge_id=${plan.id}`;
+                        const res = await fetch(url, {
+                            method: 'GET',
+                            headers: { Authorization: `Bearer ${token}` },
+                        });
+                        const json = await parseJson<ApiResponse<ChallengeProgress>>(res);
+                        if (!res.ok) {
+                            console.error(json.message || t('workouts.fetchingError'));
+                            return null;
+                        }
+                        return {
+                            id: plan.id,
+                            plan_type: 'challenge' as const,
+                            name: plan.name,
+                            progressData: json.message,
+                        };
+                    },
+                );
 
                 const results = await Promise.all(promises);
-                setChallengeProgressData(results);
-            } catch (err: any) {
-                setErrorChallengeProgress(err.message);
-                return null;
+                setChallengeProgressData(
+                    results.filter(
+                        (result): result is ChallengePlanWithProgress => result !== null,
+                    ),
+                );
+            } catch (error) {
+                console.error(error);
             } finally {
                 setLoadingChallengeProgress(false);
             }
         };
 
         fetchChallengeProgress();
-    }, [userActivePlans, session, t]);
+    }, [token, userActivePlans, t]);
 
     // const guidedWorkoutsUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/guided`;
     // const { data: guidedWorkouts, loading: loadingGuidedWorkouts, error: guidedWorkoutsError } = useFetch(guidedWorkoutsUrl, options);
     const paddingBottom = isDesktopOrLaptop ? 0 : 100 * 1.1;
 
-    const getTodayPendingExercise = () => {
-        // @ts-ignore
+    const getTodayPendingExercise = (): Exercise | null => {
         if (!activePlans?.message?.days) return null;
 
         const today = new Date();
@@ -135,11 +176,10 @@ const HomePage: React.FC = () => {
         const month = String(today.getMonth() + 1).padStart(2, '0');
         const day = String(today.getDate()).padStart(2, '0');
         const todayStr = `${year}-${month}-${day}`;
-        // @ts-ignore
-        const todayPlan = activePlans.message.days.find((day: any) => day.date === todayStr);
+        const todayPlan = activePlans.message.days.find((entry) => entry.date === todayStr);
 
         if (todayPlan) {
-            return todayPlan.exercises.find((exercise: any) => !exercise.is_completed);
+            return todayPlan.exercises.find((exercise) => !exercise.is_completed) ?? null;
         }
 
         return null;
@@ -163,7 +203,7 @@ const HomePage: React.FC = () => {
                 <div
                     className={isDesktopOrLaptop ? `flex-1` : 'flex flex-row justify-between pr-6'}
                 >
-                    <GreetingSection userName={userName || 'Guest'} />
+                    <GreetingSection userName={userName} />
 
                     {!isDesktopOrLaptop && (
                         <div className="flex justify-end items-center">
@@ -187,7 +227,7 @@ const HomePage: React.FC = () => {
                                 image_url: todayExercise.image_url,
                                 name: todayExercise.name,
                                 description: todayExercise.description,
-                                difficulty: todayExercise.difficulty,
+                                difficulty: todayExercise.difficulty ?? '',
                             }}
                         />
                     </Link>

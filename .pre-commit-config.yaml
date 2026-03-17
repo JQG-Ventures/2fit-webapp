@@ -1,20 +1,12 @@
 repos:
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.6
     hooks:
-      - id: black
-        language_version: python3.9
+      - id: ruff-format
         files: backend/.*\.py$
-
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.2.0
-    hooks:
-      - id: flake8
-        language_version: python3.9
-        files: backend/.*\.py
-        args: ["--config=backend/.flake8"]
-        additional_dependencies: []
-        # Optionally, restrict files to backend only
+      - id: ruff
+        files: backend/.*\.py$
+        args: ["--config=backend/pyproject.toml"]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.15.0
@@ -22,26 +14,55 @@ repos:
       - id: mypy
         language_version: python3.9
         files: backend/.*\.py$
+        args: ["--config-file=backend/pyproject.toml", "backend/app", "backend/run.py"]
+        pass_filenames: false
         additional_dependencies:
+          - azure-core==1.31.0
+          - azure-storage-blob==12.23.0
+          - flasgger==0.9.7.1
+          - Flask==3.0.3
+          - Flask_Cors==5.0.0
+          - Flask_JWT_Extended==4.6.0
+          - flask_marshmallow==1.2.1
+          - Flask_PyMongo==2.3.0
+          - flask-restx==1.3.2
+          - marshmallow==3.22.0
+          - marshmallow-dataclass==8.7.1
+          - openai==1.47.0
+          - pymongo==4.9.1
+          - python-dotenv==1.0.1
+          - sendgrid==6.11.0
+          - twilio==9.3.1
           - types-requests
-
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
-    hooks:
-      - id: check-docstring-first
-        files: backend/.*\.py$
 
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
-        additional_dependencies: ['prettier']
+        additional_dependencies: ["prettier@3.8.1"]
         files: frontend/.*\.(js|jsx|ts|tsx|json|css|md)$
 
   - repo: local
     hooks:
-      - id: frontend-validation
-        name: Frontend Lint, Prettier, Build Check
-        entry: bash scripts/pre-commit-frontend.sh
+      - id: frontend-lint
+        name: Frontend lint
+        entry: npm --prefix frontend run lint
         language: system
+        pass_filenames: false
+      - id: frontend-typecheck
+        name: Frontend typecheck
+        entry: npm --prefix frontend run typecheck
+        language: system
+        pass_filenames: false
+      - id: frontend-depcheck
+        name: Frontend dependency rules
+        entry: npm --prefix frontend run depcheck
+        language: system
+        pass_filenames: false
+      - id: backend-imports
+        name: Backend import contracts
+        entry: python scripts/check_backend_imports.py
+        language: python
+        additional_dependencies:
+          - import-linter==2.11
         pass_filenames: false

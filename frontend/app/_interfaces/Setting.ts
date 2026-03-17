@@ -1,6 +1,6 @@
 interface Setting {
     label: string;
-    icon: React.ComponentType<any>;
+    icon: React.ElementType;
     path: string;
     isRed?: boolean;
 }

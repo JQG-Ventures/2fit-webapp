@@ -5,22 +5,32 @@ import PremiumBenefits from './_components/PremiumBenefits';
 import PremiumPlans from './_components/PremiumPlans';
 import PaymentCards from './_components/PaymentCards';
 
+interface PaymentCard {
+    id: number;
+    last4: string;
+    name: string;
+    expDate: string;
+    kind: string;
+}
+
+interface PremiumPlan {
+    id: string;
+    name: string;
+    price: number;
+}
+
 const PremiumPage = () => {
     const [step, setStep] = useState<'benefits' | 'plans' | 'cards' | 'addCard'>('benefits');
-    const [isPremium, setIsPremium] = useState(false);
-    const [cards, setCards] = useState([]);
-    const [plans, setPlans] = useState([
+    const [isPremium] = useState(false);
+    const [cards] = useState<PaymentCard[]>([]);
+    const [plans] = useState<PremiumPlan[]>([
         { id: '1', name: 'BePremium.plans.1.name', price: 24.99 },
         { id: '2', name: 'BePremium.plans.2.name', price: 49.99 },
         { id: '3', name: 'BePremium.plans.3.name', price: 99.99 },
     ]);
-    const [selectedPlan, setSelectedPlan] = useState<{
-        id: string;
-        name: string;
-        price: number;
-    } | null>(null);
+    const [selectedPlan, setSelectedPlan] = useState<PremiumPlan | null>(null);
 
-    const handleAddCard = (cardInfo: any, saveCard: boolean) => {
+    const handleAddCard = (_cardInfo: PaymentCard, _saveCard: boolean) => {
         setStep('cards');
     };
 
@@ -30,7 +40,7 @@ const PremiumPage = () => {
         else if (step === 'plans') setStep('benefits');
     };
 
-    const onPayPlan = (cardId: string, planId: string) => {};
+    const onPayPlan = (_cardId: string, _planId: string) => {};
 
     return (
         <div className="">

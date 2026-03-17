@@ -9,44 +9,17 @@ on:
       - main
 
 jobs:
-  full-ci:
-    name: Full CI Pipeline
+  detect-changes:
+    name: Detect changed paths
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    defaults:
-      run:
-        shell: bash
+    outputs:
+      backend: ${{ steps.changes.outputs.backend }}
+      frontend: ${{ steps.changes.outputs.frontend }}
+      infra: ${{ steps.changes.outputs.infra }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Python 3.9.18
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.9.18
-
-      - name: Set up Node.js 22.14.0
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.14.0
-
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Cache npm
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Detect changed paths
         id: changes
         uses: dorny/paths-filter@v3
@@ -56,61 +29,108 @@ jobs:
               - 'backend/**'
             frontend:
               - 'frontend/**'
+            infra:
+              - 'compose.yaml'
+              - 'compose.prod.yaml'
+              - 'scripts/**'
+              - 'README.md'
 
-      # BACKEND JOBS
+  backend-quality:
+    name: Backend quality
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: bash
+        working-directory: backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.9.18
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9.18
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements-dev.txt', 'backend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - name: Install backend dependencies
-        if: steps.changes.outputs.backend == 'true'
         run: |
           python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
-          pip install flake8 black mypy pydocstyle
+          pip install -r requirements-dev.txt
+      - name: Run ruff format check
+        run: ruff format --check .
+      - name: Run ruff lint
+        run: ruff check .
+      - name: Run mypy strict
+        run: mypy app run.py
+      - name: Run import-linter
+        run: lint-imports --config .importlinter
+      - name: Run pytest
+        run: pytest
 
-      - name: Run flake8 (Python lint)
-        if: steps.changes.outputs.backend == 'true'
-        run: |
-          cd backend
-          flake8 .
+  frontend-quality:
+    name: Frontend quality
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: bash
+        working-directory: frontend
 
-      - name: Run black --check (Python format check)
-        if: steps.changes.outputs.backend == 'true'
-        run: |
-          cd backend
-          black --check .
-
-      - name: Run mypy (Python static typing check)
-        if: steps.changes.outputs.backend == 'true'
-        run: |
-          cd backend
-          mypy .
-
-      - name: Run pydocstyle (Python docstring check)
-        if: steps.changes.outputs.backend == 'true'
-        run: |
-          cd backend
-          find . -type f -name "*.py" ! -name "__init__.py" -print0 | xargs -0 pydocstyle
-        
-
-      # FRONTEND JOBS
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js 22.14.0
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Install frontend dependencies
-        if: steps.changes.outputs.frontend == 'true'
-        run: |
-          cd frontend
-          npm install
-
-      - name: Run next lint (Next.js ESLint check)
-        if: steps.changes.outputs.frontend == 'true'
-        run: |
-          cd frontend
-          npm run lint
-
-      - name: Run Prettier format check
-        if: steps.changes.outputs.frontend == 'true'
-        run: |
-          cd frontend
-          npx prettier --check .
-
+        run: npm ci
+      - name: Run frontend checks
+        run: npm run check
       - name: Run Next.js build
-        if: steps.changes.outputs.frontend == 'true'
+        run: npm run build
+
+  docker-smoke:
+    name: Docker smoke stack
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Prepare env files for Docker smoke
         run: |
-          cd frontend
-          npm run build
+          cp backend/.env.example backend/.env
+          cp frontend/.env.example frontend/.env.local
+      - name: Run Docker smoke stack
+        run: |
+          docker compose -f compose.yaml -f compose.prod.yaml up -d --build
+          docker compose -f compose.yaml -f compose.prod.yaml ps
+          curl --retry 20 --retry-delay 3 --retry-connrefused http://localhost:5000/
+          curl --retry 20 --retry-delay 3 --retry-connrefused http://localhost:3000/
+      - name: Tear down Docker smoke stack
+        if: always()
+        run: |
+          docker compose -f compose.yaml -f compose.prod.yaml down -v --remove-orphans

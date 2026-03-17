@@ -1,5 +1,4 @@
 import React, { useReducer, useEffect, useCallback, useState, useMemo } from 'react';
-import CountdownTimer from '../animations/CountdownTimer';
 import ExerciseView from './ExerciseView';
 import RestView from './RestView';
 import CompleteView from './CompleteView';
@@ -10,7 +9,12 @@ import {
     useSendChallengeProgress,
     useSendChallengeComplete,
 } from '@/app/_services/userService';
-import { Action, ExerciseFlowProps, State, ExerciseProgress } from '@/app/_interfaces/ExerciseFlow';
+import type {
+    Action,
+    ExerciseFlowProps,
+    State,
+    ExerciseProgress,
+} from '@/app/_interfaces/ExerciseFlow';
 import ConfirmationModal from '../modals/confirmationModal';
 
 const initialState: State = {
@@ -142,11 +146,18 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
     const updateExerciseProgress = useCallback(() => {
         if (exerciseStartTime === null) return;
 
+        if (!currentExercise.exercise_id) {
+            return;
+        }
+
         const elapsed = Math.floor((Date.now() - exerciseStartTime) / 1000);
-        const repsCompleted = Array(totalSets).fill(currentExercise.reps);
+        const repsCompleted: number[] = Array.from(
+            { length: totalSets },
+            () => currentExercise.reps,
+        );
 
         const exerciseProgress: ExerciseProgress = {
-            exercise_id: currentExercise.exercise_id!,
+            exercise_id: currentExercise.exercise_id,
             sets_completed: totalSets,
             reps_completed: repsCompleted,
             duration_seconds: elapsed,
@@ -195,7 +206,7 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
                 },
                 {
                     onSuccess: () => {
-                        onExerciseComplete(exerciseProgress.exercise_id!);
+                        onExerciseComplete(exerciseProgress.exercise_id);
                     },
                     onError: (error) => console.error('Error guardando progreso workout:', error),
                 },

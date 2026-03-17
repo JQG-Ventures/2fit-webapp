@@ -8,7 +8,7 @@ import { FiMail, FiLock } from 'react-icons/fi';
 import { signIn } from 'next-auth/react';
 import ButtonWithSpinner from '../_components/others/ButtonWithSpinner';
 import InputWithIcon from '../_components/form/InputWithIcon';
-import { IconType } from 'react-icons';
+import type { IconType } from 'react-icons';
 import { useTranslation } from 'react-i18next';
 
 interface FormData {
@@ -90,7 +90,7 @@ export default function Login() {
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
@@ -142,9 +142,8 @@ export default function Login() {
                             type={type}
                             placeholder={placeholder}
                             value={formData[name]}
-                            // @ts-ignore
                             onChange={handleChange}
-                            Icon={Icon}
+                            icon={Icon}
                             error={errors[name]}
                         />
                     ))}

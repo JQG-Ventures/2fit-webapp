@@ -5,7 +5,7 @@ This module contains typed dictionaries for modeling daily challenge activity an
 challenge progress, including completion status, daily exercise logs, and metadata.
 """
 
-from typing import Any, TypedDict, List
+from typing import Any, TypedDict
 
 
 class ChallengeDay(TypedDict):
@@ -25,7 +25,7 @@ class ChallengeDay(TypedDict):
     date: str
     is_completed: bool
     status: str
-    exercises: List[dict[str, Any]]
+    exercises: list[dict[str, Any]]
 
 
 class ChallengeProgress(TypedDict):
@@ -44,4 +44,4 @@ class ChallengeProgress(TypedDict):
     name: str
     total_days: int
     progress: float
-    days: List[ChallengeDay]
+    days: list[ChallengeDay]

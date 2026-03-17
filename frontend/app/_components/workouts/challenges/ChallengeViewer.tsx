@@ -15,7 +15,7 @@ interface ChallengeDayViewerProps {
     challengeName: string;
     imageUrl: string;
     level: string;
-    exercises: any[];
+    exercises: Exercise[];
     sequenceDay: number;
     onClose: () => void;
 }
@@ -30,7 +30,7 @@ const ChallengeDayViewer: React.FC<ChallengeDayViewerProps> = ({
     onClose,
 }) => {
     const { data: session } = useSession();
-    const userId = session?.user?.id!;
+    const userId = session?.user?.id ?? '';
     const { t } = useTranslation('global');
 
     const [showExerciseFlow, setShowExerciseFlow] = useState(false);

@@ -1,12 +1,42 @@
-[tool.black]
+[tool.ruff]
 line-length = 100
-target-version = ["py39"]
-include = '\.pyi?$'
-exclude = '/(\.eggs|\.git|\.hg|\.mypy_cache|\.tox|\.venv|venv|env|_build|buck-out|buildc|dist)/'
+target-version = "py39"
+exclude = [".eggs", ".git", ".hg", ".mypy_cache", ".tox", ".venv", "venv", "env", "_build", "build", "dist", "app/utils/prompts.py"]
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "UP"]
+ignore = ["B904", "E501", "UP045"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
 [tool.mypy]
-plugins = [
-    "pydantic.mypy"
+python_version = "3.9"
+files = ["app", "run.py"]
+plugins = ["pydantic.mypy"]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_unused_ignores = true
+strict_equality = true
+warn_return_any = true
+
+[[tool.mypy.overrides]]
+module = [
+    "azure.*",
+    "celery.*",
+    "flasgger.*",
+    "flask_cors.*",
+    "flask_jwt_extended.*",
+    "flask_restx.*",
+    "flask_sqlalchemy.*",
+    "google.*",
+    "openai.*",
+    "sendgrid.*",
+    "sqlalchemy.*",
+    "twilio.*",
 ]
 ignore_missing_imports = true
-warn_return_any = true

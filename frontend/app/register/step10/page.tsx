@@ -1,4 +1,3 @@
-//@ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -7,19 +6,18 @@ import { useRegister } from '../../_components/register/RegisterProvider';
 import { useTranslation } from 'react-i18next';
 import RegistrationHeader from '@/app/_components/register/RegistrationHeader';
 import RegistrationButtons from '@/app/_components/register/RegisterButtons';
-import { signIn, useSession } from 'next-auth/react';
+import type { Weekday } from '@/app/_types/register';
 
 export default function RegisterStep10() {
     const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
     const [isSubmittingNext, setIsSubmittingNext] = useState(false);
     const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
-    const { data: session } = useSession();
-    const [selectedDays, setSelectedDays] = useState<string[]>(
+    const [selectedDays, setSelectedDays] = useState<Weekday[]>(
         data.training_preferences?.available_days || [],
     );
     const router = useRouter();
-    const days = [
+    const days: Array<{ id: number; label: string; value: Weekday }> = [
         { id: 1, label: t('RegisterPagestep10.days.0'), value: 'monday' },
         { id: 2, label: t('RegisterPagestep10.days.1'), value: 'tuesday' },
         { id: 3, label: t('RegisterPagestep10.days.2'), value: 'wednesday' },
@@ -29,13 +27,14 @@ export default function RegisterStep10() {
         { id: 7, label: t('RegisterPagestep10.days.6'), value: 'sunday' },
     ];
 
-    const handleDaySelection = (dayValue: string) => {
+    const handleDaySelection = (dayValue: Weekday) => {
         setSelectedDays((prevSelected) => {
             const updatedSelectedDays = prevSelected.includes(dayValue)
                 ? prevSelected.filter((value) => value !== dayValue)
                 : [...prevSelected, dayValue];
 
             updateData({
+                training_days_per_week: updatedSelectedDays,
                 training_preferences: {
                     ...data.training_preferences,
                     available_days: updatedSelectedDays,
@@ -55,6 +54,7 @@ export default function RegisterStep10() {
         setIsSubmittingNext(true);
 
         updateData({
+            training_days_per_week: selectedDays,
             training_preferences: {
                 ...data.training_preferences,
                 available_days: selectedDays,

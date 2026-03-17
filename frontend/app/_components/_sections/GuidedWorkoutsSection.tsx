@@ -4,14 +4,20 @@ import React, { useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 
-const GuidedWorkoutsSection = ({ workouts }: { workouts: any[] }) => {
+interface GuidedWorkout {
+    name: string;
+    image_url: string;
+    muscles: string[];
+}
+
+const GuidedWorkoutsSection = ({ workouts }: { workouts: GuidedWorkout[] }) => {
     const sliderRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const { t } = useTranslation('global');
 
     useEffect(() => {
         const slider = sliderRef.current;
-        let interval: NodeJS.Timeout;
+        let interval: ReturnType<typeof setInterval> | null = null;
 
         if (slider && workouts.length > 0) {
             interval = setInterval(() => {
@@ -76,7 +82,7 @@ const GuidedWorkoutsSection = ({ workouts }: { workouts: any[] }) => {
                                     {workout.name}
                                 </h3>
                                 <ul className="flex flex-wrap space-x-4 text-sm lg:text-base">
-                                    {workout.muscles.map((muscle: string, idx: string) => (
+                                    {workout.muscles.map((muscle, idx) => (
                                         <li key={idx} className="bg-white px-3 py-1 rounded">
                                             {muscle}
                                         </li>

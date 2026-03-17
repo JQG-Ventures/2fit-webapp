@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
@@ -9,7 +8,7 @@ import { useRegister } from '../../_components/register/RegisterProvider';
 import ButtonWithSpinner from '../../_components/others/ButtonWithSpinner';
 import InputWithIcon from '../../_components/form/InputWithIcon';
 // import PhoneInput from '../../_components/form/PhoneInput';
-import PhoneInput from 'react-phone-input-2';
+import PhoneInput, { type CountryData } from 'react-phone-input-2';
 import 'react-phone-input-2/lib/bootstrap.css';
 import CountryInputForm from '../../_components/form/CountryInputForm';
 import countryCodes from '@/app/data/countryCodes.json';
@@ -29,6 +28,8 @@ interface FormData {
 interface ValidationErrors {
     [key: string]: string;
 }
+
+type RegisterStepOneField = 'name' | 'last' | 'birthdate';
 
 export default function RegisterStep1() {
     const { t } = useTranslation('global');
@@ -50,7 +51,12 @@ export default function RegisterStep1() {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-    const user_data_fields = [
+    const user_data_fields: Array<{
+        name: RegisterStepOneField;
+        label: string;
+        placeholder: string;
+        type?: string;
+    }> = [
         { name: 'name', label: 'Name', placeholder: t('RegisterPagestep1.name') },
         { name: 'last', label: 'Last', placeholder: t('RegisterPagestep1.last') },
         { name: 'birthdate', label: 'Birthdate', placeholder: 'mm/dd/yyyy', type: 'date' },
@@ -61,10 +67,10 @@ export default function RegisterStep1() {
         return phoneRegex.test(phone);
     };
 
-    const handlePhoneChange = (value: string, data: any) => {
-        let phoneCode = data.dialCode;
+    const handlePhoneChange = (value: string, country: CountryData | {}) => {
+        const phoneCode = 'dialCode' in country ? country.dialCode : '';
         let number;
-        if (value.startsWith(`${data.dialCode}`)) {
+        if (value.startsWith(`${phoneCode}`)) {
             number = value.replace(phoneCode, '').trim();
         } else {
             number = value;
@@ -82,7 +88,8 @@ export default function RegisterStep1() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        const updatedFormData = { ...formData, [name]: value };
+        const fieldName = name as RegisterStepOneField;
+        const updatedFormData = { ...formData, [fieldName]: value };
         setFormData(updatedFormData);
         updateData({ ...updatedFormData, countryCode: countryCode, number: phoneNumber });
     };
@@ -143,7 +150,6 @@ export default function RegisterStep1() {
                 return;
             }
 
-            setFormData(formattedData);
             updateData(formattedData);
             router.push('/register/step3');
         } else {
@@ -183,7 +189,7 @@ export default function RegisterStep1() {
                             placeholder={placeholder}
                             value={formData[name]}
                             onChange={handleChange}
-                            icon={name === 'birthdate' ? <IoCalendarOutline /> : undefined}
+                            icon={name === 'birthdate' ? IoCalendarOutline : undefined}
                         />
                     ))}
                     <CountryInputForm
@@ -192,7 +198,7 @@ export default function RegisterStep1() {
                         countryList={countryCodes}
                     />
                     <PhoneInput
-                        countryCode={'us'}
+                        country={'us'}
                         value={`+${countryCode}${phoneNumber}`}
                         onChange={handlePhoneChange}
                         inputClass="!w-full !py-6 !border-none !bg-gray-200 !rounded-md cursor-pointer"

@@ -9,6 +9,8 @@ import LoadingScreen from '../../_components/animations/LoadingScreen';
 import { useApiGet } from '../../utils/apiClient';
 import { useTranslation } from 'react-i18next';
 import { useUpdateProfile } from '../../_services/userService';
+import type { ApiResponse } from '../../_types/api';
+import type { AppUserProfile, ProfileToggleGroup } from '../../_types/profile';
 
 interface NotificationItemProps {
     label: string;
@@ -34,7 +36,7 @@ const Notification: React.FC = () => {
         data: userData,
         isLoading,
         isError,
-    } = useApiGet<{ status: string; message: any }>([], getProfileUrl);
+    } = useApiGet<ApiResponse<AppUserProfile>>([], getProfileUrl);
 
     const updateNotifications = useUpdateProfile();
 
@@ -57,6 +59,20 @@ const Notification: React.FC = () => {
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+    useEffect(() => {
+        const storedNotifications =
+            userData?.message.settings?.notifications ??
+            userData?.message.settings?.security_settings ??
+            {};
+
+        setNotifications({
+            general: storedNotifications.general ?? false,
+            updates: storedNotifications.updates ?? false,
+            services: storedNotifications.services ?? false,
+            tips: storedNotifications.tips ?? false,
+        });
+    }, [userData]);
+
     const handleToggle = useCallback(
         async (type: keyof typeof notifications) => {
             const previousState = notifications[type];
@@ -71,14 +87,15 @@ const Notification: React.FC = () => {
                         notifications: {
                             ...updatedNotifications,
                         },
-                        security_settings: userData?.message.settings.security_settings,
-                        nutrition_enabled: userData?.message.settings.nutrition_enabled,
-                        language_preference: userData?.message.settings.language_preference,
+                        security_settings: userData?.message.settings?.security_settings ?? {},
+                        nutrition_enabled: userData?.message.settings?.nutrition_enabled ?? false,
+                        language_preference:
+                            userData?.message.settings?.language_preference ?? 'es',
                     },
                 };
 
-                const response = await updateNotifications.mutateAsync(updatedProfile);
-            } catch (error) {
+                await updateNotifications.mutateAsync(updatedProfile);
+            } catch {
                 setNotifications({ ...notifications, [type]: previousState });
                 setErrorMessage(t('profile.Notifications.ErrorMessage'));
             }

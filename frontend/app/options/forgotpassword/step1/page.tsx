@@ -11,6 +11,7 @@ import Image from 'next/image';
 import LoadingScreen from '../../../_components/animations/LoadingScreen';
 import { useTranslation } from 'react-i18next';
 import { useApiGet } from '../../../utils/apiClient';
+import type { ApiResponse } from '../../../_types/api';
 
 interface OptionItemProps {
     icon: React.ComponentType<{ className?: string }>;
@@ -18,6 +19,11 @@ interface OptionItemProps {
     detail: string;
     isSelected: boolean;
     onClick: () => void;
+}
+
+interface ForgotPasswordUser {
+    email?: string;
+    number?: string;
 }
 
 const OptionItem: React.FC<OptionItemProps> = ({
@@ -53,7 +59,7 @@ const ForgotPassword: React.FC = () => {
     const userApiUrl = userId
         ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/by-email/${userId}`
         : '';
-    const { data: userData, isLoading } = useApiGet<{ status: string; message: any }>(
+    const { data: userData, isLoading } = useApiGet<ApiResponse<ForgotPasswordUser>>(
         ['user', userId!],
         userApiUrl,
         {
@@ -74,7 +80,9 @@ const ForgotPassword: React.FC = () => {
         if (selectedOption) {
             setIsSubmitting(true);
             const contactValue =
-                selectedOption === 'sms' ? userData?.message?.number : userData?.message?.email;
+                selectedOption === 'sms'
+                    ? (userData?.message?.number ?? '')
+                    : (userData?.message?.email ?? '');
             router.push(
                 `/options/forgotpassword/step2?contact=${encodeURIComponent(contactValue || '')}`,
             );

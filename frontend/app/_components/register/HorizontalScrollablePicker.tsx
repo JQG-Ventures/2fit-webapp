@@ -31,6 +31,20 @@ const HorizontalScrollablePicker: React.FC<HorizontalScrollablePickerProps> = ({
         }
     }, [value]);
 
+    const getValueFromItem = (item: HTMLDivElement | null): number | null => {
+        if (!item) {
+            return null;
+        }
+
+        const rawValue = item.getAttribute('data-value');
+        if (!rawValue) {
+            return null;
+        }
+
+        const parsedValue = Number(rawValue);
+        return Number.isNaN(parsedValue) ? null : parsedValue;
+    };
+
     const handleScroll = () => {
         const container = pickerRef.current;
         if (!container) return;
@@ -54,9 +68,8 @@ const HorizontalScrollablePicker: React.FC<HorizontalScrollablePickerProps> = ({
         });
 
         if (closestItem) {
-            // @ts-ignore
-            const newValue = Number(closestItem.getAttribute('data-value'));
-            if (newValue !== value) {
+            const newValue = getValueFromItem(closestItem);
+            if (newValue !== null && newValue !== value) {
                 isScrollingRef.current = true;
                 onChange(newValue);
             }
@@ -84,13 +97,14 @@ const HorizontalScrollablePicker: React.FC<HorizontalScrollablePickerProps> = ({
             });
 
             if (closestItem) {
-                // @ts-ignore
-                const newValue = Number(closestItem.getAttribute('data-value'));
-                if (newValue !== value) {
+                const newValue = getValueFromItem(closestItem);
+                if (newValue !== null && newValue !== value) {
                     isScrollingRef.current = true;
                     onChange(newValue);
                 }
-                centerValue(newValue);
+                if (newValue !== null) {
+                    centerValue(newValue);
+                }
             }
         }, 100);
     };

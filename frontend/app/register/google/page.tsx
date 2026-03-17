@@ -18,9 +18,8 @@ export default function RegisterSocial() {
                 if (emailExists) {
                     router.push('/register?error=emailExistsGoogle');
                 } else {
-                    // @ts-ignore
                     updateData({
-                        email: session.user.email!,
+                        email: session.user.email,
                         auth_provider: 'google',
                     });
                     router.push('/register/step1');

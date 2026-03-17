@@ -2,23 +2,25 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaSpinner } from 'react-icons/fa';
 
 interface PopularExercisesSectionProps {
-    workouts: any[];
+    workouts: WorkoutPlan[];
 }
 
-const WorkoutCard: React.FC<WorkoutCardProps> = ({
-    title,
-    workoutCount,
-    image,
-    exercises,
-    startText,
-    workoutId,
-}) => {
+interface WorkoutCardProps {
+    workout: WorkoutPlan;
+    exercisesLabel: string;
+    startText: string;
+}
+
+const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout, exercisesLabel, startText }) => {
     const [isLoading, setIsLoading] = useState(false);
+    const workoutCount = workout.workout_schedule.reduce(
+        (totalExercises, day) => totalExercises + day.exercises.length,
+        0,
+    );
 
     const handleClick = () => {
         setIsLoading(true);
@@ -28,19 +30,19 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
         <div className="bg-white p-10 rounded-xl shadow-md mb-6 lg:mb-0 lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl active:scale-95">
             <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-300 ease-in-out"
-                style={{ backgroundImage: `url(${image})` }}
+                style={{ backgroundImage: `url(${workout.image_url})` }}
             ></div>
             <div className="absolute inset-0 bg-gradient-to-r from-black opacity-50 to-transparent transition-opacity duration-300 ease-in-out"></div>
 
             <div className="relative flex flex-col space-y-5 w-[50%] justify-between z-20">
                 <h2 className="text-3xl tracking-wide text-white font-semibold overflow-hidden text-ellipsis whitespace-nowrap hover:whitespace-normal hover:overflow-visible hover:text-clip hover:bg-gray-800 hover:p-2 transition-all duration-300">
-                    {title}
+                    {workout.name}
                 </h2>
                 <h4 className="text-xl text-gray-200">
-                    {workoutCount} {exercises}
+                    {workoutCount} {exercisesLabel}
                 </h4>
 
-                <Link href={`/workouts/plan/${workoutId}`} passHref>
+                <Link href={`/workouts/plan/${workout._id}`} passHref>
                     <button
                         className="bg-green-600 py-3 px-6 text-xl text-white rounded-full flex items-center justify-center"
                         style={{ width: 'fit-content' }}
@@ -74,13 +76,10 @@ const PopularExercisesSection: React.FC<PopularExercisesSectionProps> = ({ worko
             <div className="flex flex-col gap-6">
                 {displayedWorkoutsCol.map((workout) => (
                     <WorkoutCard
-                        key={workout.title}
-                        title={workout.title}
-                        workoutCount={workout.workoutCount}
-                        image={workout.image}
-                        exercises={t('workouts.PopularExercisesSection.exercises')}
+                        key={workout._id}
+                        workout={workout}
+                        exercisesLabel={t('workouts.PopularExercisesSection.exercises')}
                         startText={t('workouts.PopularExercisesSection.start')}
-                        workoutId={workout.id}
                     />
                 ))}
             </div>

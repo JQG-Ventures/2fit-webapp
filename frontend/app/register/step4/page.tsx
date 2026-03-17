@@ -1,4 +1,3 @@
-//@ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
@@ -7,23 +6,31 @@ import { useRegister } from '../../_components/register/RegisterProvider';
 import RegistrationHeader from '../../_components/register/RegistrationHeader';
 import RegistrationButtons from '@/app/_components/register/RegisterButtons';
 import { useTranslation } from 'react-i18next';
+import type { FitnessGoal } from '@/app/_types/register';
 
 export default function RegisterStep4() {
     const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
     const [isSubmittingNext, setIsSubmittingNext] = useState(false);
     const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
-    const [selectedGoal, setSelectedGoal] = useState(data.fitness_goal || null);
+    const initialGoal =
+        data.fitness_goal === 'weight' ||
+        data.fitness_goal === 'keep' ||
+        data.fitness_goal === 'strength' ||
+        data.fitness_goal === 'muscle'
+            ? data.fitness_goal
+            : null;
+    const [selectedGoal, setSelectedGoal] = useState<FitnessGoal | null>(initialGoal);
     const router = useRouter();
 
-    const goals = [
+    const goals: Array<{ id: number; label: string; value: FitnessGoal; icon: string }> = [
         { id: 1, label: t('RegisterPagestep4.weight'), value: 'weight', icon: '⚖️' },
         { id: 2, label: t('RegisterPagestep4.fit'), value: 'keep', icon: '🍀' },
         { id: 3, label: t('RegisterPagestep4.stronger'), value: 'strength', icon: '💪🏻' },
         { id: 4, label: t('RegisterPagestep4.muscle'), value: 'muscle', icon: '🚀' },
     ];
 
-    const handleGoalSelection = (goalValue) => {
+    const handleGoalSelection = (goalValue: FitnessGoal) => {
         setSelectedGoal(goalValue);
         updateData({ fitness_goal: goalValue });
     };

@@ -4,12 +4,12 @@ Entry point for running the Flask application.
 Initializes logging and starts the app with settings defined in `app.settings`.
 """
 
-from app import create_app
-
-import app.settings as s
 import logging
 import sys
 
+import app.settings as s
+
+from app import create_app
 
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(
@@ -22,4 +22,4 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(debug=s.DEBUG, port=5000)
+    app.run(debug=s.DEBUG, host=s.HOST, port=s.PORT)

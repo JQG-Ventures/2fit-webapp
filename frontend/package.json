@@ -6,7 +6,11 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "next lint --max-warnings 0",
+        "typecheck": "tsc --noEmit",
+        "format:check": "prettier --check .",
+        "depcheck": "depcruise --config .dependency-cruiser.cjs --output-type err-long app actions auth.ts middleware.ts",
+        "check": "npm run format:check && npm run lint && npm run typecheck && npm run depcheck"
     },
     "dependencies": {
         "@nextui-org/react": "^2.4.6",
@@ -53,9 +57,13 @@
         "@types/react-dom": "^18",
         "@types/react-responsive": "^8.0.8",
         "@types/react-slick": "^0.23.13",
+        "@typescript-eslint/eslint-plugin": "^7.2.0",
+        "@typescript-eslint/parser": "^7.2.0",
+        "dependency-cruiser": "^17.3.9",
         "eslint": "^8",
         "eslint-config-next": "14.2.6",
         "postcss": "^8",
+        "prettier": "^3.8.1",
         "tailwindcss": "^3.4.1",
         "typescript": "^5"
     }

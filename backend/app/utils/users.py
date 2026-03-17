@@ -1,48 +1,31 @@
-"""Utility functions for user authentication and role validation."""
-
 from __future__ import annotations
-from werkzeug.security import check_password_hash
-from functools import wraps
-from flask_jwt_extended import verify_jwt_in_request, get_jwt
-from flask import abort
-from typing import Callable, Optional
 
 import logging
+from functools import wraps
+from typing import Any, Callable
+
+from flask import abort
+from flask_jwt_extended import get_jwt, verify_jwt_in_request
+from werkzeug.security import check_password_hash
 
 
-def validate_user_by_credentials(user: dict, password: str) -> bool:
-    """
-    Validate user credentials.
-
-    Args:
-        user (dict): User data from db
-        password (str): User password
-
-    Returns:
-        bool: True if the password matches, False otherwise.
-    """
+def validate_user_by_credentials(user: Any, password: str) -> bool:
     try:
-        hashed_password = user["password_hash"]
-        return check_password_hash(hashed_password, password)
+        password_hash = (
+            user.password_hash if hasattr(user, "password_hash") else user.get("password_hash")
+        )
+        if not isinstance(password_hash, str):
+            return False
+        return check_password_hash(password_hash, password)
     except Exception as e:
         logging.exception(f"{e}")
         return False
 
 
 def roles_required(required_roles: list[str]) -> Callable[..., Callable[..., object]]:
-    """
-    Decorate a function to enforce role-based access control.
-
-    Args:
-        required_roles (list[str]): Roles allowed to access the route.
-
-    Returns:
-        Callable: Wrapped function with role-based access control.
-    """
-
     def decorator(fn: Callable[..., object]) -> Callable[..., object]:
         @wraps(fn)
-        def wrapper(*args: object, **kwargs: object) -> Optional[object]:
+        def wrapper(*args: object, **kwargs: object) -> object | None:
             verify_jwt_in_request()
             claims = get_jwt()
             roles = claims.get("roles", [])

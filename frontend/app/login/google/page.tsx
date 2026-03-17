@@ -4,11 +4,16 @@ import { useEffect, useState } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import type { Session } from 'next-auth';
+import type { ApiResponse } from '@/app/_types/api';
+import type { AuthApiTokenMessage } from '@/app/_types/auth';
+import { parseJson } from '@/app/utils/http';
 
 export default function GoogleLoginCallback() {
     const { t } = useTranslation('global');
     const router = useRouter();
-    const { data: session, status } = useSession();
+    const { data: sessionData, status } = useSession();
+    const session = sessionData as Session | null;
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [hasSentRequest, setHasSentRequest] = useState(false);
@@ -28,8 +33,10 @@ export default function GoogleLoginCallback() {
             setHasSentRequest(true);
 
             try {
-                // @ts-ignore
-                if (!session?.googleIdToken) {
+                const googleIdToken =
+                    typeof session?.googleIdToken === 'string' ? session.googleIdToken : null;
+
+                if (!googleIdToken) {
                     setError('Missing Google ID Token');
                     setLoading(false);
                     return;
@@ -40,8 +47,7 @@ export default function GoogleLoginCallback() {
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        // @ts-ignore
-                        body: JSON.stringify({ id_token: session?.googleIdToken }),
+                        body: JSON.stringify({ id_token: googleIdToken }),
                     },
                 );
 
@@ -58,7 +64,7 @@ export default function GoogleLoginCallback() {
                     return;
                 }
 
-                const data = await res.json();
+                const data = await parseJson<ApiResponse<AuthApiTokenMessage>>(res);
 
                 await signIn('flaskgoogle', {
                     access_token: data.message.access_token,

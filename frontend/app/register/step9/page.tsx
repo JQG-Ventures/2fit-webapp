@@ -1,4 +1,3 @@
-//@ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -10,16 +9,24 @@ import { FaRunning, FaDumbbell, FaMusic } from 'react-icons/fa';
 import { FaRegHandPaper } from 'react-icons/fa';
 import RegistrationButtons from '@/app/_components/register/RegisterButtons';
 import { GrYoga } from 'react-icons/gr';
+import type { WorkoutType } from '@/app/_types/register';
 
 export default function RegisterStep9() {
     const { t } = useTranslation('global');
     const { data, updateData } = useRegister();
-    const [selectedActivities, setSelectedActivities] = useState<string[]>(data.workout_type || []);
+    const [selectedActivities, setSelectedActivities] = useState<WorkoutType[]>(
+        data.training_preferences?.workout_types ?? data.workout_type ?? [],
+    );
     const [isSubmittingNext, setIsSubmittingNext] = useState(false);
     const [isSubmittingPrev, setIsSubmittingPrev] = useState(false);
     const router = useRouter();
 
-    const activities = [
+    const activities: Array<{
+        id: number;
+        label: string;
+        value: WorkoutType;
+        icon: React.ReactNode;
+    }> = [
         {
             id: 1,
             label: t('RegisterPagestep9.stretch'),
@@ -47,13 +54,16 @@ export default function RegisterStep9() {
         },
     ];
 
-    const handleActivitySelection = (activityValue: string) => {
+    const handleActivitySelection = (activityValue: WorkoutType) => {
         setSelectedActivities((prevSelected) => {
             const updatedSelectedActivities = prevSelected.includes(activityValue)
                 ? prevSelected.filter((value) => value !== activityValue)
                 : [...prevSelected, activityValue];
 
-            updateData({ training_preferences: { workout_types: updatedSelectedActivities } });
+            updateData({
+                workout_type: updatedSelectedActivities,
+                training_preferences: { workout_types: updatedSelectedActivities },
+            });
 
             return updatedSelectedActivities;
         });
@@ -61,7 +71,10 @@ export default function RegisterStep9() {
 
     const handleNextStep = () => {
         setIsSubmittingNext(true);
-        updateData({ training_preferences: { workout_types: selectedActivities } });
+        updateData({
+            workout_type: selectedActivities,
+            training_preferences: { workout_types: selectedActivities },
+        });
         router.push('/register/step10');
     };
 

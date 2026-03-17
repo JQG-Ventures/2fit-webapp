@@ -19,6 +19,8 @@ import ViewModal from '@/app/_components/modals/ViewModal';
 import CustomModal from '@/app/_components/modals/CustomModal';
 import ExerciseList from '@/app/_components/workouts/ExerciseList';
 import { getSimilarExercises } from '@/app/_services/exerciseService';
+import type { ApiResponse } from '@/app/_types/api';
+import type { ExerciseDeletePayload, ExerciseModifyPayload } from '@/app/_services/workoutService';
 
 const daysOfWeekFull = [
     'monday',
@@ -28,18 +30,48 @@ const daysOfWeekFull = [
     'friday',
     'saturday',
     'sunday',
-];
+] as const;
+
+type WeekDayName = (typeof daysOfWeekFull)[number];
+
+interface WeeklyProgressDay {
+    day_of_week: string;
+    exercises: Exercise[];
+}
+
+interface WeeklyProgressMessage {
+    days: WeeklyProgressDay[];
+}
+
+interface SessionUserState {
+    id: string | null;
+    token: string | null;
+}
+
+function readSessionUser(user: unknown): SessionUserState {
+    if (typeof user !== 'object' || user === null) {
+        return { id: null, token: null };
+    }
+
+    const candidateUser = user as Record<string, unknown>;
+
+    return {
+        id: typeof candidateUser.id === 'string' ? candidateUser.id : null,
+        token: typeof candidateUser.token === 'string' ? candidateUser.token : null,
+    };
+}
 
 const MyPlan: React.FC = () => {
-    const { id } = useParams();
+    const { id } = useParams<{ id: string | string[] }>();
     const router = useRouter();
     const { t } = useTranslation('global');
     const { data: session, status } = useSession();
+    const planId = Array.isArray(id) ? id[0] : id;
+    const sessionUser = readSessionUser(session?.user);
 
     const sessionLoading = status === 'loading';
-    const userId = session?.user?.id;
-    // @ts-ignore
-    const token = session?.user?.token;
+    const userId = sessionUser.id ?? '';
+    const token = sessionUser.token;
 
     const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
     const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
@@ -52,27 +84,41 @@ const MyPlan: React.FC = () => {
     const [isDeleteMode, setIsDeleteMode] = useState<boolean>(false);
     const [isOptionalMode, setIsOptionalMode] = useState<boolean>(false);
 
-    const [exercisesToDelete, setExercisesToDelete] = useState<{ [key: string]: string[] }>({});
-    const [weeklyProgressState, setWeeklyProgressState] = useState<any>(null);
-    const [similarExercises, setSimilarExercises] = useState([]);
+    const [exercisesToDelete, setExercisesToDelete] = useState<ExerciseDeletePayload>({});
+    const [weeklyProgressState, setWeeklyProgressState] = useState<WeeklyProgressMessage | null>(
+        null,
+    );
+    const [similarExercises, setSimilarExercises] = useState<Exercise[]>([]);
 
     const getProgressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/weekly-progress`;
     const {
         data: weeklyProgressData,
         isLoading: loadingWeeklyProgress,
-        isError: errorWeeklyProgress,
+        error: weeklyProgressError,
         refetch: refetchWeeklyProgress,
-    } = useApiGet<{ status: string; message: any }>([], getProgressUrl);
-    const { mutate: deleteExercises } = useDeleteExercises(id.toString());
-    const { mutate: modifyExercises } = useModifyExercises(id.toString());
+    } = useApiGet<ApiResponse<WeeklyProgressMessage>>(
+        ['weeklyProgress', planId ?? ''],
+        getProgressUrl,
+    );
+    const { mutate: deleteExercises } = useDeleteExercises(planId ?? '');
+    const { mutate: modifyExercises } = useModifyExercises(planId ?? '');
 
-    const [selectedExerciseForReplacement, setSelectedExerciseForReplacement] =
-        useState<string>('');
     const [showExerciseReplaceConfirm, setShowExerciseReplaceConfirm] = useState(false);
     const [exerciseToReplaceId, setExerciseToReplaceId] = useState<string>('');
-    const [exercisesToReplace, setExercisesToReplace] = useState<{
-        [key: string]: { old_exercise_id: string; new_exercise: string }[];
-    }>({});
+    const [exercisesToReplace, setExercisesToReplace] = useState<ExerciseModifyPayload>({});
+
+    const normalizeExercises = (exercises: Exercise[]): Exercise[] => {
+        const uniqueExercises: Record<string, Exercise> = {};
+
+        exercises.forEach((exercise) => {
+            const exerciseId = exercise.exercise_id ?? exercise._id;
+            if (exerciseId) {
+                uniqueExercises[exerciseId] = exercise;
+            }
+        });
+
+        return Object.values(uniqueExercises);
+    };
 
     useEffect(() => {
         const currentDayIndex = new Date().getDay() - 1;
@@ -81,7 +127,7 @@ const MyPlan: React.FC = () => {
 
     useEffect(() => {
         if (weeklyProgressData) {
-            const normalizedDays = weeklyProgressData.message.days.map((day: any) => ({
+            const normalizedDays = weeklyProgressData.message.days.map((day) => ({
                 ...day,
                 exercises: normalizeExercises(day.exercises),
             }));
@@ -93,40 +139,17 @@ const MyPlan: React.FC = () => {
         return <LoadingScreen />;
     }
 
-    if (errorWeeklyProgress) {
+    if (weeklyProgressError) {
         return (
             <Modal
                 title="Error"
-                message={errorWeeklyProgress}
+                message={weeklyProgressError.message}
                 onClose={() => router.push('/workouts')}
             />
         );
     }
 
     const daysOfWeekLetters = ['M', 'T', 'W', 'Th', 'F', 'Sa', 'Su'];
-    const daysData: {
-        [key: string]: { day_of_week: string; exercises: Exercise[] };
-    } = {};
-
-    daysOfWeekFull.forEach((dayName) => {
-        daysData[dayName] = {
-            day_of_week: dayName,
-            exercises: [],
-        };
-    });
-    if (weeklyProgressState) {
-        weeklyProgressState.days.forEach((day: { day_of_week: string; exercises: Exercise[] }) => {
-            daysData[day.day_of_week.toLowerCase()] = day;
-        });
-    }
-
-    const normalizeExercises = (exercises: Exercise[]): Exercise[] => {
-        const uniqueExercises: { [key: string]: Exercise } = {};
-        exercises.forEach((exercise) => {
-            uniqueExercises[exercise.exercise_id!] = exercise;
-        });
-        return Object.values(uniqueExercises);
-    };
 
     const handleDeleteMode = () => {
         setIsDeleteMode(true);
@@ -141,7 +164,7 @@ const MyPlan: React.FC = () => {
     const handleDeleteSelect = (exerciseId: string) => {
         setExercisesToDelete((prev) => {
             const updated = { ...prev };
-            const day = daysOfWeekFull[selectedDayIndex];
+            const day: WeekDayName = daysOfWeekFull[selectedDayIndex];
 
             if (!updated[day]) {
                 updated[day] = [];
@@ -163,14 +186,14 @@ const MyPlan: React.FC = () => {
 
     const handleOptionalSelect = async (exercise_id: string) => {
         setExerciseToReplaceId(exercise_id);
-        const similarExercises = await getSimilarExercises(exercise_id, token);
-        setSimilarExercises(similarExercises);
+        const similarExerciseOptions = await getSimilarExercises(exercise_id, token);
+        setSimilarExercises(similarExerciseOptions ?? []);
         setIsOptionalExercisesOpen(true);
     };
 
     const handleConfirmDelete = () => {
         deleteExercises(exercisesToDelete, {
-            onSuccess: (response) => {
+            onSuccess: () => {
                 setIsDeleteMode(false);
                 setExercisesToDelete({});
                 setShowConfirmationModal(false);
@@ -191,7 +214,7 @@ const MyPlan: React.FC = () => {
 
     const selectedDayName = daysOfWeekFull[selectedDayIndex];
     const selectedDay = weeklyProgressState?.days.find(
-        (day: any) => day.day_of_week.toLowerCase() === selectedDayName,
+        (day) => day.day_of_week.toLowerCase() === selectedDayName,
     );
 
     const handleExerciseStart = (exercise: Exercise) => {
@@ -200,22 +223,27 @@ const MyPlan: React.FC = () => {
     };
 
     const handleExerciseSelection = (selectedExercise: Exercise) => {
-        const day = daysOfWeekFull[selectedDayIndex];
+        const day: WeekDayName = daysOfWeekFull[selectedDayIndex];
 
         setExercisesToReplace((prev) => ({
             ...prev,
             [day]: [
                 ...(prev[day] || []),
-                { old_exercise_id: exerciseToReplaceId, new_exercise: selectedExercise._id! },
+                {
+                    old_exercise_id: exerciseToReplaceId,
+                    new_exercise: selectedExercise._id ?? '',
+                },
             ],
         }));
 
-        setWeeklyProgressState((prevState: any) => {
-            if (!prevState) return prevState;
+        setWeeklyProgressState((prevState) => {
+            if (!prevState) {
+                return prevState;
+            }
 
             return {
                 ...prevState,
-                days: prevState.days.map((dayData: any) => {
+                days: prevState.days.map((dayData) => {
                     if (dayData.day_of_week.toLowerCase() !== day.toLowerCase()) {
                         return dayData;
                     }
@@ -240,7 +268,7 @@ const MyPlan: React.FC = () => {
 
     const handleConfirmExerciseReplace = () => {
         deleteExercises(exercisesToDelete, {
-            onSuccess: (response) => {
+            onSuccess: () => {
                 setIsDeleteMode(false);
                 setExercisesToDelete({});
                 setShowConfirmationModal(false);
@@ -266,12 +294,14 @@ const MyPlan: React.FC = () => {
     };
 
     const handleExerciseComplete = (exerciseId: string) => {
-        setWeeklyProgressState((prevState: any) => {
-            if (!prevState) return prevState;
+        setWeeklyProgressState((prevState) => {
+            if (!prevState) {
+                return prevState;
+            }
 
             return {
                 ...prevState,
-                days: prevState.days.map((day: any) => ({
+                days: prevState.days.map((day) => ({
                     ...day,
                     exercises: normalizeExercises(
                         day.exercises.map((exercise: Exercise) => {
@@ -397,8 +427,8 @@ const MyPlan: React.FC = () => {
                     }}
                     onExerciseComplete={handleExerciseComplete}
                     workoutType="myPlan"
-                    userId={userId!}
-                    workoutPlanId={id.toString()}
+                    userId={userId}
+                    workoutPlanId={planId ?? ''}
                 />
             )}
 

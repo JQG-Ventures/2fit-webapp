@@ -7,7 +7,13 @@ import 'react-circular-progressbar/dist/styles.css';
 
 const daysOfWeek = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-const TrackedWorkoutsSection = ({ workouts }: { workouts: any[] }) => {
+interface TrackedWorkout {
+    name: string;
+    status: 'notCompleted' | 'inProgress' | 'completed';
+    progress: number;
+}
+
+const TrackedWorkoutsSection = ({ workouts }: { workouts: TrackedWorkout[] }) => {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
     return (

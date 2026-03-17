@@ -37,7 +37,7 @@ const ExerciseBannerSection: React.FC<ExerciseBannerSectionProps> = ({
                         setTimeout(() => setSavedMessage(null), 3000);
                     }
                 },
-                onError: (error: any) => {
+                onError: (error) => {
                     if (error.response?.status === 400) {
                         setSavedMessage('Workout already saved!');
                     } else {
@@ -93,8 +93,7 @@ const ExerciseCard: React.FC<{
         e.stopPropagation();
         setLoading(true);
         setTimeout(() => {
-            // @ts-nocheck
-            window.location.href = `workouts/plan/${exercise._id}`;
+            window.location.assign(`workouts/plan/${exercise._id}`);
         }, 500);
     };
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -11,15 +10,28 @@ import SelectInput from '../../_components/form/SelectInput';
 import LoadingScreen from '../../_components/animations/LoadingScreen';
 
 import 'react-phone-input-2/lib/bootstrap.css';
-import PhoneInput from 'react-phone-input-2';
-import countries from '@/app/data/countries.json';
+import PhoneInput, { type CountryData } from 'react-phone-input-2';
 import countryCodes from '@/app/data/countryCodes.json';
 import { useApiGet } from '@/app/utils/apiClient';
 import { useEditProfile } from '@/app/_services/userService';
 import { useTranslation } from 'react-i18next';
 import CountryInputForm from '@/app/_components/form/CountryInputForm';
+import type { ApiResponse } from '@/app/_types/api';
+import type { FormField } from '@/app/_interfaces/FormField';
 
-const formFields: FormField[] = [
+type EditableProfileField = 'name' | 'birthdate' | 'email' | 'country' | 'gender';
+
+interface EditableProfilePayload {
+    name?: string;
+    email?: string;
+    birthdate?: string;
+    country?: string;
+    gender?: string;
+    code_number?: string;
+    number?: string;
+}
+
+const formFields: Array<FormField & { name: EditableProfileField }> = [
     {
         label: 'Name',
         name: 'name',
@@ -44,7 +56,6 @@ const formFields: FormField[] = [
         label: 'Country',
         name: 'country',
         type: 'select',
-        options: countryCodes,
     },
     {
         label: 'Gender',
@@ -61,14 +72,14 @@ const EditProfile: React.FC = () => {
     const { t } = useTranslation('global');
     const router = useRouter();
     const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
-    const { data: profile, isLoading: loadingProfile } = useApiGet<{
-        status: string;
-        message: any;
-    }>([], getProfileUrl);
+    const { data: profile, isLoading: loadingProfile } = useApiGet<ApiResponse<UserProfile>>(
+        [],
+        getProfileUrl,
+    );
     const { mutate: editProfile } = useEditProfile();
 
-    const handleEditProfile = async (profile_info: any) => {
-        editProfile(profile_info, {
+    const handleEditProfile = async (profileInfo: EditableProfilePayload) => {
+        editProfile(profileInfo, {
             onSuccess: (data) => {
                 if (data.status === 'success') {
                     setSuccessMessage(t('profile.updateProfile.success'));
@@ -105,10 +116,10 @@ const EditProfile: React.FC = () => {
         }
     };
 
-    const handlePhoneChange = (value: string, data: any) => {
-        let phoneCode = data.dialCode;
+    const handlePhoneChange = (value: string, country: CountryData | {}) => {
+        const phoneCode = 'dialCode' in country ? country.dialCode : '';
         let number;
-        if (value.startsWith(`${data.dialCode}`)) {
+        if (value.startsWith(`${phoneCode}`)) {
             number = value.replace(phoneCode, '').trim();
         } else {
             number = value;
@@ -126,7 +137,7 @@ const EditProfile: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        const updatedProfile = {
+        const updatedProfile: EditableProfilePayload = {
             name: profileData?.name,
             email: profileData?.email,
             birthdate: profileData?.birthdate,
@@ -177,10 +188,14 @@ const EditProfile: React.FC = () => {
                                     key={index}
                                     selectedCountry={profileData?.country || ''}
                                     onChange={(selectedCountry) => {
-                                        setProfileData((prevData) => ({
-                                            ...prevData!,
-                                            country: selectedCountry,
-                                        }));
+                                        setProfileData((prevData) =>
+                                            prevData
+                                                ? {
+                                                      ...prevData,
+                                                      country: selectedCountry,
+                                                  }
+                                                : prevData,
+                                        );
                                     }}
                                     countryList={countryCodes}
                                 />

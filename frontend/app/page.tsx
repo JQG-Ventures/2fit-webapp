@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import EmblaCarousel from './_components/carousel/EmblaCarousel';
-import { EmblaOptionsType } from 'embla-carousel';
+import type { EmblaOptionsType } from 'embla-carousel';
 import { useTranslation } from 'react-i18next';
 
 const OPTIONS: EmblaOptionsType = { dragFree: true, loop: true };
@@ -12,7 +12,7 @@ export default function RegisterStart() {
     const router = useRouter();
     const { t } = useTranslation('global');
 
-    const IMAGES_DATA = [
+    const imageData: CarouselSlide[] = [
         {
             id: 1,
             src: '/images/onboarding-1.jpg',
@@ -32,7 +32,7 @@ export default function RegisterStart() {
             caption: t('WelcomPage.description3'),
         },
     ];
-    const SLIDES = Array.from(Array(IMAGES_DATA.length).keys());
+    const slides = Array.from(Array(imageData.length).keys());
 
     const handleStartTraining = () => {
         router.push('/register');
@@ -42,7 +42,7 @@ export default function RegisterStart() {
         <div className="min-h-screen flex flex-col bg-black">
             <div className="flex-grow h-3/4 flex flex-col justify-center items-center">
                 <div className="flex justify-center items-center h-full w-full">
-                    <EmblaCarousel slides={SLIDES} image_data={IMAGES_DATA} options={OPTIONS} />
+                    <EmblaCarousel slides={slides} image_data={imageData} options={OPTIONS} />
                 </div>
                 <div className="flex flex-col items-center justify-center mt-6">
                     <button
@@ -62,4 +62,11 @@ export default function RegisterStart() {
             </div>
         </div>
     );
+}
+
+interface CarouselSlide {
+    id: number;
+    src: string;
+    title: string;
+    caption: string;
 }

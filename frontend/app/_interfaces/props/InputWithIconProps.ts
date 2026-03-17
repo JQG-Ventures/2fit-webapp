@@ -1,4 +1,4 @@
-import { IconType } from 'react-icons';
+import type { IconType } from 'react-icons';
 
 export interface InputWithIconProps {
     label: string;
@@ -8,4 +8,5 @@ export interface InputWithIconProps {
     placeholder: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
     icon?: IconType;
+    error?: string;
 }

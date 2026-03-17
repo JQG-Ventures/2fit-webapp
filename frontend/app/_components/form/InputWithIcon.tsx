@@ -1,4 +1,4 @@
-import { InputWithIconProps } from '../../_interfaces/props/InputWithIconProps';
+import type { InputWithIconProps } from '../../_interfaces/props/InputWithIconProps';
 import React from 'react';
 
 const InputWithIcon: React.FC<InputWithIconProps> = ({
@@ -7,7 +7,7 @@ const InputWithIcon: React.FC<InputWithIconProps> = ({
     value,
     placeholder,
     onChange,
-    icon: Icon,
+    error,
 }) => {
     return (
         <div className="">
@@ -19,6 +19,7 @@ const InputWithIcon: React.FC<InputWithIconProps> = ({
                 placeholder={placeholder}
                 className="appearance-none py-6 text-2xl block w-full bg-gray-200 text-gray-700 rounded-lg py-4 px-4 mb-3 leading-tight focus:border focus:border-gray-300 focus:bg-white"
             />
+            {error ? <p className="text-red-500 text-base italic">{error}</p> : null}
         </div>
     );
 };

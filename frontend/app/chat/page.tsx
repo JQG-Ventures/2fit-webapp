@@ -11,28 +11,29 @@ import { useApiGet } from '../utils/apiClient';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useSendMessage } from '../_services/userService';
 import { useTranslation } from 'react-i18next';
+import type { ApiResponse } from '@/app/_types/api';
+import type { ChatMessage } from '@/app/_types/chat';
 
 const Chat: React.FC = () => {
     const router = useRouter();
     const { t } = useTranslation('global');
 
     const getChatUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/conversation`;
-    const { data: conversationData, isError: error } = useApiGet<{ status: string; message: any }>(
-        ['conversationData'],
-        getChatUrl,
-    );
+    const { data: conversationData, isError: errorConversation } = useApiGet<
+        ApiResponse<ChatMessage[]>
+    >(['conversationData'], getChatUrl);
     const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
-    const { data: profile } = useApiGet<{ status: string; message: any }>(
+    const { data: profile, isError: errorProfile } = useApiGet<ApiResponse<UserProfile>>(
         ['profileData'],
         getProfileUrl,
     );
 
     const { mutate: sendMessage } = useSendMessage(
-        `${profile?.message.code_number}${profile?.message.number}`,
+        `${profile?.message.code_number ?? ''}${profile?.message.number ?? ''}`,
     );
 
-    const [isPremium, setIsPremium] = useState(true);
-    const [messages, setMessages] = useState<any[]>([]);
+    const [isPremium] = useState(true);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [isBotTyping, setIsBotTyping] = useState(false);
 
@@ -51,9 +52,9 @@ const Chat: React.FC = () => {
             timestamp: new Date().toISOString(),
             role: 'user',
             content: newMessage,
-        };
+        } satisfies ChatMessage;
 
-        setMessages((prev: any) => [...prev, userMessage]);
+        setMessages((prev) => [...prev, userMessage]);
         setNewMessage('');
         setIsBotTyping(true);
 
@@ -65,7 +66,7 @@ const Chat: React.FC = () => {
                         timestamp: new Date().toISOString(),
                         role: 'bot',
                         content: response.response,
-                    };
+                    } satisfies ChatMessage;
 
                     setMessages((prev) => [...prev, botMessage]);
                     setIsBotTyping(false);
@@ -78,8 +79,14 @@ const Chat: React.FC = () => {
         );
     };
 
-    if (error) {
-        return <Modal title="Error" message={error} onClose={() => router.push('/home')} />;
+    if (errorConversation || errorProfile) {
+        return (
+            <Modal
+                title="Error"
+                message={t('chat.fetchingError')}
+                onClose={() => router.push('/home')}
+            />
+        );
     }
 
     return (

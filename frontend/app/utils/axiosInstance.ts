@@ -1,8 +1,7 @@
-// @ts-nocheck
-
 'use client';
 
-import axios from 'axios';
+import axios, { AxiosHeaders, type AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import type { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
 
 const axiosInstance = axios.create({
@@ -12,28 +11,43 @@ const axiosInstance = axios.create({
     },
 });
 
+function setAuthorizationHeader(config: InternalAxiosRequestConfig, token: string): void {
+    const headers =
+        config.headers instanceof AxiosHeaders ? config.headers : new AxiosHeaders(config.headers);
+    headers.set('Authorization', `Bearer ${token}`);
+    config.headers = headers;
+}
+
 axiosInstance.interceptors.request.use(
     async (config) => {
-        const session = await getSession();
-        if (session?.user?.token) {
-            config.headers.Authorization = `Bearer ${session.user.token}`;
+        const session = (await getSession()) as Session | null;
+        const token = session?.user?.token;
+
+        if (token) {
+            setAuthorizationHeader(config, token);
         }
         return config;
     },
-    (error) => Promise.reject(error),
+    async (error: AxiosError) => Promise.reject(error),
 );
 
 axiosInstance.interceptors.response.use(
     (response) => response,
-    async (error) => {
+    async (error: AxiosError) => {
         const originalRequest = error.config;
+
+        if (!originalRequest) {
+            return Promise.reject(error);
+        }
+
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
             await getSession();
-            const session = await getSession();
+            const session = (await getSession()) as Session | null;
+            const token = session?.user?.token;
 
-            if (!session?.user?.token) {
+            if (!token) {
                 const excludedRoutes = ['/login', '/re-auth', '/register', '/login/google'];
 
                 if (typeof window !== 'undefined') {
@@ -46,10 +60,10 @@ axiosInstance.interceptors.response.use(
                     }
                 }
 
-                return new Promise(() => {});
+                return new Promise<never>(() => undefined);
             }
 
-            originalRequest.headers.Authorization = `Bearer ${session.user.token}`;
+            setAuthorizationHeader(originalRequest, token);
             return axiosInstance(originalRequest);
         }
         return Promise.reject(error);

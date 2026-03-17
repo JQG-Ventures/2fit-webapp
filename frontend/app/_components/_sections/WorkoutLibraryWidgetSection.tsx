@@ -4,35 +4,37 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface WorkoutCardProps {
-    title: string;
-    workoutCount: number;
-    description: string;
-    image: string;
+    workout: WorkoutPlan;
 }
 
 interface WorkoutLibrarySectionProps {
-    workouts: WorkoutCardProps[];
+    workouts: WorkoutPlan[];
 }
 
-const WorkoutCard: React.FC<WorkoutCardProps> = ({ title, workoutCount, description, image }) => (
-    <div className="relative bg-white p-6 rounded-xl shadow-md mb-6 lg:mb-0 lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl active:scale-95 z-10">
-        {/* Background Image */}
-        <div
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-300 ease-in-out"
-            style={{ backgroundImage: `url(${image})` }}
-        ></div>
+const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout }) => {
+    const workoutCount = workout.workout_schedule.reduce(
+        (totalExercises, day) => totalExercises + day.exercises.length,
+        0,
+    );
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black opacity-50 to-transparent transition-opacity duration-300 ease-in-out"></div>
+    return (
+        <div className="relative bg-white p-6 rounded-xl shadow-md mb-6 lg:mb-0 lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl active:scale-95 z-10">
+            <div
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-300 ease-in-out"
+                style={{ backgroundImage: `url(${workout.image_url})` }}
+            ></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black opacity-50 to-transparent transition-opacity duration-300 ease-in-out"></div>
 
-        {/* Content */}
-        <div className="relative z-10">
-            <h2 className="text-lg text-gray-200">{workoutCount}+ workouts</h2>
-            <h4 className="text-2xl tracking-wide text-white font-semibold mb-4">{title}</h4>
-            <p className="text-xl text-gray-200">{description}</p>
+            <div className="relative z-10">
+                <h2 className="text-lg text-gray-200">{workoutCount}+ workouts</h2>
+                <h4 className="text-2xl tracking-wide text-white font-semibold mb-4">
+                    {workout.name}
+                </h4>
+                <p className="text-xl text-gray-200">{workout.description}</p>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 const WorkoutLibrarySection: React.FC<WorkoutLibrarySectionProps> = ({ workouts }) => {
     const displayedWorkoutsCol = workouts.slice(0, 3);
@@ -50,13 +52,7 @@ const WorkoutLibrarySection: React.FC<WorkoutLibrarySectionProps> = ({ workouts 
                 <div className="block lg:hidden mb-12">
                     <div className="flex flex-col gap-6">
                         {displayedWorkoutsCol.map((workout) => (
-                            <WorkoutCard
-                                key={workout.title}
-                                title={workout.title}
-                                workoutCount={workout.workoutCount}
-                                description={workout.description}
-                                image={workout.image}
-                            />
+                            <WorkoutCard key={workout._id} workout={workout} />
                         ))}
                     </div>
                 </div>
@@ -64,13 +60,7 @@ const WorkoutLibrarySection: React.FC<WorkoutLibrarySectionProps> = ({ workouts 
                 {/* For desktop view */}
                 <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6 mb-12">
                     {displayedWorkoutsGrid.map((workout) => (
-                        <WorkoutCard
-                            key={workout.title}
-                            title={workout.title}
-                            workoutCount={workout.workoutCount}
-                            description={workout.description}
-                            image={workout.image}
-                        />
+                        <WorkoutCard key={workout._id} workout={workout} />
                     ))}
                 </div>
 

@@ -1,17 +1,36 @@
-# base image
-FROM python:3.9.6
-# set web server root as working dir
-WORKDIR /home/site/wwwroot
-# install required packages
-COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install sendgrid --isolated
-# copy all files
+FROM python:3.9-slim AS base
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+COPY requirements.txt ./
+
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
 COPY . .
 
-# expose port 8000
-EXPOSE 80
 
-# start flask app using Gunicorn
-CMD gunicorn -w 4 -b :80 --access-logfile - --error-logfile - --log-level info run:app
+FROM base AS dev
+
+ENV DEBUG=TRUE \
+    HOST=0.0.0.0 \
+    PORT=5000
+
+EXPOSE 5000
+
+CMD ["python", "run.py"]
+
+
+FROM base AS prod
+
+ENV DEBUG=FALSE \
+    HOST=0.0.0.0 \
+    PORT=5000
+
+EXPOSE 5000
+
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "--access-logfile", "-", "--error-logfile", "-", "--log-level", "info", "run:app"]
