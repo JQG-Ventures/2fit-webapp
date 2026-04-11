@@ -41,7 +41,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                     layout="fill"
                     objectFit="cover"
                 />
-                {exercise.is_completed && <div className="absolute inset-0 bg-black opacity-75"></div>}
+                {exercise.is_completed && (
+                    <div className="absolute inset-0 bg-black opacity-75"></div>
+                )}
                 {!exercise.is_completed && !isDeleteMode && !isOptionalMode && (
                     <button
                         type="button"

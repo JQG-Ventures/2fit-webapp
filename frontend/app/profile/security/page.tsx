@@ -36,11 +36,7 @@ const SecurityItem: React.FC<SecurityItemProps> = ({
         {hasArrow ? (
             <MdKeyboardArrowRight className="text-gray-500 w-12 h-12" aria-hidden />
         ) : (
-            <ToggleButton
-                isOn={isOn!}
-                onToggle={onToggle!}
-                ariaLabel={toggleAriaLabel ?? label}
-            />
+            <ToggleButton isOn={isOn!} onToggle={onToggle!} ariaLabel={toggleAriaLabel ?? label} />
         )}
     </div>
 );

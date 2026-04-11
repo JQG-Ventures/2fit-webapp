@@ -213,7 +213,9 @@ export default function RegisterStep1() {
                                 type="button"
                                 className="text-5xl"
                                 aria-label={
-                                    idx === 0 ? t('a11y.signInWithApple') : t('a11y.signInWithFacebook')
+                                    idx === 0
+                                        ? t('a11y.signInWithApple')
+                                        : t('a11y.signInWithFacebook')
                                 }
                             >
                                 <Icon
