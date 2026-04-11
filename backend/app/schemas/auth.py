@@ -1,13 +1,9 @@
-from __future__ import annotations
-
-from typing import Optional
-
 from pydantic import BaseModel
 
 
 class LoginRequest(BaseModel):
-    email: Optional[str] = None
-    phone: Optional[str] = None
+    email: str | None = None
+    phone: str | None = None
     password: str
 
 
@@ -22,12 +18,12 @@ class GoogleLoginRequest(BaseModel):
 
 class PlayerIDRequest(BaseModel):
     player_id: str
-    platform: Optional[str] = None
+    platform: str | None = None
 
 
 class TokenResponse(BaseModel):
     access_token: str
     expires_at: int
-    refresh_token: Optional[str] = None
-    user_id: Optional[str] = None
-    name: Optional[str] = None
+    refresh_token: str | None = None
+    user_id: str | None = None
+    name: str | None = None

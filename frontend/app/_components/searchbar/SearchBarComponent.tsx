@@ -153,8 +153,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                 <div className="relative">
                     {!isSearchOpen && (
                         <button
+                            type="button"
                             onClick={() => setSearchOpen(true)}
-                            aria-label="Open search"
+                            aria-label={t('a11y.search')}
                             className="flex items-center justify-center text-gray-300 hover:text-white focus:outline-none"
                         >
                             <FaSearch size={20} />
@@ -239,8 +240,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
         <div className="relative w-full">
             <div className="relative w-full flex items-center">
                 <button
+                    type="button"
                     onClick={() => setIsFullScreen(true)}
-                    aria-label="Search"
+                    aria-label={t('a11y.search')}
                     className="transform -translate-y-1/2 text-gray-500 focus:outline-none"
                 >
                     <FaSearch size={20} />
@@ -313,7 +315,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                             </div>
                         )}
                     </div>
-                    <button className="mt-4 text-red-500" onClick={() => setIsFullScreen(false)}>
+                    <button
+                        type="button"
+                        className="mt-4 text-red-500"
+                        onClick={() => setIsFullScreen(false)}
+                        aria-label={t('a11y.closeSearch')}
+                    >
                         {t('Navbar.close')}
                     </button>
                 </div>

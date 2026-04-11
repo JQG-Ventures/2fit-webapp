@@ -17,6 +17,7 @@ const WorkoutFooter: React.FC<WorkoutFooterProps> = ({ onStartClick, isSubmittin
                 type="submit"
                 onClick={onStartClick}
                 loading={isSubmitting}
+                ariaLabel={t('workouts.plan.start')}
                 className="bg-gradient-to-r from-emerald-400 to-emerald-600 w-[90%] text-white px-6 py-6 rounded-full text-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out"
             >
                 {t('workouts.plan.start')}

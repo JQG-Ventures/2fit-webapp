@@ -23,8 +23,7 @@ const ExerciseDetailsModal: React.FC<ExerciseDetailsModalProp> = ({
         <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
             <div
-                className="relative bg-white rounded-3xl overflow-hidden w-5/6 lg:max-w-2xl mx-auto my-auto"
-                style={{ height: '85vh' }}
+                className="relative bg-white rounded-3xl overflow-hidden w-5/6 lg:max-w-2xl mx-auto my-auto h-[85vh]"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="h-full flex flex-col">
@@ -37,8 +36,10 @@ const ExerciseDetailsModal: React.FC<ExerciseDetailsModalProp> = ({
                             className="w-full h-full object-cover"
                         />
                         <button
+                            type="button"
                             className="absolute inset-0 flex items-center justify-center"
                             onClick={onStartExercise}
+                            aria-label={t('a11y.playVideo')}
                         >
                             <FiPlayCircle className="text-white text-9xl bg-green-500 rounded-full p-4 animate-pulse shadow-xl" />
                         </button>
@@ -72,8 +73,10 @@ const ExerciseDetailsModal: React.FC<ExerciseDetailsModalProp> = ({
                         </div>
                     </div>
                     <button
+                        type="button"
                         className="absolute top-2 right-2 mt-2 mr-4 text-gray-200"
                         onClick={onClose}
+                        aria-label={t('a11y.closeExerciseList')}
                     >
                         ✕
                     </button>

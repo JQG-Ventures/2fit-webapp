@@ -19,7 +19,12 @@ const PaymentCards: React.FC<{
     return (
         <div className="flex flex-col justify-between items-center bg-gray-50 h-screen p-10 lg:pt-[10vh]">
             <div className="h-[10%] flex flex-row space-x-6 items-center w-full lg:max-w-3xl">
-                <button onClick={onBack} className="text-gray-700">
+                <button
+                    type="button"
+                    onClick={onBack}
+                    className="text-gray-700"
+                    aria-label={t('a11y.goBack')}
+                >
                     <FaArrowLeft className="w-8 h-8" />
                 </button>
                 <h2 className="text-5xl font-semibold">{t('payment.checkoutTitle')}</h2>
@@ -27,23 +32,27 @@ const PaymentCards: React.FC<{
 
             <div className="h-[10%] flex flex-row space-x-8 w-full lg:max-w-3xl justify-start items-center">
                 <button
+                    type="button"
                     className={`flex items-center w-1/2 justify-center space-x-4 px-6 py-3 rounded-lg text-lg font-semibold shadow-md ${
                         selectedPaymentMethod === 'card'
                             ? 'bg-green-600 text-white'
                             : 'bg-gray-200 text-gray-600'
                     }`}
                     onClick={() => setSelectedPaymentMethod('card')}
+                    aria-label={t('payment.methodCard')}
                 >
                     <FaCreditCard className="w-10 h-10" />
                     <span>{t('payment.methodCard')}</span>
                 </button>
                 <button
+                    type="button"
                     className={`flex items-center w-1/2 justify-center space-x-4 px-6 py-3 rounded-lg text-lg font-semibold shadow-md ${
                         selectedPaymentMethod === 'applePay'
                             ? 'bg-green-600 text-white'
                             : 'bg-gray-200 text-gray-600'
                     }`}
                     onClick={() => setSelectedPaymentMethod('applePay')}
+                    aria-label="Apple Pay"
                 >
                     <FaApple className="w-10 h-10" />
                     <span>Apple Pay</span>
@@ -82,8 +91,10 @@ const PaymentCards: React.FC<{
                         </div>
                     ))}
                     <button
+                        type="button"
                         onClick={onAddCard}
                         className="w-3/4 h-60 flex-shrink-0 rounded-lg shadow-md bg-gray-200 flex items-center justify-center cursor-pointer"
+                        aria-label={t('payment.newCard')}
                     >
                         <FaPlus className="w-8 h-8 text-gray-600" />
                     </button>
@@ -96,11 +107,13 @@ const PaymentCards: React.FC<{
                     <span className="text-3xl font-bold text-green-700">${selectedPlan.price}</span>
                 </div>
                 <button
+                    type="button"
                     onClick={() => onPay(`${selectedCard!}`, selectedPlan?.id)}
                     disabled={!selectedCard}
                     className={`w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-4 rounded-full text-2xl font-semibold shadow-lg py-8 flex items-center justify-center ${
                         !selectedCard ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
+                    aria-label={t('payment.payNow')}
                 >
                     {t('payment.payNow')}
                 </button>

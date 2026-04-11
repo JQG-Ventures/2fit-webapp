@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FaApple, FaFacebook, FaGoogle } from 'react-icons/fa';
 import { IoChevronBack, IoCalendarOutline } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '../../_components/register/RegisterProvider';
@@ -162,14 +161,21 @@ export default function RegisterStep1() {
     return (
         <div className="flex flex-col h-screen bg-white p-10 items-center">
             <div className="h-[10%] pt-20 w-full lg:max-w-3xl">
-                <button onClick={handlePrevStep} className="text-4xl lg:hidden">
+                <button
+                    type="button"
+                    onClick={handlePrevStep}
+                    className="text-4xl lg:hidden"
+                    aria-label={t('a11y.goBack')}
+                >
                     <IoChevronBack />
                 </button>
             </div>
             <div className="h-[15%] flex flex-row w-full lg:max-w-3xl mb-4">
                 <button
+                    type="button"
                     onClick={handlePrevStep}
                     className="hidden text-4xl lg:flex mr-14 mt-5 text-center"
+                    aria-label={t('a11y.goBack')}
                 >
                     <IoChevronBack />
                 </button>
@@ -215,6 +221,7 @@ export default function RegisterStep1() {
                         type="button"
                         onClick={handleNextStep}
                         loading={isSubmitting}
+                        ariaLabel={t('RegisterPagestep1.nextbtn')}
                         className="w-full bg-black text-white py-4 rounded-full text-xl font-semibold hover:bg-gray-800 transition duration-200 mt-4"
                     >
                         {t('RegisterPagestep1.nextbtn')}

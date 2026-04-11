@@ -1,6 +1,9 @@
+'use client';
+
 import React, { useState } from 'react';
 import { IoGlobeOutline } from 'react-icons/io5';
 import Image from 'next/image';
+import { useTranslation } from 'react-i18next';
 
 interface CountryInfo {
     name: string;
@@ -24,6 +27,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
     countryCodes,
     error,
 }) => {
+    const { t } = useTranslation('global');
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [validationError, setValidationError] = useState(false);
 
@@ -83,6 +87,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                     type="button"
                     onClick={toggleDropdown}
                     className={`flex items-center justify-center w-full bg-gray-200 text-gray-700 rounded-l-lg py-6 px-4 leading-tight focus:outline-none`}
+                    aria-label={t('a11y.selectCountryCode')}
                 >
                     {matchedCountry ? (
                         <Image

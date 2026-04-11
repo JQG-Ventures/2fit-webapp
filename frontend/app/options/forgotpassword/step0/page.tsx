@@ -40,7 +40,12 @@ const Step0: React.FC = () => {
     return (
         <div className="flex flex-col justify-between items-center bg-white h-screen p-14">
             <div className="h-[12%] flex flex-row justify-left space-x-8 items-center w-full max-w-3xl">
-                <button onClick={() => router.push('/login')} className="text-gray-700">
+                <button
+                    type="button"
+                    onClick={() => router.push('/login')}
+                    className="text-gray-700"
+                    aria-label={t('a11y.goBack')}
+                >
                     <IoIosArrowBack className="text-3xl cursor-pointer" />
                 </button>
                 <h1 className="text-4xl font-semibold">{t('ForgotPassword.forgotPassword')}</h1>
@@ -79,6 +84,11 @@ const Step0: React.FC = () => {
                     onClick={handleSubmit}
                     className="w-full bg-black text-white rounded-full text-2xl font-semibold shadow-lg flex items-center justify-center"
                     disabled={isSubmitting}
+                    aria-label={
+                        isSubmitting
+                            ? t('ForgotPassword.step0.submitting')
+                            : t('ForgotPassword.step0.continue')
+                    }
                 >
                     {isSubmitting
                         ? t('ForgotPassword.step0.submitting')

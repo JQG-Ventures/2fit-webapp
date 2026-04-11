@@ -82,7 +82,7 @@ export default function GoogleLoginCallback() {
             }
         }
 
-        handleGoogleLogin();
+        void handleGoogleLogin();
     }, [status, session, hasSentRequest, router, t]);
 
     if (status === 'loading' || loading) {
@@ -98,8 +98,10 @@ export default function GoogleLoginCallback() {
             <div className="flex flex-col items-center justify-center h-screen">
                 <p className="text-red-500 mb-4">{error}</p>
                 <button
+                    type="button"
                     onClick={() => router.push('/login')}
                     className="bg-black text-white px-6 py-3 rounded-md"
+                    aria-label={t('LoginPage.BackToLogin')}
                 >
                     {t('LoginPage.BackToLogin')}
                 </button>

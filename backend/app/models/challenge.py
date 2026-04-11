@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
@@ -24,14 +24,15 @@ class Challenge(BaseModel):
     image_url: Mapped[str] = mapped_column(Text, nullable=False, default="")
     video_url: Mapped[str] = mapped_column(Text, nullable=False, default="")
     intensity: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    equipment: Mapped[Optional[list]] = mapped_column(ARRAY(String), nullable=True)
-    category: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    equipment: Mapped[list[str] | None] = mapped_column(ARRAY(String), nullable=True)
+    category: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=[])
     level: Mapped[str] = mapped_column(String(20), nullable=False, default="beginner")
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
 
     challenge_days: Mapped[list[ChallengeDay]] = relationship(
-        back_populates="challenge", cascade="all, delete-orphan",
-        order_by="ChallengeDay.sequence_day"
+        back_populates="challenge",
+        cascade="all, delete-orphan",
+        order_by="ChallengeDay.sequence_day",
     )
 
 

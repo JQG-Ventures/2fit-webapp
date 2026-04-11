@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import SearchBar from '../searchbar/SearchBarComponent';
 
 type NavItem = {
@@ -18,7 +17,6 @@ type DesktopNavBarProps = {
 };
 
 const DesktopNavBar: React.FC<DesktopNavBarProps> = ({ navItems, selectedPath, onNavClick }) => {
-    const pathname = usePathname();
     const [isMounted, setIsMounted] = useState(false);
 
     useLayoutEffect(() => {

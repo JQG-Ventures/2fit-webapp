@@ -27,7 +27,6 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
 }) => {
     const { t } = useTranslation('global');
     const [expanded, setExpanded] = useState(false);
-    const currentExercise = exercises[currentExerciseIndex];
 
     return (
         <div
@@ -71,8 +70,10 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
 
                     {!isRestView && (
                         <button
+                            type="button"
                             onClick={onComplete}
                             className="w-full bg-gradient-to-r from-emerald-400 to-emerald-600 text-white py-5 rounded-full text-xl font-semibold shadow-lg hover:bg-emerald-500 transition-all"
+                            aria-label={t('ExerciseFlow.complete')}
                         >
                             {t('ExerciseFlow.complete')}
                         </button>
@@ -81,20 +82,26 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                     {isRestView && (
                         <div className="flex justify-between gap-4">
                             <button
+                                type="button"
                                 onClick={onSubtractTime}
                                 className="py-4 px-6 rounded-full border border-gray-300 text-xl font-bold shadow-sm"
+                                aria-label={t('a11y.decreaseRest')}
                             >
                                 -5
                             </button>
                             <button
+                                type="button"
                                 onClick={onSkipRest}
                                 className="bg-gradient-to-r from-emerald-400 to-emerald-600 text-white py-4 px-6 rounded-full text-xl font-semibold shadow-lg w-full"
+                                aria-label={t('RestView.skip')}
                             >
                                 {t('RestView.skip')}
                             </button>
                             <button
+                                type="button"
                                 onClick={onAddTime}
                                 className="py-4 px-6 rounded-full border border-gray-300 text-xl font-bold shadow-sm"
+                                aria-label={t('a11y.increaseRest')}
                             >
                                 +5
                             </button>
@@ -111,7 +118,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
 
                             return (
                                 <div key={`${exercise.exercise_id}-${exIdx}`} className="w-full">
-                                    {sets.map((setNumber, setIdx) => {
+                                    {sets.map((setNumber, _setIdx) => {
                                         const isSetCompleted =
                                             isCompleted || (isCurrent && setNumber < currentSet);
                                         const isCurrentSet = isCurrent && setNumber === currentSet;

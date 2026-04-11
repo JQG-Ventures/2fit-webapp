@@ -9,9 +9,9 @@ from sqlalchemy import engine_from_config, pool
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+import app.models  # noqa: E402, F401
 from app import create_app  # noqa: E402
 from app.extensions import db  # noqa: E402
-import app.models  # noqa: E402, F401
 
 config = context.config
 

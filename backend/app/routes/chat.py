@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 import uuid
 
@@ -33,7 +31,7 @@ class ChatBotResource(Resource):
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            logger.exception(f"Chat error: {e}")
+            logger.exception("Chat error: %s", e)
             return {"error": "Could not handle the message"}, 500
 
         status_code = 201 if is_new else 200
@@ -50,5 +48,5 @@ class TranscribeResource(Resource):
             response = chat_service.transcribe_audio(audio_file)
             return {"response": response}, 200
         except Exception as e:
-            logger.exception(f"Transcription error: {e}")
+            logger.exception("Transcription error: %s", e)
             return {"error": "Could not handle the message"}, 500

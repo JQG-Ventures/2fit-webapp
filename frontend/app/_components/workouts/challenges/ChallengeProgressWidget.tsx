@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { FaDumbbell } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
@@ -46,6 +48,10 @@ export const ChallengeProgressWidget: React.FC<Props> = ({ progressData, onConti
                     currentDayNumber = total_days;
                 }
 
+                const progressPercent =
+                    total_days > 0 ? Math.round((completedCount / total_days) * 100) : 0;
+                const progressLabel = `${name}: ${progressPercent}% ${t('workouts.challenges.progressLabel')}`;
+
                 return (
                     <React.Fragment key={plan.id}>
                         <div className="flex items-center space-x-4">
@@ -55,13 +61,25 @@ export const ChallengeProgressWidget: React.FC<Props> = ({ progressData, onConti
                             <span className="text-2xl font-semibold text-black">{name}</span>
                         </div>
 
-                        <div className="w-full bg-gray-200 rounded-full h-3">
-                            <div
-                                className="bg-green-500 h-3 rounded-full"
-                                style={{
-                                    width: `${(completedCount / total_days) * 100}%`,
-                                }}
-                            ></div>
+                        <p className="sr-only">{progressLabel}</p>
+                        <div
+                            className="w-full bg-gray-200 rounded-full h-3 overflow-hidden"
+                            aria-hidden="true"
+                        >
+                            <svg
+                                className="w-full h-3 block"
+                                viewBox="0 0 100 3"
+                                preserveAspectRatio="none"
+                            >
+                                <rect
+                                    x="0"
+                                    y="0"
+                                    width={total_days > 0 ? (completedCount / total_days) * 100 : 0}
+                                    height="3"
+                                    fill="rgb(34 197 94)"
+                                    rx="1.5"
+                                />
+                            </svg>
                         </div>
 
                         <p className="text-gray-800 text-lg font-medium">
@@ -71,8 +89,10 @@ export const ChallengeProgressWidget: React.FC<Props> = ({ progressData, onConti
                         </p>
 
                         <button
+                            type="button"
                             className="w-full bg-green-500 mt-6 text-white py-3 rounded-2xl text-lg font-semibold hover:bg-green-600 transition"
                             onClick={() => onContinue(plan.id, plan.plan_type)}
+                            aria-label={t('a11y.continueChallenge')}
                         >
                             {t('workouts.continue')}
                         </button>

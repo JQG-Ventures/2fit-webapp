@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 
 from flask import Blueprint, request
@@ -52,5 +50,5 @@ class StoreEmailResource(Resource):
             return {"status": "error", "message": "Email already registered!"}, 409
         except Exception as e:
             db.session.rollback()
-            logging.exception(f"Error saving email: {e}")
+            logging.exception("Error saving email: %s", e)
             return {"status": "error", "message": str(e)}, 500

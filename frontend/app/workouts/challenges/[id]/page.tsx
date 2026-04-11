@@ -82,7 +82,7 @@ const ChallengeDetailPage: React.FC = () => {
                         sequenceDay={selectedDay + 1}
                         onClose={() => {
                             setSelectedDay(null);
-                            refetchProgress();
+                            void refetchProgress();
                         }}
                     />
                 </div>
@@ -100,8 +100,10 @@ const ChallengeDetailPage: React.FC = () => {
                         />
                         <div className="absolute top-8 lg:top-32 left-8">
                             <button
+                                type="button"
                                 onClick={() => router.back()}
                                 className="text-white p-2 bg-black bg-opacity-50 rounded-full"
+                                aria-label={t('a11y.goBack')}
                             >
                                 <FaArrowLeft />
                             </button>
@@ -128,6 +130,7 @@ const ChallengeDetailPage: React.FC = () => {
 
                     <div className="h-[13%] fixed bottom-0 left-0 right-0 flex justify-center items-center z-10 bg-white shadow-lg rounded-t-3xl">
                         <button
+                            type="button"
                             onClick={() => {
                                 if (!progressData) {
                                     setSelectedDay(0);
@@ -162,6 +165,11 @@ const ChallengeDetailPage: React.FC = () => {
                                 setSelectedDay(normalizedNext - 1);
                             }}
                             className="bg-gradient-to-r from-emerald-400 to-emerald-600 w-[90%] text-white px-6 py-6 rounded-full text-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out"
+                            aria-label={
+                                !progressData
+                                    ? t('workouts.challenges.startChallenge')
+                                    : t('workouts.challenges.continueChallenge')
+                            }
                         >
                             {!progressData
                                 ? t('workouts.challenges.startChallenge')
@@ -175,12 +183,14 @@ const ChallengeDetailPage: React.FC = () => {
                             {challenge.schedule.map((week, index) => (
                                 <button
                                     key={index}
+                                    type="button"
                                     onClick={() => setActiveWeek(index)}
                                     className={`px-4 py-2 rounded-lg border text-base whitespace-nowrap ${
                                         activeWeek === index
                                             ? 'bg-emerald-100 text-emerald-700 font-semibold'
                                             : 'text-gray-600'
                                     }`}
+                                    aria-label={`${t('workouts.challenges.week')} ${week.week}`}
                                 >
                                     {t('workouts.challenges.week')} {week.week}
                                 </button>

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 
 from flask import Blueprint, request
@@ -43,7 +41,7 @@ class ContentUploadResource(Resource):
             return {"message": "Cannot upload content to Azure Storage", "content_id": ""}, 400
         except Exception as e:
             db.session.rollback()
-            logger.exception(f"Content upload error: {e}")
+            logger.exception("Content upload error: %s", e)
             return {"error": "Could not upload content"}, 500
 
 
@@ -62,7 +60,7 @@ class ContentByTagsResource(Resource):
             azure_service = AzureService()
             content_url = azure_service.get_content_by_tags(tags_list)
         except Exception as e:
-            logger.exception(f"Content retrieval error: {e}")
+            logger.exception("Content retrieval error: %s", e)
             return {"error": "Could not retrieve content"}, 500
 
         if content_url:

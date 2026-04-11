@@ -3,14 +3,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa';
-import ToggleButton from '../../_components/profile/togglebutton';
+import ToggleButton from '../../_components/profile/ToggleButton';
 import Modal from '../../_components/profile/modal';
 import LoadingScreen from '../../_components/animations/LoadingScreen';
 import { useApiGet } from '../../utils/apiClient';
 import { useTranslation } from 'react-i18next';
 import { useUpdateProfile } from '../../_services/userService';
 import type { ApiResponse } from '../../_types/api';
-import type { AppUserProfile, ProfileToggleGroup } from '../../_types/profile';
+import type { AppUserProfile } from '../../_types/profile';
 
 interface NotificationItemProps {
     label: string;
@@ -18,12 +18,17 @@ interface NotificationItemProps {
     onToggle: () => void;
 }
 
-const NotificationItem: React.FC<NotificationItemProps> = ({ label, isOn, onToggle }) => (
+const NotificationItem: React.FC<NotificationItemProps & { toggleAriaLabel: string }> = ({
+    label,
+    isOn,
+    onToggle,
+    toggleAriaLabel,
+}) => (
     <div className="flex items-center justify-between w-full py-5">
         <div className="flex items-center space-x-4">
             <span className="text-3xl">{label}</span>
         </div>
-        <ToggleButton isOn={isOn} onToggle={onToggle} />
+        <ToggleButton isOn={isOn} onToggle={onToggle} ariaLabel={toggleAriaLabel} />
     </div>
 );
 
@@ -121,7 +126,12 @@ const Notification: React.FC = () => {
             )}
 
             <div className="h-[12%] flex flex-row justify-left space-x-8 items-center w-full lg:max-w-3xl">
-                <button onClick={() => router.back()} className="text-gray-700">
+                <button
+                    type="button"
+                    onClick={() => router.back()}
+                    className="text-gray-700"
+                    aria-label={t('a11y.goBack')}
+                >
                     <FaArrowLeft className="w-8 h-8" />
                 </button>
                 <h1 className="text-5xl font-semibold">{t('profile.Notifications.Title')}</h1>
@@ -132,6 +142,7 @@ const Notification: React.FC = () => {
                     <NotificationItem
                         key={item.key}
                         label={item.label}
+                        toggleAriaLabel={t('a11y.toggleSetting', { label: item.label })}
                         isOn={notifications[item.key as keyof typeof notifications]}
                         onToggle={() => handleToggle(item.key as keyof typeof notifications)}
                     />

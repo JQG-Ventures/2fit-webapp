@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 import uuid
 from datetime import datetime
@@ -159,7 +157,7 @@ class UserChallengeProgressResource(Resource):
             progress = UserWorkoutService.get_challenge_progress(user_id, challenge_id)
             return {"status": "success", "message": progress}, 200
         except Exception as e:
-            logging.exception(f"Error getting challenge progress: {e}")
+            logging.exception("Error getting challenge progress: %s", e)
             return {"status": "error", "message": "Internal server error"}, 500
 
     @jwt_required()
@@ -188,7 +186,7 @@ class UserChallengeProgressResource(Resource):
             return {"status": "success", "message": "Progreso guardado"}, 200
         except Exception as e:
             db.session.rollback()
-            logging.exception(f"Error saving challenge progress: {e}")
+            logging.exception("Error saving challenge progress: %s", e)
             return {"status": "error", "message": "Internal server error"}, 500
 
 
@@ -215,5 +213,5 @@ class CompleteChallengeResource(Resource):
             return {"status": "success", "message": "Challenge completado guardado"}, 200
         except Exception as e:
             db.session.rollback()
-            logging.exception(f"Error saving completed challenge: {e}")
+            logging.exception("Error saving completed challenge: %s", e)
             return {"status": "error", "message": "Internal server error"}, 500

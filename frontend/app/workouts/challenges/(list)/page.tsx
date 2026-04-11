@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { FaFire, FaDumbbell, FaGem, FaArrowLeft } from 'react-icons/fa';
+import Image from 'next/image';
 import { useApiGet } from '@/app/utils/apiClient';
 
 const Challenges: React.FC = () => {
@@ -42,8 +43,10 @@ const Challenges: React.FC = () => {
         <div className="flex flex-col h-screen bg-white p-10 items-center lg:pt-[10vh]">
             <div className="h-[10%] flex flex-row items-center justify-center w-full lg:max-w-3xl">
                 <button
+                    type="button"
                     onClick={() => router.back()}
                     className="absolute left-10 text-gray-700 mr-4"
+                    aria-label={t('a11y.goBack')}
                 >
                     <FaArrowLeft className="w-8 h-8" />
                 </button>
@@ -58,12 +61,14 @@ const Challenges: React.FC = () => {
                     {categories.map((category) => (
                         <button
                             key={category}
+                            type="button"
                             onClick={() => setActiveFilter(category)}
                             className={`px-4 py-2 rounded-full border ${
                                 activeFilter === category
                                     ? 'bg-green-100 text-black font-semibold'
                                     : 'text-gray-600'
                             }`}
+                            aria-label={category}
                         >
                             {category}
                         </button>
@@ -77,14 +82,16 @@ const Challenges: React.FC = () => {
                             <div
                                 onClick={() => router.push(`/workouts/challenges/${challenge.id}`)}
                                 className="rounded-2xl overflow-hidden relative w-full aspect-square bg-gray-200"
-                                style={{
-                                    backgroundImage: `url(${challenge.image})`,
-                                    backgroundSize: 'cover',
-                                    backgroundPosition: 'center',
-                                }}
                             >
+                                <Image
+                                    src={challenge.image}
+                                    alt=""
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 1024px) 50vw, 400px"
+                                />
                                 {challenge.premium && (
-                                    <div className="absolute top-2 right-2 bg-white rounded-full p-1">
+                                    <div className="absolute top-2 right-2 bg-white rounded-full p-1 z-10">
                                         <FaGem className="text-blue-500" />
                                     </div>
                                 )}

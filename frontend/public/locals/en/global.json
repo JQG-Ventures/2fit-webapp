@@ -320,7 +320,8 @@
             "all": "All",
             "days": "days",
             "activeChallenges": "Active Challenges",
-            "continueChallenge": "Continue challenge"
+            "continueChallenge": "Continue challenge",
+            "progressLabel": "complete"
         },
         "plan": {
             "workoutAlreadySaved": "Workout already saved!",
@@ -434,5 +435,47 @@
                 }
             }
         }
+    },
+    "a11y": {
+        "goBack": "Go back",
+        "signInWithGoogle": "Sign in with Google",
+        "signInWithApple": "Sign in with Apple",
+        "signInWithFacebook": "Sign in with Facebook",
+        "toggleSetting": "Toggle {{label}}",
+        "carouselSlide": "Go to slide {{n}} of {{total}}",
+        "openWorkoutMenu": "Open workout options menu",
+        "sendMessage": "Send message",
+        "openWhatsApp": "Open WhatsApp",
+        "decreaseRest": "Decrease rest by 5 seconds",
+        "increaseRest": "Increase rest by 5 seconds",
+        "seeAllExercises": "See all exercises",
+        "closeExerciseList": "Close exercise list",
+        "expandDetails": "Expand or collapse exercise details",
+        "search": "Search",
+        "closeSearch": "Close search",
+        "toggleDarkTheme": "Toggle dark theme",
+        "checkout": "Continue to checkout",
+        "selectGender": "Select {{label}}",
+        "selectGoal": "Select fitness goal: {{label}}",
+        "playVideo": "Play video",
+        "unlockCoach": "Unlock premium coach",
+        "resendEmail": "Resend email",
+        "goToHome": "Go to home",
+        "removeExercise": "Remove exercise from selection",
+        "replaceExercise": "Replace exercise",
+        "dayOfWeek": "Select {{day}}",
+        "startExercise": "Start exercise",
+        "markForRemoval": "Mark exercise for removal",
+        "changeExerciseChoice": "Choose replacement exercise",
+        "saveWorkout": "Save workout",
+        "exitWorkout": "Exit workout",
+        "muteVideo": "Mute video",
+        "unmuteVideo": "Unmute video",
+        "continueChallenge": "Continue challenge",
+        "selectCountryCode": "Select country calling code",
+        "scrollToLatestMessages": "Scroll to latest messages",
+        "refreshExercise": "Show another exercise",
+        "verificationCodeDigit": "Verification code digit {{n}} of 4",
+        "selectProfilePhoto": "Select profile photo"
     }
 }

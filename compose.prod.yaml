@@ -16,6 +16,7 @@ services:
   worker:
     image: 2fit-backend:prod
     pull_policy: never
+    command: ["celery", "-A", "app.celery_worker:celery_app", "worker", "--loglevel=info"]
     environment:
       HOST: 0.0.0.0
       PORT: 5000

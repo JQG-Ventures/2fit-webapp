@@ -1,7 +1,3 @@
-from __future__ import annotations
-
-from typing import Optional
-
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -34,17 +30,17 @@ class ExerciseCreate(BaseModel):
 
 
 class ExerciseUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    category: Optional[str] = None
-    image_url: Optional[str] = None
-    video_url: Optional[str] = None
-    muscle_group: Optional[list[str]] = None
-    difficulty: Optional[str] = None
-    equipment: Optional[list[str]] = None
-    instructions: Optional[list[str]] = None
-    contradictions: Optional[list[str]] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    description: str | None = None
+    category: str | None = None
+    image_url: str | None = None
+    video_url: str | None = None
+    muscle_group: list[str] | None = None
+    difficulty: str | None = None
+    equipment: list[str] | None = None
+    instructions: list[str] | None = None
+    contradictions: list[str] | None = None
+    is_active: bool | None = None
 
 
 class ExerciseResponse(BaseModel):

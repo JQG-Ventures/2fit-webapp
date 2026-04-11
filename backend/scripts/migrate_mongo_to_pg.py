@@ -10,6 +10,7 @@ This script reads all collections from the existing MongoDB database
 and inserts them into the PostgreSQL database using the new ORM models.
 It handles ObjectId -> UUID translation and nested document normalization.
 """
+
 from __future__ import annotations
 
 import logging
@@ -45,30 +46,11 @@ def run_migration() -> None:
     mongo_db = mongo_client.get_default_database()
 
     from app import create_app
+
     app = create_app()
 
     with app.app_context():
         from app.extensions import db
-        from app.models.challenge import Challenge, ChallengeDay, ChallengeDayExercise
-        from app.models.content import Content
-        from app.models.conversation import Conversation, Message
-        from app.models.email import Email
-        from app.models.exercise import Exercise
-        from app.models.notification import NotificationDevice
-        from app.models.progress import (
-            ActiveChallenge,
-            ActiveChallengeExercise,
-            ActivePlan,
-            CompletedChallengeDay,
-            CompletedChallengeExercise,
-            CompletedWorkout,
-            CompletedWorkoutExercise,
-            DayProgress,
-            ExerciseProgress,
-            SavedWorkout,
-        )
-        from app.models.user import User, UserAutomationData, UserPreference, UserSettings
-        from app.models.workout_plan import WorkoutDay, WorkoutDayExercise, WorkoutPlan
 
         db.create_all()
 

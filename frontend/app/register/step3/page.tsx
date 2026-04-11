@@ -53,9 +53,11 @@ export default function RegisterStep3() {
                     {genders.map(({ id, label, value, Icon }) => (
                         <button
                             key={id}
+                            type="button"
                             className={`w-60 h-60 lg:w-80 lg:h-80 flex flex-col items-center justify-center border rounded-full text-3xl 
                             ${selectedGender === value ? 'bg-black text-white border-black' : 'bg-gray-300 text-gray-700 border-gray-300'}`}
                             onClick={() => handleGenderSelection(value)}
+                            aria-label={t('a11y.selectGender', { label })}
                         >
                             <Icon className="text-8xl" />
                             <span className="mt-2 text-2xl">{label}</span>

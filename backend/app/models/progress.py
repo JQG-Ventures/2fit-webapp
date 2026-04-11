@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
@@ -46,7 +46,7 @@ class ActivePlan(BaseModel):
     workout_name: Mapped[str] = mapped_column(String(200), nullable=False)
     plan_type: Mapped[str] = mapped_column(String(20), nullable=False)
     start_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    end_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    end_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     is_completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     progress: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
 
@@ -63,9 +63,9 @@ class DayProgress(BaseModel):
     active_plan_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("active_plans.id", ondelete="CASCADE"), nullable=False
     )
-    week_number: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    day_of_week: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
-    sequence_day: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    week_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    day_of_week: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    sequence_day: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     active_plan: Mapped[ActivePlan] = relationship(back_populates="progress_details")
@@ -77,7 +77,9 @@ class DayProgress(BaseModel):
 class ExerciseProgress(BaseModel):
     __tablename__ = "exercise_progress"
     __table_args__ = (
-        UniqueConstraint("day_progress_id", "exercise_id", name="uq_exercise_progress_day_exercise"),
+        UniqueConstraint(
+            "day_progress_id", "exercise_id", name="uq_exercise_progress_day_exercise"
+        ),
     )
 
     day_progress_id: Mapped[uuid.UUID] = mapped_column(
@@ -87,7 +89,7 @@ class ExerciseProgress(BaseModel):
         UUID(as_uuid=True), ForeignKey("exercises.id", ondelete="CASCADE"), nullable=False
     )
     sets_completed: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    reps_completed: Mapped[list] = mapped_column(ARRAY(Integer), nullable=False, default=[])
+    reps_completed: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False, default=[])
     duration_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     calories_burned: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     is_completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
@@ -108,12 +110,12 @@ class CompletedWorkout(BaseModel):
     date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     duration_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     calories_burned: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
-    day_of_week: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
-    sequence_day: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    day_of_week: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    sequence_day: Mapped[int | None] = mapped_column(Integer, nullable=True)
     was_skipped: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     user: Mapped[User] = relationship(back_populates="completed_workouts")
-    workout_plan: Mapped[Optional[WorkoutPlan]] = relationship()
+    workout_plan: Mapped[WorkoutPlan | None] = relationship()
     exercises: Mapped[list[CompletedWorkoutExercise]] = relationship(
         back_populates="completed_workout", cascade="all, delete-orphan"
     )
@@ -129,7 +131,7 @@ class CompletedWorkoutExercise(BaseModel):
         UUID(as_uuid=True), ForeignKey("exercises.id", ondelete="CASCADE"), nullable=False
     )
     sets_completed: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    reps_completed: Mapped[list] = mapped_column(ARRAY(Integer), nullable=False, default=[])
+    reps_completed: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False, default=[])
     duration_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     calories_burned: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     is_completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
@@ -140,9 +142,7 @@ class CompletedWorkoutExercise(BaseModel):
 
 class ActiveChallenge(BaseModel):
     __tablename__ = "active_challenges"
-    __table_args__ = (
-        UniqueConstraint("user_id", "challenge_id", name="uq_active_challenge_user"),
-    )
+    __table_args__ = (UniqueConstraint("user_id", "challenge_id", name="uq_active_challenge_user"),)
 
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
@@ -170,7 +170,7 @@ class ActiveChallengeExercise(BaseModel):
         UUID(as_uuid=True), ForeignKey("exercises.id", ondelete="CASCADE"), nullable=False
     )
     sets_completed: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    reps_completed: Mapped[list] = mapped_column(ARRAY(Integer), nullable=False, default=[])
+    reps_completed: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False, default=[])
     duration_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     calories_burned: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     is_completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
@@ -182,7 +182,9 @@ class ActiveChallengeExercise(BaseModel):
 class CompletedChallengeDay(BaseModel):
     __tablename__ = "completed_challenge_days"
     __table_args__ = (
-        UniqueConstraint("user_id", "challenge_id", "sequence_day", name="uq_completed_challenge_day"),
+        UniqueConstraint(
+            "user_id", "challenge_id", "sequence_day", name="uq_completed_challenge_day"
+        ),
     )
 
     user_id: Mapped[uuid.UUID] = mapped_column(
@@ -208,14 +210,15 @@ class CompletedChallengeExercise(BaseModel):
     __tablename__ = "completed_challenge_exercises"
 
     completed_challenge_day_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("completed_challenge_days.id", ondelete="CASCADE"),
-        nullable=False
+        UUID(as_uuid=True),
+        ForeignKey("completed_challenge_days.id", ondelete="CASCADE"),
+        nullable=False,
     )
     exercise_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("exercises.id", ondelete="CASCADE"), nullable=False
     )
     sets_completed: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    reps_completed: Mapped[list] = mapped_column(ARRAY(Integer), nullable=False, default=[])
+    reps_completed: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False, default=[])
     duration_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     calories_burned: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     is_completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)

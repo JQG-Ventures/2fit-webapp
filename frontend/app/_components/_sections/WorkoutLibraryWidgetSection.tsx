@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 
 interface WorkoutCardProps {
@@ -18,12 +19,15 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout }) => {
     );
 
     return (
-        <div className="relative bg-white p-6 rounded-xl shadow-md mb-6 lg:mb-0 lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl active:scale-95 z-10">
-            <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-300 ease-in-out"
-                style={{ backgroundImage: `url(${workout.image_url})` }}
-            ></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-black opacity-50 to-transparent transition-opacity duration-300 ease-in-out"></div>
+        <div className="relative bg-white p-6 rounded-xl shadow-md mb-6 lg:mb-0 lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl active:scale-95 z-10 min-h-[280px]">
+            <Image
+                src={workout.image_url}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 400px"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent transition-opacity duration-300 ease-in-out z-[1]"></div>
 
             <div className="relative z-10">
                 <h2 className="text-lg text-gray-200">{workoutCount}+ workouts</h2>
@@ -69,7 +73,11 @@ const WorkoutLibrarySection: React.FC<WorkoutLibrarySectionProps> = ({ workouts 
                         <p className="text-gray-700 text-lg mb-4">
                             {t('home.WorkoutLibrarySection.WorkoutLibrarySectiondescription2')}
                         </p>
-                        <button className="bg-green-500 text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-green-700 transition-colors">
+                        <button
+                            type="button"
+                            className="bg-green-500 text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-green-700 transition-colors"
+                            aria-label={t('home.WorkoutLibrarySection.openlibrary')}
+                        >
                             {t('home.WorkoutLibrarySection.openlibrary')}
                         </button>
                     </div>

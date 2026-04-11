@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
@@ -21,11 +21,10 @@ class NotificationDevice(BaseModel):
     )
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False, index=True
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     player_id: Mapped[str] = mapped_column(String(100), nullable=False)
-    platform: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
-    last_used: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    platform: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    last_used: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     user: Mapped[User] = relationship(back_populates="notification_devices")

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 import uuid
 from datetime import datetime, timedelta
@@ -62,7 +60,7 @@ class UserWorkoutService:
             ]
             repo.save(user_uuid, workout_data, formatted_exercises)
             db.session.flush()
-            logging.info(f"Workout saved for user {user_uuid}.")
+            logging.info("Workout saved for user %s.", user_uuid)
         except Exception:
             raise
 
@@ -97,7 +95,7 @@ class UserWorkoutService:
 
             return {"progress": progress, "exercises_left": exercises_left}
         except Exception as e:
-            logging.error(f"Error getting user progress: {e}")
+            logging.error("Error getting user progress: %s", e)
             raise
 
     @staticmethod
@@ -244,9 +242,9 @@ class UserWorkoutService:
 
             day_map = {d.day_of_week: d for d in workout_plan.workout_days if d.day_of_week}
             progress_map: dict[str, Any] = {}
-            for dp in active_plan.progress_details:
-                if dp.week_number == current_week and dp.day_of_week:
-                    progress_map[dp.day_of_week] = dp
+            for progress_detail in active_plan.progress_details:
+                if progress_detail.week_number == current_week and progress_detail.day_of_week:
+                    progress_map[progress_detail.day_of_week] = progress_detail
 
             for day_name in days_of_week:
                 day_workout = day_map.get(day_name)
@@ -306,7 +304,7 @@ class UserWorkoutService:
                 "days": response_days,
             }
         except Exception as e:
-            logging.error(f"Error getting weekly progress: {e}")
+            logging.error("Error getting weekly progress: %s", e)
             raise
 
     @staticmethod
@@ -414,7 +412,7 @@ class UserWorkoutService:
                 "days": response_days,
             }
         except Exception as e:
-            logging.error(f"Error getting challenge progress: {e}")
+            logging.error("Error getting challenge progress: %s", e)
             raise
 
     @staticmethod
@@ -491,6 +489,6 @@ class UserWorkoutService:
                 active_plan.is_completed = completed_count >= total_scheduled
 
             db.session.flush()
-            logging.info(f"Workout progress saved for user {user_uuid}.")
+            logging.info("Workout progress saved for user %s.", user_uuid)
         except Exception:
             raise

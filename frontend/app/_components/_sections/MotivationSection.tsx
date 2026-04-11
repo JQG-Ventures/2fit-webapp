@@ -50,8 +50,7 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
                     </div>
                     <div className="w-[20%] flex justify-end">
                         <div
-                            style={{ backgroundColor: '#1f2937' }}
-                            className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg relative cursor-pointer transition-transform duration-300 ease-in-out"
+                            className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg relative cursor-pointer transition-transform duration-300 ease-in-out bg-gray-800"
                             onMouseEnter={() => setIsHovered(true)}
                             onMouseLeave={() => setIsHovered(false)}
                             onClick={handleIconClick}
@@ -78,13 +77,19 @@ const MotivationSection = ({ isBotUser }: { isBotUser: boolean }) => {
                     <div className="button-container">
                         {isBotUser ? (
                             <button
+                                type="button"
                                 onClick={() => router.push('/chat')}
                                 className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition-colors"
+                                aria-label={t('home.trainer.letschat')}
                             >
                                 {t('home.trainer.letschat')}
                             </button>
                         ) : (
-                            <button className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition-colors">
+                            <button
+                                type="button"
+                                className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition-colors"
+                                aria-label={t('home.trainer.getyourplan')}
+                            >
                                 {t('home.trainer.getyourplan')}
                             </button>
                         )}

@@ -13,8 +13,10 @@ const LockScreen: React.FC<{ message: string; buttonText: string; onButtonClick:
             </div>
             <div className="w-full flex justify-center mb-8">
                 <button
+                    type="button"
                     className="flex flex-row w-full justify-center items-center bg-green-500 font-semibold text-white p-6 rounded-full hover:bg-green-600"
                     onClick={onButtonClick}
+                    aria-label={buttonText}
                 >
                     <FaUnlock className="mr-4 w-6 h-6" />
                     {buttonText}

@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 import uuid
-from typing import Optional, cast
+from typing import cast
 
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
@@ -11,13 +9,13 @@ from app.models.conversation import Conversation, Message
 
 
 class ConversationRepository:
-    def get_by_user(self, user_id: uuid.UUID) -> Optional[Conversation]:
+    def get_by_user(self, user_id: uuid.UUID) -> Conversation | None:
         stmt = (
             select(Conversation)
             .where(Conversation.user_id == user_id)
             .options(joinedload(Conversation.messages))
         )
-        return cast(Optional[Conversation], db.session.scalars(stmt).unique().first())
+        return cast(Conversation | None, db.session.scalars(stmt).unique().first())
 
     def get_or_create(self, user_id: uuid.UUID) -> Conversation:
         conversation = self.get_by_user(user_id)
@@ -28,9 +26,7 @@ class ConversationRepository:
         db.session.flush()
         return conversation
 
-    def add_message(
-        self, conversation_id: uuid.UUID, role: str, content: str
-    ) -> Message:
+    def add_message(self, conversation_id: uuid.UUID, role: str, content: str) -> Message:
         message = Message(
             conversation_id=conversation_id,
             role=role,

@@ -90,7 +90,6 @@ const MyPlan: React.FC = () => {
     );
     const [similarExercises, setSimilarExercises] = useState<Exercise[]>([]);
 
-    const getProgressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/weekly-progress`;
     const {
         data: weeklyProgressData,
         isLoading: loadingWeeklyProgress,
@@ -98,7 +97,7 @@ const MyPlan: React.FC = () => {
         refetch: refetchWeeklyProgress,
     } = useApiGet<ApiResponse<WeeklyProgressMessage>>(
         ['weeklyProgress', planId ?? ''],
-        getProgressUrl,
+        '/api/workouts/weekly-progress',
     );
     const { mutate: deleteExercises } = useDeleteExercises(planId ?? '');
     const { mutate: modifyExercises } = useModifyExercises(planId ?? '');
@@ -184,11 +183,12 @@ const MyPlan: React.FC = () => {
         });
     };
 
-    const handleOptionalSelect = async (exercise_id: string) => {
+    const handleOptionalSelect = (exercise_id: string) => {
         setExerciseToReplaceId(exercise_id);
-        const similarExerciseOptions = await getSimilarExercises(exercise_id, token);
-        setSimilarExercises(similarExerciseOptions ?? []);
-        setIsOptionalExercisesOpen(true);
+        void getSimilarExercises(exercise_id, token).then((similarExerciseOptions) => {
+            setSimilarExercises(similarExerciseOptions ?? []);
+            setIsOptionalExercisesOpen(true);
+        });
     };
 
     const handleConfirmDelete = () => {
@@ -197,9 +197,9 @@ const MyPlan: React.FC = () => {
                 setIsDeleteMode(false);
                 setExercisesToDelete({});
                 setShowConfirmationModal(false);
-                refetchWeeklyProgress();
+                void refetchWeeklyProgress();
             },
-            onError: (error) => console.error('Error ddeleting exercises:', error.message),
+            onError: (error) => console.error('Error deleting exercises:', error.message),
         });
     };
 
@@ -272,9 +272,9 @@ const MyPlan: React.FC = () => {
                 setIsDeleteMode(false);
                 setExercisesToDelete({});
                 setShowConfirmationModal(false);
-                refetchWeeklyProgress();
+                void refetchWeeklyProgress();
             },
-            onError: (error) => console.error('Error ddeleting exercises:', error.message),
+            onError: (error) => console.error('Error deleting exercises:', error.message),
         });
 
         modifyExercises(exercisesToReplace, {
@@ -282,7 +282,7 @@ const MyPlan: React.FC = () => {
                 setIsOptionalMode(false);
                 setExercisesToReplace({});
                 setShowConfirmationModal(false);
-                refetchWeeklyProgress();
+                void refetchWeeklyProgress();
             },
             onError: (error) => console.error('Error replacing exercises:', error.message),
         });
@@ -290,7 +290,7 @@ const MyPlan: React.FC = () => {
         setIsOptionalMode(false);
         setExercisesToReplace({});
         setShowConfirmationModal(false);
-        refetchWeeklyProgress();
+        void refetchWeeklyProgress();
     };
 
     const handleExerciseComplete = (exerciseId: string) => {
@@ -319,13 +319,23 @@ const MyPlan: React.FC = () => {
     return (
         <div className="flex flex-col h-screen bg-white p-10 items-center lg:pt-[10vh]">
             <div className="h-[10%] flex flex-row items-center w-full lg:max-w-3xl">
-                <button onClick={() => router.back()} className="text-gray-700 mr-4">
+                <button
+                    type="button"
+                    onClick={() => router.back()}
+                    className="text-gray-700 mr-4"
+                    aria-label={t('a11y.goBack')}
+                >
                     <FaArrowLeft className="w-8 h-8" />
                 </button>
                 <h1 className="text-5xl text-center font-semibold lg:w-full">
                     {t('workouts.my-plan.title')}
                 </h1>
-                <button onClick={() => setShowOptionsModal(true)} className="text-gray-700 ml-4">
+                <button
+                    type="button"
+                    onClick={() => setShowOptionsModal(true)}
+                    className="text-gray-700 ml-4"
+                    aria-label={t('a11y.openWorkoutMenu')}
+                >
                     <HiDotsHorizontal className="w-8 h-8" />
                 </button>
             </div>
@@ -371,8 +381,9 @@ const MyPlan: React.FC = () => {
                     onClick={() => {
                         setShowConfirmationModal(true);
                     }}
-                    type="submit"
+                    type="button"
                     className="w-[45%] bg-gradient-to-r from-green-400 to-green-700 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
+                    aria-label={t('workouts.my-plan.confirm')}
                 >
                     {t('workouts.my-plan.confirm')}
                 </button>
@@ -381,8 +392,9 @@ const MyPlan: React.FC = () => {
                         setIsDeleteMode(false);
                         setExercisesToDelete({});
                     }}
-                    type="submit"
+                    type="button"
                     className="w-[45%] bg-red-500 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
+                    aria-label={t('home.SavedWorkoutsSection.SavedWorkoutsSectioncancelText')}
                 >
                     {t('home.SavedWorkoutsSection.SavedWorkoutsSectioncancelText')}
                 </button>
@@ -393,8 +405,9 @@ const MyPlan: React.FC = () => {
             >
                 <button
                     onClick={() => setShowConfirmationModal(true)}
-                    type="submit"
+                    type="button"
                     className="w-[45%] bg-gradient-to-r from-green-400 to-green-700 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
+                    aria-label={t('workouts.my-plan.confirm')}
                 >
                     {t('workouts.my-plan.confirm')}
                 </button>
@@ -403,8 +416,9 @@ const MyPlan: React.FC = () => {
                         setIsOptionalMode(false);
                         setExercisesToReplace({});
                     }}
-                    type="submit"
+                    type="button"
                     className="w-[45%] bg-red-500 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
+                    aria-label={t('home.SavedWorkoutsSection.SavedWorkoutsSectioncancelText')}
                 >
                     {t('home.SavedWorkoutsSection.SavedWorkoutsSectioncancelText')}
                 </button>
@@ -444,14 +458,18 @@ const MyPlan: React.FC = () => {
                         </h1>
                         <div className="flex flex-col space-y-8">
                             <button
+                                type="button"
                                 className="bg-gradient-to-r from-green-400 to-green-600 text-white p-3 rounded-full w-full max-w-xs mx-auto"
                                 onClick={handleOptionalMode}
+                                aria-label={t('workouts.my-plan.changeExercise')}
                             >
                                 {t('workouts.my-plan.changeExercise')}
                             </button>
                             <button
+                                type="button"
                                 className="bg-red-500 text-white p-3 rounded-full w-full max-w-xs mx-auto"
                                 onClick={handleDeleteMode}
+                                aria-label={t('workouts.my-plan.deleteExercise')}
                             >
                                 {t('workouts.my-plan.deleteExercise')}
                             </button>

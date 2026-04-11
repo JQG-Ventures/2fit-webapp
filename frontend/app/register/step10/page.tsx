@@ -81,13 +81,11 @@ export default function RegisterStep10() {
                 />
             </div>
 
-            <div
-                className="grid grid-cols-2 lg:grid-cols-3 h-[70%] w-full lg:max-w-3xl gap-8 py-12"
-                style={{ gridAutoRows: '1fr' }}
-            >
+            <div className="grid auto-rows-[1fr] grid-cols-2 lg:grid-cols-3 h-[70%] w-full lg:max-w-3xl gap-8 py-12">
                 {days.map((day) => (
                     <button
                         key={day.id}
+                        type="button"
                         onClick={() => handleDaySelection(day.value)}
                         className={`flex items-center justify-center w-full my-6 p-8 border border-gray-300 rounded-lg text-3xl transition-all duration-300 transform font-semibold
                             ${
@@ -101,7 +99,6 @@ export default function RegisterStep10() {
                                     : ''
                             }
                         `}
-                        aria-pressed={selectedDays.includes(day.value)}
                         aria-label={day.label}
                     >
                         <div className="text-center">

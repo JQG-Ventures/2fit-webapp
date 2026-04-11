@@ -45,11 +45,6 @@ interface ExerciseProgress {
     is_completed: boolean;
 }
 
-// interface ExerciseProgress {
-//     exercises: ExerciseProgressModel[];
-//     day_of_week: string;
-// }
-
 interface ExerciseComplete {
     workout_id: string;
     duration_seconds: number;

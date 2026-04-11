@@ -13,6 +13,7 @@ interface VerificationCodeInputProps {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onBackspace: () => void;
     id: string;
+    ariaLabel: string;
 }
 
 const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
@@ -20,9 +21,12 @@ const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
     onChange,
     onBackspace,
     id,
+    ariaLabel,
 }) => (
     <input
         type="text"
+        inputMode="numeric"
+        autoComplete="one-time-code"
         maxLength={1}
         value={value}
         onChange={onChange}
@@ -30,6 +34,7 @@ const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
             if (e.key === 'Backspace') onBackspace();
         }}
         id={id}
+        aria-label={ariaLabel}
         className="w-20 h-20 text-3xl text-center border-2 rounded-md focus:outline-none focus:border-purple-500"
     />
 );
@@ -49,7 +54,12 @@ const ResendCode: React.FC<ResendCodeProps> = ({ timeLeft, onResend }) => {
                 {timeLeft > 0 ? (
                     `${timeLeft} s`
                 ) : (
-                    <button onClick={onResend} className="text-green-500 underline">
+                    <button
+                        type="button"
+                        onClick={onResend}
+                        className="text-green-500 underline"
+                        aria-label={t('a11y.resendEmail')}
+                    >
                         {t('ForgotPassword.step2.verificationScreen.resendCode.resendButton')}
                     </button>
                 )}
@@ -120,7 +130,12 @@ const VerificationScreen: React.FC = () => {
     return (
         <div className="flex flex-col justify-between items-center bg-white h-screen p-14">
             <div className="h-[10%] flex flex-row justify-left space-x-8 items-center w-full max-w-3xl">
-                <button onClick={() => router.back()} className="text-gray-700">
+                <button
+                    type="button"
+                    onClick={() => router.back()}
+                    className="text-gray-700"
+                    aria-label={t('a11y.goBack')}
+                >
                     <IoIosArrowBack className="text-3xl cursor-pointer" />
                 </button>
                 <h1 className="text-4xl font-semibold">
@@ -143,6 +158,7 @@ const VerificationScreen: React.FC = () => {
                             onChange={(e) => handleCodeChange(index, e.target.value)}
                             onBackspace={() => handleBackspace(index)}
                             id={`code-input-${index}`}
+                            ariaLabel={t('a11y.verificationCodeDigit', { n: index + 1 })}
                         />
                     ))}
                 </div>
@@ -157,6 +173,11 @@ const VerificationScreen: React.FC = () => {
                     onClick={handleVerify}
                     className="w-full bg-black text-white rounded-full text-2xl font-semibold shadow-lg flex items-center justify-center"
                     disabled={isSubmitting}
+                    aria-label={
+                        isSubmitting
+                            ? t('ForgotPassword.step2.verificationScreen.verifyButton.loadingText')
+                            : t('ForgotPassword.step2.verificationScreen.verifyButton.defaultText')
+                    }
                 >
                     {isSubmitting
                         ? t('ForgotPassword.step2.verificationScreen.verifyButton.loadingText')

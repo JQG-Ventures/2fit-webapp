@@ -1,4 +1,4 @@
-FROM python:3.9-slim AS base
+FROM python:3.12-slim AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -13,6 +13,8 @@ RUN pip install --upgrade pip \
 
 COPY . .
 
+ENV FLASK_APP=run:app
+
 
 FROM base AS dev
 
@@ -22,7 +24,7 @@ ENV DEBUG=TRUE \
 
 EXPOSE 5000
 
-CMD ["python", "run.py"]
+CMD ["sh", "-c", "flask create-tables && python run.py"]
 
 
 FROM base AS prod
@@ -33,4 +35,4 @@ ENV DEBUG=FALSE \
 
 EXPOSE 5000
 
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "--access-logfile", "-", "--error-logfile", "-", "--log-level", "info", "run:app"]
+CMD ["sh", "-c", "flask create-tables && gunicorn -w 4 -b 0.0.0.0:5000 --access-logfile - --error-logfile - --log-level info run:app"]

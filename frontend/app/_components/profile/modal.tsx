@@ -15,8 +15,10 @@ const Modal: React.FC<ModalProps> = ({ title, message, onClose }) => {
                 <div className="my-14 text-center">{message}</div>
                 <div className="flex justify-center">
                     <button
+                        type="button"
                         onClick={onClose}
                         className="bg-gradient-to-r from-green-400 to-green-600 text-white p-3 rounded-full w-full max-w-xs flex items-center justify-center"
+                        aria-label="Close"
                     >
                         Close
                     </button>

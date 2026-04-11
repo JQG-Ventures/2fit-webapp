@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useCallback, useRef, useState, useMemo } from 'react';
+import React, { useCallback, useRef, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { IoIosArrowDroprightCircle, IoIosLogOut } from 'react-icons/io';
 import Image from 'next/image';
-import ToggleButton from '../_components/profile/togglebutton';
+import ToggleButton from '../_components/profile/ToggleButton';
 import { MdModeEditOutline } from 'react-icons/md';
 import { BsMoon } from 'react-icons/bs';
 import SettingItem from '../_components/others/SettingItem';
@@ -45,9 +45,9 @@ const ProfilePage: React.FC = () => {
         [],
     );
 
-    const handleLogout = useCallback(async () => {
+    const handleLogout = useCallback(() => {
         setIsLoggingOut(true);
-        signOut({
+        void signOut({
             callbackUrl: '/',
             redirect: true,
         });
@@ -78,7 +78,7 @@ const ProfilePage: React.FC = () => {
             try {
                 const response = await updateProfileImage.mutateAsync({ body: formData });
                 if (response.status === 'success') {
-                    refetch();
+                    void refetch();
                 } else {
                     setImageError(t('profile.updateProfile.errorUploadingImage'));
                     console.error('Failed to update profile image');
@@ -102,6 +102,7 @@ const ProfilePage: React.FC = () => {
                 ref={fileInputRef}
                 onChange={handleFileChange}
                 className="hidden"
+                aria-label={t('a11y.selectProfilePhoto')}
             />
             <div className="h-[10%] flex justify-start items-center w-full lg:hidden">
                 <h1 className="text-5xl font-semibold pl-4">Profile</h1>
@@ -160,7 +161,11 @@ const ProfilePage: React.FC = () => {
                         <BsMoon className="text-gray-500 w-5 h-5" />
                         <span className="text-3xl font-medium">Dark Theme</span>
                     </div>
-                    <ToggleButton isOn={false} onToggle={() => {}} />
+                    <ToggleButton
+                        isOn={false}
+                        onToggle={() => {}}
+                        ariaLabel={t('a11y.toggleDarkTheme')}
+                    />
                 </div>
                 <SettingItem
                     label="Logout"

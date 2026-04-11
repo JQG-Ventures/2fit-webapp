@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 import uuid
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 from sqlalchemy import select
 
@@ -14,13 +12,13 @@ class UserRepository(BaseRepository[User]):
     def __init__(self) -> None:
         super().__init__(User)
 
-    def get_by_email(self, email: str) -> Optional[User]:
+    def get_by_email(self, email: str) -> User | None:
         stmt = select(User).where(User.email == email)
-        return cast(Optional[User], db.session.scalars(stmt).first())
+        return cast(User | None, db.session.scalars(stmt).first())
 
-    def get_by_number(self, number: str) -> Optional[User]:
+    def get_by_number(self, number: str) -> User | None:
         stmt = select(User).where(User.number == number)
-        return cast(Optional[User], db.session.scalars(stmt).first())
+        return cast(User | None, db.session.scalars(stmt).first())
 
     def create_with_related(
         self,
@@ -41,7 +39,7 @@ class UserRepository(BaseRepository[User]):
 
         return user
 
-    def update_profile(self, user_id: uuid.UUID, data: dict[str, Any]) -> Optional[User]:
+    def update_profile(self, user_id: uuid.UUID, data: dict[str, Any]) -> User | None:
         user = self.get_by_id(user_id)
         if not user:
             return None

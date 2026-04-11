@@ -35,8 +35,10 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ onClose }) => {
                 <div className="flex-grow"></div>
 
                 <button
+                    type="button"
                     onClick={onClose}
                     className="bg-green-500 text-white w-full py-6 rounded-full text-2xl font-semibold"
+                    aria-label={t('ForgotPassword.step3.createPasswordScreen.modal.goToHomepage')}
                 >
                     {t('ForgotPassword.step3.createPasswordScreen.modal.goToHomepage')}
                 </button>

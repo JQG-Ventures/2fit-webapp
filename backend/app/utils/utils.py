@@ -2,7 +2,7 @@ import json
 import logging
 import re
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 
 def build_gpt_generator_request(prompt: str) -> list[dict[str, str]]:
@@ -16,7 +16,7 @@ def format_json_string(answer: str) -> str:
     return answer
 
 
-def parse_answer(answer: str) -> Optional[dict[str, Any]]:
+def parse_answer(answer: str) -> dict[str, Any] | None:
     try:
         formatted_answer = format_json_string(answer)
         json_match = re.search(r"{.*}", formatted_answer, re.DOTALL)
@@ -25,7 +25,7 @@ def parse_answer(answer: str) -> Optional[dict[str, Any]]:
             return json.loads(json_string)  # type: ignore[no-any-return]
         raise ValueError("No valid JSON object found in the string.")
     except (json.JSONDecodeError, ValueError, TypeError) as e:
-        logging.error(f"Error decoding JSON: {e}")
+        logging.error("Error decoding JSON: %s", e)
         return None
 
 

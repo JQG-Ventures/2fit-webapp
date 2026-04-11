@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import Tag from '../others/Tag';
 import ExerciseList from './ExerciseList';
 import Modal from '../modals/ViewModal';
-import { FaArrowLeft, FaUserAlt, FaClock, FaDumbbell, FaFire } from 'react-icons/fa';
+import { FaArrowLeft, FaClock, FaDumbbell, FaFire } from 'react-icons/fa';
 import useIsMobile from '../../_hooks/useIsMobile';
 import WorkoutFooter from '../../_components/workouts/WorkoutFooterStart';
 import { useTranslation } from 'react-i18next';
@@ -47,13 +47,9 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
         }
     };
 
-    const handleStartClick = useCallback(async () => {
+    const handleStartClick = useCallback(() => {
         setIsSubmitting(true);
-        try {
-            console.log('Workout started');
-        } finally {
-            setIsSubmitting(false);
-        }
+        setIsSubmitting(false);
     }, []);
 
     useEffect(() => {
@@ -90,8 +86,10 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
             <div className="flex flex-row justify-between w-full px-2">
                 <h2 className="text-3xl">{t('workouts.plan.workoutActivity')}</h2>
                 <button
+                    type="button"
                     className="text-emerald-600 text-md hover:text-emerald-800"
                     onClick={handleSeeAllClick}
+                    aria-label={t('a11y.seeAllExercises')}
                 >
                     {t('workouts.plan.seeAll')}
                 </button>
@@ -100,7 +98,12 @@ const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan })
             {isMobile && isFullScreen && (
                 <div className="fixed inset-0 bg-gray-50 z-50 p-10 flex flex-col">
                     <div className="flex flex-row my-4">
-                        <button onClick={closeFullScreen} className="text-3xl">
+                        <button
+                            type="button"
+                            onClick={closeFullScreen}
+                            className="text-3xl"
+                            aria-label={t('a11y.closeExerciseList')}
+                        >
                             <FaArrowLeft />
                         </button>
                         <h2 className="text-4xl font-semibold ml-8">

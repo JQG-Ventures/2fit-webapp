@@ -35,7 +35,12 @@ const PremiumBenefits: React.FC<PremiumBenefitsProps> = ({ isPremium, onContinue
     return (
         <div className="flex flex-col justify-between items-center bg-gray-50 h-screen p-10 lg:pt-[10vh]">
             <div className="h-[10%] flex flex-row justify-start items-center space-x-8 items-start w-full lg:max-w-3xl">
-                <button onClick={() => router.back()} className="text-gray-700">
+                <button
+                    type="button"
+                    onClick={() => router.back()}
+                    className="text-gray-700"
+                    aria-label={t('a11y.goBack')}
+                >
                     <FaArrowLeft className="w-8 h-8" />
                 </button>
                 <h2 className="text-5xl font-semibold">
@@ -67,8 +72,10 @@ const PremiumBenefits: React.FC<PremiumBenefitsProps> = ({ isPremium, onContinue
             {!isPremium && (
                 <div className="h-[10%] flex flex-col w-full lg:max-w-3xl">
                     <button
+                        type="button"
                         onClick={onContinue}
                         className="w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-4 rounded-full text-2xl font-semibold shadow-lg py-8 flex items-center justify-center"
+                        aria-label={t('premium.continue')}
                     >
                         {t('premium.continue')}
                     </button>

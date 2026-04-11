@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const PlanCard = ({
@@ -74,10 +74,7 @@ const PremiumPlans: React.FC<PremiumPlansProps> = ({
     const { t } = useTranslation('global');
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-50">
-            <div
-                className="relative w-full h-full bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: "url('/images/onboarding-3.jpg')" }}
-            >
+            <div className="relative w-full h-full bg-[url('/images/onboarding-3.jpg')] bg-cover bg-center bg-no-repeat">
                 <div
                     className="absolute inset-0 bg-gradient-to-t from-white via-white/75 to-white/25"
                     aria-hidden="true"
@@ -108,11 +105,13 @@ const PremiumPlans: React.FC<PremiumPlansProps> = ({
 
                     <div className="h-[10%] lg:max-w-3xl w-full mt-10 md:mt-6">
                         <button
+                            type="button"
                             onClick={() => onCheckout()}
                             disabled={!selectedPlan}
                             className={`w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-4 rounded-full text-2xl font-semibold shadow-lg py-8 flex items-center justify-center ${
                                 !selectedPlan ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
+                            aria-label={t('a11y.checkout')}
                         >
                             {t('BePremium.checkout')}
                         </button>

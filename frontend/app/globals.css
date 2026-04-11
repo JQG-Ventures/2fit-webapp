@@ -4,7 +4,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@tailwind utilities;
 
 :root {
     --foreground-rgb: 0, 0, 0;
@@ -36,8 +35,16 @@ body {
 }
 
 @layer utilities {
+    /* Fallback for browsers without text-wrap (Chrome < 114) */
     .text-balance {
-        text-wrap: balance;
+        overflow-wrap: anywhere;
+    }
+
+    @supports (text-wrap: balance) {
+        .text-balance {
+            overflow-wrap: unset;
+            text-wrap: balance;
+        }
     }
 }
 
@@ -55,7 +62,11 @@ body.fade {
 }
 .scrollbar-hide {
     -ms-overflow-style: none;
-    scrollbar-width: none;
+}
+@supports (scrollbar-width: none) {
+    .scrollbar-hide {
+        scrollbar-width: none;
+    }
 }
 
 @media (min-width: 1224px) {
@@ -75,7 +86,11 @@ body.fade {
 }
 .no-scrollbar {
     -ms-overflow-style: none;
-    scrollbar-width: none;
+}
+@supports (scrollbar-width: none) {
+    .no-scrollbar {
+        scrollbar-width: none;
+    }
 }
 
 @keyframes slide-up {

@@ -35,14 +35,11 @@ function buildUrl(baseUrl: string, queryParams?: QueryParams): string {
 }
 
 export function useApiGet<T>(key: string[], url: string, options?: UseApiGetOptions<T>) {
-    const { axiosConfig, suspense = false, ...queryOptions } = options || {};
+    const { axiosConfig, suspense: _suspense, ...queryOptions } = options || {};
 
     return useQuery<T, AxiosError>({
         queryKey: key,
         queryFn: async () => {
-            console.groupCollapsed('→ GET', url);
-            console.trace();
-            console.groupEnd();
             const response = await axiosInstance.get<T>(url, axiosConfig);
             return response.data;
         },

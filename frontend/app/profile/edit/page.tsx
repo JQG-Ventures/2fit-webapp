@@ -171,7 +171,12 @@ const EditProfile: React.FC = () => {
                 />
             )}
             <div className="h-[10%] flex flex-row justify-left space-x-8 items-center w-full lg:max-w-3xl">
-                <button onClick={() => router.back()} className="text-gray-700">
+                <button
+                    type="button"
+                    onClick={() => router.back()}
+                    className="text-gray-700"
+                    aria-label={t('a11y.goBack')}
+                >
                     <FaArrowLeft className="w-8 h-8" />
                 </button>
                 <h1 className="text-5xl font-semibold">{t('profile.editModalTitle')}</h1>
@@ -257,6 +262,7 @@ const EditProfile: React.FC = () => {
                         type="submit"
                         className="w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-4 rounded-full text-2xl font-semibold shadow-lg py-8 flex items-center justify-center"
                         disabled={isSubmitting}
+                        aria-label={t('profile.updateProfile.updateText')}
                     >
                         {isSubmitting && (
                             <div className="loader ease-linear rounded-full border-4 border-t-4 border-white h-6 w-6 mr-2 animate-spin"></div>

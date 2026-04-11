@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 
@@ -50,8 +51,10 @@ const GuidedWorkoutsSection = ({ workouts }: { workouts: GuidedWorkout[] }) => {
                 </div>
                 <div className="flex-none">
                     <button
+                        type="button"
                         onClick={handleViewAll}
                         className="text-blue-600 hover:underline lg:text-lg"
+                        aria-label={t('home.GuidedWorkoutsSection.viewall')}
                     >
                         {t('home.GuidedWorkoutsSection.viewall')}
                     </button>
@@ -67,17 +70,22 @@ const GuidedWorkoutsSection = ({ workouts }: { workouts: GuidedWorkout[] }) => {
             ) : (
                 <div
                     ref={sliderRef}
-                    className="flex space-x-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory lg:grid lg:grid-cols-3 lg:gap-6"
-                    style={{ scrollBehavior: 'smooth' }}
+                    className="flex scroll-smooth space-x-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory lg:grid lg:grid-cols-3 lg:gap-6"
                 >
                     {workouts.map((workout, index) => (
                         <div
                             key={index}
-                            className="min-w-[300px] h-[250px] bg-cover bg-center rounded-lg relative snap-start lg:w-full transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg active:scale-95 active:bg-opacity-80"
-                            style={{ backgroundImage: `url(${workout.image_url})` }}
+                            className="min-w-[300px] h-[250px] rounded-lg relative snap-start lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg active:scale-95"
                         >
-                            <div className="absolute inset-0 bg-black opacity-50"></div>
-                            <div className="absolute bottom-4 left-4 right-4">
+                            <Image
+                                src={workout.image_url}
+                                alt=""
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 1024px) 300px, 33vw"
+                            />
+                            <div className="absolute inset-0 bg-black opacity-50 z-[1]"></div>
+                            <div className="absolute bottom-4 left-4 right-4 z-[2]">
                                 <h3 className="text-xl text-gray-200 mb-4 font-semibold lg:text-3xl">
                                     {workout.name}
                                 </h3>

@@ -14,9 +14,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
 import './workouts.css';
 import { useApiGet } from '../utils/apiClient';
-import { useSession } from 'next-auth/react';
 import type { ApiResponse } from '../_types/api';
-import { parseJson } from '../utils/http';
+import axiosInstance from '../utils/axiosInstance';
 
 interface ActivePlanSummary {
     id: string;
@@ -36,19 +35,10 @@ interface PlanProgressCard {
     progressData: WorkoutProgressSummary;
 }
 
-interface AppSession {
-    user?: {
-        token?: string | null;
-    };
-}
-
 export default function Workouts() {
     const { t } = useTranslation('global');
     const router = useRouter();
     const [isClicked, setIsClicked] = useState(false);
-    const { data: sessionData } = useSession();
-    const session = sessionData as AppSession | null;
-    const token = session?.user?.token ?? null;
     const getActivePlansUrl = `/api/users/active-plans`;
     const getPopularWorkoutsUrl = `/api/workouts/popular`;
     const { data: activePlansResponse, isError: errorActivePlans } = useApiGet<
@@ -74,39 +64,29 @@ export default function Workouts() {
                 const progressPromises: Promise<PlanProgressCard>[] =
                     activePlansResponse.message.map(async (plan): Promise<PlanProgressCard> => {
                         if (plan.plan_type === 'challenge') {
-                            const progressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/challenges/challenges/progress?challenge_id=${plan.id}`;
-                            const response = await fetch(progressUrl, {
-                                method: 'GET',
-                                headers: { Authorization: `Bearer ${token}` },
+                            const response = await axiosInstance.get<
+                                ApiResponse<WorkoutProgressSummary>
+                            >('/api/challenges/challenges/progress', {
+                                params: { challenge_id: plan.id },
                             });
-                            const jsonData =
-                                await parseJson<ApiResponse<WorkoutProgressSummary>>(response);
-                            if (!response.ok) {
-                                console.error(t('workouts.fetchingError'));
-                            }
                             return {
                                 id: plan.id,
                                 plan_type: 'challenge',
                                 name: plan.name,
-                                progressData: jsonData.message,
+                                progressData: response.data.message,
                             };
                         }
 
-                        const progressUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/workouts/progress?workout_plan_id=${plan.id}`;
-                        const response = await fetch(progressUrl, {
-                            method: 'GET',
-                            headers: { Authorization: `Bearer ${token}` },
+                        const response = await axiosInstance.get<
+                            ApiResponse<WorkoutProgressSummary>
+                        >('/api/users/workouts/progress', {
+                            params: { workout_plan_id: plan.id },
                         });
-                        const jsonData =
-                            await parseJson<ApiResponse<WorkoutProgressSummary>>(response);
-                        if (!response.ok) {
-                            console.error(t('workouts.fetchingError'));
-                        }
                         return {
                             id: plan.id,
                             plan_type: plan.plan_type,
                             name: plan.name,
-                            progressData: jsonData.message,
+                            progressData: response.data.message,
                         };
                     });
 
@@ -119,8 +99,8 @@ export default function Workouts() {
             }
         };
 
-        fetchProgressData();
-    }, [activePlansResponse, t, token]);
+        void fetchProgressData();
+    }, [activePlansResponse, t]);
 
     const handleClick = (planId: string, workoutType: string) => {
         if (isClicked || loadingPlanId) return;
@@ -138,7 +118,7 @@ export default function Workouts() {
         return (
             <Modal
                 title="Error"
-                message={errorActivePlans || errorProgressData || t('workouts.fetchingError')}
+                message={errorProgressData ?? t('workouts.fetchingError')}
                 onClose={() => router.push('/home')}
             />
         );
@@ -147,7 +127,12 @@ export default function Workouts() {
     return (
         <div className="flex flex-col h-screen bg-gray-200 p-10 items-center lg:pt-[10vh] space-y-6">
             <div className="h-[10%] flex flex-row justify-left space-x-8 items-center w-full lg:max-w-3xl">
-                <button onClick={() => router.back()} className="text-gray-700">
+                <button
+                    type="button"
+                    onClick={() => router.back()}
+                    className="text-gray-700"
+                    aria-label={t('a11y.goBack')}
+                >
                     <FaArrowLeft className="w-8 h-8" />
                 </button>
             </div>

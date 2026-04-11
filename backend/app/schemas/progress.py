@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -22,16 +20,16 @@ class CompletedWorkoutCreate(BaseModel):
     duration_seconds: int
     calories_burned: float
     exercises: list[ExecutedExercise]
-    day_of_week: Optional[str] = None
-    sequence_day: Optional[int] = None
+    day_of_week: str | None = None
+    sequence_day: int | None = None
     was_skipped: bool = False
 
 
 class ProgressUpdate(BaseModel):
     date: str = ""
     exercises: list[ExecutedExercise]
-    day_of_week: Optional[str] = None
-    sequence_day: Optional[int] = None
+    day_of_week: str | None = None
+    sequence_day: int | None = None
 
 
 class ChallengeProgressUpdate(BaseModel):

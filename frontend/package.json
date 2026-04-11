@@ -10,7 +10,10 @@
         "typecheck": "tsc --noEmit",
         "format:check": "prettier --check .",
         "depcheck": "depcruise --config .dependency-cruiser.cjs --output-type err-long app actions auth.ts middleware.ts",
-        "check": "npm run format:check && npm run lint && npm run typecheck && npm run depcheck"
+        "check": "npm run format:check && npm run lint && npm run typecheck && npm run depcheck",
+        "test": "vitest",
+        "test:ci": "vitest run",
+        "test:coverage": "vitest run --coverage"
     },
     "dependencies": {
         "@nextui-org/react": "^2.4.6",
@@ -52,6 +55,9 @@
         "uuid": "^11.0.2"
     },
     "devDependencies": {
+        "@testing-library/jest-dom": "^6.6.0",
+        "@testing-library/react": "^16.0.0",
+        "@testing-library/user-event": "^14.5.0",
         "@types/node": "^20",
         "@types/react": "^18",
         "@types/react-dom": "^18",
@@ -59,12 +65,17 @@
         "@types/react-slick": "^0.23.13",
         "@typescript-eslint/eslint-plugin": "^7.2.0",
         "@typescript-eslint/parser": "^7.2.0",
+        "@vitejs/plugin-react": "^4.0.0",
+        "@vitest/coverage-v8": "^3.1.0",
         "dependency-cruiser": "^17.3.9",
         "eslint": "^8",
         "eslint-config-next": "14.2.6",
+        "jsdom": "^26.0.0",
         "postcss": "^8",
         "prettier": "^3.8.1",
         "tailwindcss": "^3.4.1",
-        "typescript": "^5"
+        "typescript": "^5",
+        "vite": "^6.0.0",
+        "vitest": "^3.1.0"
     }
 }

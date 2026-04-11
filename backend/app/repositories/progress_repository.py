@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 import uuid
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
@@ -60,12 +58,12 @@ class SavedWorkoutRepository:
 
     def add(self, user_id: uuid.UUID, workout_plan_id: uuid.UUID) -> SavedWorkout:
         existing = cast(
-            Optional[SavedWorkout],
+            SavedWorkout | None,
             db.session.scalars(
-            select(SavedWorkout).where(
-                SavedWorkout.user_id == user_id,
-                SavedWorkout.workout_plan_id == workout_plan_id,
-            )
+                select(SavedWorkout).where(
+                    SavedWorkout.user_id == user_id,
+                    SavedWorkout.workout_plan_id == workout_plan_id,
+                )
             ).first(),
         )
         if existing:
@@ -77,12 +75,12 @@ class SavedWorkoutRepository:
 
     def remove(self, user_id: uuid.UUID, workout_plan_id: uuid.UUID) -> bool:
         sw = cast(
-            Optional[SavedWorkout],
+            SavedWorkout | None,
             db.session.scalars(
-            select(SavedWorkout).where(
-                SavedWorkout.user_id == user_id,
-                SavedWorkout.workout_plan_id == workout_plan_id,
-            )
+                select(SavedWorkout).where(
+                    SavedWorkout.user_id == user_id,
+                    SavedWorkout.workout_plan_id == workout_plan_id,
+                )
             ).first(),
         )
         if not sw:
@@ -103,7 +101,7 @@ class ActivePlanRepository:
 
     def get_active_for_user(
         self, user_id: uuid.UUID, workout_plan_id: uuid.UUID
-    ) -> Optional[ActivePlan]:
+    ) -> ActivePlan | None:
         stmt = (
             select(ActivePlan)
             .where(
@@ -113,7 +111,7 @@ class ActivePlanRepository:
             )
             .options(joinedload(ActivePlan.progress_details).joinedload(DayProgress.exercises))
         )
-        return cast(Optional[ActivePlan], db.session.scalars(stmt).unique().first())
+        return cast(ActivePlan | None, db.session.scalars(stmt).unique().first())
 
     def create(self, **kwargs: object) -> ActivePlan:
         plan = ActivePlan(**kwargs)
@@ -126,9 +124,9 @@ class DayProgressRepository:
     def find_or_create(
         self,
         active_plan_id: uuid.UUID,
-        week_number: Optional[int] = None,
-        day_of_week: Optional[str] = None,
-        sequence_day: Optional[int] = None,
+        week_number: int | None = None,
+        day_of_week: str | None = None,
+        sequence_day: int | None = None,
     ) -> DayProgress:
         filters = [DayProgress.active_plan_id == active_plan_id]
         if day_of_week:
@@ -139,7 +137,7 @@ class DayProgressRepository:
             filters.append(DayProgress.week_number == week_number)
 
         existing = cast(
-            Optional[DayProgress],
+            DayProgress | None,
             db.session.scalars(select(DayProgress).where(*filters)).first(),
         )
         if existing:
@@ -159,12 +157,12 @@ class DayProgressRepository:
         self, day_progress_id: uuid.UUID, exercise_id: uuid.UUID, **kwargs: object
     ) -> ExerciseProgress:
         existing = cast(
-            Optional[ExerciseProgress],
+            ExerciseProgress | None,
             db.session.scalars(
-            select(ExerciseProgress).where(
-                ExerciseProgress.day_progress_id == day_progress_id,
-                ExerciseProgress.exercise_id == exercise_id,
-            )
+                select(ExerciseProgress).where(
+                    ExerciseProgress.day_progress_id == day_progress_id,
+                    ExerciseProgress.exercise_id == exercise_id,
+                )
             ).first(),
         )
         if existing:
@@ -229,9 +227,7 @@ class CompletedWorkoutRepository:
 
 
 class ActiveChallengeRepository:
-    def get_for_user(
-        self, user_id: uuid.UUID, challenge_id: uuid.UUID
-    ) -> Optional[ActiveChallenge]:
+    def get_for_user(self, user_id: uuid.UUID, challenge_id: uuid.UUID) -> ActiveChallenge | None:
         stmt = (
             select(ActiveChallenge)
             .where(
@@ -240,7 +236,7 @@ class ActiveChallengeRepository:
             )
             .options(joinedload(ActiveChallenge.exercises))
         )
-        return cast(Optional[ActiveChallenge], db.session.scalars(stmt).unique().first())
+        return cast(ActiveChallenge | None, db.session.scalars(stmt).unique().first())
 
     def get_all_for_user(self, user_id: uuid.UUID) -> list[ActiveChallenge]:
         stmt = (

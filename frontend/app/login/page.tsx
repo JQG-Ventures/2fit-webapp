@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaApple, FaFacebook, FaGoogle } from 'react-icons/fa';
+import { FaGoogle } from 'react-icons/fa';
 import { IoChevronBack } from 'react-icons/io5';
 import { FiMail, FiLock } from 'react-icons/fi';
 import { signIn } from 'next-auth/react';
@@ -113,15 +113,22 @@ export default function Login() {
     return (
         <div className="flex flex-col h-screen bg-white p-10 items-center">
             <div className="h-[15%] pt-20 w-full lg:max-w-3xl">
-                <button onClick={handlePrevStep} className="text-4xl lg:hidden">
+                <button
+                    type="button"
+                    onClick={handlePrevStep}
+                    className="text-4xl lg:hidden"
+                    aria-label={t('a11y.goBack')}
+                >
                     <IoChevronBack />
                 </button>
             </div>
 
             <div className="h-[15%] flex flex-row w-full lg:max-w-3xl">
                 <button
+                    type="button"
                     onClick={handlePrevStep}
                     className="hidden text-4xl lg:flex mr-14 mt-5 text-center"
+                    aria-label={t('a11y.goBack')}
                 >
                     <IoChevronBack />
                 </button>
@@ -162,6 +169,7 @@ export default function Login() {
                     <ButtonWithSpinner
                         type="submit"
                         loading={isSubmitting}
+                        ariaLabel={t('LoginPage.signIn')}
                         className="w-full bg-black text-white py-4 rounded-full text-1xl font-semibold hover:bg-gray-800 transition duration-200"
                     >
                         {t('LoginPage.signIn')}
@@ -177,6 +185,7 @@ export default function Login() {
                         type="button"
                         loading={isSocialLoading['google']}
                         onClick={() => handleSocialSignIn('google')}
+                        ariaLabel={t('a11y.signInWithGoogle')}
                         className="text-5xl"
                     >
                         <FaGoogle className="text-red-600" />

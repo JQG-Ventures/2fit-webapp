@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -13,12 +11,12 @@ class WorkoutExerciseCreate(BaseModel):
 
 
 class WorkoutDayCreate(BaseModel):
-    day_of_week: Optional[str] = None
-    sequence_day: Optional[int] = None
+    day_of_week: str | None = None
+    sequence_day: int | None = None
     exercises: list[WorkoutExerciseCreate]
 
     @model_validator(mode="after")
-    def validate_day_identifier(self) -> WorkoutDayCreate:
+    def validate_day_identifier(self) -> "WorkoutDayCreate":
         if not self.day_of_week and self.sequence_day is None:
             raise ValueError("Either day_of_week or sequence_day must be provided.")
         return self
@@ -28,8 +26,8 @@ class WorkoutPlanCreate(BaseModel):
     name: str
     description: str = ""
     plan_type: str
-    duration_weeks: Optional[int] = None
-    price: Optional[float] = None
+    duration_weeks: int | None = None
+    price: float | None = None
     image_url: str = ""
     video_url: str = ""
     workout_schedule: list[WorkoutDayCreate]
@@ -51,16 +49,16 @@ class WorkoutPlanCreate(BaseModel):
 
 
 class WorkoutPlanUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    plan_type: Optional[str] = None
-    duration_weeks: Optional[int] = None
-    price: Optional[float] = None
-    image_url: Optional[str] = None
-    video_url: Optional[str] = None
-    workout_schedule: Optional[list[WorkoutDayCreate]] = None
-    level: Optional[str] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    description: str | None = None
+    plan_type: str | None = None
+    duration_weeks: int | None = None
+    price: float | None = None
+    image_url: str | None = None
+    video_url: str | None = None
+    workout_schedule: list[WorkoutDayCreate] | None = None
+    level: str | None = None
+    is_active: bool | None = None
 
 
 class WorkoutExerciseResponse(BaseModel):
@@ -70,21 +68,21 @@ class WorkoutExerciseResponse(BaseModel):
     sets: int
     reps: int
     rest_seconds: int
-    name: Optional[str] = None
-    description: Optional[str] = None
-    image_url: Optional[str] = None
-    video_url: Optional[str] = None
-    difficulty: Optional[str] = None
-    category: Optional[str] = None
-    muscle_group: Optional[list[str]] = None
-    equipment: Optional[list[str]] = None
+    name: str | None = None
+    description: str | None = None
+    image_url: str | None = None
+    video_url: str | None = None
+    difficulty: str | None = None
+    category: str | None = None
+    muscle_group: list[str] | None = None
+    equipment: list[str] | None = None
 
 
 class WorkoutDayResponse(BaseModel):
     model_config = {"from_attributes": True}
 
-    day_of_week: Optional[str] = None
-    sequence_day: Optional[int] = None
+    day_of_week: str | None = None
+    sequence_day: int | None = None
     exercises: list[WorkoutExerciseResponse] = []
 
 
@@ -95,8 +93,8 @@ class WorkoutPlanResponse(BaseModel):
     name: str
     description: str
     plan_type: str
-    duration_weeks: Optional[int] = None
-    price: Optional[float] = None
+    duration_weeks: int | None = None
+    price: float | None = None
     image_url: str
     video_url: str
     workout_schedule: list[WorkoutDayResponse] = []

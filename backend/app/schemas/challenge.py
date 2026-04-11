@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -28,7 +26,7 @@ class ChallengeCreate(BaseModel):
     image_url: str = ""
     video_url: str = ""
     intensity: bool = True
-    equipment: Optional[list[str]] = None
+    equipment: list[str] | None = None
     category: list[str] = []
     workout_schedule: list[ChallengeDayCreate]
     level: str = "beginner"
@@ -43,18 +41,18 @@ class ChallengeCreate(BaseModel):
 
 
 class ChallengeUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    duration_days: Optional[int] = None
-    price: Optional[float] = None
-    image_url: Optional[str] = None
-    video_url: Optional[str] = None
-    intensity: Optional[bool] = None
-    equipment: Optional[list[str]] = None
-    category: Optional[list[str]] = None
-    workout_schedule: Optional[list[ChallengeDayCreate]] = None
-    level: Optional[str] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    description: str | None = None
+    duration_days: int | None = None
+    price: float | None = None
+    image_url: str | None = None
+    video_url: str | None = None
+    intensity: bool | None = None
+    equipment: list[str] | None = None
+    category: list[str] | None = None
+    workout_schedule: list[ChallengeDayCreate] | None = None
+    level: str | None = None
+    is_active: bool | None = None
 
 
 class ChallengeExerciseResponse(BaseModel):
@@ -64,14 +62,14 @@ class ChallengeExerciseResponse(BaseModel):
     sets: int
     reps: int
     rest_seconds: int
-    name: Optional[str] = None
-    description: Optional[str] = None
-    image_url: Optional[str] = None
-    video_url: Optional[str] = None
-    difficulty: Optional[str] = None
-    category: Optional[str] = None
-    muscle_group: Optional[list[str]] = None
-    equipment: Optional[list[str]] = None
+    name: str | None = None
+    description: str | None = None
+    image_url: str | None = None
+    video_url: str | None = None
+    difficulty: str | None = None
+    category: str | None = None
+    muscle_group: list[str] | None = None
+    equipment: list[str] | None = None
 
 
 class ChallengeDayResponse(BaseModel):
@@ -95,7 +93,7 @@ class ChallengeResponse(BaseModel):
     image_url: str
     video_url: str
     intensity: bool
-    equipment: Optional[list[str]] = None
+    equipment: list[str] | None = None
     category: list[str]
     workout_schedule: list[ChallengeDayResponse] = []
     level: str

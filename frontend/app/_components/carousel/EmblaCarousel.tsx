@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { EmblaCarouselType, EmblaEventType, EmblaOptionsType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-react';
 import { DotButton, useDotButton } from './EmblaCarouselDotButton';
@@ -13,6 +16,7 @@ type PropType = {
 };
 
 const EmblaCarousel: React.FC<PropType> = (props) => {
+    const { t } = useTranslation('global');
     const { slides, image_data, options } = props;
     const [emblaRef, emblaApi] = useEmblaCarousel(options);
     const tweenFactor = useRef(0);
@@ -120,6 +124,10 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
                         className={`w-4 h-4 rounded-full ${
                             index === selectedIndex ? 'bg-white' : 'bg-gray-400'
                         } focus:outline-none z-10`}
+                        aria-label={t('a11y.carouselSlide', {
+                            n: index + 1,
+                            total: scrollSnaps.length,
+                        })}
                     />
                 ))}
             </div>

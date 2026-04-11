@@ -1,8 +1,6 @@
-from __future__ import annotations
-
 import re
 import uuid
-from typing import Any, Optional
+from typing import Any
 
 from openai import OpenAI
 from werkzeug.datastructures import FileStorage
@@ -24,7 +22,7 @@ class ChatService:
         self._conversation_repo = ConversationRepository()
         self._user_repo = UserRepository()
 
-    def handle_message(self, user_message: Optional[str], user_id: uuid.UUID) -> tuple[str, bool]:
+    def handle_message(self, user_message: str | None, user_id: uuid.UUID) -> tuple[str, bool]:
         if not user_message:
             return "No message received", False
 
@@ -79,7 +77,7 @@ class ChatService:
             )
         return response.text
 
-    def generate_motivational_phrases(self) -> Optional[dict[str, Any]]:
+    def generate_motivational_phrases(self) -> dict[str, Any] | None:
         message_for_bot = build_gpt_generator_request(motivational_messages_instructions)
         answer = self.generate_bot_response(
             message_for_bot, self.openai_client, s.INTERNAL_OPENAI_MODEL

@@ -36,7 +36,7 @@ export const fetchUserDataByNumber = async (number: string) => {
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/by-number/${number}`,
         );
         if (!res.ok) {
-            if (res.status == 404) {
+            if (res.status === 404) {
                 return null;
             }
             throw new Error('Error fetching user profile');
@@ -55,7 +55,7 @@ export const fetchUserDataByEmail = async (email: string) => {
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/by-email/${email}`,
         );
         if (!res.ok) {
-            if (res.status == 404) {
+            if (res.status === 404) {
                 return null;
             }
             throw new Error('Error fetching user profile');
@@ -175,8 +175,6 @@ export const useUpdateProfile = () => {
 export const useUploadProfileImage = () => {
     return useApiPost<{ body: FormData }, ApiStatusResponse & { url: string }>(
         '/api/users/profile/image',
-        undefined,
-        { 'Content-Type': 'multipart/form-data' },
     );
 };
 

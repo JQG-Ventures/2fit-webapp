@@ -106,6 +106,7 @@ export default function RegisterStep9() {
                     {activities.map((activity) => (
                         <button
                             key={activity.id}
+                            type="button"
                             onClick={() => handleActivitySelection(activity.value)}
                             className={`
                                 flex flex-col items-center justify-center w-full p-5 border rounded-lg text-center transition-all duration-300 transform font-semibold
@@ -115,7 +116,6 @@ export default function RegisterStep9() {
                                         : 'bg-white text-black hover:scale-105 hover:shadow-md border-gray-300'
                                 }
                             `}
-                            aria-pressed={selectedActivities.includes(activity.value)}
                             aria-label={activity.label}
                         >
                             <div className="mb-4">{activity.icon}</div>

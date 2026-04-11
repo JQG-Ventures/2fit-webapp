@@ -57,7 +57,6 @@ export default function RegisterStep1() {
     const [isChecked, setIsChecked] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const router = useRouter();
-    // const searchParams = useSearchParams();
 
     const user_data_fields: Array<{
         name: RegisterEntryField;
@@ -73,24 +72,6 @@ export default function RegisterStep1() {
             type: 'password',
         },
     ];
-
-    // useEffect(() => {
-    //     const errorParam = searchParams.get('error');
-
-    //     if (errorParam) {
-    //         const newErrors: Record<string, string> = {};
-
-    //         if (errorParam === 'emailExistsGoogle') {
-    //             newErrors.email = t("RegisterPage.registeredGoogle");
-    //         } else if (errorParam === 'errorGoogle') {
-    //             newErrors.password = t('RegisterPage.googleError');
-    //         } else if (errorParam === 'generalError') {
-    //             newErrors.general = t('RegisterPage.generalError');
-    //         }
-
-    //         setErrors(newErrors);
-    //     }
-    // }, [searchParams, t]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -145,15 +126,22 @@ export default function RegisterStep1() {
             <SearchParamsHandler setErrors={setErrors} t={t} />
             <div className="flex flex-col h-screen bg-white p-10 items-center">
                 <div className="h-[15%] pt-20 w-full lg:max-w-3xl">
-                    <button onClick={handlePrevStep} className="text-4xl lg:hidden">
+                    <button
+                        type="button"
+                        onClick={handlePrevStep}
+                        className="text-4xl lg:hidden"
+                        aria-label={t('a11y.goBack')}
+                    >
                         <IoChevronBack />
                     </button>
                 </div>
 
                 <div className="h-[15%] flex flex-row w-full lg:max-w-3xl">
                     <button
+                        type="button"
                         onClick={handlePrevStep}
                         className="hidden text-4xl lg:flex mr-14 mt-5 text-center"
+                        aria-label={t('a11y.goBack')}
                     >
                         <IoChevronBack />
                     </button>
@@ -166,26 +154,28 @@ export default function RegisterStep1() {
 
                 <div className="h-[50%] flex w-full items-center justify-center">
                     <form className="w-full lg:max-w-3xl">
-                        {user_data_fields.map(({ name, label, placeholder, type = 'text' }) => (
-                            <div key={name} className="flex flex-wrap -mx-3 mb-6">
-                                <div className="w-full px-3">
-                                    <input
-                                        className={`appearance-none py-6 text-2xl block w-full bg-gray-200 text-gray-700 border ${errors[name] ? 'border-red-500' : 'border-gray-200'} rounded-lg py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
-                                        id={`grid-${name}`}
-                                        type={type}
-                                        name={name}
-                                        placeholder={placeholder}
-                                        value={formData[name]}
-                                        onChange={handleChange}
-                                    />
-                                    {errors[name] && (
-                                        <p className="text-red-500 text-base italic">
-                                            {errors[name]}
-                                        </p>
-                                    )}
+                        {user_data_fields.map(
+                            ({ name, label: _label, placeholder, type = 'text' }) => (
+                                <div key={name} className="flex flex-wrap -mx-3 mb-6">
+                                    <div className="w-full px-3">
+                                        <input
+                                            className={`appearance-none py-6 text-2xl block w-full bg-gray-200 text-gray-700 border ${errors[name] ? 'border-red-500' : 'border-gray-200'} rounded-lg py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white`}
+                                            id={`grid-${name}`}
+                                            type={type}
+                                            name={name}
+                                            placeholder={placeholder}
+                                            value={formData[name]}
+                                            onChange={handleChange}
+                                        />
+                                        {errors[name] && (
+                                            <p className="text-red-500 text-base italic">
+                                                {errors[name]}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ),
+                        )}
                         <div className="flex items-start my-6">
                             <input
                                 type="checkbox"
@@ -205,6 +195,7 @@ export default function RegisterStep1() {
                             type="button"
                             onClick={handleSubmit}
                             loading={isSubmitting}
+                            ariaLabel={t('RegisterPage.nextbtn')}
                             className={`w-full bg-black text-white py-4 rounded-full text-1xl font-semibold hover:bg-gray-800 transition duration-200 mt-4 ${!isChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={!isChecked}
                         >
@@ -217,7 +208,14 @@ export default function RegisterStep1() {
                     <p className="text-gray-500 mb-10">{t('RegisterPage.signuptxt')}</p>
                     <div className="flex flex-row justify-evenly space-x-8">
                         {[FaApple, FaFacebook].map((Icon, idx) => (
-                            <button key={idx} className="text-5xl">
+                            <button
+                                key={idx}
+                                type="button"
+                                className="text-5xl"
+                                aria-label={
+                                    idx === 0 ? t('a11y.signInWithApple') : t('a11y.signInWithFacebook')
+                                }
+                            >
                                 <Icon
                                     className={
                                         idx === 1
@@ -230,8 +228,10 @@ export default function RegisterStep1() {
                             </button>
                         ))}
                         <button
+                            type="button"
                             onClick={() => signIn('google', { callbackUrl: '/register/google' })}
                             className="text-5xl"
+                            aria-label={t('a11y.signInWithGoogle')}
                         >
                             <FaGoogle className="text-red-600" />
                         </button>

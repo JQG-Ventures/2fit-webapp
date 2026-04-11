@@ -77,10 +77,12 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
                     </div>
                     <div className="absolute top-2 right-2">
                         <button
+                            type="button"
                             onClick={() => handleHeartClick(workout)}
                             className={`text-white p-1 rounded-full transition-transform transform ${
                                 selectedWorkout?._id === workout._id ? 'bg-red-600' : 'bg-gray-800'
                             }`}
+                            aria-label={`${t('a11y.saveWorkout')}: ${workout.name}`}
                         >
                             {selectedWorkout?._id === workout._id ? (
                                 <AiOutlineClose size={24} />
@@ -91,7 +93,7 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
                     </div>
                 </div>
             )),
-        [savedWorkouts, selectedWorkout],
+        [savedWorkouts, selectedWorkout, t],
     );
 
     return (

@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+import click
 from flask import Flask, Response, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -47,6 +48,14 @@ def create_app() -> Flask:
     def ping() -> tuple[Response, int]:
         return jsonify({"status": "success", "message": "pong"}), 200
 
-    import app.models  # noqa: F401
+    with app_instance.app_context():
+        import app.models  # noqa: F401
+
+    @app_instance.cli.command("create-tables")
+    def create_tables() -> None:
+        """Create all database tables (initial bootstrap only)."""
+        with app_instance.app_context():
+            db.create_all()
+            click.echo("All tables created.")
 
     return app_instance

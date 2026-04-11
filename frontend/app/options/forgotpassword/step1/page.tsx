@@ -34,11 +34,10 @@ const OptionItem: React.FC<OptionItemProps> = ({
     onClick,
 }) => (
     <div
-        className={`flex items-center border-2 rounded-xl p-6 cursor-pointer transition overflow-hidden ${
+        className={`flex h-[100px] w-full items-center border-2 rounded-xl p-6 cursor-pointer transition overflow-hidden ${
             isSelected ? 'border-black bg-white' : 'border-gray-300'
         }`}
         onClick={onClick}
-        style={{ height: '100px', width: '100%' }}
     >
         <div className="bg-green-200 rounded-full p-8">
             <Icon className="text-black text-4xl" />
@@ -94,7 +93,12 @@ const ForgotPassword: React.FC = () => {
     return (
         <div className="flex flex-col justify-between items-center bg-white h-screen p-14">
             <div className="h-[12%] flex flex-row justify-left space-x-8 items-center w-full max-w-3xl">
-                <button onClick={() => router.push('/login')} className="text-gray-700">
+                <button
+                    type="button"
+                    onClick={() => router.push('/login')}
+                    className="text-gray-700"
+                    aria-label={t('a11y.goBack')}
+                >
                     <IoIosArrowBack className="text-3xl cursor-pointer" />
                 </button>
                 <h1 className="text-4xl font-semibold">{t('ForgotPassword.forgotPassword')}</h1>
@@ -139,6 +143,11 @@ const ForgotPassword: React.FC = () => {
                     onClick={handleContinue}
                     className="w-full bg-black text-white rounded-full text-2xl font-semibold shadow-lg flex items-center justify-center"
                     disabled={isSubmitting}
+                    aria-label={
+                        isSubmitting
+                            ? t('ForgotPassword.step1.continueButton.loadingText')
+                            : t('ForgotPassword.step1.continueButton.defaultText')
+                    }
                 >
                     {isSubmitting
                         ? t('ForgotPassword.step1.continueButton.loadingText')

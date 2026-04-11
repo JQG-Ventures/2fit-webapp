@@ -8,6 +8,15 @@ export interface ExerciseFlowProps {
     sequenceDay?: number;
 }
 
+export interface ExerciseProgress {
+    exercise_id: string;
+    sets_completed: number;
+    reps_completed: number[];
+    duration_seconds: number;
+    calories_burned: number;
+    is_completed: boolean;
+}
+
 export interface State {
     currentExerciseIndex: number;
     currentSet: number;
@@ -36,12 +45,3 @@ export type Action =
     | { type: 'RESET_COUNTDOWN' }
     | { type: 'RESET_EXERCISE_TIMER' }
     | { type: 'SET_COMPLETE_MESSAGE'; message: string | null };
-
-export interface ExerciseProgress {
-    exercise_id: string;
-    sets_completed: number;
-    reps_completed: number[];
-    duration_seconds: number;
-    calories_burned: number;
-    is_completed: boolean;
-}

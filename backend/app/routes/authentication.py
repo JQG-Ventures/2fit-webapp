@@ -1,8 +1,6 @@
-from __future__ import annotations
-
 import logging
 import uuid
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 
 from flask import Blueprint, request
 from flask_jwt_extended import (
@@ -34,6 +32,15 @@ ResponseBody = dict[str, object]
 ResponseTuple = tuple[ResponseBody, int]
 
 
+def _birthdate_str_to_date(value: str) -> date:
+    s = value.strip()
+    if "T" in s:
+        if s.endswith("Z"):
+            s = s[:-1] + "+00:00"
+        return datetime.fromisoformat(s).date()
+    return date.fromisoformat(s)
+
+
 @api.route("/register")
 class RegisterResource(Resource):
     def post(self) -> ResponseTuple:
@@ -58,7 +65,7 @@ class RegisterResource(Resource):
                 "name": schema.name,
                 "last": schema.last,
                 "age": schema.age,
-                "birthdate": date.fromisoformat(schema.birthdate),
+                "birthdate": _birthdate_str_to_date(schema.birthdate),
                 "code_number": schema.code_number,
                 "country": schema.country,
                 "number": schema.number,
@@ -131,7 +138,7 @@ class RegisterResource(Resource):
             return {"status": "error", "message": err.errors()}, 400
         except Exception as e:
             db.session.rollback()
-            logger.exception(f"Registration error: {e}")
+            logger.exception("Registration error: %s", e)
             return {"status": "error", "message": "Could not handle the user registration"}, 500
 
 
@@ -174,7 +181,7 @@ class LoginResource(Resource):
                 },
             }, 200
         except Exception as e:
-            logger.exception(f"Login error: {e}")
+            logger.exception("Login error: %s", e)
             return {"status": "error", "message": "Could not handle the user login"}, 500
 
 
@@ -191,7 +198,7 @@ class RefreshTokenResource(Resource):
                 "message": {"access_token": access_token, "expires_at": exp},
             }, 200
         except Exception as e:
-            logger.exception(f"Token refresh error: {e}")
+            logger.exception("Token refresh error: %s", e)
             return {"status": "error", "message": "Could not refresh the token"}, 500
 
 
@@ -213,7 +220,7 @@ class GoogleAuthResource(Resource):
                 return {"status": "success", "message": {"email": email, "name": name}}, 200
             return {"status": "error", "message": "User already registered"}, 400
         except Exception as e:
-            logger.exception(f"Google auth error: {e}")
+            logger.exception("Google auth error: %s", e)
             return {"status": "error", "message": "Could not handle Google login"}, 500
 
 
@@ -270,23 +277,28 @@ class PlayerIDResource(Resource):
             schema = PlayerIDRequest(**raw_data)
             user_id = get_jwt_identity()
 
+            try:
+                user_uuid = uuid.UUID(user_id)
+            except (ValueError, AttributeError):
+                return {"status": "error", "message": "Invalid user identity"}, 401
+
             from sqlalchemy import select
 
             existing = db.session.scalars(
                 select(NotificationDevice).where(
-                    NotificationDevice.user_id == uuid.UUID(user_id),
+                    NotificationDevice.user_id == user_uuid,
                     NotificationDevice.player_id == schema.player_id,
                 )
             ).first()
 
             if existing:
-                existing.last_used = datetime.utcnow()
+                existing.last_used = datetime.now(UTC)
             else:
                 device = NotificationDevice(
-                    user_id=uuid.UUID(user_id),
+                    user_id=user_uuid,
                     player_id=schema.player_id,
                     platform=schema.platform,
-                    last_used=datetime.utcnow(),
+                    last_used=datetime.now(UTC),
                 )
                 db.session.add(device)
 
@@ -296,5 +308,5 @@ class PlayerIDResource(Resource):
             return {"status": "error", "message": ve.errors()}, 400
         except Exception as e:
             db.session.rollback()
-            logger.exception(f"Error saving player ID: {e}")
+            logger.exception("Error saving player ID: %s", e)
             return {"status": "error", "message": "Failed to save player ID"}, 500

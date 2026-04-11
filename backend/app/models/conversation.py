@@ -17,14 +17,16 @@ class Conversation(BaseModel):
     __tablename__ = "conversations"
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False, unique=True, index=True
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+        index=True,
     )
 
     user: Mapped[User] = relationship(back_populates="conversations")
     messages: Mapped[list[Message]] = relationship(
-        back_populates="conversation", cascade="all, delete-orphan",
-        order_by="Message.created_at"
+        back_populates="conversation", cascade="all, delete-orphan", order_by="Message.created_at"
     )
 
 

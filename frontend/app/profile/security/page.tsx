@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import ToggleButton from '../../_components/profile/togglebutton';
+import ToggleButton from '../../_components/profile/ToggleButton';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa';
 import { MdKeyboardArrowRight } from 'react-icons/md';
@@ -19,17 +19,28 @@ interface SecurityItemProps {
     hasArrow?: boolean;
     isOn?: boolean;
     onToggle?: () => void;
+    toggleAriaLabel?: string;
 }
 
-const SecurityItem: React.FC<SecurityItemProps> = ({ label, hasArrow = false, isOn, onToggle }) => (
+const SecurityItem: React.FC<SecurityItemProps> = ({
+    label,
+    hasArrow = false,
+    isOn,
+    onToggle,
+    toggleAriaLabel,
+}) => (
     <div className="flex items-center justify-between w-full py-5">
         <div className="flex items-center space-x-4">
             <span className="text-3xl">{label}</span>
         </div>
         {hasArrow ? (
-            <MdKeyboardArrowRight className="text-gray-500 w-12 h-12" />
+            <MdKeyboardArrowRight className="text-gray-500 w-12 h-12" aria-hidden />
         ) : (
-            <ToggleButton isOn={isOn!} onToggle={onToggle!} />
+            <ToggleButton
+                isOn={isOn!}
+                onToggle={onToggle!}
+                ariaLabel={toggleAriaLabel ?? label}
+            />
         )}
     </div>
 );
@@ -163,7 +174,12 @@ const Security: React.FC = () => {
             )}
 
             <div className="h-[12%] flex flex-row justify-left space-x-8 items-center w-full lg:max-w-3xl">
-                <button onClick={() => router.back()} className="text-gray-700">
+                <button
+                    type="button"
+                    onClick={() => router.back()}
+                    className="text-gray-700"
+                    aria-label={t('a11y.goBack')}
+                >
                     <FaArrowLeft className="w-8 h-8" />
                 </button>
                 <h1 className="text-5xl font-semibold">{t('profile.Security.Title')}</h1>
@@ -175,6 +191,7 @@ const Security: React.FC = () => {
                         key={index}
                         label={item.label}
                         hasArrow={item.hasArrow}
+                        toggleAriaLabel={t('a11y.toggleSetting', { label: item.label })}
                         isOn={
                             item.hasArrow
                                 ? undefined
@@ -191,9 +208,10 @@ const Security: React.FC = () => {
 
             <div className="h-[10%] flex flex-col w-full max-w-xl">
                 <button
-                    type="submit"
+                    type="button"
                     className="w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-4 py-8 rounded-full text-2xl font-semibold shadow-lg flex items-center justify-center"
                     onClick={() => setIsChangePasswordModalOpen(true)}
+                    aria-label={t('profile.Security.ChangePassword')}
                 >
                     {t('profile.Security.ChangePassword')}
                 </button>

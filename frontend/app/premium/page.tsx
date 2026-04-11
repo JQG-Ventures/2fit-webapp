@@ -30,7 +30,7 @@ const PremiumPage = () => {
     ]);
     const [selectedPlan, setSelectedPlan] = useState<PremiumPlan | null>(null);
 
-    const handleAddCard = (_cardInfo: PaymentCard, _saveCard: boolean) => {
+    const _handleAddCard = (_cardInfo: PaymentCard, _saveCard: boolean) => {
         setStep('cards');
     };
 

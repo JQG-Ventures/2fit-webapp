@@ -119,7 +119,7 @@ export default function RegisterStep11() {
             }
         }
 
-        handleRegistration();
+        void handleRegistration();
         return () => {
             clearInterval(changeTextInterval);
         };
@@ -150,8 +150,10 @@ export default function RegisterStep11() {
                     <div>
                         <h2 className="text-3xl font-bold text-red-600 mb-6">{errorMessage}</h2>
                         <button
+                            type="button"
                             onClick={handleRetry}
                             className="mt-4 px-6 py-4 bg-red-500 text-white text-2xl rounded-lg"
+                            aria-label={t('RegisterPagestep11.homebtn')}
                         >
                             {t('RegisterPagestep11.homebtn')}
                         </button>

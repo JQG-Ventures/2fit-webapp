@@ -95,11 +95,10 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
     onClose,
     onExerciseComplete,
     workoutType,
-    userId,
+    userId: _userId,
     workoutPlanId,
     sequenceDay,
 }) => {
-    console.log('Deubging Exercise flow', exercises, workoutType, workoutPlanId);
     const { t } = useTranslation('global');
     const [state, dispatch] = useReducer(reducer, initialState);
     const [formattedDuration, setFormattedDuration] = useState<string>('');
@@ -169,8 +168,6 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
         dispatch({ type: 'COMPLETE_EXERCISE' });
 
         if (workoutType === 'challenge') {
-            console.log('currentExercise', currentExercise);
-            // Parsea workoutPlanId como “challengeId” (puedes pasarlo directamente desde el componente padre)
             const challenge_id = workoutPlanId;
             const sequence_day = Number(sequenceDay);
 

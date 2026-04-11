@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { IoChevronBack } from 'react-icons/io5';
-import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import BottomSheet from '../modals/ExpandableBottomSheet';
@@ -21,32 +20,14 @@ const RestView: React.FC<RestViewProp> = ({
     restDuration,
     onNext,
     onBack,
-    nextExercise,
+    nextExercise: _nextExercise,
     exercises,
     currentExerciseIndex,
     currentSet,
 }) => {
     const { t } = useTranslation('global');
-    const [remainingTime, setRemainingTime] = useState(restDuration);
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
     const [duration, setDuration] = useState(restDuration);
     const [timerKey, setTimerKey] = useState(Date.now());
-
-    useEffect(() => {
-        setRemainingTime(restDuration);
-        if (timerRef.current) clearInterval(timerRef.current);
-        timerRef.current = setInterval(() => {
-            setRemainingTime((prev) => {
-                if (prev <= 1) {
-                    clearInterval(timerRef.current!);
-                    onNext();
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-        return () => clearInterval(timerRef.current!);
-    }, [restDuration, onNext]);
 
     const addTime = () => {
         setDuration((prev) => prev + 5);
@@ -61,7 +42,12 @@ const RestView: React.FC<RestViewProp> = ({
     return (
         <div className="flex flex-col h-full w-full max-w-4xl items-center">
             <div className="h-[15%] w-full p-10 pt-20">
-                <button onClick={onBack} className="text-4xl lg:hidden">
+                <button
+                    type="button"
+                    onClick={onBack}
+                    className="text-4xl lg:hidden"
+                    aria-label={t('a11y.goBack')}
+                >
                     <IoChevronBack />
                 </button>
             </div>

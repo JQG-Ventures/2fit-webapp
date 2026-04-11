@@ -2,15 +2,12 @@
 
 import React, { useEffect } from 'react';
 import { signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { ImSpinner8 } from 'react-icons/im';
 
 const ReauthPage = () => {
-    const router = useRouter();
-
     useEffect(() => {
         const timer = setTimeout(() => {
-            signOut({ callbackUrl: '/login', redirect: true });
+            void signOut({ callbackUrl: '/login', redirect: true });
         }, 1500);
 
         return () => clearTimeout(timer);

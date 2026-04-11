@@ -1,18 +1,18 @@
 [tool.ruff]
 line-length = 100
-target-version = "py39"
+target-version = "py312"
 exclude = [".eggs", ".git", ".hg", ".mypy_cache", ".tox", ".venv", "venv", "env", "_build", "build", "dist", "app/utils/prompts.py"]
 
 [tool.ruff.lint]
 select = ["B", "E", "F", "I", "UP"]
-ignore = ["B904", "E501", "UP045"]
+ignore = ["B904", "E501"]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.12"
 files = ["app", "run.py"]
 plugins = ["pydantic.mypy"]
 disallow_untyped_defs = true
@@ -40,3 +40,25 @@ module = [
     "twilio.*",
 ]
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "app/celery.py",
+    "app/celery_worker.py",
+    "app/tasks/*",
+]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@(abc\\.)?abstractmethod",
+]

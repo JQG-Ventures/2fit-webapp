@@ -19,7 +19,6 @@ const CreatePasswordScreen: React.FC = () => {
     const contactInfo = searchParams.get('contact') || '';
     const { t } = useTranslation('global');
 
-    const [rememberMe, setRememberMe] = useState(false);
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -83,7 +82,12 @@ const CreatePasswordScreen: React.FC = () => {
                 className="flex flex-col justify-between items-center bg-white h-screen p-16"
             >
                 <div className="h-[10%] flex flex-row justify-left space-x-10 items-center w-full max-w-3xl">
-                    <button onClick={() => router.back()} className="text-gray-700">
+                    <button
+                        type="button"
+                        onClick={() => router.back()}
+                        className="text-gray-700"
+                        aria-label={t('a11y.goBack')}
+                    >
                         <IoIosArrowBack className="text-4xl cursor-pointer" />
                     </button>
                     <h1 className="text-5xl font-semibold">
@@ -138,6 +142,15 @@ const CreatePasswordScreen: React.FC = () => {
                             isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                         disabled={isSubmitting}
+                        aria-label={
+                            isSubmitting
+                                ? t(
+                                      'ForgotPassword.step3.createPasswordScreen.continueButton.loadingText',
+                                  )
+                                : t(
+                                      'ForgotPassword.step3.createPasswordScreen.continueButton.defaultText',
+                                  )
+                        }
                     >
                         {isSubmitting
                             ? t(

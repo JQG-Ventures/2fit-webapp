@@ -39,8 +39,10 @@ const ExerciseView: React.FC<ExerciseViewProp> = ({
         <div className="flex flex-col h-full w-full bg-white">
             <div className="flex flex-row items-center justify-between w-full h-[10%] pt-10 p-6 text-center">
                 <button
+                    type="button"
                     onClick={onBack}
                     className="p-6 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white rounded-full shadow-lg hover:bg-emerald-500 transition-all"
+                    aria-label={t('a11y.exitWorkout')}
                 >
                     <FaTimes className="text-2xl" />
                 </button>
@@ -71,8 +73,10 @@ const ExerciseView: React.FC<ExerciseViewProp> = ({
                     className="object-cover w-full"
                 />
                 <button
+                    type="button"
                     onClick={toggleMute}
                     className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white p-3 rounded-full shadow-lg hover:bg-opacity-75 transition"
+                    aria-label={isMuted ? t('a11y.unmuteVideo') : t('a11y.muteVideo')}
                 >
                     {isMuted ? (
                         <FaVolumeMute className="text-xl" />

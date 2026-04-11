@@ -18,7 +18,7 @@ import OneSignalInitializer from '../_components/others/OneSignalInitializer';
 import { useRouter } from 'next/navigation';
 import ChallengeProgressWidget from '../_components/workouts/challenges/ChallengeProgressWidget';
 import type { ApiResponse } from '../_types/api';
-import { parseJson } from '../utils/http';
+import axiosInstance from '../utils/axiosInstance';
 
 interface ActiveUserPlan {
     id: string;
@@ -60,7 +60,6 @@ const HomePage: React.FC = () => {
     const session = sessionData as AppSession | null;
     const userId = session?.user?.id ?? session?.user?.userId;
     const userName = session?.user?.userName ?? session?.user?.name ?? 'Guest';
-    const token = session?.user?.token ?? null;
     const [isDesktopOrLaptop, setIsDesktopOrLaptop] = useState(false);
     const { mutate: deleteSavedWorkout } = useDeleteWorkout();
 
@@ -129,21 +128,15 @@ const HomePage: React.FC = () => {
 
                 const promises: Promise<ChallengePlanWithProgress | null>[] = challengePlans.map(
                     async (plan): Promise<ChallengePlanWithProgress | null> => {
-                        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/challenges/challenges/progress?challenge_id=${plan.id}`;
-                        const res = await fetch(url, {
-                            method: 'GET',
-                            headers: { Authorization: `Bearer ${token}` },
-                        });
-                        const json = await parseJson<ApiResponse<ChallengeProgress>>(res);
-                        if (!res.ok) {
-                            console.error(json.message || t('workouts.fetchingError'));
-                            return null;
-                        }
+                        const response = await axiosInstance.get<ApiResponse<ChallengeProgress>>(
+                            `/api/challenges/challenges/progress`,
+                            { params: { challenge_id: plan.id } },
+                        );
                         return {
                             id: plan.id,
                             plan_type: 'challenge' as const,
                             name: plan.name,
-                            progressData: json.message,
+                            progressData: response.data.message,
                         };
                     },
                 );
@@ -161,12 +154,8 @@ const HomePage: React.FC = () => {
             }
         };
 
-        fetchChallengeProgress();
-    }, [token, userActivePlans, t]);
-
-    // const guidedWorkoutsUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/workouts/guided`;
-    // const { data: guidedWorkouts, loading: loadingGuidedWorkouts, error: guidedWorkoutsError } = useFetch(guidedWorkoutsUrl, options);
-    const paddingBottom = isDesktopOrLaptop ? 0 : 100 * 1.1;
+        void fetchChallengeProgress();
+    }, [userActivePlans, t]);
 
     const getTodayPendingExercise = (): Exercise | null => {
         if (!activePlans?.message?.days) return null;
@@ -197,7 +186,9 @@ const HomePage: React.FC = () => {
     };
 
     return (
-        <div className="home-page-container bg-white space-y-12 pt-10" style={{ paddingBottom }}>
+        <div
+            className={`home-page-container bg-white space-y-12 pt-10 ${!isDesktopOrLaptop ? 'pb-[110px]' : 'pb-0'}`}
+        >
             <OneSignalInitializer />
             <div className="flex flex-col lg:flex-row lg:space-x-8">
                 <div

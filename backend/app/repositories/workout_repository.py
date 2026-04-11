@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 import uuid
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
@@ -21,7 +19,7 @@ class WorkoutPlanRepository(BaseRepository[WorkoutPlan]):
             stmt = stmt.where(WorkoutPlan.plan_type != "personalized")
         return list(db.session.scalars(stmt).all())
 
-    def get_with_schedule(self, plan_id: uuid.UUID) -> Optional[WorkoutPlan]:
+    def get_with_schedule(self, plan_id: uuid.UUID) -> WorkoutPlan | None:
         stmt = (
             select(WorkoutPlan)
             .where(WorkoutPlan.id == plan_id)
@@ -31,7 +29,7 @@ class WorkoutPlanRepository(BaseRepository[WorkoutPlan]):
                 .joinedload(WorkoutDayExercise.exercise)
             )
         )
-        return cast(Optional[WorkoutPlan], db.session.scalars(stmt).unique().first())
+        return cast(WorkoutPlan | None, db.session.scalars(stmt).unique().first())
 
     def get_one_day_plans(self) -> list[WorkoutPlan]:
         subq = (
@@ -39,19 +37,15 @@ class WorkoutPlanRepository(BaseRepository[WorkoutPlan]):
             .group_by(WorkoutDay.workout_plan_id)
             .having(func.count(WorkoutDay.id) == 1)
         )
-        stmt = (
-            select(WorkoutPlan)
-            .where(
-                WorkoutPlan.is_active.is_(True),
-                WorkoutPlan.id.in_(subq),
-            )
+        stmt = select(WorkoutPlan).where(
+            WorkoutPlan.is_active.is_(True),
+            WorkoutPlan.id.in_(subq),
         )
         return list(db.session.scalars(stmt).all())
 
     def get_by_difficulty(self, difficulty: str) -> list[WorkoutPlan]:
-        stmt = (
-            select(WorkoutPlan)
-            .where(WorkoutPlan.is_active.is_(True), WorkoutPlan.level == difficulty)
+        stmt = select(WorkoutPlan).where(
+            WorkoutPlan.is_active.is_(True), WorkoutPlan.level == difficulty
         )
         return list(db.session.scalars(stmt).all())
 

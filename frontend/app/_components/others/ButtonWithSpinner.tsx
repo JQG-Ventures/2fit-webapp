@@ -8,6 +8,7 @@ interface ButtonWithSpinnerProps {
     disabled?: boolean;
     children: React.ReactNode;
     className?: string;
+    ariaLabel: string;
 }
 
 const ButtonWithSpinner: React.FC<ButtonWithSpinnerProps> = ({
@@ -17,12 +18,14 @@ const ButtonWithSpinner: React.FC<ButtonWithSpinnerProps> = ({
     disabled,
     children,
     className = '',
+    ariaLabel,
 }) => {
     return (
         <button
             type={type}
             onClick={!loading ? onClick : undefined}
             disabled={disabled || loading}
+            aria-label={ariaLabel}
             className={`${className} flex items-center justify-center ${
                 loading ? 'cursor-not-allowed opacity-50' : ''
             }`}

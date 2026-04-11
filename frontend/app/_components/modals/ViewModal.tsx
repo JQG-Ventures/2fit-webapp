@@ -23,7 +23,12 @@ const ViewModal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) =
                 <div className="flex flex-row justify-between p-6 mb-4">
                     <h2 className="text-3xl font-semibold">{title}</h2>
 
-                    <button onClick={onClose} className="text-red-500 hover:text-red-800 mb-4">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="text-red-500 hover:text-red-800 mb-4"
+                        aria-label={`Close: ${title}`}
+                    >
                         <IoMdClose className="text-3xl" />
                     </button>
                 </div>

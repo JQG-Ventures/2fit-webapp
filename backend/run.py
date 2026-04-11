@@ -8,7 +8,6 @@ import logging
 import sys
 
 import app.settings as s
-
 from app import create_app
 
 if not logging.getLogger().hasHandlers():

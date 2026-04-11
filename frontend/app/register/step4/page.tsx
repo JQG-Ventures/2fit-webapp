@@ -59,9 +59,11 @@ export default function RegisterStep4() {
                     {goals.map((goal) => (
                         <button
                             key={goal.id}
+                            type="button"
                             className={`w-full p-8 flex text-left items-center border rounded-lg text-3xl transition-all duration-300 transform 
                                 ${selectedGoal === goal.value ? 'bg-black text-white scale-105 shadow-lg' : 'bg-white text-black hover:scale-105 hover:shadow-md border-gray-300'}`}
                             onClick={() => handleGoalSelection(goal.value)}
+                            aria-label={t('a11y.selectGoal', { label: goal.label })}
                         >
                             <span role="img" aria-label={goal.label} className="mr-4">
                                 {goal.icon}

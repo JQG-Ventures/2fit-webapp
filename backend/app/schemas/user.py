@@ -1,7 +1,4 @@
-from __future__ import annotations
-
 from datetime import date, datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -23,9 +20,9 @@ class TrainingPreferencesCreate(BaseModel):
 
 
 class PreferencesCreate(BaseModel):
-    water_consumption: Optional[float] = None
+    water_consumption: float | None = None
     dietary_restrictions: list[str] = []
-    dietary_goals: Optional[str] = None
+    dietary_goals: str | None = None
     preferences: list[str] = []
 
 
@@ -56,7 +53,7 @@ class AutomationDataCreate(BaseModel):
     message_sent: bool = False
     greetings_sent: bool = False
     created_by_bot: bool = False
-    last_motivational_message: Optional[str] = None
+    last_motivational_message: str | None = None
 
 
 class UserCreate(BaseModel):
@@ -69,7 +66,7 @@ class UserCreate(BaseModel):
     number: str
     gender: str
     email: str
-    password: Optional[str] = None
+    password: str | None = None
     roles: list[str] = ["user"]
     height: int
     weight: int
@@ -112,7 +109,7 @@ class UserCreate(BaseModel):
         return v
 
     @model_validator(mode="after")
-    def validate_password_required_for_default(self) -> UserCreate:
+    def validate_password_required_for_default(self) -> "UserCreate":
         if self.auth_provider == "default":
             if not self.password or not self.password.strip():
                 raise ValueError("Password is required for default auth provider")
@@ -120,24 +117,24 @@ class UserCreate(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    name: Optional[str] = None
-    last: Optional[str] = None
-    age: Optional[int] = None
-    birthdate: Optional[str] = None
-    country: Optional[str] = None
-    number: Optional[str] = None
-    gender: Optional[str] = None
-    email: Optional[str] = None
-    height: Optional[int] = None
-    weight: Optional[int] = None
-    target_weight: Optional[int] = None
-    profile_image: Optional[str] = None
-    fitness_goal: Optional[str] = None
-    fitness_level: Optional[str] = None
-    preferred_muscle_groups: Optional[list[str]] = None
-    equipment: Optional[list[str]] = None
-    available_days: Optional[list[str]] = None
-    workout_types: Optional[list[str]] = None
+    name: str | None = None
+    last: str | None = None
+    age: int | None = None
+    birthdate: str | None = None
+    country: str | None = None
+    number: str | None = None
+    gender: str | None = None
+    email: str | None = None
+    height: int | None = None
+    weight: int | None = None
+    target_weight: int | None = None
+    profile_image: str | None = None
+    fitness_goal: str | None = None
+    fitness_level: str | None = None
+    preferred_muscle_groups: list[str] | None = None
+    equipment: list[str] | None = None
+    available_days: list[str] | None = None
+    workout_types: list[str] | None = None
 
 
 class UserResponse(BaseModel):

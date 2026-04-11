@@ -18,6 +18,7 @@ export default function RegistrationButtons({
                 type="button"
                 onClick={handlePrev}
                 loading={isSubmittingPrev}
+                ariaLabel={prevText}
                 className={
                     'w-full bg-black text-white py-4 rounded-full text-1xl font-semibold hover:bg-gray-800 transition duration-200 mt-4'
                 }
@@ -30,6 +31,7 @@ export default function RegistrationButtons({
                 onClick={handleNext}
                 loading={isSubmittingNext}
                 disabled={isNextDisabled}
+                ariaLabel={nextText}
                 className={`w-full ${isNextDisabled ? 'bg-gray-500 cursor-not-allowed' : 'bg-black hover:bg-gray-800'} text-white py-4 rounded-full text-1xl font-semibold transition duration-200 mt-4`}
             >
                 {nextText}

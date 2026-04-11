@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import date
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Date, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
@@ -36,7 +36,7 @@ class User(BaseModel):
     gender: Mapped[str] = mapped_column(String(1), nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
-    roles: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=["user"])
+    roles: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=["user"])
     height: Mapped[int] = mapped_column(Integer, nullable=False)
     weight: Mapped[int] = mapped_column(Integer, nullable=False)
     target_weight: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -45,18 +45,20 @@ class User(BaseModel):
     fitness_goal: Mapped[str] = mapped_column(String(20), nullable=False)
     fitness_level: Mapped[str] = mapped_column(String(20), nullable=False)
 
-    preferred_muscle_groups: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
-    equipment: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
-    available_days: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
-    workout_types: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    preferred_muscle_groups: Mapped[list[str]] = mapped_column(
+        ARRAY(String), nullable=False, default=[]
+    )
+    equipment: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=[])
+    available_days: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=[])
+    workout_types: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=[])
 
-    preference: Mapped[Optional[UserPreference]] = relationship(
+    preference: Mapped[UserPreference | None] = relationship(
         back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
-    settings: Mapped[Optional[UserSettings]] = relationship(
+    settings: Mapped[UserSettings | None] = relationship(
         back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
-    automation_data: Mapped[Optional[UserAutomationData]] = relationship(
+    automation_data: Mapped[UserAutomationData | None] = relationship(
         back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
     saved_workouts: Mapped[list[SavedWorkout]] = relationship(
@@ -88,10 +90,12 @@ class UserPreference(BaseModel):
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
     )
-    water_consumption: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    dietary_restrictions: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
-    dietary_goals: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    preferences: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    water_consumption: Mapped[float | None] = mapped_column(Float, nullable=True)
+    dietary_restrictions: Mapped[list[str]] = mapped_column(
+        ARRAY(String), nullable=False, default=[]
+    )
+    dietary_goals: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    preferences: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=[])
 
     user: Mapped[User] = relationship(back_populates="preference")
 
@@ -127,6 +131,6 @@ class UserAutomationData(BaseModel):
     message_sent: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     greetings_sent: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_by_bot: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    last_motivational_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    last_motivational_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     user: Mapped[User] = relationship(back_populates="automation_data")

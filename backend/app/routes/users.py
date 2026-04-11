@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 import uuid
 from datetime import datetime
@@ -55,7 +53,7 @@ class CompleteWorkoutResource(Resource):
             return {"status": "success", "message": "Workout saved successfully"}, 200
         except Exception as e:
             db.session.rollback()
-            logger.exception(f"Error saving completed workout: {e}")
+            logger.exception("Error saving completed workout: %s", e)
             return {"status": "error", "message": "Internal server error"}, 500
 
 
@@ -77,7 +75,7 @@ class UserProgressResource(Resource):
             progress = UserWorkoutService.get_user_progress(user_id, workout_plan_id)
             return {"status": "success", "message": progress}, 200
         except Exception as e:
-            logger.exception(f"Error retrieving user progress: {e}")
+            logger.exception("Error retrieving user progress: %s", e)
             return {"status": "error", "message": "Internal server error"}, 500
 
     @jwt_required()
@@ -112,7 +110,7 @@ class UserProgressResource(Resource):
             return {"status": "success", "message": "Progress updated successfully"}, 200
         except Exception as e:
             db.session.rollback()
-            logger.exception(f"Error saving workout progress: {e}")
+            logger.exception("Error saving workout progress: %s", e)
             return {"status": "error", "message": "Internal server error"}, 500
 
 
@@ -126,7 +124,7 @@ class MotivationalMessagesResource(Resource):
                 return {"status": "success", "message": response}, 200
             return {"status": "error", "message": "No motivational messages generated"}, 500
         except Exception as e:
-            logger.exception(f"Error generating motivational messages: {e}")
+            logger.exception("Error generating motivational messages: %s", e)
             return {"status": "error", "message": "Could not handle the message"}, 500
 
 
@@ -149,7 +147,7 @@ class UserResource(Resource):
                 return {"status": "success", "message": result}, 200
             return {"status": "error", "message": "User not found"}, 404
         except Exception as e:
-            logger.exception(f"An error occurred: {e}")
+            logger.exception("An error occurred: %s", e)
             return {"status": "error", "message": f"An error occurred: {str(e)}"}, 500
 
     def put(self) -> ResponseTuple:
@@ -177,7 +175,7 @@ class UserResource(Resource):
             return {"status": "error", "message": "User not found"}, 404
         except Exception as e:
             db.session.rollback()
-            logger.exception(f"An error occurred: {e}")
+            logger.exception("An error occurred: %s", e)
             return {"status": "error", "message": f"An error occurred: {str(e)}"}, 500
 
 
@@ -199,13 +197,13 @@ class SendCodeResource(Resource):
             )
             return {"status": "success", "message": "Verification code sent"}, 200
         except TwilioRestException as te:
-            logger.exception(f"Twilio error: {te}")
+            logger.exception("Twilio error: %s", te)
             return {
                 "status": "error",
                 "message": f"Twilio could not send the code: {te}",
             }, te.status
         except Exception as e:
-            logger.exception(f"Error sending verification code: {e}")
+            logger.exception("Error sending verification code: %s", e)
             return {"status": "error", "message": f"Error sending verification code: {e}"}, 500
 
 
@@ -241,7 +239,7 @@ class UserConversationResource(Resource):
                 return {"status": "success", "message": messages}, 200
             return {"status": "success", "message": []}, 200
         except Exception as e:
-            logger.exception(f"An error occurred: {e}")
+            logger.exception("An error occurred: %s", e)
             return {"status": "error", "message": f"An error occurred: {str(e)}"}, 500
 
 
@@ -258,7 +256,7 @@ class UserByNumberResource(Resource):
                 return {"status": "success", "message": result}, 200
             return {"status": "error", "message": "User not found"}, 404
         except Exception as e:
-            logger.exception(f"An error occurred: {e}")
+            logger.exception("An error occurred: %s", e)
             return {"status": "error", "message": f"An error occurred: {str(e)}"}, 500
 
 
@@ -275,7 +273,7 @@ class UserByEmailResource(Resource):
                 return {"status": "success", "message": result}, 200
             return {"status": "error", "message": "User not found"}, 404
         except Exception as e:
-            logger.exception(f"An error occurred: {e}")
+            logger.exception("An error occurred: %s", e)
             return {"status": "error", "message": f"An error occurred: {str(e)}"}, 500
 
 
@@ -320,7 +318,7 @@ class UserResourcePlans(Resource):
                 return {"status": "success", "message": result}, 200
             return {"status": "error", "message": "Plans not found"}, 404
         except Exception as e:
-            logger.exception(f"An error occurred: {e}")
+            logger.exception("An error occurred: %s", e)
             return {"status": "error", "message": f"{str(e)}"}, 500
 
 

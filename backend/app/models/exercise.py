@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy import Boolean, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column
@@ -15,9 +13,9 @@ class Exercise(BaseModel):
     category: Mapped[str] = mapped_column(String(20), nullable=False)
     image_url: Mapped[str] = mapped_column(Text, nullable=False, default="")
     video_url: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    muscle_group: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    muscle_group: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=[])
     difficulty: Mapped[str] = mapped_column(String(20), nullable=False, default="beginner")
-    equipment: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
-    instructions: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
-    contradictions: Mapped[list] = mapped_column(ARRAY(String), nullable=False, default=[])
+    equipment: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=[])
+    instructions: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=[])
+    contradictions: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=[])
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)

@@ -30,15 +30,17 @@ const ConfirmationModal: FC<ConfirmationModalProps> = ({
                     <div className={`h-[10%] flex flex-row justify-evenly items-center w-full`}>
                         <button
                             onClick={onConfirm}
-                            type="submit"
+                            type="button"
                             className="w-[45%] max-w-xl bg-gradient-to-r from-green-400 to-green-700 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
+                            aria-label={confirmText}
                         >
                             {confirmText}
                         </button>
                         <button
                             onClick={onClose}
-                            type="submit"
+                            type="button"
                             className="w-[45%] max-w-xl bg-red-500 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
+                            aria-label={cancelText}
                         >
                             {cancelText}
                         </button>

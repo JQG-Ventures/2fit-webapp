@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 import uuid
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
@@ -19,7 +17,7 @@ class ChallengeRepository(BaseRepository[Challenge]):
         stmt = select(Challenge).where(Challenge.is_active.is_(True))
         return list(db.session.scalars(stmt).all())
 
-    def get_with_schedule(self, challenge_id: uuid.UUID) -> Optional[Challenge]:
+    def get_with_schedule(self, challenge_id: uuid.UUID) -> Challenge | None:
         stmt = (
             select(Challenge)
             .where(Challenge.id == challenge_id)
@@ -29,7 +27,7 @@ class ChallengeRepository(BaseRepository[Challenge]):
                 .joinedload(ChallengeDayExercise.exercise)
             )
         )
-        return cast(Optional[Challenge], db.session.scalars(stmt).unique().first())
+        return cast(Challenge | None, db.session.scalars(stmt).unique().first())
 
     def soft_delete(self, challenge_id: uuid.UUID) -> bool:
         challenge = self.get_by_id(challenge_id)

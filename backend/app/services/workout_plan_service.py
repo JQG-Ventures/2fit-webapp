@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 import random
 import uuid
@@ -232,7 +230,7 @@ class WorkoutPlanGenerator:
             )
 
             db.session.flush()
-            logging.info(f"Set workout plan {plan_id} as active for user {user_uuid}.")
+            logging.info("Set workout plan %s as active for user %s.", plan_id, user_uuid)
         except Exception as e:
-            logging.error(f"Error setting active workout plan: {e}")
+            logging.error("Error setting active workout plan: %s", e)
             raise

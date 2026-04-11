@@ -58,14 +58,18 @@ const CompleteView: React.FC<{ goToPlan: string; textGoTo: string; duration: str
 
             <div className="flex flex-col justify-evenly items-center h-[20%]">
                 <button
+                    type="button"
                     className="w-full lg:max-w-3xl bg-gradient-to-r from-emerald-400 to-emerald-600 text-white py-6 rounded-full text-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out"
                     onClick={() => handleNavigation(goToPlan)}
+                    aria-label={textGoTo}
                 >
                     {textGoTo}
                 </button>
                 <button
+                    type="button"
                     className="w-full lg:max-w-3xl bg-green-100 hover:bg-green-200 text-black text-2xl font-bold py-6 rounded-full shadow-lg transition duration-300 ease-in-out"
                     onClick={() => handleNavigation('/home')}
+                    aria-label={t('workouts.plan.home')}
                 >
                     <span className="text-xl">{t('workouts.plan.home')}</span>
                 </button>

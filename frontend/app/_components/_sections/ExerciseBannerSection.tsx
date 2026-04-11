@@ -86,6 +86,7 @@ const ExerciseCard: React.FC<{
     onSaveClick: (id: string, name: string) => void;
     isSaved: boolean;
 }> = ({ exercise, onSaveClick, isSaved }) => {
+    const { t } = useTranslation('global');
     const [loading, setLoading] = useState(false);
 
     const handleRedirect = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -126,6 +127,7 @@ const ExerciseCard: React.FC<{
                             </p>
                             <div className="flex space-x-4">
                                 <button
+                                    type="button"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
@@ -135,15 +137,18 @@ const ExerciseCard: React.FC<{
                                         isSaved ? 'bg-red-500' : 'bg-gray-700'
                                     } rounded-full transition-transform transform hover:scale-110 active:scale-90`}
                                     disabled={isSaved}
+                                    aria-label={`${t('a11y.saveWorkout')}: ${exercise.name}`}
                                 >
                                     <AiFillHeart size={24} />
                                 </button>
                                 <button
+                                    type="button"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
                                     }}
                                     className="p-2 bg-green-500 rounded-full"
+                                    aria-label={String(t('a11y.refreshExercise'))}
                                 >
                                     <AiOutlineReload size={24} />
                                 </button>

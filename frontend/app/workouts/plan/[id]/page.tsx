@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import WorkoutHeader from '@/app/_components/workouts/WorkoutHeader';
 import WorkoutDetails from '@/app/_components/workouts/WorkoutDetails';

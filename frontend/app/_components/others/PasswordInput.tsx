@@ -8,7 +8,7 @@ interface PasswordInputProps {
 }
 
 const PasswordInput: React.FC<PasswordInputProps> = ({ placeholder, value, onChange }) => {
-    const [showPassword, setShowPassword] = useState(false);
+    const [showPassword] = useState(false);
 
     return (
         <div className="flex items-center border-2 rounded-lg px-6 py-6 w-full">

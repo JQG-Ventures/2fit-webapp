@@ -3,12 +3,15 @@
 interface ToggleButtonProps {
     isOn: boolean;
     onToggle: () => void;
+    ariaLabel: string;
 }
 
-const ToggleButton: React.FC<ToggleButtonProps> = ({ isOn, onToggle }) => {
+const ToggleButton: React.FC<ToggleButtonProps> = ({ isOn, onToggle, ariaLabel }) => {
     return (
         <button
+            type="button"
             onClick={onToggle}
+            aria-label={ariaLabel}
             className={`w-16 h-8 flex items-center rounded-full p-1 transition-colors duration-300 focus:outline-none  ${
                 isOn ? 'bg-green-500' : 'bg-gray-300'
             }`}

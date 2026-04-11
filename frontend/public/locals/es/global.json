@@ -318,7 +318,8 @@
             "of": "de",
             "all": "Todos",
             "days": "días",
-            "activeChallenges": "Retos Activos"
+            "activeChallenges": "Retos Activos",
+            "progressLabel": "completado"
         },
         "plan": {
             "workoutAlreadySaved": "El plan ya ha sido guardado!",
@@ -424,5 +425,47 @@
                 }
             }
         }
+    },
+    "a11y": {
+        "goBack": "Volver",
+        "signInWithGoogle": "Iniciar sesión con Google",
+        "signInWithApple": "Continuar con Apple",
+        "signInWithFacebook": "Continuar con Facebook",
+        "toggleSetting": "Activar o desactivar {{label}}",
+        "carouselSlide": "Ir a la diapositiva {{n}} de {{total}}",
+        "openWorkoutMenu": "Abrir menú de opciones del entrenamiento",
+        "sendMessage": "Enviar mensaje",
+        "openWhatsApp": "Abrir WhatsApp",
+        "decreaseRest": "Reducir el descanso 5 segundos",
+        "increaseRest": "Aumentar el descanso 5 segundos",
+        "seeAllExercises": "Ver todos los ejercicios",
+        "closeExerciseList": "Cerrar lista de ejercicios",
+        "expandDetails": "Expandir o contraer detalles del ejercicio",
+        "search": "Buscar",
+        "closeSearch": "Cerrar búsqueda",
+        "toggleDarkTheme": "Activar o desactivar tema oscuro",
+        "checkout": "Continuar al pago",
+        "selectGender": "Seleccionar {{label}}",
+        "selectGoal": "Seleccionar objetivo: {{label}}",
+        "playVideo": "Reproducir video",
+        "unlockCoach": "Desbloquear entrenador premium",
+        "resendEmail": "Reenviar correo",
+        "goToHome": "Ir al inicio",
+        "removeExercise": "Quitar ejercicio de la selección",
+        "replaceExercise": "Reemplazar ejercicio",
+        "dayOfWeek": "Seleccionar {{day}}",
+        "startExercise": "Iniciar ejercicio",
+        "markForRemoval": "Marcar ejercicio para eliminar",
+        "changeExerciseChoice": "Elegir ejercicio de reemplazo",
+        "saveWorkout": "Guardar entrenamiento",
+        "exitWorkout": "Salir del entrenamiento",
+        "muteVideo": "Silenciar video",
+        "unmuteVideo": "Activar sonido del video",
+        "continueChallenge": "Continuar reto",
+        "selectCountryCode": "Seleccionar código de país",
+        "scrollToLatestMessages": "Ir a los últimos mensajes",
+        "refreshExercise": "Ver otro ejercicio",
+        "verificationCodeDigit": "Dígito {{n}} del código de verificación (de 4)",
+        "selectProfilePhoto": "Seleccionar foto de perfil"
     }
 }

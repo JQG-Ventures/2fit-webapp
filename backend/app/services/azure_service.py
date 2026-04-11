@@ -1,9 +1,7 @@
-from __future__ import annotations
-
 import logging
 import os
 import uuid as uuid_mod
-from typing import IO, Optional
+from typing import IO
 
 from azure.storage.blob import BlobServiceClient
 
@@ -22,7 +20,7 @@ class AzureService:
 
     def upload_content(
         self, file_path: str, title: str, description: str, tags: list[str]
-    ) -> Optional[str]:
+    ) -> str | None:
         try:
             file_name = os.path.basename(file_path)
 
@@ -47,10 +45,10 @@ class AzureService:
 
             return str(content.id)
         except Exception as e:
-            logging.exception(f"Error uploading blob to Azure: {e}")
+            logging.exception("Error uploading blob to Azure: %s", e)
             return None
 
-    def get_content_by_tags(self, tags: list[str]) -> Optional[str]:
+    def get_content_by_tags(self, tags: list[str]) -> str | None:
         try:
             from sqlalchemy import select
 
@@ -60,12 +58,12 @@ class AzureService:
                 return str(content.blob_url)
             return None
         except Exception as e:
-            logging.exception(f"Could not get content from DB: {e}")
+            logging.exception("Could not get content from DB: %s", e)
             return None
 
     def upload_profile_image(
         self, file_stream: IO[bytes], user_id: str, original_filename: str
-    ) -> Optional[str]:
+    ) -> str | None:
         try:
             extension = (
                 original_filename.rsplit(".", 1)[1].lower() if "." in original_filename else "png"

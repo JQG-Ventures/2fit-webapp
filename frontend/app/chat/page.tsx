@@ -14,18 +14,19 @@ import { useTranslation } from 'react-i18next';
 import type { ApiResponse } from '@/app/_types/api';
 import type { ChatMessage } from '@/app/_types/chat';
 
+const WHATSAPP_BOT_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_BOT_NUMBER ?? '50670340514';
+const WHATSAPP_BOT_URL = `https://wa.me/${WHATSAPP_BOT_NUMBER}?text=Hey 2Fit bot!`;
+
 const Chat: React.FC = () => {
     const router = useRouter();
     const { t } = useTranslation('global');
 
-    const getChatUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/conversation`;
     const { data: conversationData, isError: errorConversation } = useApiGet<
         ApiResponse<ChatMessage[]>
-    >(['conversationData'], getChatUrl);
-    const getProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`;
+    >(['conversationData'], '/api/users/conversation');
     const { data: profile, isError: errorProfile } = useApiGet<ApiResponse<UserProfile>>(
         ['profileData'],
-        getProfileUrl,
+        '/api/users/profile',
     );
 
     const { mutate: sendMessage } = useSendMessage(
@@ -38,8 +39,9 @@ const Chat: React.FC = () => {
     const [isBotTyping, setIsBotTyping] = useState(false);
 
     useEffect(() => {
-        if (Array.isArray(conversationData?.message)) {
-            setMessages(conversationData.message);
+        const list = conversationData?.message;
+        if (Array.isArray(list)) {
+            setMessages(list);
         } else {
             setMessages([]);
         }
@@ -93,24 +95,29 @@ const Chat: React.FC = () => {
         <div className="flex flex-col justify-between items-center bg-[#1A1A1A] h-screen p-14 lg:pt-[10vh] relative">
             <div className="h-[10%] flex flex-row justify-between space-x-8 items-center w-full lg:max-w-3xl">
                 <div className="flex flex-row space-x-8">
-                    <button onClick={() => router.back()} className="text-white">
+                    <button
+                        type="button"
+                        onClick={() => router.back()}
+                        className="text-white"
+                        aria-label={t('a11y.goBack')}
+                    >
                         <FaArrowLeft className="w-8 h-8" />
                     </button>
                     <h1 className="text-5xl text-white font-semibold">2Fit.AI Coach</h1>
                 </div>
                 <button
+                    type="button"
                     onClick={() => {
                         if (typeof window !== 'undefined') {
-                            window.open(
-                                `https://wa.me/${50670340514}?text=Hey 2Fit bot!`,
-                                '_blank',
-                            );
+                            window.open(WHATSAPP_BOT_URL, '_blank');
                         }
                     }}
+                    aria-label={t('a11y.openWhatsApp')}
                 >
                     <FaWhatsapp
                         className="text-white w-12 h-12"
-                        title={`${t('chat.openWhatsApp')}`}
+                        aria-hidden
+                        title={t('chat.openWhatsApp')}
                     />
                 </button>
             </div>
@@ -143,8 +150,10 @@ const Chat: React.FC = () => {
                             className="flex-grow bg-gray-800 rounded-full p-6 pl-8 text-white placeholder-gray-500 outline-none border-none focus:ring-0"
                         />
                         <button
+                            type="button"
                             onClick={handleSendMessage}
                             className="bg-green-500 text-white p-8 rounded-full focus:outline-none hover:bg-green-600"
+                            aria-label={t('a11y.sendMessage')}
                         >
                             <FaPaperPlane className="w-full h-full" />
                         </button>

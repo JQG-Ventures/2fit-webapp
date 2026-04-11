@@ -79,9 +79,11 @@ export default function RegisterStep8() {
                     {levels.map((level) => (
                         <button
                             key={level.id}
+                            type="button"
                             onClick={() => handleTrainingLevel(level.value)}
                             className={`w-full p-8 flex text-left items-center border rounded-lg text-3xl transition-all duration-300 transform font-semibold
                                 ${selectedLevel === level.value ? 'bg-black text-gray-50 scale-105 shadow-lg' : 'bg-white text-black hover:scale-105 hover:shadow-md border-gray-300'}`}
+                            aria-label={level.title}
                         >
                             <div className="text-left">
                                 <span className="text-2xl font-medium">{level.title}</span>

@@ -32,7 +32,7 @@ const OneSignalInitializer = () => {
             });
         };
 
-        run();
+        void run();
     }, [token, status, registerOneSignalPlayerId]);
 
     return null;

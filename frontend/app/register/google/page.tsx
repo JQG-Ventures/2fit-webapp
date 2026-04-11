@@ -28,7 +28,7 @@ export default function RegisterSocial() {
                 router.push('/register?error=googleError');
             }
         };
-        doCheck();
+        void doCheck();
     }, [session, router, updateData]);
 
     return (

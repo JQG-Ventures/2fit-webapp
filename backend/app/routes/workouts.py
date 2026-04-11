@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 import uuid
 from typing import Any
@@ -311,7 +309,7 @@ class WeeklyWorkoutProgressResource(Resource):
             progress = UserWorkoutService.get_weekly_workout_progress(user_id)
             return {"status": "success", "message": progress}, 200
         except Exception as e:
-            logging.exception(f"Error retrieving weekly workout progress: {e}")
+            logging.exception("Error retrieving weekly workout progress: %s", e)
             return {"status": "error", "message": str(e)}, 500
 
 
@@ -330,7 +328,7 @@ class ChallengeProgressResource(Resource):
             progress = UserWorkoutService.get_challenge_progress(user_id, challenge_id)
             return {"status": "success", "message": progress}, 200
         except Exception as e:
-            logging.exception(f"Error retrieving challenge progress: {e}")
+            logging.exception("Error retrieving challenge progress: %s", e)
             return {"status": "error", "message": "Internal server error"}, 500
 
 
@@ -372,7 +370,7 @@ class PopularWorkoutsResource(Resource):
 
             return {"status": "success", "message": result}, 200
         except Exception as e:
-            logging.exception(f"Error retrieving popular workouts: {e}")
+            logging.exception("Error retrieving popular workouts: %s", e)
             return {"status": "error", "message": "Internal server error"}, 500
 
 

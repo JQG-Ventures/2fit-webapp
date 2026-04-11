@@ -3,7 +3,7 @@
 import React, { useCallback } from 'react';
 import Modal from '../profile/modal';
 
-export function ErrorFallback({ error }: { error: Error }) {
+export function ErrorFallback({ error: _error }: { error: Error }) {
     const handleClose = useCallback(() => {
         if (typeof window !== 'undefined') {
             window.location.reload();

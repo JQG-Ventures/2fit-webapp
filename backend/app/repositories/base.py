@@ -1,22 +1,18 @@
-from __future__ import annotations
-
 import uuid
-from typing import Any, Generic, Optional, TypeVar, cast
+from typing import Any, cast
 
 from sqlalchemy import select
 
 from app.extensions import db
 from app.models.base import BaseModel
 
-T = TypeVar("T", bound=BaseModel)
 
-
-class BaseRepository(Generic[T]):
+class BaseRepository[T: BaseModel]:
     def __init__(self, model: type[T]) -> None:
         self.model = model
 
-    def get_by_id(self, record_id: uuid.UUID) -> Optional[T]:
-        return cast(Optional[T], db.session.get(self.model, record_id))
+    def get_by_id(self, record_id: uuid.UUID) -> T | None:
+        return cast(T | None, db.session.get(self.model, record_id))
 
     def get_all(self, **filters: Any) -> list[T]:
         stmt = select(self.model).filter_by(**filters)
@@ -28,7 +24,7 @@ class BaseRepository(Generic[T]):
         db.session.flush()
         return instance
 
-    def update(self, record_id: uuid.UUID, **kwargs: Any) -> Optional[T]:
+    def update(self, record_id: uuid.UUID, **kwargs: Any) -> T | None:
         instance = self.get_by_id(record_id)
         if not instance:
             return None

@@ -114,6 +114,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                         type="button"
                         className="px-8 py-4 bg-gray-300 text-gray-700 rounded-full text-2xl"
                         onClick={onClose}
+                        aria-label={t('ChangePasswordModal.cancel') || 'Cancel'}
                     >
                         {t('ChangePasswordModal.cancel') || 'Cancel'}
                     </button>
@@ -121,6 +122,11 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                         type="submit"
                         className={`px-8 py-4 bg-green-500 text-white rounded-full text-2xl font-semibold ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={isSubmitting}
+                        aria-label={
+                            isSubmitting
+                                ? t('ChangePasswordModal.updating') || 'Updating...'
+                                : t('ChangePasswordModal.update') || 'Update'
+                        }
                     >
                         {isSubmitting
                             ? t('ChangePasswordModal.updating') || 'Updating...'

@@ -1,8 +1,7 @@
-from __future__ import annotations
-
 import logging
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable
+from typing import Any
 
 from flask import abort
 from flask_jwt_extended import get_jwt, verify_jwt_in_request
@@ -18,7 +17,7 @@ def validate_user_by_credentials(user: Any, password: str) -> bool:
             return False
         return check_password_hash(password_hash, password)
     except Exception as e:
-        logging.exception(f"{e}")
+        logging.exception("%s", e)
         return False
 
 
