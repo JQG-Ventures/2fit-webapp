@@ -1,4 +1,4 @@
-import type { RegisterData, RegisterDraft } from '../_types/register';
+import type { RegisterData, RegisterDraft } from '@/app/_types/register';
 
 export function createInitialRegisterData(): RegisterData {
     return {

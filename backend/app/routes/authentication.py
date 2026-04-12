@@ -41,6 +41,38 @@ def _birthdate_str_to_date(value: str) -> date:
     return date.fromisoformat(s)
 
 
+@api.route("/check-email")
+class CheckEmailAvailabilityResource(Resource):
+    def post(self) -> ResponseTuple:
+        payload = request.get_json(silent=True) or {}
+        email = payload.get("email", "").strip().lower()
+        if not email:
+            return {"status": "error", "message": "Email is required"}, 400
+        try:
+            repo = UserRepository()
+            user = repo.get_by_email(email)
+            return {"status": "success", "available": user is None}, 200
+        except Exception as e:
+            logger.exception("Error checking email availability: %s", e)
+            return {"status": "error", "message": "Internal server error"}, 500
+
+
+@api.route("/check-phone")
+class CheckPhoneAvailabilityResource(Resource):
+    def post(self) -> ResponseTuple:
+        payload = request.get_json(silent=True) or {}
+        number = payload.get("number", "").strip()
+        if not number:
+            return {"status": "error", "message": "Phone number is required"}, 400
+        try:
+            repo = UserRepository()
+            user = repo.get_by_number(number)
+            return {"status": "success", "available": user is None}, 200
+        except Exception as e:
+            logger.exception("Error checking phone availability: %s", e)
+            return {"status": "error", "message": "Internal server error"}, 500
+
+
 @api.route("/register")
 class RegisterResource(Resource):
     def post(self) -> ResponseTuple:
@@ -282,26 +314,23 @@ class PlayerIDResource(Resource):
             except (ValueError, AttributeError):
                 return {"status": "error", "message": "Invalid user identity"}, 401
 
-            from sqlalchemy import select
+            from sqlalchemy.dialects.postgresql import insert
 
-            existing = db.session.scalars(
-                select(NotificationDevice).where(
-                    NotificationDevice.user_id == user_uuid,
-                    NotificationDevice.player_id == schema.player_id,
-                )
-            ).first()
-
-            if existing:
-                existing.last_used = datetime.now(UTC)
-            else:
-                device = NotificationDevice(
+            now = datetime.now(UTC)
+            stmt = (
+                insert(NotificationDevice)
+                .values(
                     user_id=user_uuid,
                     player_id=schema.player_id,
                     platform=schema.platform,
-                    last_used=datetime.now(UTC),
+                    last_used=now,
                 )
-                db.session.add(device)
-
+                .on_conflict_do_update(
+                    constraint="uq_notification_device_user_player",
+                    set_={"last_used": now, "platform": schema.platform},
+                )
+            )
+            db.session.execute(stmt)
             db.session.commit()
             return {"status": "success", "message": "Player ID saved"}, 200
         except ValidationError as ve:

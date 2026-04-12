@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import './Conversation.css';
+import '@/app/_components/chat/Conversation.css';
 import { FaArrowDown } from 'react-icons/fa';
 import type { ChatMessage } from '@/app/_types/chat';
 import { useTranslation } from 'react-i18next';

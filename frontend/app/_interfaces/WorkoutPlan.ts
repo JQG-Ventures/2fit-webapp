@@ -17,8 +17,8 @@ interface WorkoutPlan {
     name: string;
     description: string;
     plan_type: 'library' | 'paid' | 'personalized' | 'challenge';
-    duration_weeks: number;
-    price: number;
+    duration_weeks: number | null;
+    price: number | null;
     image_url: string;
     video_url: string;
     workout_schedule: WorkoutDay[];

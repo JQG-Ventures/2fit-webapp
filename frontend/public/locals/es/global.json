@@ -125,7 +125,11 @@
         "home": "Inicio",
         "workouts": "Ejercicio",
         "bot": "Bot",
-        "profile": "Perfil"
+        "profile": "Perfil",
+        "startTypingSrc": "Empieza a escribir para buscar",
+        "close": "Cerrar",
+        "searchText": "Buscar entrenamientos...",
+        "loading": "Cargando..."
     },
     "settings": {
         "title": "Configuración",
@@ -275,6 +279,7 @@
         },
         "motivation": {
             "main": "¡Sigue con el excelente trabajo!",
+            "headlineGuest": "Ponte en forma con 2Fit AI",
             "base": "Alcanza tus objetivos de fitness con un entrenador personal de IA diseñado especialmente para ti.",
             "phrases": [
                 "¡Mantente constante y los resultados llegarán!",
@@ -289,12 +294,59 @@
         "greeting": {
             "morning": "Buenos Días",
             "afternoon": "Buenas Tardes",
-            "evening": "Buenas Noches"
+            "evening": "Buenas Noches",
+            "guestName": "Invitado",
+            "iconSunAria": "Mañana",
+            "iconAfternoonAria": "Tarde",
+            "iconEveningAria": "Noche"
         },
         "trainer": {
             "talk": "Habla con tu entrenador",
             "letschat": "¡Charlemos!",
             "getyourplan": "Obtén tu plan!"
+        },
+        "workoutHero": {
+            "noPlanTitle": "¿Listo para empezar?",
+            "noPlanDescription": "Crea tu plan de entrenamiento personalizado con inteligencia artificial.",
+            "noPlanCTA": "Generar mi plan con AI",
+            "workoutOfTheDay": "Workout del día",
+            "defaultDifficulty": "Intermedio",
+            "defaultDescription": "Continúa tu progreso",
+            "planProgress": "Progreso del plan",
+            "continueCTA": "Continuar sesión"
+        },
+        "discovery": {
+            "exploreTitle": "Explora ejercicios",
+            "trainingLevelsTitle": "Niveles de entrenamiento",
+            "viewAll": "Ver todo",
+            "filterAll": "Todos",
+            "filterBeginner": "Principiante",
+            "filterIntermediate": "Intermedio",
+            "filterAdvanced": "Avanzado",
+            "levelBeginner": "Principiante",
+            "levelIntermediate": "Intermedio",
+            "levelAdvanced": "Avanzado",
+            "metaLine": "{{minutes}} min · {{level}}",
+            "metaMinutes": "{{minutes}} min",
+            "metaDaysExercises": "{{days}} días · {{exercises}} ejercicios",
+            "emptyExplore": "Aún no hay contenido para mostrar. ¡Vuelve pronto!",
+            "emptyTraining": "No hay entrenamientos para este filtro."
+        },
+        "topBar": {
+            "notifications": "Notificaciones",
+            "brand": "2FIT.AI"
+        },
+        "footer": {
+            "copyright": "© {{year}} 2Fit AI. Todos los derechos reservados.",
+            "poweredBy": "Desarrollado por JQG-Ventures S.A"
+        },
+        "stats": {
+            "sectionAria": "Resumen de tu actividad",
+            "loadingAria": "Cargando resumen de actividad",
+            "streakLabel": "días racha",
+            "streakEmpty": "¡Empieza hoy!",
+            "weekLabel": "esta semana",
+            "totalLabel": "total"
         }
     },
     "workouts": {
@@ -467,5 +519,29 @@
         "refreshExercise": "Ver otro ejercicio",
         "verificationCodeDigit": "Dígito {{n}} del código de verificación (de 4)",
         "selectProfilePhoto": "Seleccionar foto de perfil"
+    },
+    "muscles": {
+        "codes": {
+            "upper_chest": "Pecho superior",
+            "lower_chest": "Pecho inferior",
+            "upper_back": "Parte alta de la espalda",
+            "lats": "Dorsales",
+            "mid_back": "Espalda media",
+            "lower_back": "Zona lumbar",
+            "deltoid_anterior": "Deltoides frontal",
+            "deltoid_lateral": "Deltoides lateral",
+            "deltoid_posterior": "Deltoides posterior",
+            "biceps": "Bíceps",
+            "triceps": "Tríceps",
+            "forearms": "Antebrazos",
+            "quadriceps": "Cuádriceps",
+            "hamstrings": "Isquiotibiales",
+            "glutes": "Glúteos",
+            "adductors": "Aductores (cara interna del muslo)",
+            "calves": "Gemelos",
+            "shins": "Tibia / parte frontal de la pierna",
+            "abs": "Abdomen",
+            "obliques": "Oblícuos"
+        }
     }
 }

@@ -1,8 +1,26 @@
 'use client';
 
 import axios, { AxiosHeaders, type AxiosError, type InternalAxiosRequestConfig } from 'axios';
-import type { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
+import { tokenStore } from '@/app/utils/tokenStore';
+
+/** Single in-flight refresh so parallel 401s share one GET /api/auth/session. */
+let sessionRefreshPromise: Promise<string | null> | null = null;
+
+async function refreshSessionAndToken(): Promise<string | null> {
+    if (!sessionRefreshPromise) {
+        sessionRefreshPromise = (async () => {
+            // Runs NextAuth jwt callback (Flask refresh if access token expired).
+            const session = await getSession({ broadcast: false });
+            const token = session?.user?.token ?? null;
+            tokenStore.set(token);
+            return token;
+        })().finally(() => {
+            sessionRefreshPromise = null;
+        });
+    }
+    return sessionRefreshPromise;
+}
 
 const axiosInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -20,15 +38,14 @@ function setAuthorizationHeader(config: InternalAxiosRequestConfig, token: strin
 
 axiosInstance.interceptors.request.use(
     async (config) => {
-        const session = (await getSession()) as Session | null;
-        const token = session?.user?.token;
-
+        await tokenStore.waitUntilReady();
+        const token = tokenStore.get();
         if (token) {
             setAuthorizationHeader(config, token);
         }
         return config;
     },
-    async (error: AxiosError) => Promise.reject(error),
+    (error: AxiosError) => Promise.reject(error),
 );
 
 axiosInstance.interceptors.response.use(
@@ -43,19 +60,18 @@ axiosInstance.interceptors.response.use(
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
-            await getSession();
-            const session = (await getSession()) as Session | null;
-            const token = session?.user?.token;
+            const newToken = await refreshSessionAndToken();
 
-            if (!token) {
+            if (!newToken) {
                 const excludedRoutes = ['/login', '/re-auth', '/register', '/login/google'];
 
                 if (typeof window !== 'undefined') {
-                    if (
-                        window.location.pathname !== '/' &&
-                        !excludedRoutes.some((route) => window.location.pathname === route) &&
-                        !window.location.pathname.startsWith('/register/')
-                    ) {
+                    const isExcluded =
+                        window.location.pathname === '/' ||
+                        excludedRoutes.some((route) => window.location.pathname === route) ||
+                        window.location.pathname.startsWith('/register/');
+
+                    if (!isExcluded) {
                         window.location.href = '/re-auth';
                     }
                 }
@@ -63,9 +79,10 @@ axiosInstance.interceptors.response.use(
                 return new Promise<never>(() => undefined);
             }
 
-            setAuthorizationHeader(originalRequest, token);
+            setAuthorizationHeader(originalRequest, newToken);
             return axiosInstance(originalRequest);
         }
+
         return Promise.reject(error);
     },
 );

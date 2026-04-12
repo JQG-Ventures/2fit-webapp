@@ -3,7 +3,7 @@
 import { FaTimes, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import BottomSheet from '../modals/ExpandableBottomSheet';
+import BottomSheet from '@/app/_components/modals/ExpandableBottomSheet';
 
 interface ExerciseViewProp {
     exercise: ExerciseView;

@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect, useCallback, useState, useMemo } from 'react';
-import ExerciseView from './ExerciseView';
-import RestView from './RestView';
-import CompleteView from './CompleteView';
+import ExerciseView from '@/app/_components/workouts/ExerciseView';
+import RestView from '@/app/_components/workouts/RestView';
+import CompleteView from '@/app/_components/workouts/CompleteView';
 import { useTranslation } from 'react-i18next';
 import {
     useSendProgressToBackend,
@@ -15,7 +15,7 @@ import type {
     State,
     ExerciseProgress,
 } from '@/app/_interfaces/ExerciseFlow';
-import ConfirmationModal from '../modals/confirmationModal';
+import ConfirmationModal from '@/app/_components/modals/confirmationModal';
 
 const initialState: State = {
     currentExerciseIndex: 0,
@@ -337,12 +337,34 @@ const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
             }
 
             if (workoutType === 'myPlan') {
-                dispatch({ type: 'SET_COMPLETE_MESSAGE', message: t('ExerciseFlow.completed') });
-                const timer = setTimeout(() => {
-                    dispatch({ type: 'SET_COMPLETE_MESSAGE', message: null });
-                    onClose();
-                }, 2500);
-                return () => clearTimeout(timer);
+                const dayOfWeek = new Date()
+                    .toLocaleDateString('en-US', { weekday: 'long' })
+                    .toLowerCase();
+                const payload = {
+                    workout_id: workoutPlanId,
+                    duration_seconds: totalDuration,
+                    calories_burned: 0,
+                    exercises: exercisesProgress,
+                    day_of_week: dayOfWeek,
+                    was_skipped: false,
+                };
+                completeWorkout(
+                    { body: payload },
+                    {
+                        onSuccess: () => {
+                            dispatch({
+                                type: 'SET_COMPLETE_MESSAGE',
+                                message: t('ExerciseFlow.completed'),
+                            });
+                            setTimeout(() => {
+                                dispatch({ type: 'SET_COMPLETE_MESSAGE', message: null });
+                                onClose();
+                            }, 2500);
+                        },
+                        onError: (error) =>
+                            console.error('Error guardando sesión completada (myPlan):', error),
+                    },
+                );
             }
         }
     }, [

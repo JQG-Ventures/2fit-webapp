@@ -1,4 +1,4 @@
-type RawChallenge = {
+export type RawChallenge = {
     _id: string;
     name: string;
     description: string;
@@ -17,7 +17,7 @@ type RawChallenge = {
     equipment: string[];
 };
 
-type FormattedChallenge = {
+export type FormattedChallenge = {
     title: string;
     description: string;
     days: number;
@@ -33,35 +33,33 @@ type FormattedChallenge = {
     }[];
 };
 
-interface ChallengeProgress {
-    challenge_id?: string;
+export interface ChallengeProgressDayExercise {
+    exercise_id: string;
+    name: string;
+    sets: number;
+    reps: number;
+    rest_seconds: number;
+    image_url: string;
+    is_completed: boolean;
+}
+
+export interface ChallengeProgressDay {
+    sequence_day: number;
+    date: string;
+    is_completed: boolean;
+    status: 'completed' | 'failed' | 'in_progress' | 'pending';
+    exercises: ChallengeProgressDayExercise[];
+}
+
+export interface ChallengeProgress {
+    challenge_id: string;
     name: string;
     total_days: number;
     progress: number;
-    days?: Array<{
-        sequence_day: number;
-        date: string;
-        is_completed: boolean;
-        status: 'completed' | 'failed' | 'in_progress' | 'pending';
-        exercises: Array<{
-            exercise_id: string;
-            name: string;
-            sets: number;
-            reps: number;
-            rest_seconds: number;
-            image_url: string;
-            is_completed: boolean;
-        }>;
-    }>;
+    days: ChallengeProgressDay[];
 }
 
-type ChallengeDay = {
-    sequence_day: number;
-    is_completed: boolean;
-    status: 'completed' | 'failed' | 'in_progress' | 'pending';
-};
-
-type PlanWithProgress = {
+export type PlanWithProgress = {
     id: string;
     plan_type: 'challenge';
     name: string;

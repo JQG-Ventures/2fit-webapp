@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { IoChevronBack } from 'react-icons/io5';
 import { useTranslation } from 'react-i18next';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
-import BottomSheet from '../modals/ExpandableBottomSheet';
+import BottomSheet from '@/app/_components/modals/ExpandableBottomSheet';
 
 interface RestViewProp {
     restDuration: number;

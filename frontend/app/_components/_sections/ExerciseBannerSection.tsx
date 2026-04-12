@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { AiFillHeart, AiOutlineReload } from 'react-icons/ai';
-import SavedMessage from '../others/SavedMessage';
+import SavedMessage from '@/app/_components/others/SavedMessage';
 import { useTranslation } from 'react-i18next';
 import { useSaveWorkout } from '@/app/_services/userService';
 import { FaSpinner } from 'react-icons/fa';

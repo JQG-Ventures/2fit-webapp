@@ -4,6 +4,8 @@ export const API_ROUTES = {
         refreshToken: '/api/auth/refresh-token',
         googleLogin: '/api/auth/google-login',
         notificationsPlayerId: '/api/auth/notifications/player-id',
+        checkEmail: '/api/auth/check-email',
+        checkPhone: '/api/auth/check-phone',
     },
     users: {
         profile: '/api/users/profile',
@@ -25,6 +27,8 @@ export const API_ROUTES = {
         saved: '/api/workouts/saved',
         popular: '/api/workouts/popular',
         library: '/api/workouts/library',
+        homeExplore: '/api/workouts/home/explore',
+        homeByLevel: '/api/workouts/home/by-level',
         plans: '/api/workouts/plans',
         oneDay: '/api/workouts/plans/one-day',
         weeklyProgress: '/api/workouts/weekly-progress',
@@ -36,7 +40,12 @@ export const API_ROUTES = {
         list: '/api/challenges/challenges',
         byId: (id: string) => `/api/challenges/challenges/${id}`,
         progress: '/api/challenges/challenges/progress',
+        progressBatch: '/api/challenges/challenges/progress/batch',
         complete: '/api/challenges/challenges/complete',
     },
     chat: '/api/chat',
+    exercises: {
+        list: '/api/exercises/exercises',
+        muscleTaxonomy: '/api/exercises/muscles/taxonomy',
+    },
 } as const;

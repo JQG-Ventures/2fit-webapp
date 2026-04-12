@@ -13,15 +13,15 @@ interface WorkoutLibrarySectionProps {
 }
 
 const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout }) => {
-    const workoutCount = workout.workout_schedule.reduce(
-        (totalExercises, day) => totalExercises + day.exercises.length,
+    const workoutCount = (workout.workout_schedule ?? []).reduce(
+        (totalExercises, day) => totalExercises + (day.exercises?.length ?? 0),
         0,
     );
 
     return (
         <div className="relative bg-white p-6 rounded-xl shadow-md mb-6 lg:mb-0 lg:w-full overflow-hidden transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl active:scale-95 z-10 min-h-[280px]">
             <Image
-                src={workout.image_url}
+                src={workout.image_url || '/images/placeholder.jpg'}
                 alt=""
                 fill
                 className="object-cover"

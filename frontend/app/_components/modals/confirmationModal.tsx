@@ -1,7 +1,7 @@
 'use client';
 
 import type { FC } from 'react';
-import CustomModal from './CustomModal';
+import CustomModal from '@/app/_components/modals/CustomModal';
 
 interface ConfirmationModalProps {
     isOpen: boolean;

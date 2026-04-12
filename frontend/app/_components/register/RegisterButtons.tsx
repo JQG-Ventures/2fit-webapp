@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import ButtonWithSpinner from '../../_components/others/ButtonWithSpinner';
+import ButtonWithSpinner from '@/app/_components/others/ButtonWithSpinner';
 
 export default function RegistrationButtons({
     handleNext,

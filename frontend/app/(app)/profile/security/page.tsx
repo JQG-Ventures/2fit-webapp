@@ -1,0 +1,230 @@
+'use client';
+
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import ToggleButton from '@/app/_components/profile/ToggleButton';
+import { useRouter } from 'next/navigation';
+import { FaArrowLeft } from 'react-icons/fa';
+import { MdKeyboardArrowRight } from 'react-icons/md';
+import { useApiGet } from '@/app/utils/apiClient';
+import { useTranslation } from 'react-i18next';
+import ChangePasswordModal from '@/app/_components/profile/ChangePasswordModal';
+import Modal from '@/app/_components/profile/modal';
+import LoadingScreen from '@/app/_components/animations/LoadingScreen';
+import { useResetPassword, useUpdateProfile } from '@/app/_services/userService';
+import type { ApiResponse } from '@/app/_types/api';
+import type { AppUserProfile } from '@/app/_types/profile';
+
+interface SecurityItemProps {
+    label: string;
+    hasArrow?: boolean;
+    isOn?: boolean;
+    onToggle?: () => void;
+    toggleAriaLabel?: string;
+}
+
+const SecurityItem: React.FC<SecurityItemProps> = ({
+    label,
+    hasArrow = false,
+    isOn,
+    onToggle,
+    toggleAriaLabel,
+}) => (
+    <div className="flex items-center justify-between w-full py-5">
+        <div className="flex items-center space-x-4">
+            <span className="text-3xl">{label}</span>
+        </div>
+        {hasArrow ? (
+            <MdKeyboardArrowRight className="text-gray-500 w-12 h-12" aria-hidden />
+        ) : (
+            <ToggleButton isOn={isOn!} onToggle={onToggle!} ariaLabel={toggleAriaLabel ?? label} />
+        )}
+    </div>
+);
+
+const Security: React.FC = () => {
+    const router = useRouter();
+    const { t } = useTranslation('global');
+
+    const resetPassword = useResetPassword();
+
+    const getProfileUrl = '/api/users/profile';
+    const {
+        data: userData,
+        isLoading,
+        isError,
+    } = useApiGet<ApiResponse<AppUserProfile>>([], getProfileUrl);
+
+    const updateSecuritySettings = useUpdateProfile();
+
+    const [securitySettings, setSecuritySettings] = useState({
+        face_id: false,
+        remember_me: false,
+        touch_id: false,
+    });
+
+    const [errorMessage, setErrorMessage] = useState<React.ReactNode | null>(null);
+    const [successMessage, setSuccessMessage] = useState<React.ReactNode | null>(null);
+    const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+    const [passwordUpdateError, setPasswordUpdateError] = useState('');
+
+    const securityItems = useMemo(
+        () => [
+            { label: t('profile.Security.FaceID'), key: 'face_id' },
+            { label: t('profile.Security.RememberMe'), key: 'remember_me' },
+            { label: t('profile.Security.TouchID'), key: 'touch_id' },
+            { label: t('profile.Security.GoogleAuthenticator'), hasArrow: true },
+        ],
+        [t],
+    );
+
+    useEffect(() => {
+        const storedSecuritySettings =
+            userData?.message.settings?.security_settings ??
+            userData?.message.settings?.notifications ??
+            {};
+
+        setSecuritySettings({
+            face_id: storedSecuritySettings.face_id ?? false,
+            remember_me: storedSecuritySettings.remember_me ?? false,
+            touch_id: storedSecuritySettings.touch_id ?? false,
+        });
+    }, [userData]);
+
+    const handleToggle = useCallback(
+        async (type: keyof typeof securitySettings) => {
+            const previousState = securitySettings[type];
+            const newStatus = !previousState;
+            const updatedSecuritySettings = { ...securitySettings, [type]: newStatus };
+
+            setSecuritySettings(updatedSecuritySettings);
+
+            try {
+                const updatedProfile = {
+                    settings: {
+                        security_settings: {
+                            ...updatedSecuritySettings,
+                        },
+                        notifications: userData?.message.settings?.notifications ?? {},
+                        nutrition_enabled: userData?.message.settings?.nutrition_enabled ?? false,
+                        language_preference:
+                            userData?.message.settings?.language_preference ?? 'es',
+                    },
+                };
+
+                await updateSecuritySettings.mutateAsync(updatedProfile);
+            } catch (error) {
+                console.error(error);
+                setSecuritySettings({ ...securitySettings, [type]: previousState });
+                setErrorMessage(t('profile.Notifications.ErrorMessage'));
+            }
+        },
+        [securitySettings, userData, updateSecuritySettings, t],
+    );
+
+    const handlePasswordChangeSubmit = async (newPassword: string) => {
+        try {
+            const email = userData?.message.email;
+
+            if (!email) {
+                throw new Error('User data is incomplete');
+            }
+            const response = await resetPassword.mutateAsync({
+                email,
+                password: newPassword,
+            });
+
+            setSuccessMessage(response.message);
+            setIsChangePasswordModalOpen(false);
+        } catch (error) {
+            console.error(error);
+            setPasswordUpdateError(t('profile.Security.Failedchangepswd'));
+        }
+    };
+
+    if (isLoading) return <LoadingScreen />;
+    if (isError) {
+        return (
+            <Modal
+                title="Error"
+                message={t('profile.errorFetching')}
+                onClose={() => router.push('/home')}
+            />
+        );
+    }
+
+    return (
+        <div className="flex flex-col justify-between items-center bg-white h-screen p-14 lg:pt-[10vh]">
+            {errorMessage && (
+                <Modal
+                    title={''}
+                    message={t('profile.Security.Failedchangepswd')}
+                    onClose={() => setErrorMessage(null)}
+                />
+            )}
+            {successMessage && (
+                <Modal
+                    title={''}
+                    message={t('profile.Security.Successfullchangepswd')}
+                    onClose={() => setSuccessMessage(null)}
+                />
+            )}
+
+            <div className="h-[12%] flex flex-row justify-left space-x-8 items-center w-full lg:max-w-3xl">
+                <button
+                    type="button"
+                    onClick={() => router.back()}
+                    className="text-gray-700"
+                    aria-label={t('a11y.goBack')}
+                >
+                    <FaArrowLeft className="w-8 h-8" />
+                </button>
+                <h1 className="text-5xl font-semibold">{t('profile.Security.Title')}</h1>
+            </div>
+
+            <div className="h-[78%] flex flex-col justify-start py-6 w-full max-w-3xl space-y-8 overflow-y-auto">
+                {securityItems.map((item, index) => (
+                    <SecurityItem
+                        key={index}
+                        label={item.label}
+                        hasArrow={item.hasArrow}
+                        toggleAriaLabel={t('a11y.toggleSetting', { label: item.label })}
+                        isOn={
+                            item.hasArrow
+                                ? undefined
+                                : securitySettings[item.key as keyof typeof securitySettings]
+                        }
+                        onToggle={
+                            item.hasArrow
+                                ? undefined
+                                : () => handleToggle(item.key as keyof typeof securitySettings)
+                        }
+                    />
+                ))}
+            </div>
+
+            <div className="h-[10%] flex flex-col w-full max-w-xl">
+                <button
+                    type="button"
+                    className="w-full bg-gradient-to-r from-green-400 to-green-700 text-white p-4 py-8 rounded-full text-2xl font-semibold shadow-lg flex items-center justify-center"
+                    onClick={() => setIsChangePasswordModalOpen(true)}
+                    aria-label={t('profile.Security.ChangePassword')}
+                >
+                    {t('profile.Security.ChangePassword')}
+                </button>
+            </div>
+
+            {isChangePasswordModalOpen && (
+                <ChangePasswordModal
+                    onClose={() => {
+                        setIsChangePasswordModalOpen(false);
+                        setPasswordUpdateError('');
+                    }}
+                    onSubmit={handlePasswordChangeSubmit}
+                    errorMessage={passwordUpdateError}
+                />
+            )}
+        </div>
+    );
+};
+
+export default Security;

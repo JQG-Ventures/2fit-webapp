@@ -8,11 +8,34 @@ from pydantic import ValidationError
 
 from app.extensions import db
 from app.repositories.exercise_repository import ExerciseRepository
+from app.repositories.muscle_repository import (
+    ensure_muscles_seeded,
+    list_muscles_ordered,
+    muscle_to_dict,
+)
 from app.schemas.exercise import ExerciseCreate, ExerciseResponse
+from app.schemas.muscle import MuscleTaxonomyItem
 
 exercises_bp = Blueprint("exercises_bp", __name__)
 api = Api(exercises_bp, doc="/docs")
 ResponseTuple = tuple[dict[str, object], int]
+
+
+@api.route("/exercises/muscles/taxonomy")
+class MuscleTaxonomyResource(Resource):
+    method_decorators = [jwt_required()]
+
+    def get(self) -> ResponseTuple:
+        try:
+            ensure_muscles_seeded()
+            muscles = list_muscles_ordered()
+            result = [
+                MuscleTaxonomyItem(**muscle_to_dict(m)).model_dump(by_alias=True) for m in muscles
+            ]
+            return {"status": "success", "message": result}, 200
+        except Exception as e:
+            logging.exception(str(e))
+            return {"status": "error", "message": str(e)}, 500
 
 
 @api.route("/exercises")

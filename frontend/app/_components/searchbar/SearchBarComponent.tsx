@@ -43,10 +43,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
 
     const { data: exercisesData, isLoading: loadingExercises } = useApiGet<
         ApiResponse<SearchableExercise[]>
-    >(['exercises'], getExercisesUrl);
+    >(['exercises'], getExercisesUrl, { enabled: isSearchOpen || isFullScreen });
     const { data: plansData, isLoading: loadingPlans } = useApiGet<ApiResponse<SearchablePlan[]>>(
         ['plans'],
         getPlansUrl,
+        { enabled: isSearchOpen || isFullScreen },
     );
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
@@ -213,7 +214,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                                                         <span className="font-semibold">
                                                             {result.name}
                                                         </span>
-                                                        <div className="text-sm text-gray-500">
+                                                        <div className="text-sm text-gray-600">
                                                             {result.typeLabel}
                                                         </div>
                                                     </div>
@@ -243,7 +244,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                     type="button"
                     onClick={() => setIsFullScreen(true)}
                     aria-label={t('a11y.search')}
-                    className="transform -translate-y-1/2 text-gray-500 focus:outline-none"
+                    className="text-gray-600 focus:outline-none"
                 >
                     <FaSearch size={20} />
                 </button>
@@ -267,7 +268,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                                 <FaSpinner className="text-emerald-500 text-5xl animate-spin" />
                             </div>
                         ) : filteredResults.length === 0 ? (
-                            <p className="p-4 text-gray-500">{t('Navbar.startTypingSrc')}</p>
+                            <p className="p-4 text-gray-600">{t('Navbar.startTypingSrc')}</p>
                         ) : (
                             <div className="w-full rounded-lg p-4">
                                 {filteredResults.slice(0, visibleCount).map((result, index) => (
@@ -294,7 +295,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isDesktop = false }) => {
                                                             <span className="font-semibold">
                                                                 {result.name}
                                                             </span>
-                                                            <div className="text-sm text-gray-500">
+                                                            <div className="text-sm text-gray-600">
                                                                 {result.typeLabel}
                                                             </div>
                                                         </div>

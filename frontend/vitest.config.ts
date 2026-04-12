@@ -19,9 +19,16 @@ export default defineConfig({
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json', 'html', 'lcov'],
-            include: ['app/**/*.{ts,tsx}', 'actions/**/*.{ts,tsx}'],
+            include: [
+                'app/(app)/home/**/*.ts',
+                'app/(app)/home/**/*.tsx',
+                'app/_components/_sections/WorkoutHeroCard.tsx',
+                'app/_components/_sections/HomeStatsRow.tsx',
+                'app/_components/workouts/challenges/ChallengeProgressWidget.tsx',
+            ],
             exclude: [
                 'app/**/*.{test,spec}.{ts,tsx}',
+                'app/(app)/home/page.tsx',
                 'app/**/layout.tsx',
                 'app/**/loading.tsx',
                 'app/**/error.tsx',
@@ -30,13 +37,12 @@ export default defineConfig({
                 '.next/**',
                 'coverage/**',
             ],
-            // Uncomment when tests are written to enforce the 90% threshold:
-            // thresholds: {
-            //     lines: 90,
-            //     functions: 90,
-            //     branches: 90,
-            //     statements: 90,
-            // },
+            thresholds: {
+                lines: 90,
+                functions: 90,
+                statements: 90,
+                branches: 88,
+            },
         },
     },
 });

@@ -4,7 +4,18 @@ import nextI18NextConfig from './next-i18next.config.js';
 const nextConfig = {
     i18n: nextI18NextConfig.i18n,
     images: {
-        domains: ['2fitcontentstorage.blob.core.windows.net'],
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: '2fitcontentstorage.blob.core.windows.net',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'picsum.photos',
+                pathname: '/**',
+            },
+        ],
     },
     output: 'standalone',
     reactStrictMode: true,

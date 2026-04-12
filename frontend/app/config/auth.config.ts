@@ -3,7 +3,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import type { User } from '@auth/core/types';
 import type { JWT } from 'next-auth/jwt';
 import type { AppProviders } from '@auth/core/providers';
-import { loginWithCredentials, refreshServerAccessToken } from '../_services/authServerService';
+import { loginWithCredentials, refreshServerAccessToken } from '@/app/_services/authServerService';
 
 interface AuthProviderUser extends User {
     accessToken: string;
@@ -66,7 +66,6 @@ interface SessionCallbackParams {
             authProvider?: string | null;
         };
         googleIdToken?: string | null;
-        refreshToken?: string | null;
         accessTokenExpires?: number | null;
     };
     token: JWT;
@@ -119,8 +118,8 @@ const sessionCallback = async ({
         authProvider: token.authProvider ?? null,
     };
 
-    session.googleIdToken = token.googleIdToken ?? null;
-    session.refreshToken = token.refreshToken ?? null;
+    // refreshToken stays server-only inside the NextAuth JWT cookie — never exposed to the client.
+    // accessTokenExpires is kept for the client to know when the session is near expiry (UI purposes).
     session.accessTokenExpires = token.accessTokenExpires ?? null;
 
     return session;

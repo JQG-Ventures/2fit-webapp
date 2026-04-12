@@ -1,8 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Boolean, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import BaseModel
+
+if TYPE_CHECKING:
+    from app.models.muscle import ExerciseMuscle
 
 
 class Exercise(BaseModel):
@@ -19,3 +26,9 @@ class Exercise(BaseModel):
     instructions: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=[])
     contradictions: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=[])
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
+
+    muscle_links: Mapped[list[ExerciseMuscle]] = relationship(
+        "ExerciseMuscle",
+        back_populates="exercise",
+        cascade="all, delete-orphan",
+    )

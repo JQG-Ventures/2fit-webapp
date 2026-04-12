@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import styles from './NavBar.module.css';
+import styles from '@/app/_components/navbar/NavBar.module.css';
 
 type NavItem = {
     href: string;

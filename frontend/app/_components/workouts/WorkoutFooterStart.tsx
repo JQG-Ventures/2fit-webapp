@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
-import ButtonWithSpinner from '../others/ButtonWithSpinner';
+import ButtonWithSpinner from '@/app/_components/others/ButtonWithSpinner';
 
 interface WorkoutFooterProps {
     onStartClick: () => void;

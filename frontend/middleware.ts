@@ -6,27 +6,16 @@ export async function middleware(req: NextRequest) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const { pathname } = req.nextUrl;
 
-    const publicRoutes = [
-        '/login',
-        '/register',
-        '/re-auth',
-        '/options/forgotpassword/step0',
-        '/options/forgotpassword/step1',
-        '/options/forgotpassword/step2',
-        '/options/forgotpassword/step3',
-    ];
-    const isRootRoute = pathname === '/';
-    const isPublicRoute = isRootRoute || publicRoutes.some((route) => pathname.startsWith(route));
-    const isNotAuthenticated = Boolean(!token?.accessToken);
+    const isAuthenticated = Boolean(token?.accessToken);
 
-    if (isNotAuthenticated) {
-        if (isPublicRoute) {
-            return NextResponse.next();
-        }
+    const publicPaths = ['/', '/login', '/register', '/re-auth', '/options/forgotpassword'];
+    const isPublic = publicPaths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+
+    if (!isAuthenticated && !isPublic) {
         return NextResponse.redirect(new URL('/', req.url));
     }
 
-    if (!isNotAuthenticated && isPublicRoute) {
+    if (isAuthenticated && isPublic) {
         return NextResponse.redirect(new URL('/home', req.url));
     }
 

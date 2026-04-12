@@ -160,6 +160,27 @@ class UserChallengeProgressResource(Resource):
             logging.exception("Error getting challenge progress: %s", e)
             return {"status": "error", "message": "Internal server error"}, 500
 
+
+@api.route("/challenges/progress/batch")
+class UserChallengeProgressBatchResource(Resource):
+    @jwt_required()
+    def get(self) -> ResponseTuple:
+        try:
+            user_id = get_jwt_identity()
+            challenge_ids = request.args.getlist("challenge_ids")
+            if not user_id:
+                return {"status": "error", "message": "Falta user_id"}, 400
+            if not challenge_ids:
+                return {"status": "success", "message": []}, 200
+
+            results = [
+                UserWorkoutService.get_challenge_progress(user_id, cid) for cid in challenge_ids
+            ]
+            return {"status": "success", "message": results}, 200
+        except Exception as e:
+            logging.exception("Error getting batch challenge progress: %s", e)
+            return {"status": "error", "message": "Internal server error"}, 500
+
     @jwt_required()
     def post(self) -> ResponseTuple:
         try:
