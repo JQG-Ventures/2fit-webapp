@@ -1,16 +1,7 @@
-import type { ApiResponse, ApiStatusResponse } from '../_types/api';
-import type { AuthApiTokenMessage, AuthTokenState } from '../_types/auth';
-import { parseJson } from '../utils/http';
-import { useApiDelete, useApiPost, useApiPut } from '../utils/apiClient';
-
-interface UserLookup {
-    _id?: string;
-    email?: string;
-    number?: string;
-    code_number?: string;
-    name?: string;
-    last?: string;
-}
+import type { ApiResponse, ApiStatusResponse } from '@/app/_types/api';
+import type { AuthApiTokenMessage, AuthTokenState } from '@/app/_types/auth';
+import { parseJson } from '@/app/utils/http';
+import { useApiDelete, useApiPost, useApiPut } from '@/app/utils/apiClient';
 
 interface ChatResponse {
     message: string;
@@ -30,60 +21,38 @@ interface ProfileUpdatePayload {
 
 type RefreshTokenResponse = ApiResponse<AuthApiTokenMessage>;
 
-export const fetchUserDataByNumber = async (number: string) => {
-    try {
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/by-number/${number}`,
-        );
-        if (!res.ok) {
-            if (res.status === 404) {
-                return null;
-            }
-            throw new Error('Error fetching user profile');
-        }
-        const data = await parseJson<ApiResponse<UserLookup>>(res);
-        return data.message;
-    } catch (error) {
-        console.error('Error fetching user profile:', error);
-        throw error;
-    }
+interface AvailabilityResponse {
+    status: string;
+    available: boolean;
+}
+
+export const isEmailAvailable = async (email: string): Promise<boolean> => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/check-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+    });
+    if (!res.ok) throw new Error('Error checking email availability');
+    const data = await parseJson<AvailabilityResponse>(res);
+    return data.available;
 };
 
-export const fetchUserDataByEmail = async (email: string) => {
-    try {
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/by-email/${email}`,
-        );
-        if (!res.ok) {
-            if (res.status === 404) {
-                return null;
-            }
-            throw new Error('Error fetching user profile');
-        }
-        const data = await parseJson<ApiResponse<UserLookup>>(res);
-        return data.message;
-    } catch (error) {
-        console.error('Error fetching user profile:', error);
-        throw error;
-    }
+export const isPhoneAvailable = async (number: string): Promise<boolean> => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/check-phone`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ number }),
+    });
+    if (!res.ok) throw new Error('Error checking phone availability');
+    const data = await parseJson<AvailabilityResponse>(res);
+    return data.available;
 };
 
-export async function checkUserInBackend(email: string) {
+export async function checkUserInBackend(email: string): Promise<boolean> {
     try {
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/by-email/${email}`,
-            {
-                method: 'GET',
-            },
-        );
-        if (!res.ok) {
-            return null;
-        }
-        const data = await parseJson<ApiResponse<UserLookup>>(res);
-        return data?.message;
-    } catch (error) {
-        console.error('Error checking user in backend:', error);
-        return null;
+        return !(await isEmailAvailable(email));
+    } catch {
+        return false;
     }
 }
 

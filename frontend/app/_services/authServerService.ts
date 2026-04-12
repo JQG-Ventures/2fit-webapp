@@ -1,7 +1,7 @@
-import type { ApiResponse } from '../_types/api';
-import type { AuthApiTokenMessage, AuthenticatedUser, AuthTokenState } from '../_types/auth';
+import type { ApiResponse } from '@/app/_types/api';
+import type { AuthApiTokenMessage, AuthenticatedUser, AuthTokenState } from '@/app/_types/auth';
 import type { JWT } from 'next-auth/jwt';
-import { parseJson } from '../utils/http';
+import { parseJson } from '@/app/utils/http';
 
 const apiBaseUrl = process.env.API_BASE_URL_INTERNAL || process.env.NEXT_PUBLIC_API_BASE_URL || '';
 

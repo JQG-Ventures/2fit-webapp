@@ -1,5 +1,5 @@
-import type { ApiResponse } from '../_types/api';
-import { parseJson } from '../utils/http';
+import type { ApiResponse } from '@/app/_types/api';
+import { parseJson } from '@/app/utils/http';
 
 export async function getSimilarExercises(
     exercise_id: string,

@@ -8,6 +8,7 @@ from flask_restx import Api, Resource
 from pydantic import ValidationError
 
 from app.extensions import db
+from app.repositories.home_discovery_repository import get_by_level_cards, get_explore_cards
 from app.repositories.progress_repository import SavedWorkoutRepository
 from app.repositories.workout_repository import WorkoutPlanRepository
 from app.schemas.workout import WorkoutPlanCreate, WorkoutPlanResponse
@@ -239,6 +240,45 @@ class UserWorkoutSavedResource(Resource):
             }, 400
         except Exception as e:
             db.session.rollback()
+            logging.exception(str(e))
+            return {"status": "error", "message": str(e)}, 500
+
+
+@api.route("/home/explore")
+class HomeExploreResource(Resource):
+    @jwt_required()
+    def get(self) -> tuple[dict[str, Any], int]:
+        try:
+            raw = request.args.get("limit", "6")
+            try:
+                limit = int(raw)
+            except ValueError:
+                limit = 6
+            limit = max(5, min(8, limit))
+            cards = get_explore_cards(limit)
+            return {"status": "success", "message": cards}, 200
+        except Exception as e:
+            logging.exception(str(e))
+            return {"status": "error", "message": str(e)}, 500
+
+
+@api.route("/home/by-level")
+class HomeByLevelResource(Resource):
+    @jwt_required()
+    def get(self) -> tuple[dict[str, Any], int]:
+        try:
+            level = request.args.get("level", "all")
+            if level not in ("all", "beginner", "intermediate", "advanced"):
+                return {"status": "error", "message": "Invalid level"}, 400
+            raw_limit = request.args.get("limit", "3")
+            try:
+                lim = int(raw_limit)
+            except ValueError:
+                lim = 3
+            lim = max(1, min(10, lim))
+            cards = get_by_level_cards(level, lim)  # type: ignore[arg-type]
+            return {"status": "success", "message": cards}, 200
+        except Exception as e:
             logging.exception(str(e))
             return {"status": "error", "message": str(e)}, 500
 

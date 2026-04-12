@@ -229,6 +229,7 @@
         },
         "motivation": {
             "main": "Keep up the great work!",
+            "headlineGuest": "Get Fit with 2Fit AI",
             "base": "Achieve your fitness goals with a personal AI trainer designed just for you.",
             "phrases": [
                 "Stay consistent and results will follow!",
@@ -243,12 +244,59 @@
         "greeting": {
             "morning": "Good Morning",
             "afternoon": "Good Afternoon",
-            "evening": "Good Night"
+            "evening": "Good Night",
+            "guestName": "Guest",
+            "iconSunAria": "Morning",
+            "iconAfternoonAria": "Afternoon",
+            "iconEveningAria": "Evening"
         },
         "trainer": {
             "talk": "Talk to your trainer",
             "letschat": "Let's Chat!",
             "getyourplan": "Get your plan"
+        },
+        "workoutHero": {
+            "noPlanTitle": "Ready to get started?",
+            "noPlanDescription": "Create your personalized training plan with artificial intelligence.",
+            "noPlanCTA": "Generate my plan with AI",
+            "workoutOfTheDay": "Workout of the day",
+            "defaultDifficulty": "Intermediate",
+            "defaultDescription": "Keep up your progress",
+            "planProgress": "Plan progress",
+            "continueCTA": "Continue session"
+        },
+        "discovery": {
+            "exploreTitle": "Explore workouts",
+            "trainingLevelsTitle": "Training levels",
+            "viewAll": "View all",
+            "filterAll": "All",
+            "filterBeginner": "Beginner",
+            "filterIntermediate": "Intermediate",
+            "filterAdvanced": "Advanced",
+            "levelBeginner": "Beginner",
+            "levelIntermediate": "Intermediate",
+            "levelAdvanced": "Advanced",
+            "metaLine": "{{minutes}} min · {{level}}",
+            "metaMinutes": "{{minutes}} min",
+            "metaDaysExercises": "{{days}} days · {{exercises}} exercises",
+            "emptyExplore": "No workouts to show yet. Check back soon!",
+            "emptyTraining": "No workouts for this filter."
+        },
+        "topBar": {
+            "notifications": "Notifications",
+            "brand": "2FIT.AI"
+        },
+        "footer": {
+            "copyright": "© {{year}} 2Fit AI. All rights reserved.",
+            "poweredBy": "Powered by JQG-Ventures S.A"
+        },
+        "stats": {
+            "sectionAria": "Your activity summary",
+            "loadingAria": "Loading activity summary",
+            "streakLabel": "day streak",
+            "streakEmpty": "Start today!",
+            "weekLabel": "this week",
+            "totalLabel": "total"
         }
     },
     "chat": {
@@ -477,5 +525,29 @@
         "refreshExercise": "Show another exercise",
         "verificationCodeDigit": "Verification code digit {{n}} of 4",
         "selectProfilePhoto": "Select profile photo"
+    },
+    "muscles": {
+        "codes": {
+            "upper_chest": "Upper chest",
+            "lower_chest": "Lower chest",
+            "upper_back": "Upper back",
+            "lats": "Lats",
+            "mid_back": "Mid back",
+            "lower_back": "Lower back",
+            "deltoid_anterior": "Front shoulder",
+            "deltoid_lateral": "Side shoulder",
+            "deltoid_posterior": "Rear shoulder",
+            "biceps": "Biceps",
+            "triceps": "Triceps",
+            "forearms": "Forearms",
+            "quadriceps": "Quadriceps",
+            "hamstrings": "Hamstrings",
+            "glutes": "Glutes",
+            "adductors": "Inner thigh",
+            "calves": "Calves",
+            "shins": "Shins",
+            "abs": "Abs",
+            "obliques": "Obliques"
+        }
     }
 }

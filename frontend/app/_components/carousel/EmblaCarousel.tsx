@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { EmblaCarouselType, EmblaEventType, EmblaOptionsType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-react';
-import { DotButton, useDotButton } from './EmblaCarouselDotButton';
+import { DotButton, useDotButton } from '@/app/_components/carousel/EmblaCarouselDotButton';
 import Image from 'next/image';
 
 const TWEEN_FACTOR_BASE = 0.2;

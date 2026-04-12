@@ -1,4 +1,4 @@
-import type { InputWithIconProps } from '../../_interfaces/props/InputWithIconProps';
+import type { InputWithIconProps } from '@/app/_interfaces/props/InputWithIconProps';
 import React from 'react';
 
 const InputWithIcon: React.FC<InputWithIconProps> = ({
@@ -10,16 +10,18 @@ const InputWithIcon: React.FC<InputWithIconProps> = ({
     error,
 }) => {
     return (
-        <div className="">
+        <div>
             <input
                 type={type}
                 name={name}
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
-                className="appearance-none py-6 text-2xl block w-full bg-gray-200 text-gray-700 rounded-lg py-4 px-4 mb-3 leading-tight focus:border focus:border-gray-300 focus:bg-white"
+                className={`w-full bg-gray-50 text-gray-900 placeholder-gray-400 border ${
+                    error ? 'border-red-400' : 'border-gray-200'
+                } rounded-xl py-[18px] px-5 text-[17px] focus:outline-none focus:border-black focus:bg-white transition`}
             />
-            {error ? <p className="text-red-500 text-base italic">{error}</p> : null}
+            {error && <p className="text-red-500 text-sm mt-1.5 pl-1">{error}</p>}
         </div>
     );
 };

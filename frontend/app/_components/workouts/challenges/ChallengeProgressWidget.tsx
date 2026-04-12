@@ -3,14 +3,35 @@
 import React from 'react';
 import { FaDumbbell } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import type { PlanWithProgress } from '@/app/_types/challenges';
 
 interface Props {
     progressData: PlanWithProgress[];
     onContinue: (planId: string, planType: string) => void;
+    isLoading?: boolean;
 }
 
-export const ChallengeProgressWidget: React.FC<Props> = ({ progressData, onContinue }) => {
+export const ChallengeProgressWidget: React.FC<Props> = ({
+    progressData,
+    onContinue,
+    isLoading = false,
+}) => {
     const { t } = useTranslation('global');
+
+    if (isLoading) {
+        return (
+            <div className="w-full overflow-hidden rounded-3xl shadow-xl bg-white flex flex-col p-6 space-y-4 animate-pulse">
+                <div className="h-8 w-48 bg-gray-200 rounded-lg" />
+                <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gray-200 rounded-full" />
+                    <div className="h-6 w-40 bg-gray-200 rounded-lg" />
+                </div>
+                <div className="h-3 bg-gray-200 rounded-full w-full" />
+                <div className="h-5 w-24 bg-gray-200 rounded" />
+                <div className="h-12 bg-gray-200 rounded-2xl w-full" />
+            </div>
+        );
+    }
 
     // filter only "challenge" plans
     const challenges = progressData.filter((plan) => plan.plan_type === 'challenge');
@@ -18,8 +39,8 @@ export const ChallengeProgressWidget: React.FC<Props> = ({ progressData, onConti
     if (challenges.length === 0) return null;
 
     return (
-        <div className="w-full overflow-hidden rounded-3xl lg:max-w-3xl shadow-xl bg-white flex flex-col items-left justify-between p-6 space-y-4">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+        <div className="w-full overflow-hidden rounded-3xl shadow-xl bg-white flex flex-col items-left justify-between p-6 space-y-4">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">
                 {t('workouts.challenges.activeChallenges')}
             </h2>
 
@@ -38,8 +59,8 @@ export const ChallengeProgressWidget: React.FC<Props> = ({ progressData, onConti
                 }
 
                 const { total_days, days, name } = prog;
-                const completedCount = days!.filter((d) => d.is_completed).length;
-                const todayInProgress = days!.find((d) => d.status === 'in_progress');
+                const completedCount = days.filter((d) => d.is_completed).length;
+                const todayInProgress = days.find((d) => d.status === 'in_progress');
                 let currentDayNumber = completedCount + 1;
                 if (todayInProgress) {
                     currentDayNumber = todayInProgress.sequence_day;
@@ -58,7 +79,7 @@ export const ChallengeProgressWidget: React.FC<Props> = ({ progressData, onConti
                             <div className="bg-green-500 p-3 rounded-full">
                                 <FaDumbbell className="text-white text-xl" />
                             </div>
-                            <span className="text-2xl font-semibold text-black">{name}</span>
+                            <span className="text-3xl font-semibold text-black">{name}</span>
                         </div>
 
                         <p className="sr-only">{progressLabel}</p>
@@ -82,7 +103,7 @@ export const ChallengeProgressWidget: React.FC<Props> = ({ progressData, onConti
                             </svg>
                         </div>
 
-                        <p className="text-gray-800 text-lg font-medium">
+                        <p className="text-base text-gray-600 font-medium">
                             {`${t('workouts.challenges.day')} ${currentDayNumber} ${t(
                                 'workouts.challenges.of',
                             )} ${total_days}`}

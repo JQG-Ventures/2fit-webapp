@@ -37,11 +37,19 @@ class WorkoutPlanRepository(BaseRepository[WorkoutPlan]):
             .group_by(WorkoutDay.workout_plan_id)
             .having(func.count(WorkoutDay.id) == 1)
         )
-        stmt = select(WorkoutPlan).where(
-            WorkoutPlan.is_active.is_(True),
-            WorkoutPlan.id.in_(subq),
+        stmt = (
+            select(WorkoutPlan)
+            .where(
+                WorkoutPlan.is_active.is_(True),
+                WorkoutPlan.id.in_(subq),
+            )
+            .options(
+                joinedload(WorkoutPlan.workout_days)
+                .joinedload(WorkoutDay.exercises)
+                .joinedload(WorkoutDayExercise.exercise)
+            )
         )
-        return list(db.session.scalars(stmt).all())
+        return list(db.session.scalars(stmt).unique().all())
 
     def get_by_difficulty(self, difficulty: str) -> list[WorkoutPlan]:
         stmt = select(WorkoutPlan).where(

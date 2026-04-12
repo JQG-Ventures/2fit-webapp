@@ -2,18 +2,15 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { AiFillHeart, AiOutlineClose } from 'react-icons/ai';
-import ConfirmationModal from '../modals/confirmationModal';
+import ConfirmationModal from '@/app/_components/modals/confirmationModal';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
+import Link from 'next/link';
 
-interface Workout {
-    _id: string;
-    image_url: string;
-    name: string;
-}
+type SavedWorkoutCard = Pick<WorkoutPlan, '_id' | 'name' | 'image_url'>;
 
 interface SavedWorkoutsSectionProps {
-    workouts: Workout[];
+    workouts: SavedWorkoutCard[];
     deleteWorkout: (workoutId: string) => Promise<void>;
     emptyMessage: string;
     sectionTitle: string;
@@ -27,10 +24,10 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
 }) => {
     const { t } = useTranslation('global');
     const [modalOpen, setModalOpen] = useState<boolean>(false);
-    const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
-    const [savedWorkouts, setSavedWorkouts] = useState<Workout[]>(workouts);
+    const [selectedWorkout, setSelectedWorkout] = useState<SavedWorkoutCard | null>(null);
+    const [savedWorkouts, setSavedWorkouts] = useState<SavedWorkoutCard[]>(workouts);
 
-    const handleHeartClick = (workout: Workout) => {
+    const handleHeartClick = (workout: SavedWorkoutCard) => {
         setSelectedWorkout(workout);
         setModalOpen(true);
     };
@@ -73,7 +70,9 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
                         alt={workout.name}
                     />
                     <div className="absolute bottom-0 left-0 p-2 bg-opacity-75 bg-gray-800 text-white w-full rounded-b-lg transition-opacity duration-300 ease-in-out">
-                        <p className="text-lg truncate">{workout.name}</p>
+                        <p className="text-base font-semibold truncate leading-snug">
+                            {workout.name}
+                        </p>
                     </div>
                     <div className="absolute top-2 right-2">
                         <button
@@ -97,20 +96,25 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
     );
 
     return (
-        <div className="bg-white p-4 rounded-lg">
-            <div className="flex justify-between items-center mb-8 px-2">
-                <h2 className="text-4xl font-bold text-gray-800">{sectionTitle}</h2>
-                <a href="#" className="text-blue-600 hover:underline text-lg lg:text-2xl">
+        <section className="bg-white px-6 py-6">
+            <div className="flex justify-between items-baseline mb-4">
+                <h2 className="text-3xl font-bold text-gray-900 tracking-tight">{sectionTitle}</h2>
+                <Link
+                    href="/workouts"
+                    className="text-base font-semibold text-green-600 hover:text-green-700 hover:underline shrink-0 ml-2"
+                >
                     {t('home.SavedWorkoutsSection.viewall')}
-                </a>
+                </Link>
             </div>
 
             {savedWorkouts.length === 0 ? (
-                <div className="border-dashed border-2 border-gray-400 p-8 rounded-lg flex justify-center items-center">
-                    <p className="text-gray-500 text-xl">{emptyMessage}</p>
+                <div className="border-dashed border-2 border-gray-300 p-8 rounded-xl flex justify-center items-center">
+                    <p className="text-lg text-gray-500 text-center leading-relaxed">
+                        {emptyMessage}
+                    </p>
                 </div>
             ) : (
-                <div className="flex overflow-x-auto py-2 px-2 no-scrollbar space-x-6 lg:space-x-12 xl:space-x-14">
+                <div className="flex overflow-x-auto py-2 -mx-1 px-1 no-scrollbar space-x-4 lg:space-x-6">
                     {workoutItems}
                 </div>
             )}
@@ -123,7 +127,7 @@ const SavedWorkoutsSection: React.FC<SavedWorkoutsSectionProps> = ({
                 confirmText={t('home.SavedWorkoutsSection.SavedWorkoutsSectionconfirmText')}
                 cancelText={t('home.SavedWorkoutsSection.SavedWorkoutsSectioncancelText')}
             />
-        </div>
+        </section>
     );
 };
 

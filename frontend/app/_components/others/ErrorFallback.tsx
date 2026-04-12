@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import Modal from '../profile/modal';
+import Modal from '@/app/_components/profile/modal';
 
 export function ErrorFallback({ error: _error }: { error: Error }) {
     const handleClose = useCallback(() => {

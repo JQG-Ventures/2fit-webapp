@@ -8,8 +8,8 @@ import {
     type UseMutationOptions,
 } from '@tanstack/react-query';
 import type { AxiosError, AxiosRequestConfig } from 'axios';
-import axiosInstance from '../utils/axiosInstance';
-import type { QueryParams } from '../_types/api';
+import axiosInstance from '@/app/utils/axiosInstance';
+import type { QueryParams } from '@/app/_types/api';
 
 interface UseApiGetOptions<T> extends Omit<
     UseQueryOptions<T, AxiosError, T, QueryKey>,

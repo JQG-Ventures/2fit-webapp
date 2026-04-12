@@ -7,6 +7,10 @@ exclude = [".eggs", ".git", ".hg", ".mypy_cache", ".tox", ".venv", "venv", "env"
 select = ["B", "E", "F", "I", "UP"]
 ignore = ["B904", "E501"]
 
+# Stable isort when linting from repo root (`pre-commit`) or from `backend/` (Docker / local cd).
+[tool.ruff.lint.isort]
+known-first-party = ["app", "tests"]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"

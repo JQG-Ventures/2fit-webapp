@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import DesktopNavBar from './DesktopNavBar';
-import MobileNavBar from './MobileNavBar';
+import DesktopNavBar from '@/app/_components/navbar/DesktopNavBar';
+import MobileNavBar from '@/app/_components/navbar/MobileNavBar';
 import { usePathname } from 'next/navigation';
 import { FaHome, FaDumbbell, FaRobot, FaUser } from 'react-icons/fa';
 import { useMediaQuery } from 'react-responsive';

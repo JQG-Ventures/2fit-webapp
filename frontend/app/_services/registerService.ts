@@ -1,6 +1,6 @@
-import type { ApiStatusResponse } from '../_types/api';
-import type { RegisterData } from '../_types/register';
-import { parseJson } from '../utils/http';
+import type { ApiStatusResponse } from '@/app/_types/api';
+import type { RegisterData } from '@/app/_types/register';
+import { parseJson } from '@/app/utils/http';
 
 export const registerUser = async (data: RegisterData): Promise<ApiStatusResponse> => {
     try {

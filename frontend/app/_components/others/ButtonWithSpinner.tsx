@@ -8,6 +8,7 @@ interface ButtonWithSpinnerProps {
     disabled?: boolean;
     children: React.ReactNode;
     className?: string;
+    style?: React.CSSProperties;
     ariaLabel: string;
 }
 
@@ -18,6 +19,7 @@ const ButtonWithSpinner: React.FC<ButtonWithSpinnerProps> = ({
     disabled,
     children,
     className = '',
+    style,
     ariaLabel,
 }) => {
     return (
@@ -29,6 +31,7 @@ const ButtonWithSpinner: React.FC<ButtonWithSpinnerProps> = ({
             className={`${className} flex items-center justify-center ${
                 loading ? 'cursor-not-allowed opacity-50' : ''
             }`}
+            style={style}
         >
             {children}
             {loading && <FaSpinner className="ml-4 animate-spin" />}

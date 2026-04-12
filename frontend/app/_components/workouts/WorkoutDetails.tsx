@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import Tag from '../others/Tag';
-import ExerciseList from './ExerciseList';
-import Modal from '../modals/ViewModal';
+import Tag from '@/app/_components/others/Tag';
+import ExerciseList from '@/app/_components/workouts/ExerciseList';
+import Modal from '@/app/_components/modals/ViewModal';
 import { FaArrowLeft, FaClock, FaDumbbell, FaFire } from 'react-icons/fa';
-import useIsMobile from '../../_hooks/useIsMobile';
-import WorkoutFooter from '../../_components/workouts/WorkoutFooterStart';
+import useIsMobile from '@/app/_hooks/useIsMobile';
+import WorkoutFooter from '@/app/_components/workouts/WorkoutFooterStart';
 import { useTranslation } from 'react-i18next';
 
 const WorkoutDetails: React.FC<{ workoutPlan: WorkoutPlan }> = ({ workoutPlan }) => {

@@ -81,12 +81,11 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                 validationError ? 'border-red-500' : 'border-transparent'
             } rounded-lg`}
         >
-            {/* Country Code Dropdown Button */}
-            <div className="relative w-[30%] flex justify-center items-center">
+            <div className="relative w-[38%] sm:w-[30%] flex justify-center items-center">
                 <button
                     type="button"
                     onClick={toggleDropdown}
-                    className={`flex items-center justify-center w-full bg-gray-200 text-gray-700 rounded-l-lg py-6 px-4 leading-tight focus:outline-none`}
+                    className={`flex items-center justify-center w-full bg-gray-200 text-gray-700 rounded-l-lg py-3 sm:py-5 px-3 leading-tight focus:outline-none`}
                     aria-label={t('a11y.selectCountryCode')}
                 >
                     {matchedCountry ? (
@@ -131,7 +130,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                 onChange={handlePhoneChange}
                 onBlur={handlePhoneBlur}
                 placeholder="Enter phone number"
-                className={`appearance-none text-2xl block w-full bg-gray-200 text-gray-700 rounded-r-lg py-3 leading-tight focus:outline-none focus:bg-white
+                className={`appearance-none text-base sm:text-xl block w-full bg-gray-200 text-gray-700 rounded-r-lg py-3 sm:py-5 leading-tight focus:outline-none focus:bg-white
           ${error ? 'border-2 border-red-500' : 'border border-transparent'}`}
             />
             {error && <p className="text-red-500 text-center">{error}</p>}

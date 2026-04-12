@@ -2,7 +2,7 @@
 
 import React, { useState, useLayoutEffect } from 'react';
 import Link from 'next/link';
-import SearchBar from '../searchbar/SearchBarComponent';
+import SearchBar from '@/app/_components/searchbar/SearchBarComponent';
 
 type NavItem = {
     href: string;

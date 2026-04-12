@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import en from '../../public/locals/en/global.json';
-import es from '../../public/locals/es/global.json';
+import en from '@/public/locals/en/global.json';
+import es from '@/public/locals/es/global.json';
 
 void i18n.use(initReactI18next).init({
     fallbackLng: 'es',

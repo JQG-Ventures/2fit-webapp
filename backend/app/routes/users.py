@@ -295,7 +295,7 @@ class UserResourcePlans(Resource):
                 if not p.is_completed:
                     result.append(
                         {
-                            "id": str(p.id),
+                            "id": str(p.workout_plan_id),
                             "type": p.plan_type,
                             "name": p.workout_name,
                             "plan_type": p.plan_type,
@@ -307,7 +307,7 @@ class UserResourcePlans(Resource):
             for ac in active_challenges:
                 result.append(
                     {
-                        "id": str(ac.id),
+                        "id": str(ac.challenge_id),
                         "type": "challenge",
                         "name": ac.challenge.name if ac.challenge else "",
                         "plan_type": "challenge",

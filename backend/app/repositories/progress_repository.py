@@ -49,10 +49,17 @@ def _coerce_float(value: object, default: float = 0.0) -> float:
 
 class SavedWorkoutRepository:
     def get_by_user(self, user_id: uuid.UUID) -> list[SavedWorkout]:
+        from app.models.workout_plan import WorkoutDay, WorkoutDayExercise, WorkoutPlan
+
         stmt = (
             select(SavedWorkout)
             .where(SavedWorkout.user_id == user_id)
-            .options(joinedload(SavedWorkout.workout_plan))
+            .options(
+                joinedload(SavedWorkout.workout_plan)
+                .joinedload(WorkoutPlan.workout_days)
+                .joinedload(WorkoutDay.exercises)
+                .joinedload(WorkoutDayExercise.exercise)
+            )
         )
         return list(db.session.scalars(stmt).unique().all())
 
@@ -242,7 +249,10 @@ class ActiveChallengeRepository:
         stmt = (
             select(ActiveChallenge)
             .where(ActiveChallenge.user_id == user_id)
-            .options(joinedload(ActiveChallenge.exercises))
+            .options(
+                joinedload(ActiveChallenge.exercises),
+                joinedload(ActiveChallenge.challenge),
+            )
         )
         return list(db.session.scalars(stmt).unique().all())
 

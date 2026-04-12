@@ -3,8 +3,8 @@
 
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRegisterPlayerId } from '../../_services/userService';
-import { initializeOneSignal } from '../../_services/initOnesignal';
+import { useRegisterPlayerId } from '@/app/_services/userService';
+import { initializeOneSignal } from '@/app/_services/initOnesignal';
 
 interface AppSession {
     user?: {

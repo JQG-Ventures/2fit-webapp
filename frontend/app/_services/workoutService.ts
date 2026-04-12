@@ -1,5 +1,5 @@
-import { useApiPut } from '../utils/apiClient';
-import type { ApiStatusResponse } from '../_types/api';
+import { useApiPut } from '@/app/utils/apiClient';
+import type { ApiStatusResponse } from '@/app/_types/api';
 
 export type ExerciseDeletePayload = Record<string, string[]>;
 

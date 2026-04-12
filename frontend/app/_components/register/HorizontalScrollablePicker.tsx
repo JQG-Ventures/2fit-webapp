@@ -32,26 +32,18 @@ const HorizontalScrollablePicker: React.FC<HorizontalScrollablePickerProps> = ({
     }, [value]);
 
     const getValueFromItem = (item: HTMLDivElement | null): number | null => {
-        if (!item) {
-            return null;
-        }
-
-        const rawValue = item.getAttribute('data-value');
-        if (!rawValue) {
-            return null;
-        }
-
-        const parsedValue = Number(rawValue);
-        return Number.isNaN(parsedValue) ? null : parsedValue;
+        if (!item) return null;
+        const raw = item.getAttribute('data-value');
+        if (!raw) return null;
+        const parsed = Number(raw);
+        return Number.isNaN(parsed) ? null : parsed;
     };
 
-    const handleScroll = () => {
-        const container = pickerRef.current;
-        if (!container) return;
-
+    const findClosestItem = (
+        container: HTMLDivElement,
+        items: NodeListOf<HTMLDivElement>,
+    ): HTMLDivElement | null => {
         const containerWidth = container.clientWidth;
-        const items = container.querySelectorAll<HTMLDivElement>('[data-value]');
-
         let closestItem: HTMLDivElement | null = null;
         let minDistance = Infinity;
 
@@ -60,92 +52,77 @@ const HorizontalScrollablePicker: React.FC<HorizontalScrollablePickerProps> = ({
             const containerRect = container.getBoundingClientRect();
             const itemCenter = itemRect.left - containerRect.left + itemRect.width / 2;
             const distance = Math.abs(itemCenter - containerWidth / 2);
-
             if (distance < minDistance) {
                 minDistance = distance;
                 closestItem = item;
             }
         });
 
-        if (closestItem) {
-            const newValue = getValueFromItem(closestItem);
+        return closestItem;
+    };
+
+    const handleScroll = () => {
+        const container = pickerRef.current;
+        if (!container) return;
+
+        const items = container.querySelectorAll<HTMLDivElement>('[data-value]');
+        const closest = findClosestItem(container, items);
+
+        if (closest) {
+            const newValue = getValueFromItem(closest);
             if (newValue !== null && newValue !== value) {
                 isScrollingRef.current = true;
                 onChange(newValue);
             }
         }
 
-        if (scrollTimeoutRef.current) {
-            clearTimeout(scrollTimeoutRef.current);
-        }
+        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
         scrollTimeoutRef.current = setTimeout(() => {
             if (!container) return;
-
-            let closestItem: HTMLDivElement | null = null;
-            let minDistance = Infinity;
-
-            items.forEach((item) => {
-                const itemRect = item.getBoundingClientRect();
-                const containerRect = container.getBoundingClientRect();
-                const itemCenter = itemRect.left - containerRect.left + itemRect.width / 2;
-                const distance = Math.abs(itemCenter - containerWidth / 2);
-
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestItem = item;
-                }
-            });
-
-            if (closestItem) {
-                const newValue = getValueFromItem(closestItem);
+            const latestClosest = findClosestItem(container, items);
+            if (latestClosest) {
+                const newValue = getValueFromItem(latestClosest);
                 if (newValue !== null && newValue !== value) {
                     isScrollingRef.current = true;
                     onChange(newValue);
                 }
-                if (newValue !== null) {
-                    centerValue(newValue);
-                }
+                if (newValue !== null) centerValue(newValue);
             }
         }, 100);
     };
 
-    const centerValue = (value: number) => {
-        if (pickerRef.current) {
-            const itemElement = pickerRef.current.querySelector<HTMLDivElement>(
-                `[data-value="${value}"]`,
-            );
-            if (itemElement) {
-                const containerWidth = pickerRef.current.clientWidth;
-                const itemLeft = itemElement.offsetLeft;
-                const itemWidth = itemElement.offsetWidth;
-                const targetScrollPosition = itemLeft - containerWidth / 2 + itemWidth / 2;
-                pickerRef.current.scrollTo({
-                    left: targetScrollPosition,
-                    behavior: 'smooth',
-                });
-            }
+    const centerValue = (val: number) => {
+        if (!pickerRef.current) return;
+        const itemElement = pickerRef.current.querySelector<HTMLDivElement>(
+            `[data-value="${val}"]`,
+        );
+        if (itemElement) {
+            const containerWidth = pickerRef.current.clientWidth;
+            const targetScrollPosition =
+                itemElement.offsetLeft - containerWidth / 2 + itemElement.offsetWidth / 2;
+            pickerRef.current.scrollTo({ left: targetScrollPosition, behavior: 'smooth' });
         }
     };
 
     return (
         <div className="h-auto w-full mx-auto flex flex-col justify-center items-center relative">
             <div className="relative w-full">
-                <div className="absolute inset-0 bg-gradient-to-r from-white via-transparent to-white pointer-events-none z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-white via-transparent to-white pointer-events-none z-10" />
 
                 <div
-                    className="w-full h-auto overflow-x-scroll no-scrollbar relative"
+                    className="w-full h-auto overflow-x-scroll no-scrollbar"
                     onScroll={handleScroll}
                     ref={pickerRef}
                 >
-                    <div className="flex flex-row items-center relative space-x-4">
+                    <div className="flex flex-row items-center space-x-2 sm:space-x-4">
                         {range.map((item) => (
                             <div
                                 key={item}
                                 data-value={item}
-                                className={`w-[80px] h-[80px] flex-shrink-0 flex justify-center items-center text-6xl transition-transform ${
+                                className={`w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] flex-shrink-0 flex justify-center items-center transition-transform cursor-pointer ${
                                     value === item
-                                        ? 'text-black font-bold transform scale-110 border-black'
-                                        : 'text-gray-500'
+                                        ? 'text-black font-bold text-5xl sm:text-6xl scale-110'
+                                        : 'text-gray-400 text-3xl sm:text-4xl'
                                 }`}
                                 onClick={() => onChange(item)}
                             >
@@ -156,8 +133,8 @@ const HorizontalScrollablePicker: React.FC<HorizontalScrollablePickerProps> = ({
                 </div>
             </div>
 
-            <div className="z-20 flex items-center justify-center mt-2">
-                <FaCaretUp className="text-black text-6xl" />
+            <div className="z-20 flex items-center justify-center mt-1">
+                <FaCaretUp className="text-black text-3xl sm:text-4xl" />
             </div>
         </div>
     );
