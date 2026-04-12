@@ -36,6 +36,10 @@ services:
     image: 2fit-frontend:prod
     environment:
       NODE_ENV: production
+      # Next standalone uses HOSTNAME for server.listen(); the container OS sets HOSTNAME to the
+      # container id/name and overrides the image ENV, so bind fails unless we force 0.0.0.0.
+      HOSTNAME: "0.0.0.0"
+      PORT: "3000"
       NEXTAUTH_URL: http://localhost:3000
       NEXT_PUBLIC_HOST: http://localhost:3000
       NEXT_PUBLIC_API_BASE_URL: http://localhost:5000
