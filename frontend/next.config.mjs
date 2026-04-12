@@ -20,13 +20,17 @@ const nextConfig = {
     output: 'standalone',
     reactStrictMode: true,
     async headers() {
+        const forwardedHost = process.env.NEXT_PUBLIC_HOST;
+        if (!forwardedHost) {
+            return [];
+        }
         return [
             {
                 source: '/(.*)',
                 headers: [
                     {
                         key: 'x-forwarded-host',
-                        value: process.env.NEXT_PUBLIC_HOST,
+                        value: forwardedHost,
                     },
                 ],
             },
