@@ -21,8 +21,11 @@ def test_chat_post_requires_jwt(client, db) -> None:
     assert r.status_code == 401
 
 
+@patch("app.routes.chat.OpenAI")
 @patch("app.routes.chat.ChatService")
-def test_chat_post_success_new_conversation(mock_svc_cls, app, client, db, sample_user) -> None:
+def test_chat_post_success_new_conversation(
+    mock_svc_cls, _mock_openai, app, client, db, sample_user
+) -> None:
     instance = MagicMock()
     instance.handle_message.return_value = ("Assistant reply", True)
     mock_svc_cls.return_value = instance
@@ -34,8 +37,11 @@ def test_chat_post_success_new_conversation(mock_svc_cls, app, client, db, sampl
     assert "initiated" in body["message"].lower()
 
 
+@patch("app.routes.chat.OpenAI")
 @patch("app.routes.chat.ChatService")
-def test_chat_post_continued_conversation(mock_svc_cls, app, client, db, sample_user) -> None:
+def test_chat_post_continued_conversation(
+    mock_svc_cls, _mock_openai, app, client, db, sample_user
+) -> None:
     instance = MagicMock()
     instance.handle_message.return_value = ("Next", False)
     mock_svc_cls.return_value = instance
@@ -50,8 +56,11 @@ def test_chat_post_missing_json_body(app, client, db, sample_user) -> None:
     assert r.status_code == 415
 
 
+@patch("app.routes.chat.OpenAI")
 @patch("app.routes.chat.ChatService")
-def test_chat_post_service_error_returns_500(mock_svc_cls, app, client, db, sample_user) -> None:
+def test_chat_post_service_error_returns_500(
+    mock_svc_cls, _mock_openai, app, client, db, sample_user
+) -> None:
     instance = MagicMock()
     instance.handle_message.side_effect = RuntimeError("openai down")
     mock_svc_cls.return_value = instance
@@ -60,8 +69,9 @@ def test_chat_post_service_error_returns_500(mock_svc_cls, app, client, db, samp
     assert r.status_code == 500
 
 
+@patch("app.routes.chat.OpenAI")
 @patch("app.routes.chat.ChatService")
-def test_transcribe_post_success(mock_svc_cls, client, db) -> None:
+def test_transcribe_post_success(mock_svc_cls, _mock_openai, client, db) -> None:
     instance = MagicMock()
     instance.transcribe_audio.return_value = "transcribed text"
     mock_svc_cls.return_value = instance

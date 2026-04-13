@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import random
+import uuid
 from types import SimpleNamespace
+from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 
@@ -78,3 +80,71 @@ def test_generate_day_routine_includes_cardio_when_requested() -> None:
         ["legs", "cardio"], mixed, settings, "intermediate", cardio=True
     )
     assert len(routine) >= 1
+
+
+def test_get_intensity_settings_unknown_level_falls_back_to_beginner_shape() -> None:
+    s = WorkoutPlanGenerator.get_intensity_settings("not-a-level", "muscle")
+    assert s["sets"] == 2 and "reps" in s
+
+
+def test_determine_plan_duration_default_goal() -> None:
+    d = WorkoutPlanGenerator.determine_plan_duration("unknown_goal", "intermediate")
+    assert d == 12
+
+
+@patch("app.services.workout_plan_service.db.session.flush")
+@patch("app.services.workout_plan_service.WorkoutPlanGenerator.set_active_plan_for_user")
+@patch("app.services.workout_plan_service.WorkoutPlanRepository")
+@patch("app.services.workout_plan_service.ExerciseRepository")
+def test_generate_workout_plan_creates_and_activates(
+    mock_ex_cls: MagicMock,
+    mock_wp_cls: MagicMock,
+    mock_set_active: MagicMock,
+    _flush: MagicMock,
+) -> None:
+    random.seed(7)
+    ex = SimpleNamespace(
+        id=uuid.uuid4(),
+        muscle_group=["chest", "back", "legs"],
+        category="strength",
+    )
+    mock_ex_cls.return_value.get_active.return_value = [ex] * 25
+    plan = SimpleNamespace(id=uuid.uuid4())
+    mock_wp_cls.return_value.create_full_plan.return_value = plan
+    uid = str(uuid.uuid4())
+    WorkoutPlanGenerator.generate_workout_plan(
+        uid,
+        {
+            "fitness_level": "beginner",
+            "fitness_goal": "muscle",
+            "available_days": ["monday", "tuesday"],
+            "name": "Tester",
+        },
+    )
+    mock_wp_cls.return_value.create_full_plan.assert_called_once()
+    mock_set_active.assert_called_once_with(uid, str(plan.id), ANY, ANY)
+
+
+@patch("app.services.workout_plan_service.db.session.flush")
+@patch("app.services.workout_plan_service.ActivePlanRepository")
+def test_set_active_plan_for_user_completes_existing_personalized(
+    mock_ap_cls: MagicMock, _flush: MagicMock
+) -> None:
+    existing = SimpleNamespace(is_completed=False, plan_type="personalized")
+    mock_ap_cls.return_value.get_by_user.return_value = [existing]
+    uid = str(uuid.uuid4())
+    pid = str(uuid.uuid4())
+    WorkoutPlanGenerator.set_active_plan_for_user(uid, pid, "My Plan", 6)
+    assert existing.is_completed is True
+    mock_ap_cls.return_value.create.assert_called_once()
+
+
+@patch("app.services.workout_plan_service.db.session.flush")
+@patch("app.services.workout_plan_service.ActivePlanRepository")
+def test_set_active_plan_for_user_propagates_repository_error(
+    mock_ap_cls: MagicMock, _flush: MagicMock
+) -> None:
+    mock_ap_cls.return_value.get_by_user.return_value = []
+    mock_ap_cls.return_value.create.side_effect = RuntimeError("db down")
+    with pytest.raises(RuntimeError, match="db down"):
+        WorkoutPlanGenerator.set_active_plan_for_user(str(uuid.uuid4()), str(uuid.uuid4()), "P", 4)

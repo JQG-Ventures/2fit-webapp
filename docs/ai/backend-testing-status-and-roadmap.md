@@ -1,125 +1,103 @@
-# Backend: estado de testing y roadmap hacia >90% cobertura
+# Backend: estado de testing y roadmap hacia ≥90% cobertura
 
-**Última verificación:** 2026-04-12 (ejecución local: `pytest tests/ --cov=app --cov-report=term-missing`).
+**Última verificación:** 2026-04-12 — `cd backend && pytest tests/ --cov=app --cov-report=term-missing --cov-fail-under=0`.
 
 ## Resumen ejecutivo
 
 | Métrica | Valor actual | Objetivo (repo) |
 |--------|----------------|-----------------|
-| Tests | 16+ (1 integración PG opcional puede quedar en skip local) | Crecer por lotes |
-| Cobertura total (`app`) | **~45%** | **≥90%** (`pyproject.toml` `[tool.coverage.report] fail_under = 90`; CI: `--cov-fail-under=90`) |
-| Archivos de test | 4 módulos + `conftest.py` | Ampliar por dominio |
+| Archivos `tests/test_*.py` | **31** + `conftest.py`, `db_utils.py`, `db_checks.py`, `support/*`, `factories/*`, `helpers/*` | Seguir ampliando por dominio |
+| Última corrida local | **52 passed, 161 skipped** (sin PostgreSQL: la mayoría de `@pytest.mark.integration` no corre) | En CI con `TEST_DATABASE_URL` + Postgres deberían ejecutarse casi todos |
+| Cobertura total (`app`, según `pyproject` `omit`) | **~49%** en el entorno anterior | **≥90%** (`[tool.coverage.report] fail_under = 90`; CI suele usar `--cov-fail-under=90`) |
 
-La meta de cobertura del repositorio es **90%**; hoy la suite **no la alcanza**. Los tests actuales cubren bien piezas puntuales (taxonomía muscular, helpers de repositorio, un endpoint de challenges con mocks), pero la mayor parte de **routes**, **services** y **repositories** permanece sin ejercitar.
+La meta del repositorio sigue siendo **90%** de líneas en `app/` (excluyendo Celery/tasks ya omitidos). Hoy **no se alcanza**. El porcentaje local **sube** cuando Postgres está disponible: muchos tests de rutas, repositorios y servicios solo corren con el fixture `db`.
 
-**Exclusiones de cobertura** (no cuentan hacia el total medido): `app/celery.py`, `app/celery_worker.py`, `app/tasks/*` (`pyproject.toml`).
-
----
-
-## Inventario de tests existentes
-
-| Archivo | Enfoque aproximado |
-|---------|-------------------|
-| `tests/test_challenges_progress_batch.py` | API `GET .../progress/batch`: 401 sin JWT, 400 sin user, lista vacía, datos mockeados del repositorio |
-| `tests/test_muscle_repository_helpers.py` | Funciones puras / helpers del repositorio muscular |
-| `tests/test_muscle_taxonomy_expand.py` | Constantes y expansión de taxonomía muscular |
-| `tests/test_typing_smoke.py` | Smoke de import / tipado |
-| `tests/conftest.py` | App Flask session-scoped, `client`, `db` (Postgres + truncate), `auth_headers()` |
-| `tests/test_db_smoke.py` | Smoke de factory `User` + Postgres (skip si no hay servidor) |
-| `tests/factories/` | Factory Boy para modelos de dominio (users, prefs, workout plans, challenges, progreso, conversación, notificaciones, contenido, email) |
-| `tests/support/builders.py` | Grafos persistidos reutilizables (plan+día+ejercicio, usuario+saved+active plan, …) |
-| `tests/support/mocks.py` | Mocks mínimos (Azure, OpenAI) para unit tests sin DB |
-| `tests/db_checks.py` | `postgres_reachable()` para skip condicional |
-| Marcadores pytest | `@pytest.mark.integration` / `@pytest.mark.unit` (`pyproject.toml`) |
-
-**Infraestructura compartida:** `conftest.py` fuerza `DATABASE_URL` desde `TEST_DATABASE_URL` (por defecto `postgresql://...@127.0.0.1:5432/twofit_test`). Los tests que **no** piden el fixture `db` no crean tablas ni necesitan Postgres. El fixture `db` hace `create_all` una vez y `TRUNCATE … CASCADE` tras cada test que lo usa. Factories: `tests/factories/` (Factory Boy).
-
-### Esquema, migraciones y seed
-
-- **No hay revisiones Alembic en el repo** (`backend/migrations/versions/` vacío o inexistente). El esquema sale de los **modelos SQLAlchemy** y de `db.create_all()` (CLI `flask create-tables`, `scripts/seed.py`, tests con fixture `db`).
-- **No se puede usar SQLite** para reflejar el esquema actual: los modelos usan tipos propios de PostgreSQL (`ARRAY`, `UUID` de `sqlalchemy.dialects.postgresql`). `create_all` contra SQLite falla al compilar columnas `ARRAY`.
-- **Seed (`scripts/seed.py`)** está alineado con los modelos (mismos campos al insertar ejercicios, planes, retos). Si la base real se modificó **a mano** o con SQL externo, ese desfase **no** está versionado aquí; habría que documentar el cambio o añadir migraciones Alembic.
-- **Inconsistencia menor en datos de seed:** el plan de workout se llama `"Marathon Prep 60-Day Plan"` y el challenge relacionado en `CHALLENGES_DATA` se llama `"Marathon Ready 60-Day Prep"` (nombres distintos; mismo tipo de contenido, distinta cadena).
+**Exclusiones de cobertura** (no entran en el total medido): `app/celery.py`, `app/celery_worker.py`, `app/tasks/*` (`pyproject.toml`).
 
 ---
 
-## Cobertura por área (referencia de la última corrida)
+## Inventario actual de tests (`tests/test_*.py`)
 
-Valores orientativos; el detalle línea a línea está en `coverage.xml` tras correr pytest con `--cov-report=xml`.
+| Área | Archivos |
+|------|-----------|
+| Auth / JWT / roles | `test_auth_routes.py`, `test_auth_decorators_routes.py` |
+| Usuarios | `test_user_repository.py`, `test_users_routes.py`, `test_users_verify_code.py`, `test_users_utils_unit.py`, `test_users_api_workouts.py` |
+| Workouts / planes / progreso / home | `test_workout_repository.py`, `test_workout_routes.py`, `test_progress_repository.py`, `test_home_discovery_repository.py`, `test_user_workout_service_unit.py` |
+| Ejercicios / músculos | `test_exercise_repository.py`, `test_exercise_routes.py`, `test_muscle_repository_helpers.py`, `test_muscle_taxonomy_expand.py` |
+| Challenges | `test_challenges_routes.py`, `test_challenges_progress_batch.py`, `test_challenge_repository.py`, `test_user_challenge_service_integration.py` |
+| Schemas / tipos | `test_schemas_challenge_workout.py`, `test_challenge_types_smoke.py` |
+| Chat / OpenAI (mocks) | `test_chat_routes.py`, `test_chat_service_unit.py` |
+| Email / Azure | `test_email_routes.py`, `test_azure_content_routes.py` |
+| Utilidades / generación | `test_utils_unit.py`, `test_workout_plan_generator_unit.py` |
+| Smoke / infra | `test_db_smoke.py`, `test_integration_fixtures_smoke.py`, `test_typing_smoke.py` |
 
-**Bien cubiertos o razonables:** modelos SQLAlchemy, muchos schemas, `settings.py`, `extensions.py`, parte de `app/__init__.py`, `muscle_taxonomy.py`.
-
-**Huecos grandes (prioridad para roadmap):**
-
-- **`app/services/user_workout_service.py`** (~10% cubierto): núcleo de lógica de entrenamientos.
-- **`app/routes/workouts.py`**, **`app/routes/users.py`**, **`app/routes/authentication.py`**: mayoría de líneas sin ejecutar.
-- **Repositories** (`progress_repository`, `workout_repository`, `challenge_repository`, `home_discovery_repository`, `muscle_repository` parcial, etc.): bajo % salvo lo tocado por tests unitarios puntuales.
-- **`app/services/workout_plan_service.py`**, **`user_challenge_service.py`**, **`chat_service.py`**, **`azure_service.py`**: casi sin tests.
-- **`app/utils/users.py`**, **`app/types/challenge_types.py`**: 0% en la corrida (convienen tests directos o uso vía rutas/servicios).
-- **`app/auth/decorators.py`**: ~50%; completar con requests autenticados / no autenticados.
-- **`app/utils/utils.py`**: parcial; añadir casos borde.
-
----
-
-## Roadmap por lotes (implementación sugerida)
-
-Cada lote debería incluir: **happy path**, **parámetros inválidos** (400/422 según el diseño), **autenticación** (401), **recursos inexistentes** (404), y **autorización** (403 si aplica). Para servicios externos (Azure, OpenAI, email, etc.), usar **mocks** (`unittest.mock` / `pytest` fixtures).
-
-### Lote 0 — Base de test (habilita el resto)
-
-- **Postgres dedicado** (`TEST_DATABASE_URL`, p. ej. `twofit_test`). Crear la base localmente: `docker compose up -d postgres` y `docker compose exec postgres psql -U postgres -c "CREATE DATABASE twofit_test;"` (una vez).
-- Fixture `db` + `tests/db_utils.truncate_all_tables` + factories en `tests/factories/`.
-- Ampliar factories según dominio (progreso, planes activos, etc.).
-
-### Lote 1 — Autenticación y usuarios
-
-**Implementado:** tests de integración (PostgreSQL) y algunos sin DB.
-
-| Área | Archivos de test |
-|------|------------------|
-| Repositorio | `tests/test_user_repository.py` |
-| Auth HTTP | `tests/test_auth_routes.py` (registro con mock de `WorkoutPlanGenerator.generate_workout_plan`) |
-| Usuarios HTTP | `tests/test_users_routes.py` |
-| SMS verify | `tests/test_users_verify_code.py` (sin Postgres; Twilio mockeado en `send-code`) |
-| Helpers | `tests/support/registration_payload.py`, `tests/helpers/jwt_headers.py` |
-
-**Fuera de este lote (siguen en backlog):** `POST /google-login` con token real, `POST /profile/image` (Azure), `POST /messages/motivational` (OpenAI), `POST /workouts/*` bajo `/api/users`.
-
-### Lote 2 — Workouts y progreso (mayor superficie)
-
-**Implementado:** `tests/test_workout_repository.py`, `tests/test_progress_repository.py`, `tests/test_workout_routes.py`, `tests/test_home_discovery_repository.py`, `tests/test_user_workout_service_unit.py`, `tests/support/workout_payload.py`.
-
-- Repositorio de planes: activos (excl. personalized), `get_with_schedule`, `get_one_day_plans`, `get_by_difficulty`, `soft_delete`, `get_library_with_exercise_count`, `create_full_plan`, `replace_schedule`.
-- Progreso: `SavedWorkoutRepository`, `DayProgressRepository.find_or_create`.
-- Rutas `/api/workouts/*`: planes, one-day, saved, home explore/by-level, library, popular, weekly/challenge (servicio mockeado), bulk, delete/update exercises (400 sin body).
-- Unit: `UserWorkoutService.calculate_week_number`.
-
-**Siguiente iteración:** `PUT /plans/<id>` con cuerpo completo, JSON reales para delete/update exercises, weekly/challenge sin mock si se quiere E2E.
-
-### Lote 3 — Ejercicios, músculos, contenido discovery
-
-**Implementado:** `tests/test_exercise_repository.py`, `tests/test_exercise_routes.py` (incluye `GET .../muscles/taxonomy`). Home discovery compartido con Lote 2 (`test_home_discovery_repository.py`). Tests existentes de `muscle_repository` / taxonomía (`test_muscle_*`) se mantienen.
-
-### Lote 4 — Challenges (resto) y planes
-
-- `routes/challenges.py` (más allá del batch), `services/user_challenge_service.py`, `repositories/challenge_repository.py`, `services/workout_plan_service.py`, `schemas/challenge.py` / `workout.py` (validadores y ramas faltantes).
-
-### Lote 5 — Chat, email, contenido, Azure
-
-**Implementado:** `tests/test_chat_routes.py` (`/api/chat`, `/api/transcribe`, mocks de `ChatService`), `tests/test_chat_service_unit.py` (`generate_bot_response`, `generate_motivational_phrases`, mensaje vacío), `tests/test_email_routes.py` (`/api/mail/save`, mock SendGrid), `tests/test_azure_content_routes.py` (`/api/azure/content/upload` y `GET .../content`, rol admin, mock `AzureService`).
-
-### Lote 6 — Utilidades, tipos y capa transversal
-
-**Implementado:** `tests/test_utils_unit.py` (`build_gpt_generator_request`, `parse_answer`, `parse_date`, `format_json_string`), `tests/test_users_utils_unit.py` (`validate_user_by_credentials`), `tests/test_challenge_types_smoke.py` (TypedDicts), `tests/test_auth_decorators_routes.py` (`role_required` vía rutas Azure: 403 sin admin, 404 usuario inexistente).
+**Infraestructura:** `conftest.py` (app, `client`, `db`, tablas + `TRUNCATE`), `tests/factories/`, `tests/support/builders.py`, `tests/support/mocks.py`, `tests/helpers/jwt_headers.py`, `postgres_reachable()` en `db_checks.py`.
 
 ---
 
-## Criterios de calidad (alineado con tu objetivo)
+## Cobertura por módulo (referencia de la última corrida local)
 
-1. **Funcional:** cada endpoint o función pública con al menos un test de éxito y uno de error esperado.
-2. **Parámetros incorrectos:** query/body inválidos, tipos erróneos, límites (strings vacíos, listas vacías, enums fuera de rango).
-3. **Determinismo:** mocks en I/O y reloj cuando haya fechas o IDs generados.
-4. **Cobertura:** ejecutar `pytest --cov=app --cov-report=term-missing` y revisar `Missing` hasta superar el umbral del proyecto.
+Cifras con **muchos tests saltados** (sin Postgres). Sirven para **priorizar**, no como techo definitivo.
+
+**Mayor brecha (prioridad para llegar al 90%):**
+
+| Módulo | Cobertura (aprox.) | Comentario |
+|--------|-------------------|------------|
+| `app/services/user_workout_service.py` | ~10% | Núcleo grande de lógica de negocio; pocos unitarios frente al tamaño del archivo |
+| `app/routes/workouts.py` | ~23% | Muchos endpoints; `test_workout_routes.py` no cubre la mayoría de ramas |
+| `app/routes/authentication.py` | ~25% | Google login, subida de imagen, flujos largos sin tests o con mocks parciales |
+| `app/repositories/progress_repository.py` | ~22% | Muchos métodos; ampliar tests de repo o vía servicios |
+| `app/repositories/workout_repository.py` | ~24% | Similar |
+| `app/repositories/challenge_repository.py` | ~25% | Similar |
+| `app/services/user_challenge_service.py` | ~23% | Complementar integración existente |
+| `app/routes/exercises.py` | ~29% | CRUD y filtros; ampliar `test_exercise_routes.py` |
+| `app/routes/challenges.py` | ~30% | Varias ramas (activos, por id, errores Pydantic) |
+| `app/routes/users.py` | ~33% | Perfil, workouts anidados, motivación, Azure, etc. |
+| `app/repositories/home_discovery_repository.py` | ~33% | Consultas de exploración |
+| `app/repositories/exercise_repository.py` | ~37% | |
+| `app/repositories/user_repository.py` | ~38% | |
+| `app/routes/content.py` | ~37% | Azure upload/list; parcialmente cubierto con admin/JWT |
+| `app/services/azure_service.py` | ~25% | Idealmente unit tests con SDK/storage mockeado |
+| `app/auth/decorators.py` | ~48% | Con Postgres + rutas RESTX, `role_required` se ejerce; sin DB el decorador casi no cuenta |
+| `app/services/chat_service.py` | ~56% | Ampliar ramas de conversación / Whisper en unit |
+| `app/routes/chat.py` | ~45% | Rutas reales con JWT + mocks |
+
+**Razonablemente altos o completos (27 archivos “skipped” por 100% en el reporte):** modelos, `settings`, `extensions`, parte de `app/__init__.py`, varios schemas, `workout_plan_service.py` parcial (~67%), taxonomía muscular, etc.
+
+---
+
+## Qué falta implementar para acercarse al 90%
+
+Orden sugerido por **impacto en líneas** y **riesgo de regresiones**:
+
+1. **`UserWorkoutService`** — Tests unitarios por función pública (cálculo de semana, armado de respuestas, errores) y/o tests de integración que invoquen rutas que delegan en este servicio. Es el mayor agujero único.
+2. **`routes/workouts.py`** — Tabla de endpoints sin cobertura: happy path + 401/403/404/400 para cada grupo (planes, one-day, saved, library, bulk, weekly/challenge, etc.), con DB + factories.
+3. **`routes/authentication.py`** — Ramas restantes: `google-login` (mock de verificación de token), `profile/image` (mock Azure), recuperación de contraseña si aplica, validaciones de body.
+4. **`ProgressRepository` + `WorkoutRepository`** — Tests directos del repo (como ya hacéis con otros) o vía servicios para cubrir `list`, updates, soft deletes y agregaciones.
+5. **`routes/users.py`** — Endpoints de perfil, mensajes motivacionales (OpenAI mockeado), sub-rutas de workouts bajo `/api/users` no cubiertas por `test_users_api_workouts.py`.
+6. **`routes/exercises.py`** y **`ExerciseRepository`** — Listados, filtros, errores de validación.
+7. **`UserChallengeService` + `routes/challenges.py`** — Casos borde, retos inactivos, errores de validación de schemas ya parcialmente testeados.
+8. **`AzureService`** — Unit tests aislados (sin red) mockeando cliente de blob/storage.
+9. **`app/repositories/base.py`** — Si sigue contando líneas sin cubrir, tests mínimos o `# pragma: no cover` solo donde sea intencional (mejor cubrir).
+
+**Táctica práctica:** tras cada lote, volver a ejecutar `pytest tests/ --cov=app --cov-report=term-missing --cov-fail-under=0` **con Postgres** y ordenar el reporte por `Miss` para el siguiente objetivo.
+
+---
+
+## Esquema, migraciones y seed
+
+- **No hay revisiones Alembic** en el repo en muchos despliegues: el esquema sale de modelos + `db.create_all()` (tests con fixture `db`, `flask create-tables`, `scripts/seed.py`).
+- **SQLite no replica el esquema** actual (p. ej. `ARRAY`, `UUID` de PostgreSQL).
+- **Seed (`scripts/seed.py`)** debe mantenerse alineado con los modelos; nombres de planes/challenges pueden diferir entre constantes (detalle documentado antes en este archivo).
+
+---
+
+## Criterios de calidad
+
+1. Cada endpoint o función pública: al menos **éxito** + **error esperado** (401, 403, 404, 400/415/422 según diseño).
+2. **Mocks** para OpenAI, Azure, Twilio, SendGrid, etc., en tests que no sean E2E.
+3. **Determinismo:** fechas e IDs acotados donde aplique.
+4. **Cobertura:** `pytest --cov=app --cov-report=term-missing`; en CI el umbral 90% es la barra oficial.
 
 ---
 
@@ -127,7 +105,11 @@ Cada lote debería incluir: **happy path**, **parámetros inválidos** (400/422 
 
 ```bash
 cd backend
+# Con Postgres (TEST_DATABASE_URL apuntando a twofit_test, p. ej.):
 pytest tests/ --cov=app --cov-report=term-missing --cov-report=xml
+
+# Medir sin fallar por umbral (exploración local):
+pytest tests/ --cov=app --cov-report=term-missing --cov-fail-under=0
 ```
 
-Nota: con la configuración actual, el reporte fallará en cobertura hasta acercarse al 90%; es el comportamiento esperado en CI.
+Hasta que la cobertura global llegue al 90%, es **esperado** que `pytest` falle por `fail_under` si no se pasa `--cov-fail-under=0` o equivalente en CI.
