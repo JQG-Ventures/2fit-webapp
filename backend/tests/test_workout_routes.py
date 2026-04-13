@@ -81,7 +81,8 @@ def test_saved_get_empty(app, client, db, sample_user) -> None:
 def test_saved_post_missing_workout_id(app, client, db, sample_user) -> None:
     headers = auth_headers(app, str(sample_user.id))
     r = client.post("/api/workouts/saved", headers=headers)
-    assert r.status_code == 415
+    assert r.status_code == 400
+    assert "workout_id" in (r.get_json() or {}).get("message", "")
 
 
 def test_saved_post_and_delete(app, client, db, sample_user, sample_workout_plan) -> None:
