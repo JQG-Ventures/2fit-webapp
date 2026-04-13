@@ -47,6 +47,10 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "integration: uses PostgreSQL (db fixture) or real I/O",
+    "unit: isolated logic and mocks, no database",
+]
 
 [tool.coverage.run]
 source = ["app"]
