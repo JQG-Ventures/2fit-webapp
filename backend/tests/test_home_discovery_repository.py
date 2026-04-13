@@ -13,13 +13,11 @@ pytestmark = [
 ]
 
 
-def test_get_explore_cards_empty_when_no_content(app, db) -> None:
-    with app.app_context():
-        cards = get_explore_cards(6)
-        assert isinstance(cards, list)
+def test_get_explore_cards_empty_when_no_content(db) -> None:
+    cards = get_explore_cards(6)
+    assert isinstance(cards, list)
 
 
-def test_get_by_level_all(app, db) -> None:
-    with app.app_context():
-        cards = get_by_level_cards("all", 3)
-        assert isinstance(cards, list)
+def test_get_by_level_all(db) -> None:
+    cards = get_by_level_cards("all", 3)
+    assert isinstance(cards, list)

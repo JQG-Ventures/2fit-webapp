@@ -32,7 +32,7 @@ def test_plans_get_success(app, client, db, sample_user) -> None:
 def test_plans_post_missing_body(app, client, db, sample_user) -> None:
     headers = auth_headers(app, str(sample_user.id))
     r = client.post("/api/workouts/plans", headers=headers)
-    assert r.status_code == 400
+    assert r.status_code == 415
 
 
 def test_plans_post_creates_plan(app, client, db, sample_user, sample_exercise) -> None:
@@ -81,7 +81,7 @@ def test_saved_get_empty(app, client, db, sample_user) -> None:
 def test_saved_post_missing_workout_id(app, client, db, sample_user) -> None:
     headers = auth_headers(app, str(sample_user.id))
     r = client.post("/api/workouts/saved", headers=headers)
-    assert r.status_code == 400
+    assert r.status_code == 415
 
 
 def test_saved_post_and_delete(app, client, db, sample_user, sample_workout_plan) -> None:
@@ -158,7 +158,7 @@ def test_delete_exercises_missing_body(
     headers = auth_headers(app, str(sample_user.id))
     pid = str(plan_with_one_exercise.plan.id)
     r = client.put(f"/api/workouts/plans/{pid}/delete-exercises", headers=headers)
-    assert r.status_code == 400
+    assert r.status_code == 415
 
 
 def test_update_exercises_missing_body(
@@ -167,7 +167,7 @@ def test_update_exercises_missing_body(
     headers = auth_headers(app, str(sample_user.id))
     pid = str(plan_with_one_exercise.plan.id)
     r = client.put(f"/api/workouts/plans/{pid}/update-exercises", headers=headers)
-    assert r.status_code == 400
+    assert r.status_code == 415
 
 
 def test_plans_bulk_validation(app, client, db, sample_user) -> None:

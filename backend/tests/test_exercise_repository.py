@@ -16,25 +16,23 @@ pytestmark = [
 ]
 
 
-def test_get_active_filters_inactive(app, db) -> None:
+def test_get_active_filters_inactive(db) -> None:
     ExerciseFactory.create(is_active=True, name="Active Ex")
     ExerciseFactory.create(is_active=False, name="Inactive Ex")
-    with app.app_context():
-        repo = ExerciseRepository()
-        active = repo.get_active()
-        names = {e.name for e in active}
-        assert "Active Ex" in names
-        assert "Inactive Ex" not in names
+    repo = ExerciseRepository()
+    active = repo.get_active()
+    names = {e.name for e in active}
+    assert "Active Ex" in names
+    assert "Inactive Ex" not in names
 
 
-def test_get_by_ids_order(app, db, sample_exercise) -> None:
-    with app.app_context():
-        repo = ExerciseRepository()
-        rows = repo.get_by_ids([sample_exercise.id])
-        assert len(rows) == 1
+def test_get_by_ids_order(db, sample_exercise) -> None:
+    repo = ExerciseRepository()
+    rows = repo.get_by_ids([sample_exercise.id])
+    assert len(rows) == 1
 
 
-def test_get_similar_overlapping_muscle(app, db) -> None:
+def test_get_similar_overlapping_muscle(db) -> None:
     a = ExerciseFactory.create(
         name="A",
         muscle_group=["chest", "triceps"],
@@ -46,31 +44,28 @@ def test_get_similar_overlapping_muscle(app, db) -> None:
         is_active=True,
     )
     db.session.commit()
-    with app.app_context():
-        repo = ExerciseRepository()
-        sim = repo.get_similar(a.id)
-        ids = {ex.id for ex in sim}
-        assert b.id in ids
+    repo = ExerciseRepository()
+    sim = repo.get_similar(a.id)
+    ids = {ex.id for ex in sim}
+    assert b.id in ids
 
 
-def test_get_similar_unknown_returns_empty(app, db) -> None:
-    with app.app_context():
-        repo = ExerciseRepository()
-        assert repo.get_similar(uuid.uuid4()) == []
+def test_get_similar_unknown_returns_empty(db) -> None:
+    repo = ExerciseRepository()
+    assert repo.get_similar(uuid.uuid4()) == []
 
 
-def test_soft_delete(app, db, sample_exercise) -> None:
+def test_soft_delete(db, sample_exercise) -> None:
     eid = sample_exercise.id
-    with app.app_context():
-        repo = ExerciseRepository()
-        assert repo.soft_delete(eid) is True
-        db.session.commit()
-        ex = repo.get_by_id(eid)
-        assert ex is not None
-        assert ex.is_active is False
+    repo = ExerciseRepository()
+    assert repo.soft_delete(eid) is True
+    db.session.commit()
+    ex = repo.get_by_id(eid)
+    assert ex is not None
+    assert ex.is_active is False
 
 
-def test_bulk_create(app, db) -> None:
+def test_bulk_create(db) -> None:
     data = [
         {
             "name": "Bulk 1",
@@ -86,8 +81,7 @@ def test_bulk_create(app, db) -> None:
             "video_url": "",
         }
     ]
-    with app.app_context():
-        repo = ExerciseRepository()
-        rows = repo.bulk_create(data)
-        assert len(rows) == 1
-        db.session.commit()
+    repo = ExerciseRepository()
+    rows = repo.bulk_create(data)
+    assert len(rows) == 1
+    db.session.commit()

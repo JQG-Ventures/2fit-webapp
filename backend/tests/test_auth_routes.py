@@ -115,21 +115,19 @@ def test_login_user_not_found(client, db) -> None:
 
 
 def test_login_wrong_password(app, client, db) -> None:
-    with app.app_context():
-        u = UserFactory.create()
-        u.password_hash = generate_password_hash("correct")
-        db.session.commit()
-        email = u.email
+    u = UserFactory.create()
+    u.password_hash = generate_password_hash("correct")
+    db.session.commit()
+    email = u.email
     r = client.post("/api/auth/login", json={"email": email, "password": "wrong"})
     assert r.status_code == 401
 
 
 def test_login_success(app, client, db) -> None:
-    with app.app_context():
-        u = UserFactory.create()
-        u.password_hash = generate_password_hash("correct")
-        db.session.commit()
-        email = u.email
+    u = UserFactory.create()
+    u.password_hash = generate_password_hash("correct")
+    db.session.commit()
+    email = u.email
     r = client.post("/api/auth/login", json={"email": email, "password": "correct"})
     assert r.status_code == 200
     body = r.get_json()
@@ -142,11 +140,10 @@ def test_login_success(app, client, db) -> None:
 
 
 def test_login_with_phone(app, client, db) -> None:
-    with app.app_context():
-        u = UserFactory.create()
-        u.password_hash = generate_password_hash("secret")
-        db.session.commit()
-        number = u.number
+    u = UserFactory.create()
+    u.password_hash = generate_password_hash("secret")
+    db.session.commit()
+    number = u.number
     r = client.post("/api/auth/login", json={"phone": number, "password": "secret"})
     assert r.status_code == 200
 
@@ -157,11 +154,10 @@ def test_refresh_requires_token(client, db) -> None:
 
 
 def test_refresh_success(app, client, db) -> None:
-    with app.app_context():
-        u = UserFactory.create()
-        u.password_hash = generate_password_hash("pw")
-        db.session.commit()
-        email = u.email
+    u = UserFactory.create()
+    u.password_hash = generate_password_hash("pw")
+    db.session.commit()
+    email = u.email
     login = client.post("/api/auth/login", json={"email": email, "password": "pw"})
     refresh = login.get_json()["message"]["refresh_token"]
     r = client.post(
@@ -256,9 +252,8 @@ def test_google_login_wrong_auth_provider(mock_verify, client, db, sample_user) 
 
 @patch("app.routes.authentication.id_token.verify_oauth2_token")
 def test_google_login_success(mock_verify, app, client, db) -> None:
-    with app.app_context():
-        UserFactory.create(email="googleok@example.com", auth_provider="google", password_hash="")
-        db.session.commit()
+    UserFactory.create(email="googleok@example.com", auth_provider="google", password_hash="")
+    db.session.commit()
     mock_verify.return_value = {"email": "googleok@example.com"}
     r = client.post("/api/auth/google-login", json={"id_token": "fake"})
     assert r.status_code == 200

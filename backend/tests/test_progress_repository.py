@@ -20,41 +20,38 @@ pytestmark = [
 ]
 
 
-def test_saved_add_get_remove(app, db) -> None:
+def test_saved_add_get_remove(db) -> None:
     user = UserFactory.create()
     plan = WorkoutPlanFactory.create()
     db.session.commit()
     uid, pid = user.id, plan.id
-    with app.app_context():
-        repo = SavedWorkoutRepository()
-        sw = repo.add(uid, pid)
-        assert sw.user_id == uid
-        rows = repo.get_by_user(uid)
-        assert len(rows) == 1
-        assert repo.remove(uid, pid) is True
-        assert repo.get_by_user(uid) == []
+    repo = SavedWorkoutRepository()
+    sw = repo.add(uid, pid)
+    assert sw.user_id == uid
+    rows = repo.get_by_user(uid)
+    assert len(rows) == 1
+    assert repo.remove(uid, pid) is True
+    assert repo.get_by_user(uid) == []
 
 
-def test_saved_add_idempotent(app, db) -> None:
+def test_saved_add_idempotent(db) -> None:
     user = UserFactory.create()
     plan = WorkoutPlanFactory.create()
     db.session.commit()
-    with app.app_context():
-        repo = SavedWorkoutRepository()
-        a = repo.add(user.id, plan.id)
-        b = repo.add(user.id, plan.id)
-        assert a.id == b.id
+    repo = SavedWorkoutRepository()
+    a = repo.add(user.id, plan.id)
+    b = repo.add(user.id, plan.id)
+    assert a.id == b.id
 
 
-def test_saved_remove_missing_returns_false(app, db, sample_user) -> None:
+def test_saved_remove_missing_returns_false(db, sample_user) -> None:
     plan = WorkoutPlanFactory.create()
     db.session.commit()
-    with app.app_context():
-        repo = SavedWorkoutRepository()
-        assert repo.remove(sample_user.id, plan.id) is False
+    repo = SavedWorkoutRepository()
+    assert repo.remove(sample_user.id, plan.id) is False
 
 
-def test_day_progress_find_or_create(app, db) -> None:
+def test_day_progress_find_or_create(db) -> None:
     user = UserFactory.create()
     plan = WorkoutPlanFactory.create()
     ap = ActivePlanFactory.create(
@@ -65,17 +62,15 @@ def test_day_progress_find_or_create(app, db) -> None:
         start_date=datetime(2024, 1, 1, tzinfo=UTC),
     )
     db.session.commit()
-    with app.app_context():
-        repo = DayProgressRepository()
-        d1 = repo.find_or_create(ap.id, week_number=1, day_of_week="monday")
-        d2 = repo.find_or_create(ap.id, week_number=1, day_of_week="monday")
-        assert d1.id == d2.id
+    repo = DayProgressRepository()
+    d1 = repo.find_or_create(ap.id, week_number=1, day_of_week="monday")
+    d2 = repo.find_or_create(ap.id, week_number=1, day_of_week="monday")
+    assert d1.id == d2.id
 
 
-def test_saved_workout_factory_links(app, db) -> None:
+def test_saved_workout_factory_links(db) -> None:
     sw = SavedWorkoutFactory.create()
     db.session.commit()
-    with app.app_context():
-        repo = SavedWorkoutRepository()
-        rows = repo.get_by_user(sw.user_id)
-        assert len(rows) == 1
+    repo = SavedWorkoutRepository()
+    rows = repo.get_by_user(sw.user_id)
+    assert len(rows) == 1

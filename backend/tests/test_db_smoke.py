@@ -13,10 +13,9 @@ from tests.factories import UserFactory
     not postgres_reachable(),
     reason="PostgreSQL not reachable (Docker: compose up postgres; create DB twofit_test)",
 )
-def test_user_factory_persists(app, db) -> None:
-    with app.app_context():
-        user = UserFactory.create()
-        db.session.commit()
-        loaded = db.session.get(User, user.id)
-        assert loaded is not None
-        assert loaded.email == user.email
+def test_user_factory_persists(db) -> None:
+    user = UserFactory.create()
+    db.session.commit()
+    loaded = db.session.get(User, user.id)
+    assert loaded is not None
+    assert loaded.email == user.email

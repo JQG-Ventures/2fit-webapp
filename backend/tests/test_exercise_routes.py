@@ -31,7 +31,7 @@ def test_exercises_list_success(app, client, db, sample_user) -> None:
 def test_exercises_post_missing_body(app, client, db, sample_user) -> None:
     headers = auth_headers(app, str(sample_user.id))
     r = client.post("/api/exercises/exercises", headers=headers)
-    assert r.status_code == 400
+    assert r.status_code == 415
 
 
 def test_exercises_post_success(app, client, db, sample_user) -> None:
@@ -90,11 +90,10 @@ def test_similar_not_found(app, client, db, sample_user) -> None:
 
 
 def test_similar_found(app, client, db, sample_user) -> None:
-    with app.app_context():
-        ex1 = ExerciseFactory.create(muscle_group=["chest", "biceps"])
-        ExerciseFactory.create(muscle_group=["chest", "triceps"])
-        db.session.commit()
-        eid = ex1.id
+    ex1 = ExerciseFactory.create(muscle_group=["chest", "biceps"])
+    ExerciseFactory.create(muscle_group=["chest", "triceps"])
+    db.session.commit()
+    eid = ex1.id
     headers = auth_headers(app, str(sample_user.id))
     r = client.get(f"/api/exercises/similar-exercises/{eid}", headers=headers)
     assert r.status_code == 200
