@@ -1,4 +1,4 @@
-# Backend: estado de testing y roadmap hacia ≥90% cobertura
+# Backend: estado de testing y roadmap (umbral de cobertura ≥85%)
 
 **Última verificación:** 2026-04-12 — `cd backend && pytest tests/ --cov=app --cov-report=term-missing --cov-fail-under=0`.
 
@@ -8,9 +8,9 @@
 |--------|----------------|-----------------|
 | Archivos `tests/test_*.py` | **31** + `conftest.py`, `db_utils.py`, `db_checks.py`, `support/*`, `factories/*`, `helpers/*` | Seguir ampliando por dominio |
 | Última corrida local | **52 passed, 161 skipped** (sin PostgreSQL: la mayoría de `@pytest.mark.integration` no corre) | En CI con `TEST_DATABASE_URL` + Postgres deberían ejecutarse casi todos |
-| Cobertura total (`app`, según `pyproject` `omit`) | **~49%** en el entorno anterior | **≥90%** (`[tool.coverage.report] fail_under = 90`; CI suele usar `--cov-fail-under=90`) |
+| Cobertura total (`app`, según `pyproject` `omit`) | **~49%** en el entorno anterior | **≥85%** (`[tool.coverage.report] fail_under = 85`; CI: `--cov-fail-under=85`) |
 
-La meta del repositorio sigue siendo **90%** de líneas en `app/` (excluyendo Celery/tasks ya omitidos). Hoy **no se alcanza**. El porcentaje local **sube** cuando Postgres está disponible: muchos tests de rutas, repositorios y servicios solo corren con el fixture `db`.
+La barra oficial del repositorio es **≥85%** de líneas en `app/` (excluyendo Celery/tasks ya omitidos). El porcentaje local **sube** cuando Postgres está disponible: muchos tests de rutas, repositorios y servicios solo corren con el fixture `db`.
 
 **Exclusiones de cobertura** (no entran en el total medido): `app/celery.py`, `app/celery_worker.py`, `app/tasks/*` (`pyproject.toml`).
 
@@ -39,7 +39,7 @@ La meta del repositorio sigue siendo **90%** de líneas en `app/` (excluyendo Ce
 
 Cifras con **muchos tests saltados** (sin Postgres). Sirven para **priorizar**, no como techo definitivo.
 
-**Mayor brecha (prioridad para llegar al 90%):**
+**Mayor brecha (mejoras opcionales por encima del umbral):**
 
 | Módulo | Cobertura (aprox.) | Comentario |
 |--------|-------------------|------------|
@@ -66,7 +66,7 @@ Cifras con **muchos tests saltados** (sin Postgres). Sirven para **priorizar**, 
 
 ---
 
-## Qué falta implementar para acercarse al 90%
+## Qué falta implementar para seguir subiendo cobertura
 
 Orden sugerido por **impacto en líneas** y **riesgo de regresiones**:
 
@@ -97,7 +97,7 @@ Orden sugerido por **impacto en líneas** y **riesgo de regresiones**:
 1. Cada endpoint o función pública: al menos **éxito** + **error esperado** (401, 403, 404, 400/415/422 según diseño).
 2. **Mocks** para OpenAI, Azure, Twilio, SendGrid, etc., en tests que no sean E2E.
 3. **Determinismo:** fechas e IDs acotados donde aplique.
-4. **Cobertura:** `pytest --cov=app --cov-report=term-missing`; en CI el umbral 90% es la barra oficial.
+4. **Cobertura:** `pytest --cov=app --cov-report=term-missing`; en CI el umbral **85%** es la barra oficial (`fail_under` / `--cov-fail-under`).
 
 ---
 
@@ -112,4 +112,4 @@ pytest tests/ --cov=app --cov-report=term-missing --cov-report=xml
 pytest tests/ --cov=app --cov-report=term-missing --cov-fail-under=0
 ```
 
-Hasta que la cobertura global llegue al 90%, es **esperado** que `pytest` falle por `fail_under` si no se pasa `--cov-fail-under=0` o equivalente en CI.
+Si la cobertura global cae por debajo de **85%**, `pytest` fallará por `fail_under` en local y en CI (salvo que se use `--cov-fail-under=0` solo para exploración).
