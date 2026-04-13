@@ -106,13 +106,11 @@ Cada lote debería incluir: **happy path**, **parámetros inválidos** (400/422 
 
 ### Lote 5 — Chat, email, contenido, Azure
 
-- `routes/chat.py`, `services/chat_service.py` (mock de LLM/API).
-- `routes/email.py`, integraciones SendGrid/Twilio según código real (mock).
-- `routes/content.py`, `services/azure_service.py` (mock de cliente Azure).
+**Implementado:** `tests/test_chat_routes.py` (`/api/chat`, `/api/transcribe`, mocks de `ChatService`), `tests/test_chat_service_unit.py` (`generate_bot_response`, `generate_motivational_phrases`, mensaje vacío), `tests/test_email_routes.py` (`/api/mail/save`, mock SendGrid), `tests/test_azure_content_routes.py` (`/api/azure/content/upload` y `GET .../content`, rol admin, mock `AzureService`).
 
 ### Lote 6 — Utilidades, tipos y capa transversal
 
-- `app/utils/utils.py`, `app/utils/users.py`, `app/types/challenge_types.py`, `app/auth/decorators.py` hasta estabilizar cobertura y cerrar el gap hacia **≥90%**.
+**Implementado:** `tests/test_utils_unit.py` (`build_gpt_generator_request`, `parse_answer`, `parse_date`, `format_json_string`), `tests/test_users_utils_unit.py` (`validate_user_by_credentials`), `tests/test_challenge_types_smoke.py` (TypedDicts), `tests/test_auth_decorators_routes.py` (`role_required` vía rutas Azure: 403 sin admin, 404 usuario inexistente).
 
 ---
 

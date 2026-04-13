@@ -25,15 +25,14 @@ class ChallengeListResource(Resource):
         try:
             repo = ChallengeRepository()
             challenges = repo.get_active()
-            result = []
+            result: list[dict[str, Any]] = []
             for c in challenges:
                 full = repo.get_with_schedule(c.id)
                 if full:
-                    result.append(
-                        ChallengeResponse.model_validate(full, from_attributes=True).model_dump(
-                            by_alias=True
-                        )
-                    )
+                    dumped: dict[str, Any] = ChallengeResponse.model_validate(
+                        full, from_attributes=True
+                    ).model_dump(by_alias=True)
+                    result.append(dumped)
             return {"status": "success", "message": result}, 200
         except Exception as e:
             logging.exception(str(e))
@@ -41,13 +40,13 @@ class ChallengeListResource(Resource):
 
     def post(self) -> ResponseTuple:
         try:
-            data = request.get_json()
+            data: Any | None = request.get_json()
             if data is None:
                 return {"status": "error", "message": "Body JSON requerido"}, 400
 
             schema = ChallengeCreate(**data)
             repo = ChallengeRepository()
-            challenge_data = {
+            challenge_data: dict[str, Any] = {
                 "name": schema.name,
                 "description": schema.description,
                 "plan_type": schema.plan_type,
@@ -61,12 +60,15 @@ class ChallengeListResource(Resource):
                 "level": schema.level,
                 "is_active": schema.is_active,
             }
-            days_data = [d.model_dump() for d in schema.workout_schedule]
+            days_data: list[dict[str, Any]] = [d.model_dump() for d in schema.workout_schedule]
             challenge = repo.create_full_challenge(challenge_data, days_data)
             db.session.commit()
             return {"status": "success", "message": str(challenge.id)}, 201
         except ValidationError as err:
-            return {"status": "error", "message": err.errors()}, 400
+            return {
+                "status": "error",
+                "message": err.errors(include_context=False, include_input=False),
+            }, 400
         except Exception as e:
             db.session.rollback()
             logging.exception(str(e))
@@ -79,19 +81,21 @@ class ChallengeResource(Resource):
         try:
             repo = ChallengeRepository()
             challenge = repo.get_with_schedule(uuid.UUID(challenge_id))
-            if challenge:
-                result = ChallengeResponse.model_validate(
-                    challenge, from_attributes=True
-                ).model_dump(by_alias=True)
-                return {"status": "success", "message": result}, 200
-            return {"status": "error", "message": "Challenge not found"}, 404
+            if challenge is None:
+                return {"status": "error", "message": "Challenge not found"}, 404
+            if not challenge.is_active:
+                return {"status": "error", "message": "Challenge not found"}, 404
+            result: dict[str, Any] = ChallengeResponse.model_validate(
+                challenge, from_attributes=True
+            ).model_dump(by_alias=True)
+            return {"status": "success", "message": result}, 200
         except Exception as e:
             logging.exception(str(e))
             return {"status": "error", "message": str(e)}, 500
 
     def put(self, challenge_id: str) -> ResponseTuple:
         try:
-            data = request.get_json()
+            data: Any | None = request.get_json()
             if data is None:
                 return {"status": "error", "message": "Body JSON requerido"}, 400
 
@@ -116,13 +120,16 @@ class ChallengeResource(Resource):
                 return {"status": "error", "message": "Challenge not found"}, 404
 
             if schema.workout_schedule:
-                days_data = [d.model_dump() for d in schema.workout_schedule]
+                days_data: list[dict[str, Any]] = [d.model_dump() for d in schema.workout_schedule]
                 repo.replace_schedule(ch_uuid, days_data)
 
             db.session.commit()
             return {"status": "success", "message": "Challenge updated"}, 200
         except ValidationError as err:
-            return {"status": "error", "message": err.errors()}, 400
+            return {
+                "status": "error",
+                "message": err.errors(include_context=False, include_input=False),
+            }, 400
         except Exception as e:
             db.session.rollback()
             logging.exception(str(e))
@@ -154,7 +161,7 @@ class UserChallengeProgressResource(Resource):
             if not challenge_id:
                 return {"status": "error", "message": "Falta challenge_id"}, 400
 
-            progress = UserWorkoutService.get_challenge_progress(user_id, challenge_id)
+            progress: Any = UserWorkoutService.get_challenge_progress(user_id, challenge_id)
             return {"status": "success", "message": progress}, 200
         except Exception as e:
             logging.exception("Error getting challenge progress: %s", e)
@@ -173,7 +180,7 @@ class UserChallengeProgressBatchResource(Resource):
             if not challenge_ids:
                 return {"status": "success", "message": []}, 200
 
-            results = [
+            results: list[Any] = [
                 UserWorkoutService.get_challenge_progress(user_id, cid) for cid in challenge_ids
             ]
             return {"status": "success", "message": results}, 200
@@ -189,7 +196,7 @@ class UserChallengeProgressBatchResource(Resource):
             if not user_id or not challenge_id:
                 return {"status": "error", "message": "Falta challenge_id o usuario"}, 400
 
-            data = request.get_json()
+            data: Any = request.get_json()
             if not data:
                 return {"status": "error", "message": "Body JSON requerido"}, 400
 
@@ -220,7 +227,7 @@ class CompleteChallengeResource(Resource):
             if not user_id:
                 return {"status": "error", "message": "Falta usuario"}, 400
 
-            data = request.get_json()
+            data: Any = request.get_json()
             if not data:
                 return {"status": "error", "message": "Body JSON requerido"}, 400
 

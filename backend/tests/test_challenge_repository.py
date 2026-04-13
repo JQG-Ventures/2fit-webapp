@@ -83,13 +83,14 @@ def test_soft_delete(db) -> None:
     repo = ChallengeRepository()
     assert repo.soft_delete(cid) is True
     db.session.commit()
-    assert repo.get_by_id(cid) is not None
-    assert repo.get_by_id(cid).is_active is False
+    loaded = repo.get_by_id(cid)
+    assert loaded is not None
+    assert loaded.is_active is False
 
 
-def test_replace_schedule(db, create_challenge_with_one_exercise) -> None:
+def test_replace_schedule(db, challenge_with_one_exercise) -> None:
     ex2 = ExerciseFactory.create(name="Replacement Ex")
-    ch_id = create_challenge_with_one_exercise.challenge.id
+    ch_id = challenge_with_one_exercise.challenge.id
     repo = ChallengeRepository()
     repo.replace_schedule(
         ch_id,
