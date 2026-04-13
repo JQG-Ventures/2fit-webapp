@@ -1,6 +1,7 @@
 """Minimal stubs for Pylance (``flask_restx`` ships without inline types)."""
 
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 R = TypeVar("R", bound=type)
 
