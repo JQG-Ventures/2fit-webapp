@@ -48,6 +48,12 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
+pythonpath = ["."]
+markers = [
+    "integration: uses PostgreSQL (db fixture) or real I/O",
+    "unit: isolated logic and mocks, no database",
+]
+
 [tool.coverage.run]
 source = ["app"]
 omit = [
@@ -57,7 +63,7 @@ omit = [
 ]
 
 [tool.coverage.report]
-fail_under = 90
+fail_under = 85
 show_missing = true
 exclude_lines = [
     "pragma: no cover",

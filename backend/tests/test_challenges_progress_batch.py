@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from flask.testing import FlaskClient
 
-from tests.conftest import auth_headers
+from tests.helpers.jwt_headers import auth_headers
 
 BATCH_PATH = "/api/challenges/challenges/progress/batch"
 
