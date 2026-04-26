@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { IoChevronBack } from 'react-icons/io5';
+import { FiX } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import BottomSheet from '@/app/_components/modals/ExpandableBottomSheet';
@@ -20,7 +20,7 @@ const RestView: React.FC<RestViewProp> = ({
     restDuration,
     onNext,
     onBack,
-    nextExercise: _nextExercise,
+    nextExercise,
     exercises,
     currentExerciseIndex,
     currentSet,
@@ -40,97 +40,65 @@ const RestView: React.FC<RestViewProp> = ({
     };
 
     return (
-        <div className="flex flex-col h-full w-full max-w-4xl items-center">
-            <div className="h-[15%] w-full p-10 pt-20">
+        <div className="flex h-full w-full flex-col items-center bg-[#f8faf9]">
+            <div className="flex w-full max-w-3xl items-center justify-between px-5 pt-[calc(1.25rem+env(safe-area-inset-top))]">
                 <button
                     type="button"
                     onClick={onBack}
-                    className="text-4xl lg:hidden"
-                    aria-label={t('a11y.goBack')}
+                    className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+                    aria-label={t('a11y.exitWorkout')}
                 >
-                    <IoChevronBack />
+                    <FiX className="h-6 w-6" />
                 </button>
+                <span className="rounded-full bg-white px-4 py-2 text-[1.05rem] font-semibold text-gray-600 shadow-sm">
+                    Set {currentSet}
+                </span>
+                <div className="h-12 w-12" />
             </div>
-            <div className="h-[60%] p-10 flex flex-col justify-between items-center">
-                <h2 className="text-center text-5xl font-semibold bg-gradient-to-r from-green-400 to-green-600 text-transparent bg-clip-text">
-                    {t('RestView.rest')}
-                </h2>
 
-                <div className="flex-1 flex items-center justify-center">
-                    <CountdownCircleTimer
-                        key={timerKey}
-                        isPlaying
-                        duration={duration}
-                        size={200}
-                        strokeWidth={16}
-                        colors={['#34D399', '#10B981', '#059669', '#047857']}
-                        colorsTime={[duration, duration / 2, duration / 4, 0]}
-                        trailColor="#E6E6E6"
-                        onComplete={() => {
-                            onNext();
-                            return { shouldRepeat: false };
-                        }}
-                    >
-                        {({ remainingTime }) => (
-                            <span className="text-5xl font-bold text-black">
-                                {String(Math.floor(remainingTime / 60)).padStart(2, '0')}:
-                                {String(remainingTime % 60).padStart(2, '0')}
-                            </span>
-                        )}
-                    </CountdownCircleTimer>
-                </div>
-            </div>
-            {/*             <div className="fixed bottom-0 left-0 w-full z-50 border rounded-t-3xl">
-                <div className="absolute top-[10px] left-1/2 transform -translate-x-1/2 w-24 h-2 bg-gray-300 rounded-full opacity-50 z-10"></div>
-                <div className="w-full bg-white rounded-t-3xl shadow-xl px-6 py-10 flex flex-col space-y-8">
-                    {nextExercise && (
-                        <div className="flex flex-row items-center space-x-4">
-                            <div className="relative w-48 h-48 rounded-xl overflow-hidden flex-shrink-0">
-                                <Image
-                                    src={nextExercise.image_url}
-                                    alt={nextExercise.name}
-                                    layout="fill"
-                                    objectFit="cover"
-                                    className="object-cover"
-                                />
-                            </div>
-                            <div className="flex-1 py-4">
-                                <h3 className="text-2xl font-semibold leading-tight">
-                                    {t('RestView.nextEx')}
-                                    <br />
-                                    {nextExercise.name}
-                                </h3>
-                                <p className="text-xl mt-2 text-gray-600">12 reps • Rest 90s</p>
-                            </div>
-                        </div>
-                    )}
-                    <div className="flex justify-between items-center mt-4">
-                        <button
-                            onClick={subtractTime}
-                            className="py-4 px-5 rounded-full border border-gray-300 text-xl font-bold shadow-sm"
+            <div className="flex min-h-0 flex-1 items-center justify-center px-5 pb-44 pt-8">
+                <div className="flex w-full max-w-md flex-col items-center rounded-[2rem] border border-gray-100 bg-white p-8 shadow-sm">
+                    <p className="text-[1.05rem] font-medium text-green-600">
+                        {t('RestView.rest')}
+                    </p>
+                    <h2 className="mt-2 text-center text-[2.25rem] font-semibold text-gray-950">
+                        {t('RestView.nextEx')}
+                    </h2>
+                    <p className="mt-1 max-w-xs truncate text-center text-[1.2rem] text-gray-500">
+                        {nextExercise.name}
+                    </p>
+
+                    <div className="mt-8 flex items-center justify-center">
+                        <CountdownCircleTimer
+                            key={timerKey}
+                            isPlaying
+                            duration={duration}
+                            size={220}
+                            strokeWidth={14}
+                            colors={['#22C55E', '#16A34A', '#15803D', '#166534']}
+                            colorsTime={[duration, duration / 2, duration / 4, 0]}
+                            trailColor="#F1F5F9"
+                            onComplete={() => {
+                                onNext();
+                                return { shouldRepeat: false };
+                            }}
                         >
-                            -5
-                        </button>
-                        <button
-                            onClick={onNext}
-                            className="flex-1 mx-4 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white py-6 rounded-full text-xl font-semibold shadow-lg"
-                        >
-                            {t('RestView.skip')}
-                        </button>
-                        <button
-                            onClick={addTime}
-                            className="py-4 px-5 rounded-full border border-gray-300 text-xl font-bold shadow-sm"
-                        >
-                            +5
-                        </button>
+                            {({ remainingTime }) => (
+                                <span className="text-5xl font-semibold text-gray-950">
+                                    {String(Math.floor(remainingTime / 60)).padStart(2, '0')}:
+                                    {String(remainingTime % 60).padStart(2, '0')}
+                                </span>
+                            )}
+                        </CountdownCircleTimer>
                     </div>
                 </div>
-            </div> */}
+            </div>
             <BottomSheet
                 exercises={exercises}
                 currentExerciseIndex={currentExerciseIndex}
                 currentSet={currentSet}
                 isRestView
+                nextPreviewExercise={nextExercise}
                 onAddTime={addTime}
                 onSubtractTime={subtractTime}
                 onSkipRest={onNext}

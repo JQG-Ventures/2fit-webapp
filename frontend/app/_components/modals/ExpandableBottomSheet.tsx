@@ -10,6 +10,7 @@ interface BottomSheetProps {
     currentSet: number;
     onComplete?: () => void;
     isRestView?: boolean;
+    nextPreviewExercise?: Exercise;
     onAddTime?: () => void;
     onSubtractTime?: () => void;
     onSkipRest?: () => void;
@@ -21,49 +22,61 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     currentSet,
     onComplete,
     isRestView,
+    nextPreviewExercise,
     onAddTime,
     onSubtractTime,
     onSkipRest,
 }) => {
+    const restPreview = isRestView && nextPreviewExercise;
     const { t } = useTranslation('global');
     const [expanded, setExpanded] = useState(false);
 
     return (
         <div
-            className={`fixed bottom-0 left-0 w-full z-50 rounded-t-3xl bg-white transition-all duration-300 ${
-                expanded ? 'h-[80vh]' : 'pb-6'
-            } shadow-[0_-4px_20px_rgba(0,0,0,0.15)] border-t border-gray-200`}
+            className={`fixed bottom-0 left-0 z-50 w-full rounded-t-[2rem] border-t border-gray-100 bg-white transition-all duration-300 ${
+                expanded ? 'h-[80vh]' : 'pb-[calc(1.25rem+env(safe-area-inset-bottom))]'
+            } shadow-[0_-10px_40px_rgba(15,23,42,0.12)]`}
         >
             <div
-                className="absolute top-2 left-1/2 transform -translate-x-1/2 w-24 h-2 bg-gray-300 rounded-full opacity-50 z-10 cursor-pointer"
+                className="absolute left-1/2 top-3 z-10 h-1.5 w-14 -translate-x-1/2 cursor-pointer rounded-full bg-gray-200"
                 onClick={() => setExpanded((prev) => !prev)}
             ></div>
 
-            <div className="flex flex-col h-full w-full px-0 pt-8">
-                <div className="px-6 space-y-6">
-                    <div className="flex items-center space-x-4">
-                        <div className="relative w-36 h-36 rounded-xl overflow-hidden flex-shrink-0">
+            <div className="flex h-full w-full flex-col px-0 pt-9">
+                <div className="space-y-5 px-5">
+                    <div className="flex items-center gap-4 rounded-3xl border border-gray-100 bg-[#f8faf9] p-3">
+                        <div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-2xl bg-gray-100">
                             <Image
                                 src={
-                                    isRestView
-                                        ? exercises[currentExerciseIndex + 1]?.image_url
+                                    restPreview
+                                        ? nextPreviewExercise.image_url
                                         : exercises[currentExerciseIndex].image_url
                                 }
-                                alt={exercises[currentExerciseIndex]?.name}
-                                layout="fill"
-                                objectFit="cover"
+                                alt={
+                                    restPreview
+                                        ? nextPreviewExercise.name
+                                        : exercises[currentExerciseIndex].name
+                                }
+                                fill
+                                sizes="112px"
                                 className="object-cover"
                             />
                         </div>
-                        <div className="flex-1">
-                            <h3 className="text-3xl font-semibold leading-tight">
-                                {isRestView
-                                    ? exercises[currentExerciseIndex + 1]?.name
+                        <div className="min-w-0 flex-1">
+                            <p className="text-xs font-medium uppercase tracking-[0.16em] text-green-600">
+                                {restPreview
+                                    ? t('RestView.nextEx')
+                                    : t('workouts.my-plan.previewExercise')}
+                            </p>
+                            <h3 className="mt-1 truncate text-[1.35rem] font-semibold leading-tight text-gray-950">
+                                {restPreview
+                                    ? nextPreviewExercise.name
                                     : exercises[currentExerciseIndex].name}
                             </h3>
-                            <p className="text-xl mt-2 text-gray-600">
-                                {exercises[currentExerciseIndex]?.reps} reps • Rest{' '}
-                                {exercises[currentExerciseIndex]?.rest_seconds}s
+                            <p className="mt-2 text-sm text-gray-500">
+                                {restPreview
+                                    ? `${nextPreviewExercise.reps} reps • ${nextPreviewExercise.rest_seconds}s ${t('workouts.my-plan.restLabel')}`
+                                    : `${exercises[currentExerciseIndex].reps} reps • ${exercises[currentExerciseIndex].rest_seconds}s ${t('workouts.my-plan.restLabel')}`}
                             </p>
                         </div>
                     </div>
@@ -72,7 +85,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                         <button
                             type="button"
                             onClick={onComplete}
-                            className="w-full bg-gradient-to-r from-emerald-400 to-emerald-600 text-white py-5 rounded-full text-xl font-semibold shadow-lg hover:bg-emerald-500 transition-all"
+                            className="w-full rounded-full bg-green-500 py-5 text-lg font-semibold text-white shadow-lg shadow-green-500/20 transition-colors hover:bg-green-600"
                             aria-label={t('ExerciseFlow.complete')}
                         >
                             {t('ExerciseFlow.complete')}
@@ -84,7 +97,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                             <button
                                 type="button"
                                 onClick={onSubtractTime}
-                                className="py-4 px-6 rounded-full border border-gray-300 text-xl font-bold shadow-sm"
+                                className="rounded-full border border-gray-200 bg-white px-6 py-4 text-xl font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
                                 aria-label={t('a11y.decreaseRest')}
                             >
                                 -5
@@ -92,7 +105,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                             <button
                                 type="button"
                                 onClick={onSkipRest}
-                                className="bg-gradient-to-r from-emerald-400 to-emerald-600 text-white py-4 px-6 rounded-full text-xl font-semibold shadow-lg w-full"
+                                className="w-full rounded-full bg-green-500 px-6 py-4 text-lg font-semibold text-white shadow-lg shadow-green-500/20 transition-colors hover:bg-green-600"
                                 aria-label={t('RestView.skip')}
                             >
                                 {t('RestView.skip')}
@@ -100,7 +113,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                             <button
                                 type="button"
                                 onClick={onAddTime}
-                                className="py-4 px-6 rounded-full border border-gray-300 text-xl font-bold shadow-sm"
+                                className="rounded-full border border-gray-200 bg-white px-6 py-4 text-xl font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
                                 aria-label={t('a11y.increaseRest')}
                             >
                                 +5
@@ -110,7 +123,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                 </div>
 
                 {expanded && (
-                    <div className="overflow-y-auto mt-6 px-0 pb-20">
+                    <div className="mt-6 overflow-y-auto px-3 pb-20">
                         {exercises.map((exercise, exIdx) => {
                             const isCompleted = exIdx < currentExerciseIndex;
                             const isCurrent = exIdx === currentExerciseIndex;
@@ -125,31 +138,32 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                                         return (
                                             <div
                                                 key={`set-${setNumber}`}
-                                                className={`flex items-center space-x-4 px-4 py-4 ${
-                                                    isCurrentSet ? 'bg-emerald-50' : ''
+                                                className={`flex items-center gap-4 rounded-3xl px-3 py-3 ${
+                                                    isCurrentSet ? 'bg-green-50' : ''
                                                 }`}
                                             >
-                                                <div className="relative w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
+                                                <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-2xl bg-gray-100">
                                                     <Image
                                                         src={exercise.image_url}
                                                         alt={exercise.name}
-                                                        layout="fill"
-                                                        objectFit="cover"
+                                                        fill
+                                                        sizes="96px"
                                                         className="object-cover"
                                                     />
                                                 </div>
-                                                <div className="flex-1">
+                                                <div className="min-w-0 flex-1">
                                                     <div className="flex items-center justify-between">
-                                                        <h3 className="text-2xl font-semibold">
+                                                        <h3 className="truncate text-base font-semibold text-gray-950">
                                                             {exercise.name}
                                                         </h3>
                                                         {isSetCompleted && (
-                                                            <FaCheckCircle className="text-green-500 text-xl ml-2" />
+                                                            <FaCheckCircle className="ml-2 text-xl text-green-500" />
                                                         )}
                                                     </div>
-                                                    <p className="text-lg text-gray-600 mt-1">
-                                                        {exercise.reps} reps • Rest{' '}
-                                                        {exercise.rest_seconds}s
+                                                    <p className="mt-1 text-sm text-gray-500">
+                                                        {exercise.reps} reps •{' '}
+                                                        {exercise.rest_seconds}s{' '}
+                                                        {t('workouts.my-plan.restLabel')}
                                                     </p>
                                                 </div>
                                             </div>
@@ -157,7 +171,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                                     })}
 
                                     {exIdx < exercises.length - 1 && (
-                                        <div className="text-center py-2 text-gray-400 text-sm">
+                                        <div className="py-2 text-center text-sm text-gray-400">
                                             {t('ExerciseFlow.restIndicator', {
                                                 seconds: exercise.rest_seconds,
                                             })}

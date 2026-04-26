@@ -13,11 +13,11 @@ const CustomModal: FC<ConfirmationModalProps> = ({ isOpen, handleCloseModal, chi
 
     return (
         <div
-            className="fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-[999]"
+            className="fixed inset-0 z-[999] flex items-end justify-center bg-black/45 px-3"
             onClick={handleCloseModal}
         >
             <div
-                className="bg-white p-10 rounded-t-3xl shadow-xl w-full mb-0 transform transition-all duration-300 ease-in-out translate-y-10 opacity-100 animate-slide-up"
+                className="mb-0 w-full max-w-2xl animate-slide-up rounded-t-[2rem] bg-[#f8faf9] p-5 pb-[calc(2.5rem+env(safe-area-inset-bottom))] shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
             >
                 {children}

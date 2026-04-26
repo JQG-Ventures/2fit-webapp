@@ -102,9 +102,10 @@ export const useSendProgressToBackend = () => {
 };
 
 export const useSendCompleteToBackend = () => {
-    return useApiPost<{ body: ExerciseComplete }, ApiStatusResponse>(
-        '/api/users/workouts/complete',
-    );
+    return useApiPost<
+        { queryParams?: { workout_plan_id: string }; body: ExerciseComplete },
+        ApiStatusResponse
+    >('/api/users/workouts/complete');
 };
 
 export const useSaveWorkout = () => {

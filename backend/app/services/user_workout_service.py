@@ -20,6 +20,11 @@ Payload = dict[str, Any]
 class UserWorkoutService:
     @staticmethod
     def calculate_week_number(start_date: datetime, completed_date: datetime) -> int:
+        if start_date.tzinfo is None and completed_date.tzinfo is not None:
+            start_date = start_date.replace(tzinfo=completed_date.tzinfo)
+        elif completed_date.tzinfo is None and start_date.tzinfo is not None:
+            completed_date = completed_date.replace(tzinfo=start_date.tzinfo)
+
         delta_days = (completed_date - start_date).days
         return delta_days // 7 + 1
 
@@ -197,7 +202,7 @@ class UserWorkoutService:
         return progress_pct, exercises_left
 
     @staticmethod
-    def get_weekly_workout_progress(user_id: str) -> Payload:
+    def get_weekly_workout_progress(user_id: str, week_number: int | None = None) -> Payload:
         try:
             user_uuid = uuid.UUID(user_id)
             plan_repo = ActivePlanRepository()
@@ -220,11 +225,20 @@ class UserWorkoutService:
             delta_days = (today - start_date).days
             current_week = (delta_days // 7) + 1
             duration_weeks = workout_plan.duration_weeks or 0
+            requested_week = week_number or current_week
 
-            if current_week > duration_weeks:
-                return {"week_start_date": "", "week_end_date": "", "progress": 0.0, "days": []}
+            if requested_week < 1 or requested_week > duration_weeks:
+                return {
+                    "week_start_date": "",
+                    "week_end_date": "",
+                    "progress": 0.0,
+                    "current_week": current_week,
+                    "week_number": requested_week,
+                    "total_weeks": duration_weeks,
+                    "days": [],
+                }
 
-            start_of_week = start_date + timedelta(weeks=(current_week - 1))
+            start_of_week = start_date + timedelta(weeks=(requested_week - 1))
             end_of_week = start_of_week + timedelta(days=6)
 
             days_of_week = [
@@ -243,7 +257,7 @@ class UserWorkoutService:
             day_map = {d.day_of_week: d for d in workout_plan.workout_days if d.day_of_week}
             progress_map: dict[str, Any] = {}
             for progress_detail in active_plan.progress_details:
-                if progress_detail.week_number == current_week and progress_detail.day_of_week:
+                if progress_detail.week_number == requested_week and progress_detail.day_of_week:
                     progress_map[progress_detail.day_of_week] = progress_detail
 
             for day_name in days_of_week:
@@ -300,6 +314,9 @@ class UserWorkoutService:
             return {
                 "week_start_date": start_of_week.date().isoformat(),
                 "week_end_date": end_of_week.date().isoformat(),
+                "current_week": current_week,
+                "week_number": requested_week,
+                "total_weeks": duration_weeks,
                 "progress": progress,
                 "days": response_days,
             }
@@ -483,6 +500,8 @@ class UserWorkoutService:
                 total_scheduled = len(workout_plan.workout_days)
                 db.session.refresh(active_plan)
                 completed_count = sum(1 for dp in active_plan.progress_details if dp.is_completed)
+                if not any(dp.id == day_progress.id for dp in active_plan.progress_details):
+                    completed_count += 1
                 active_plan.progress = (
                     (completed_count / total_scheduled) * 100 if total_scheduled else 0.0
                 )

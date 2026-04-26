@@ -1,6 +1,6 @@
 import logging
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from random import randint
 
 from flask import Blueprint, request
@@ -40,17 +40,28 @@ class CompleteWorkoutResource(Resource):
             if not isinstance(user_id, str):
                 return {"status": "error", "message": "Missing required parameter: user_id"}, 400
 
+            workout_plan_id = request.args.get("workout_plan_id")
             data = request.get_json()
-            data["date"] = datetime.now().isoformat()
+            data["date"] = datetime.now(UTC).isoformat()
 
             try:
                 validated = CompletedWorkoutCreate(**data)
             except Exception as err:
                 return {"status": "error", "message": "Invalid input", "errors": str(err)}, 400
 
-            UserWorkoutService.save_completed_workout(user_id, validated.model_dump())
+            completed_payload = validated.model_dump()
+            UserWorkoutService.save_completed_workout(user_id, completed_payload.copy())
+            if workout_plan_id:
+                UserWorkoutService.save_workout_progress(
+                    user_id,
+                    workout_plan_id,
+                    completed_payload.copy(),
+                )
             db.session.commit()
             return {"status": "success", "message": "Workout saved successfully"}, 200
+        except ValueError as e:
+            db.session.rollback()
+            return {"status": "error", "message": str(e)}, 400
         except Exception as e:
             db.session.rollback()
             logger.exception("Error saving completed workout: %s", e)

@@ -346,7 +346,9 @@ class WeeklyWorkoutProgressResource(Resource):
     def get(self) -> tuple[dict[str, Any], int]:
         try:
             user_id = get_jwt_identity()
-            progress = UserWorkoutService.get_weekly_workout_progress(user_id)
+            week_number_arg = request.args.get("week_number")
+            week_number = int(week_number_arg) if week_number_arg else None
+            progress = UserWorkoutService.get_weekly_workout_progress(user_id, week_number)
             return {"status": "success", "message": progress}, 200
         except Exception as e:
             logging.exception("Error retrieving weekly workout progress: %s", e)

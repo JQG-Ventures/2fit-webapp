@@ -1,3 +1,15 @@
+export interface AnimationOriginRect {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+}
+
+export interface ExerciseAnimationTargets {
+    previewOrigin?: AnimationOriginRect | null;
+    completionTarget?: AnimationOriginRect | null;
+}
+
 export interface ExerciseFlowProps {
     exercises: Exercise[];
     onClose: () => void;
@@ -6,6 +18,9 @@ export interface ExerciseFlowProps {
     userId: string;
     workoutPlanId: string;
     sequenceDay?: number;
+    dayOfWeek?: string;
+    animationOrigin?: AnimationOriginRect | null;
+    completionTarget?: AnimationOriginRect | null;
 }
 
 export interface ExerciseProgress {
