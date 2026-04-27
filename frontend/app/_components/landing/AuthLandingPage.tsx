@@ -24,7 +24,7 @@ const SLIDES = [
     },
 ];
 
-export default function LandingPage() {
+export default function AuthLandingPage() {
     const { t } = useTranslation('global');
     const router = useRouter();
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -36,7 +36,6 @@ export default function LandingPage() {
 
     return (
         <div className="relative flex flex-col min-h-screen bg-black overflow-hidden">
-            {/* Background image */}
             <AnimatePresence mode="wait">
                 <motion.div
                     key={currentSlide}
@@ -57,9 +56,7 @@ export default function LandingPage() {
                 </motion.div>
             </AnimatePresence>
 
-            {/* Content */}
             <div className="relative z-10 flex flex-col min-h-screen">
-                {/* Top — tap zone to advance */}
                 <button
                     type="button"
                     onClick={handleNext}
@@ -67,9 +64,7 @@ export default function LandingPage() {
                     aria-label="Next slide"
                 />
 
-                {/* Bottom — text + CTAs */}
                 <div className="w-full max-w-lg mx-auto px-6 pb-12 pt-6">
-                    {/* Dot indicators */}
                     <div className="flex justify-center gap-2 mb-6">
                         {SLIDES.map((_, i) => (
                             <button
@@ -84,7 +79,6 @@ export default function LandingPage() {
                         ))}
                     </div>
 
-                    {/* Slide text */}
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={currentSlide}
@@ -103,7 +97,6 @@ export default function LandingPage() {
                         </motion.div>
                     </AnimatePresence>
 
-                    {/* CTAs */}
                     <div className="flex flex-col gap-3">
                         <button
                             type="button"
