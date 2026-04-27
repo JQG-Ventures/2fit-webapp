@@ -6,6 +6,8 @@ import { FiCheck, FiRefreshCw, FiX } from 'react-icons/fi';
 import { FaClock, FaDumbbell, FaFire } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import ReplacementExerciseCard from '@/app/_components/workouts/my-plan/ReplacementExerciseCard';
+import ExerciseScopeBlock from '@/app/_components/workouts/my-plan/ExerciseScopeBlock';
+import type { PlanChangeScope } from '@/app/_types/planChangeScope';
 
 interface ExerciseReplaceSheetProps {
     isOpen: boolean;
@@ -15,6 +17,9 @@ interface ExerciseReplaceSheetProps {
     onSelectExercise: (exercise: Exercise) => void;
     onConfirm: () => void;
     onClose: () => void;
+    scope: PlanChangeScope;
+    onScopeChange: (scope: PlanChangeScope) => void;
+    viewedWeekNumber: number;
 }
 
 const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
@@ -25,6 +30,9 @@ const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
     onSelectExercise,
     onConfirm,
     onClose,
+    scope,
+    onScopeChange,
+    viewedWeekNumber,
 }) => {
     const { t } = useTranslation('global');
 
@@ -48,11 +56,11 @@ const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
                 <div className="sticky top-0 z-10 border-b border-gray-100 bg-[#f8faf9]/95 px-5 pb-5 pt-[calc(2rem+env(safe-area-inset-top))] backdrop-blur">
                     <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0">
-                            <p className="flex items-center gap-2 text-sm font-medium text-green-600">
+                            <p className="flex items-center gap-2 text-base font-medium text-green-600">
                                 <FiRefreshCw className="h-4 w-4" />
                                 {t('workouts.my-plan.replaceExerciseTitle')}
                             </p>
-                            <h2 className="mt-2 text-[1.375rem] font-semibold leading-tight text-gray-950">
+                            <h2 className="mt-2 text-xl font-semibold leading-tight text-gray-950">
                                 {t('workouts.my-plan.replaceExerciseSubtitle', {
                                     exerciseName: currentExercise?.name ?? '',
                                 })}
@@ -70,9 +78,14 @@ const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
                 </div>
 
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+                    <ExerciseScopeBlock
+                        value={scope}
+                        onChange={onScopeChange}
+                        weekNumber={viewedWeekNumber}
+                    />
                     {currentExercise && (
                         <section className="mb-5 rounded-3xl border border-gray-100 bg-white p-3 shadow-sm">
-                            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+                            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-gray-400">
                                 {t('workouts.my-plan.currentExercise')}
                             </p>
                             <div className="flex items-center gap-4">
@@ -87,14 +100,14 @@ const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
                                         />
                                     ) : (
                                         <div className="flex h-full w-full items-center justify-center">
-                                            <span className="text-xs font-semibold uppercase text-green-700">
+                                            <span className="text-sm font-semibold uppercase text-green-700">
                                                 {currentFallback.slice(0, 4)}
                                             </span>
                                         </div>
                                     )}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <h3 className="truncate text-base font-semibold text-gray-950">
+                                    <h3 className="truncate text-lg font-semibold text-gray-950">
                                         {currentExercise.name}
                                     </h3>
                                     <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
@@ -117,10 +130,10 @@ const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
 
                     <section>
                         <div className="mb-3 flex items-center justify-between">
-                            <p className="text-sm font-semibold text-gray-900">
+                            <p className="text-base font-semibold text-gray-900">
                                 {t('workouts.my-plan.replacementOptions')}
                             </p>
-                            <span className="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-gray-500">
+                            <span className="rounded-full bg-white px-2.5 py-1 text-sm font-medium text-gray-500">
                                 {options.length}
                             </span>
                         </div>
@@ -146,7 +159,7 @@ const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
                                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gray-50 text-gray-400">
                                     <FaDumbbell className="h-6 w-6" />
                                 </div>
-                                <h3 className="mt-4 font-semibold text-gray-900">
+                                <h3 className="mt-4 text-lg font-semibold text-gray-900">
                                     {t('workouts.my-plan.noReplacementOptions')}
                                 </h3>
                             </div>
@@ -159,7 +172,7 @@ const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 rounded-full border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+                            className="flex-1 rounded-full border border-gray-200 bg-white px-4 py-3 text-base font-semibold text-gray-700 transition-colors hover:bg-gray-50"
                         >
                             {t('workouts.my-plan.cancelReplacement')}
                         </button>
@@ -167,7 +180,7 @@ const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
                             type="button"
                             onClick={onConfirm}
                             disabled={!selectedExercise}
-                            className={`flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition-colors ${
+                            className={`flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-3 text-base font-semibold transition-colors ${
                                 selectedExercise
                                     ? 'bg-green-500 text-white shadow-lg shadow-green-500/20 hover:bg-green-600'
                                     : 'cursor-not-allowed bg-gray-100 text-gray-400'

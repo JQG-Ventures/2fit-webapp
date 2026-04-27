@@ -13,20 +13,20 @@ import ExerciseFlow from '@/app/_components/workouts/ExerciseFlow';
 import { useApiGet } from '@/app/utils/apiClient';
 import { useSession } from 'next-auth/react';
 import { HiDotsHorizontal } from 'react-icons/hi';
-import ConfirmationModal from '@/app/_components/modals/confirmationModal';
 import { useDeleteExercises, useModifyExercises } from '@/app/_services/workoutService';
 import { useSendCompleteToBackend } from '@/app/_services/userService';
 import ExerciseCard from '@/app/_components/workouts/my-plan/ExerciseCard';
 import DaysOfWeekSelector from '@/app/_components/workouts/my-plan/DaysOfWeekSelector';
 import CustomModal from '@/app/_components/modals/CustomModal';
 import ExerciseReplaceSheet from '@/app/_components/workouts/my-plan/ExerciseReplaceSheet';
+import ExerciseDeleteSheet from '@/app/_components/workouts/my-plan/ExerciseDeleteSheet';
+import type { PlanChangeScope } from '@/app/_types/planChangeScope';
 import { getSimilarExercises } from '@/app/_services/exerciseService';
 import { API_ROUTES } from '@/lib/apiRoutes';
 import { WEEKLY_WORKOUT_PROGRESS_QUERY_KEY } from '@/app/_constants/queryKeys';
 import { IoChevronBack, IoChevronForward } from 'react-icons/io5';
 import { FiRefreshCw, FiTrash2, FiX } from 'react-icons/fi';
 import type { ApiResponse } from '@/app/_types/api';
-import type { ExerciseDeletePayload } from '@/app/_services/workoutService';
 import type { AnimationOriginRect, ExerciseAnimationTargets } from '@/app/_interfaces/ExerciseFlow';
 
 const DEFAULT_SECONDS_PER_REP = 3;
@@ -110,13 +110,15 @@ const MyPlan: React.FC = () => {
     const [showExerciseFlow, setShowExerciseFlow] = useState<boolean>(false);
 
     const [showOptionsModal, setShowOptionsModal] = useState<boolean>(false);
-    const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
     const [isOptionalExercisesOpen, setIsOptionalExercisesOpen] = useState(false);
 
     const [isDeleteMode, setIsDeleteMode] = useState<boolean>(false);
     const [isOptionalMode, setIsOptionalMode] = useState<boolean>(false);
 
-    const [exercisesToDelete, setExercisesToDelete] = useState<ExerciseDeletePayload>({});
+    const [exercisesToDelete, setExercisesToDelete] = useState<Record<string, string[]>>({});
+    const [isDeleteSheetOpen, setIsDeleteSheetOpen] = useState(false);
+    const [deleteScope, setDeleteScope] = useState<PlanChangeScope>('template');
+    const [replaceScope, setReplaceScope] = useState<PlanChangeScope>('template');
     const [weeklyProgressState, setWeeklyProgressState] = useState<WeeklyProgressMessage | null>(
         null,
     );
@@ -210,6 +212,11 @@ const MyPlan: React.FC = () => {
             const exerciseId = exercise.exercise_id ?? exercise._id;
             return exerciseId === exerciseToReplaceId;
         }) ?? null;
+    const deleteSelectionTotal = useMemo(
+        () => Object.values(exercisesToDelete).reduce((n, list) => n + list.length, 0),
+        [exercisesToDelete],
+    );
+    const deleteDayLabel = t(`workouts.my-plan.weekdays.${selectedDayName}`);
 
     if (sessionLoading || (loadingWeeklyProgress && !weeklyProgressState)) {
         return <LoadingScreen />;
@@ -227,11 +234,13 @@ const MyPlan: React.FC = () => {
 
     const handleDeleteMode = () => {
         setIsDeleteMode(true);
+        setDeleteScope('template');
         setShowOptionsModal(false);
     };
 
     const handleOptionalMode = () => {
         setIsOptionalMode(true);
+        setReplaceScope('template');
         setShowOptionsModal(false);
     };
 
@@ -268,18 +277,33 @@ const MyPlan: React.FC = () => {
     };
 
     const handleConfirmDelete = () => {
-        deleteExercises(exercisesToDelete, {
-            onSuccess: () => {
-                setIsDeleteMode(false);
-                setExercisesToDelete({});
-                setShowConfirmationModal(false);
-                void queryClient.invalidateQueries({
-                    queryKey: WEEKLY_WORKOUT_PROGRESS_QUERY_KEY,
-                });
-                void refetchWeeklyProgress();
+        deleteExercises(
+            {
+                ...exercisesToDelete,
+                scope: deleteScope,
+                ...(deleteScope === 'instance' ? { week_number: viewedWeekNumber } : {}),
             },
-            onError: (error) => console.error('Error deleting exercises:', error.message),
-        });
+            {
+                onSuccess: () => {
+                    setIsDeleteMode(false);
+                    setIsDeleteSheetOpen(false);
+                    setExercisesToDelete({});
+                    setDeleteScope('template');
+                    void queryClient.invalidateQueries({
+                        queryKey: WEEKLY_WORKOUT_PROGRESS_QUERY_KEY,
+                    });
+                    void refetchWeeklyProgress();
+                },
+                onError: (error) => console.error('Error deleting exercises:', error.message),
+            },
+        );
+    };
+
+    const handleCloseDeleteSheet = () => {
+        setIsDeleteSheetOpen(false);
+        setIsDeleteMode(false);
+        setExercisesToDelete({});
+        setDeleteScope('template');
     };
 
     const handleExerciseCardClick = (
@@ -325,6 +349,7 @@ const MyPlan: React.FC = () => {
         setExerciseToReplaceId('');
         setPendingReplacementExercise(null);
         setSimilarExercises([]);
+        setReplaceScope('template');
     };
 
     const handleConfirmExerciseReplace = () => {
@@ -333,18 +358,21 @@ const MyPlan: React.FC = () => {
         }
 
         const day: WeekDayName = daysOfWeekFull[selectedDayIndex];
+        const newId =
+            pendingReplacementExercise.exercise_id ?? pendingReplacementExercise._id ?? '';
+        if (!newId) {
+            return;
+        }
         const payload = {
             [day]: [
                 {
                     old_exercise_id: exerciseToReplaceId,
-                    new_exercise: pendingReplacementExercise._id ?? '',
+                    new_exercise: newId,
                 },
             ],
+            scope: replaceScope,
+            ...(replaceScope === 'instance' ? { week_number: viewedWeekNumber } : {}),
         };
-
-        if (!payload[day][0].new_exercise) {
-            return;
-        }
 
         modifyExercises(payload, {
             onSuccess: () => {
@@ -655,7 +683,7 @@ const MyPlan: React.FC = () => {
                     </AnimatePresence>
                 </div>
 
-                <div className="mt-4 min-h-0 flex-1 overflow-y-auto pb-[calc(7.5rem+env(safe-area-inset-bottom))] pr-1">
+                <div className="mt-4 min-h-0 flex-1 overflow-y-auto pb-[calc(2rem+env(safe-area-inset-bottom))] pr-1">
                     {isSelectedRestDay ? (
                         <div className="mt-6 flex flex-col items-center rounded-3xl border border-gray-100 bg-gray-50 px-6 py-12 text-center">
                             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white text-gray-400 shadow-sm">
@@ -682,11 +710,50 @@ const MyPlan: React.FC = () => {
                                     </div>
                                     <button
                                         type="button"
-                                        onClick={() => setIsOptionalMode(false)}
+                                        onClick={() => {
+                                            setIsOptionalMode(false);
+                                            setReplaceScope('template');
+                                        }}
                                         className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm"
                                     >
                                         {t('workouts.my-plan.cancel')}
                                     </button>
+                                </div>
+                            )}
+                            {isDeleteMode && (
+                                <div className="flex flex-col gap-3 rounded-3xl border border-red-100 bg-red-50/90 p-4 text-red-800 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <h2 className="font-semibold">
+                                            {t('workouts.my-plan.deleteExercise')}
+                                        </h2>
+                                        <p className="text-sm text-red-800/85">
+                                            {t('workouts.my-plan.deleteExerciseDescription')}
+                                        </p>
+                                    </div>
+                                    <div className="flex shrink-0 gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={handleCloseDeleteSheet}
+                                            className="rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-800 shadow-sm"
+                                        >
+                                            {t('workouts.my-plan.cancel')}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (deleteSelectionTotal === 0) return;
+                                                setIsDeleteSheetOpen(true);
+                                            }}
+                                            disabled={deleteSelectionTotal === 0}
+                                            className={`rounded-full px-4 py-2 text-sm font-semibold shadow-sm ${
+                                                deleteSelectionTotal === 0
+                                                    ? 'cursor-not-allowed bg-red-100 text-red-300'
+                                                    : 'bg-red-600 text-white hover:bg-red-700'
+                                            }`}
+                                        >
+                                            {t('workouts.my-plan.confirm')}
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                             {isSelectedDayComplete && (
@@ -702,26 +769,28 @@ const MyPlan: React.FC = () => {
                                     </div>
                                 </div>
                             )}
-                            {selectedExercises.map((exercise: Exercise, index) => (
-                                <ExerciseCard
-                                    key={`${exercise.exercise_id ?? exercise._id}-${index}`}
-                                    exercise={exercise}
-                                    onClick={(action, targets) =>
-                                        handleExerciseCardClick(exercise, action, targets)
-                                    }
-                                    isDeleteMode={isDeleteMode}
-                                    isOptionalMode={isOptionalMode}
-                                    onDeleteSelect={handleDeleteSelect}
-                                    onOptionalSelect={handleOptionalSelect}
-                                    onCompleteSelect={handleQuickCompleteExercise}
-                                    canComplete={canCompleteSelectedDay}
-                                    selectedForDelete={
-                                        exercisesToDelete[selectedDayName]?.includes(
-                                            exercise.exercise_id!,
-                                        ) || false
-                                    }
-                                />
-                            ))}
+                            {selectedExercises.map((exercise: Exercise, index) => {
+                                const rowId = exercise.exercise_id ?? exercise._id ?? '';
+                                return (
+                                    <ExerciseCard
+                                        key={`${rowId || index}`}
+                                        exercise={exercise}
+                                        onClick={(action, targets) =>
+                                            handleExerciseCardClick(exercise, action, targets)
+                                        }
+                                        isDeleteMode={isDeleteMode}
+                                        isOptionalMode={isOptionalMode}
+                                        onDeleteSelect={handleDeleteSelect}
+                                        onOptionalSelect={handleOptionalSelect}
+                                        onCompleteSelect={handleQuickCompleteExercise}
+                                        canComplete={canCompleteSelectedDay}
+                                        selectedForDelete={Boolean(
+                                            rowId &&
+                                            exercisesToDelete[selectedDayName]?.includes(rowId),
+                                        )}
+                                    />
+                                );
+                            })}
                         </div>
                     ) : (
                         <div className="mt-6 flex flex-col items-center rounded-3xl border border-gray-100 bg-gray-50 px-6 py-12 text-center">
@@ -737,32 +806,6 @@ const MyPlan: React.FC = () => {
                         </div>
                     )}
                 </div>
-            </div>
-
-            <div
-                className={`h-[10%] flex flex-row justify-between items-center w-full max-w-xl ${!isDeleteMode ? 'hidden' : ''}`}
-            >
-                <button
-                    onClick={() => {
-                        setShowConfirmationModal(true);
-                    }}
-                    type="button"
-                    className="w-[45%] bg-gradient-to-r from-green-400 to-green-700 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
-                    aria-label={t('workouts.my-plan.confirm')}
-                >
-                    {t('workouts.my-plan.confirm')}
-                </button>
-                <button
-                    onClick={() => {
-                        setIsDeleteMode(false);
-                        setExercisesToDelete({});
-                    }}
-                    type="button"
-                    className="w-[45%] bg-red-500 text-white px-4 rounded-full text-2xl font-semibold shadow-lg py-4 flex items-center justify-center"
-                    aria-label={t('home.SavedWorkoutsSection.SavedWorkoutsSectioncancelText')}
-                >
-                    {t('home.SavedWorkoutsSection.SavedWorkoutsSectioncancelText')}
-                </button>
             </div>
 
             {selectedExercise && !showExerciseFlow && (
@@ -865,16 +908,16 @@ const MyPlan: React.FC = () => {
                 }
             </CustomModal>
 
-            {/* Modal for confirmation Question */}
-            <ConfirmationModal
-                isOpen={showConfirmationModal}
-                onClose={() => {
-                    setShowConfirmationModal(false);
-                }}
+            <ExerciseDeleteSheet
+                isOpen={isDeleteSheetOpen}
+                dayLabel={deleteDayLabel}
+                count={deleteSelectionTotal}
+                scope={deleteScope}
+                onScopeChange={setDeleteScope}
+                viewedWeekNumber={viewedWeekNumber}
                 onConfirm={handleConfirmDelete}
-                question={t('home.SavedWorkoutsSection.SavedWorkoutsSectionquestion')}
-                confirmText={t('home.SavedWorkoutsSection.SavedWorkoutsSectionconfirmText')}
-                cancelText={t('workouts.my-plan.cancel')}
+                onClose={handleCloseDeleteSheet}
+                confirmDisabled={deleteSelectionTotal === 0}
             />
 
             <ExerciseReplaceSheet
@@ -885,6 +928,9 @@ const MyPlan: React.FC = () => {
                 onSelectExercise={handleReplacementSelect}
                 onConfirm={handleConfirmExerciseReplace}
                 onClose={handleCloseReplaceSheet}
+                scope={replaceScope}
+                onScopeChange={setReplaceScope}
+                viewedWeekNumber={viewedWeekNumber}
             />
         </div>
     );

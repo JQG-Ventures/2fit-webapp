@@ -69,3 +69,9 @@ Or:
   - `NEXT_PUBLIC_API_BASE_URL` for browser requests
   - `API_BASE_URL_INTERNAL` for server-side calls inside Docker
 - **PostgreSQL** and **Redis** are only reachable on the Docker network; their ports are not published to the host. Services connect by name (`postgres`, `redis`).
+
+## Split deploy (Vercel + Supabase + Render)
+
+- **Vercel:** connect the repo, set **Root Directory** to `frontend`, configure env from `frontend/.env.example` (production URLs for `NEXTAUTH_*`, `NEXT_PUBLIC_*`, and `API_BASE_URL_INTERNAL`).
+- **Supabase:** create a Postgres project and put its connection string in Render as `DATABASE_URL` (see `render.yaml` env group `twofit-backend`).
+- **Render:** Dashboard → **Blueprints** → New Blueprint Instance → select this repo and `render.yaml` at the root. When prompted, set the secrets in `twofit-backend`. The blueprint provisions **Key Value (Redis)**, the **Flask API** (Docker), and a **Celery worker** (paid starter tier; API can stay on the free web plan).

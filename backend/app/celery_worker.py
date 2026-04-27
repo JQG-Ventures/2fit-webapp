@@ -6,7 +6,7 @@ all required tasks to ensure they are registered with the Celery worker.
 """
 
 from app import create_app
-from app.celery import init_celery
+from app.celery import celery_app, init_celery  # noqa: F401
 
 flask_app = create_app()
 init_celery(flask_app)

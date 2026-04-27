@@ -128,7 +128,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                         className="flex h-11 w-11 items-center justify-center rounded-full bg-red-500 text-white shadow-sm"
                         onClick={(e) => {
                             e.stopPropagation();
-                            onDeleteSelect(exercise.exercise_id!);
+                            const id = exercise.exercise_id ?? exercise._id;
+                            if (id) onDeleteSelect(id);
                         }}
                         aria-label={`${t('a11y.markForRemoval')}: ${exercise.name}`}
                     >
@@ -141,7 +142,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                         className="flex h-11 w-11 items-center justify-center rounded-full bg-green-500 text-white shadow-sm transition-colors hover:bg-green-600"
                         onClick={(e) => {
                             e.stopPropagation();
-                            onOptionalSelect(exercise.exercise_id!);
+                            const id = exercise.exercise_id ?? exercise._id;
+                            if (id) onOptionalSelect(id);
                         }}
                         aria-label={`${t('a11y.changeExerciseChoice')}: ${exercise.name}`}
                     >

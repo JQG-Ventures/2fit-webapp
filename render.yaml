@@ -1,0 +1,75 @@
+# 2fit-webapp on Render (API + Celery + Redis/Valkey). Postgres = Supabase (set DATABASE_URL in the group below).
+#
+# Apply: Render Dashboard → Blueprints → New Blueprint Instance → select this repo → deploy.
+# Pick the same region as your Supabase project when possible.
+#
+# Vercel (Next.js): import repo, set Root Directory to "frontend", add env vars from frontend/.env.example.
+# Point NEXT_PUBLIC_API_BASE_URL and API_BASE_URL_INTERNAL at this API's https://…onrender.com URL.
+# Set CORS_ORIGINS in the backend group to your Vercel URL(s), comma-separated if several.
+#
+# Plans: API uses "free" (cold start after idle). Worker has no free tier — "starter" is the smallest paid worker.
+# Key Value uses "starter" + noeviction so Celery queues are not evicted when memory fills.
+
+envVarGroups:
+  - name: twofit-backend
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+
+services:
+  - type: keyvalue
+    name: twofit-kv
+    region: oregon
+    plan: starter
+    maxmemoryPolicy: noeviction
+    ipAllowList: []
+
+  - type: web
+    name: twofit-api
+    region: oregon
+    plan: free
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /
+    envVars:
+      - fromGroup: twofit-backend
+      - key: REDIS_URL
+        fromService:
+          name: twofit-kv
+          type: keyvalue
+          property: connectionString
+      - key: DEBUG
+        value: "FALSE"
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: "5000"
+
+  - type: worker
+    name: twofit-worker
+    region: oregon
+    plan: starter
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    dockerCommand: celery -A app.celery_worker:celery_app worker --loglevel=info
+    envVars:
+      - fromGroup: twofit-backend
+      - key: REDIS_URL
+        fromService:
+          name: twofit-kv
+          type: keyvalue
+          property: connectionString
+      - key: DEBUG
+        value: "FALSE"
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: "5000"
