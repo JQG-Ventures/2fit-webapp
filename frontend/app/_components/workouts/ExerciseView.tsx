@@ -1,6 +1,6 @@
 'use client';
 
-import { FaTimes, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
+import { FiVolume2, FiVolumeX, FiX } from 'react-icons/fi';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import BottomSheet from '@/app/_components/modals/ExpandableBottomSheet';
@@ -36,54 +36,47 @@ const ExerciseView: React.FC<ExerciseViewProp> = ({
     };
 
     return (
-        <div className="flex flex-col h-full w-full bg-white">
-            <div className="flex flex-row items-center justify-between w-full h-[10%] pt-10 p-6 text-center">
+        <div className="flex h-full w-full flex-col bg-[#f8faf9]">
+            <div className="absolute left-0 right-0 top-0 z-20 flex items-center justify-between px-5 pt-[calc(1.25rem+env(safe-area-inset-top))]">
                 <button
                     type="button"
                     onClick={onBack}
-                    className="p-6 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white rounded-full shadow-lg hover:bg-emerald-500 transition-all"
+                    className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-lg backdrop-blur transition-colors hover:bg-white"
                     aria-label={t('a11y.exitWorkout')}
                 >
-                    <FaTimes className="text-2xl" />
+                    <FiX className="h-6 w-6" />
                 </button>
-                <div>
-                    <h2 className="text-4xl font-bold">{exercise.name}</h2>
-                    <p className="text-lg mt-2">
+                <div className="mx-3 min-w-0 rounded-full bg-white/90 px-5 py-3 text-center shadow-lg backdrop-blur">
+                    <h2 className="max-w-[14rem] truncate text-[1.05rem] font-semibold text-gray-950">
+                        {exercise.name}
+                    </h2>
+                    <p className="text-sm font-medium text-gray-500">
                         Set {exercise.currentSet} {t('workouts.plan.of')} {exercise.totalSets}
                     </p>
                 </div>
                 <button
+                    type="button"
                     onClick={toggleMute}
-                    className="p-6 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white rounded-full shadow-lg hover:bg-emerald-500 transition-all"
+                    className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-lg backdrop-blur transition-colors hover:bg-white"
+                    aria-label={isMuted ? t('a11y.unmuteVideo') : t('a11y.muteVideo')}
                 >
                     {isMuted ? (
-                        <FaVolumeMute className="text-2xl" />
+                        <FiVolumeX className="h-6 w-6" />
                     ) : (
-                        <FaVolumeUp className="text-2xl" />
+                        <FiVolume2 className="h-6 w-6" />
                     )}
                 </button>
             </div>
-            <div className="flex flex-col h-[80%] w-full overflow-hidden items-center justify-center">
+            <div className="relative flex h-[72dvh] w-full flex-col items-center justify-center overflow-hidden rounded-b-[2rem] bg-gray-100">
                 <video
                     ref={videoRef}
                     src={exercise.video_url}
                     autoPlay
                     loop
                     muted={isMuted}
-                    className="object-cover w-full"
+                    className="h-full w-full object-cover"
                 />
-                <button
-                    type="button"
-                    onClick={toggleMute}
-                    className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white p-3 rounded-full shadow-lg hover:bg-opacity-75 transition"
-                    aria-label={isMuted ? t('a11y.unmuteVideo') : t('a11y.muteVideo')}
-                >
-                    {isMuted ? (
-                        <FaVolumeMute className="text-xl" />
-                    ) : (
-                        <FaVolumeUp className="text-xl" />
-                    )}
-                </button>
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/25 to-transparent" />
             </div>
             <BottomSheet
                 currentExerciseIndex={currentExerciseIndex}

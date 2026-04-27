@@ -346,7 +346,17 @@ class WeeklyWorkoutProgressResource(Resource):
     def get(self) -> tuple[dict[str, Any], int]:
         try:
             user_id = get_jwt_identity()
-            progress = UserWorkoutService.get_weekly_workout_progress(user_id)
+            week_number_arg = request.args.get("week_number")
+            week_number: int | None = None
+            if week_number_arg is not None and str(week_number_arg).strip() != "":
+                try:
+                    week_number = int(week_number_arg)
+                except (TypeError, ValueError):
+                    return {
+                        "status": "error",
+                        "message": "Invalid week_number",
+                    }, 400
+            progress = UserWorkoutService.get_weekly_workout_progress(user_id, week_number)
             return {"status": "success", "message": progress}, 200
         except Exception as e:
             logging.exception("Error retrieving weekly workout progress: %s", e)
@@ -422,21 +432,41 @@ class DeleteExercisesResource(Resource):
         if data is None:
             return {"status": "error", "message": "Missing JSON body"}, 400
         try:
+            payload = dict(data)
+            scope = payload.pop("scope", "template") or "template"
+            if not isinstance(scope, str):
+                scope = "template"
+            scope = scope.lower()
+            week_raw = payload.pop("week_number", None)
+            if scope == "instance":
+                if week_raw is None:
+                    return {
+                        "status": "error",
+                        "message": "week_number is required when scope is instance",
+                    }, 400
+                try:
+                    week_num = int(week_raw)
+                except (TypeError, ValueError):
+                    return {"status": "error", "message": "Invalid week_number"}, 400
+            else:
+                week_num = 0
+
             repo = WorkoutPlanRepository()
             plan = repo.get_with_schedule(uuid.UUID(plan_id))
             if not plan:
                 return {"status": "error", "message": "Workout Plan not found"}, 404
 
-            for day in plan.workout_days:
-                day_key = (day.day_of_week or "").lower()
-                if day_key in data:
-                    ids_to_remove = set(data[day_key])
-                    for wde in list(day.exercises):
-                        if str(wde.exercise_id) in ids_to_remove:
-                            db.session.delete(wde)
+            user_id = get_jwt_identity()
+            if scope == "instance":
+                UserWorkoutService.apply_instance_deletes(str(user_id), plan.id, week_num, payload)
+            else:
+                UserWorkoutService.apply_template_deletes(str(user_id), plan, payload)
 
             db.session.commit()
             return {"status": "success", "message": "Exercises deleted successfully"}, 200
+        except ValueError as ve:
+            db.session.rollback()
+            return {"status": "error", "message": str(ve)}, 400
         except Exception as e:
             db.session.rollback()
             logging.exception(str(e))
@@ -451,21 +481,43 @@ class UpdateExercisesResource(Resource):
         if data is None:
             return {"status": "error", "message": "Missing JSON body"}, 400
         try:
+            payload = dict(data)
+            scope = payload.pop("scope", "template") or "template"
+            if not isinstance(scope, str):
+                scope = "template"
+            scope = scope.lower()
+            week_raw = payload.pop("week_number", None)
+            if scope == "instance":
+                if week_raw is None:
+                    return {
+                        "status": "error",
+                        "message": "week_number is required when scope is instance",
+                    }, 400
+                try:
+                    week_num = int(week_raw)
+                except (TypeError, ValueError):
+                    return {"status": "error", "message": "Invalid week_number"}, 400
+            else:
+                week_num = 0
+
             repo = WorkoutPlanRepository()
             plan = repo.get_with_schedule(uuid.UUID(plan_id))
             if not plan:
                 return {"status": "error", "message": "Workout Plan not found"}, 404
 
-            for day in plan.workout_days:
-                day_key = (day.day_of_week or "").lower()
-                if day_key in data:
-                    for wde in day.exercises:
-                        for replacement in data[day_key]:
-                            if str(wde.exercise_id) == replacement.get("old_exercise_id"):
-                                wde.exercise_id = uuid.UUID(replacement["new_exercise"])
+            user_id = get_jwt_identity()
+            if scope == "instance":
+                UserWorkoutService.apply_instance_replacements(
+                    str(user_id), plan.id, week_num, payload
+                )
+            else:
+                UserWorkoutService.apply_template_replacements(str(user_id), plan, payload)
 
             db.session.commit()
             return {"status": "success", "message": "Exercises updated successfully"}, 200
+        except ValueError as ve:
+            db.session.rollback()
+            return {"status": "error", "message": str(ve)}, 400
         except Exception as e:
             db.session.rollback()
             logging.exception(str(e))

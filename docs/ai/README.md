@@ -15,6 +15,8 @@ When starting a new session with any AI, provide this README as the first messag
 5. [`roadmap.md`](./roadmap.md) — 12-month product vision and feature phases
 6. [`vision-ecosystem.md`](./vision-ecosystem.md) — long-term ecosystem narrative (hub, coaches, marketplace, community)
 7. [`domain/workouts-and-progress.md`](./domain/workouts-and-progress.md) — business/technical domain: workout generation, progress models, muscle taxonomy direction
+7b. [`design/my-plan-rework-tech-spec.md`](./design/my-plan-rework-tech-spec.md) — **My plan (personalizado) rework:** producto acordado, API/FE actual, fases (P0–P2), UI brief para v0, checklist implementación
+7c. [`design/my-plan-preview-replace-rework.md`](./design/my-plan-preview-replace-rework.md) — **My plan preview/replacement rework:** brief extenso para v0, rediseño del preview de ejercicio y cambio de ejercicio
 8. [`design/analytics-layer.md`](./design/analytics-layer.md) — what “analytics layer” means (derived metrics vs operational data, no extra product)
 8b. [`design/workout-tracking-and-analytics.md`](./design/workout-tracking-and-analytics.md) — **tracking end-to-end, payloads, gaps, agreed principles, roadmap phases**
 9. [`design/exercise-catalog-strategy.md`](./design/exercise-catalog-strategy.md) — Option A: canonical exercise catalog + ETL, current vs target, phased work  
@@ -40,6 +42,8 @@ When starting a new session with any AI, provide this README as the first messag
 | `objectives/current-sprint.md` | Active tasks and immediate objectives |
 | `design/home-dashboard.md` | Home dashboard design intent and layout description |
 | `design/home-refactor-implementation.md` | Home refactor: shipped features, technical notes, future work |
+| `design/my-plan-rework-tech-spec.md` | Rework of personalized “My plan” screen: weekly-progress integration, state/cache, day-scoped completion, UI direction + v0 prompt, acceptance criteria |
+| `design/my-plan-preview-replace-rework.md` | Rework brief for My Plan exercise preview and exercise replacement sheets, including v0 prompt, UX direction, i18n, and acceptance criteria |
 
 ## Updating This Hub
 

@@ -15,6 +15,7 @@ from app.models.progress import (  # noqa: F401
     CompletedWorkoutExercise,
     DayProgress,
     ExerciseProgress,
+    PlanSessionExerciseOverride,
     SavedWorkout,
 )
 from app.models.user import User, UserAutomationData, UserPreference, UserSettings  # noqa: F401

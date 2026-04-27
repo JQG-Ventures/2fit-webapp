@@ -40,6 +40,75 @@ def test_users_complete_workout_success(mock_save, app, client, db, sample_user)
     mock_save.assert_called_once()
 
 
+@patch("app.routes.users.UserWorkoutService.save_workout_progress")
+@patch("app.routes.users.UserWorkoutService.save_completed_workout")
+def test_users_complete_workout_updates_plan_progress_when_plan_query_present(
+    mock_save_completed, mock_save_progress, app, client, db, sample_user
+) -> None:
+    headers = auth_headers(app, str(sample_user.id))
+    plan_id = str(uuid.uuid4())
+    ex_id = str(uuid.uuid4())
+    payload = {
+        "workout_id": plan_id,
+        "duration_seconds": 120,
+        "calories_burned": 50.0,
+        "day_of_week": "sunday",
+        "exercises": [
+            {
+                "exercise_id": ex_id,
+                "sets_completed": 3,
+                "reps_completed": [10, 10, 10],
+                "duration_seconds": 120,
+                "calories_burned": 50.0,
+                "is_completed": True,
+            }
+        ],
+    }
+    r = client.post(
+        f"/api/users/workouts/complete?workout_plan_id={plan_id}",
+        headers=headers,
+        json=payload,
+    )
+    assert r.status_code == 200
+    mock_save_completed.assert_called_once()
+    mock_save_progress.assert_called_once()
+    assert mock_save_progress.call_args[0][1] == plan_id
+    assert mock_save_progress.call_args[0][2]["day_of_week"] == "sunday"
+
+
+@patch("app.routes.users.UserWorkoutService.save_workout_progress")
+@patch("app.routes.users.UserWorkoutService.save_completed_workout")
+def test_users_complete_workout_rolls_back_when_plan_progress_is_invalid(
+    mock_save_completed, mock_save_progress, app, client, db, sample_user
+) -> None:
+    mock_save_progress.side_effect = ValueError("Progress data must include day_of_week")
+    headers = auth_headers(app, str(sample_user.id))
+    plan_id = str(uuid.uuid4())
+    payload = {
+        "workout_id": plan_id,
+        "duration_seconds": 120,
+        "calories_burned": 50.0,
+        "exercises": [
+            {
+                "exercise_id": str(uuid.uuid4()),
+                "sets_completed": 3,
+                "reps_completed": [10, 10, 10],
+                "duration_seconds": 120,
+                "calories_burned": 50.0,
+                "is_completed": True,
+            }
+        ],
+    }
+    r = client.post(
+        f"/api/users/workouts/complete?workout_plan_id={plan_id}",
+        headers=headers,
+        json=payload,
+    )
+    assert r.status_code == 400
+    mock_save_completed.assert_called_once()
+    mock_save_progress.assert_called_once()
+
+
 @patch("app.routes.users.UserWorkoutService.get_user_progress")
 def test_users_workout_progress_get_success(mock_get, app, client, db, sample_user) -> None:
     mock_get.return_value = {"progress": 0.5, "exercises_left": []}

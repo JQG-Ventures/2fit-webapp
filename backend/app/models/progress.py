@@ -55,6 +55,10 @@ class ActivePlan(BaseModel):
     progress_details: Mapped[list[DayProgress]] = relationship(
         back_populates="active_plan", cascade="all, delete-orphan"
     )
+    session_exercise_overrides: Mapped[list[PlanSessionExerciseOverride]] = relationship(
+        back_populates="active_plan",
+        cascade="all, delete-orphan",
+    )
 
 
 class DayProgress(BaseModel):
@@ -227,3 +231,33 @@ class CompletedChallengeExercise(BaseModel):
         back_populates="exercises"
     )
     exercise: Mapped[Exercise] = relationship()
+
+
+class PlanSessionExerciseOverride(BaseModel):
+    """Per active plan, week, and day: hide or replace one template exercise without mutating the plan."""
+
+    __tablename__ = "plan_session_exercise_overrides"
+    __table_args__ = (
+        UniqueConstraint(
+            "active_plan_id",
+            "week_number",
+            "day_of_week",
+            "source_exercise_id",
+            name="uq_session_override_active_week_day_source",
+        ),
+    )
+
+    active_plan_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("active_plans.id", ondelete="CASCADE"), nullable=False
+    )
+    week_number: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    day_of_week: Mapped[str] = mapped_column(String(10), nullable=False)
+    action: Mapped[str] = mapped_column(String(20), nullable=False)  # "remove" or "replace"
+    source_exercise_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("exercises.id", ondelete="CASCADE"), nullable=False
+    )
+    replacement_exercise_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("exercises.id", ondelete="CASCADE"), nullable=True
+    )
+
+    active_plan: Mapped[ActivePlan] = relationship(back_populates="session_exercise_overrides")

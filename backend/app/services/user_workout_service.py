@@ -3,7 +3,11 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Any
 
+from sqlalchemy import select
+
 from app.extensions import db
+from app.models.exercise import Exercise
+from app.models.workout_plan import WorkoutPlan
 from app.repositories.challenge_repository import ChallengeRepository
 from app.repositories.progress_repository import (
     ActiveChallengeRepository,
@@ -11,6 +15,7 @@ from app.repositories.progress_repository import (
     CompletedChallengeDayRepository,
     CompletedWorkoutRepository,
     DayProgressRepository,
+    PlanSessionExerciseOverrideRepository,
 )
 from app.repositories.workout_repository import WorkoutPlanRepository
 
@@ -20,6 +25,11 @@ Payload = dict[str, Any]
 class UserWorkoutService:
     @staticmethod
     def calculate_week_number(start_date: datetime, completed_date: datetime) -> int:
+        if start_date.tzinfo is None and completed_date.tzinfo is not None:
+            start_date = start_date.replace(tzinfo=completed_date.tzinfo)
+        elif completed_date.tzinfo is None and start_date.tzinfo is not None:
+            completed_date = completed_date.replace(tzinfo=start_date.tzinfo)
+
         delta_days = (completed_date - start_date).days
         return delta_days // 7 + 1
 
@@ -197,7 +207,7 @@ class UserWorkoutService:
         return progress_pct, exercises_left
 
     @staticmethod
-    def get_weekly_workout_progress(user_id: str) -> Payload:
+    def get_weekly_workout_progress(user_id: str, week_number: int | None = None) -> Payload:
         try:
             user_uuid = uuid.UUID(user_id)
             plan_repo = ActivePlanRepository()
@@ -220,11 +230,20 @@ class UserWorkoutService:
             delta_days = (today - start_date).days
             current_week = (delta_days // 7) + 1
             duration_weeks = workout_plan.duration_weeks or 0
+            requested_week = week_number or current_week
 
-            if current_week > duration_weeks:
-                return {"week_start_date": "", "week_end_date": "", "progress": 0.0, "days": []}
+            if requested_week < 1 or requested_week > duration_weeks:
+                return {
+                    "week_start_date": "",
+                    "week_end_date": "",
+                    "progress": 0.0,
+                    "current_week": current_week,
+                    "week_number": requested_week,
+                    "total_weeks": duration_weeks,
+                    "days": [],
+                }
 
-            start_of_week = start_date + timedelta(weeks=(current_week - 1))
+            start_of_week = start_date + timedelta(weeks=(requested_week - 1))
             end_of_week = start_of_week + timedelta(days=6)
 
             days_of_week = [
@@ -243,8 +262,25 @@ class UserWorkoutService:
             day_map = {d.day_of_week: d for d in workout_plan.workout_days if d.day_of_week}
             progress_map: dict[str, Any] = {}
             for progress_detail in active_plan.progress_details:
-                if progress_detail.week_number == current_week and progress_detail.day_of_week:
+                if progress_detail.week_number == requested_week and progress_detail.day_of_week:
                     progress_map[progress_detail.day_of_week] = progress_detail
+
+            or_repo = PlanSessionExerciseOverrideRepository()
+            overrides = or_repo.list_for_plan_and_week(active_plan.id, requested_week)
+            ov_index: dict[tuple[str, str], Any] = {}
+            for o in overrides:
+                ov_index[(o.day_of_week.lower(), str(o.source_exercise_id))] = o
+            replacement_ids = {
+                o.replacement_exercise_id
+                for o in overrides
+                if o.replacement_exercise_id is not None
+            }
+            ex_cache: dict[uuid.UUID, Exercise] = {}
+            if replacement_ids:
+                for ex in db.session.scalars(
+                    select(Exercise).where(Exercise.id.in_(replacement_ids))
+                ):
+                    ex_cache[ex.id] = ex
 
             for day_name in days_of_week:
                 day_workout = day_map.get(day_name)
@@ -263,7 +299,38 @@ class UserWorkoutService:
                 exercises = []
                 all_done = True
                 for wde in day_workout.exercises:
+                    ov = ov_index.get((day_name, str(wde.exercise_id)))
+                    if ov and ov.action == "remove":
+                        continue
                     ex = wde.exercise
+                    if ov and ov.action == "replace" and ov.replacement_exercise_id:
+                        repl = ex_cache.get(ov.replacement_exercise_id)
+                        if not repl:
+                            repl = db.session.get(Exercise, ov.replacement_exercise_id)
+                            if repl:
+                                ex_cache[ov.replacement_exercise_id] = repl
+                        if repl:
+                            is_done = (
+                                str(wde.exercise_id) in completed_exercise_ids
+                                or str(repl.id) in completed_exercise_ids
+                            )
+                            if not is_done:
+                                all_done = False
+                            exercises.append(
+                                {
+                                    "exercise_id": str(repl.id),
+                                    "name": repl.name,
+                                    "sets": wde.sets,
+                                    "reps": wde.reps,
+                                    "rest_seconds": wde.rest_seconds,
+                                    "difficulty": repl.difficulty,
+                                    "description": repl.description,
+                                    "image_url": repl.image_url,
+                                    "video_url": repl.video_url,
+                                    "is_completed": is_done,
+                                }
+                            )
+                            continue
                     is_done = str(wde.exercise_id) in completed_exercise_ids
                     if not is_done:
                         all_done = False
@@ -300,6 +367,9 @@ class UserWorkoutService:
             return {
                 "week_start_date": start_of_week.date().isoformat(),
                 "week_end_date": end_of_week.date().isoformat(),
+                "current_week": current_week,
+                "week_number": requested_week,
+                "total_weeks": duration_weeks,
                 "progress": progress,
                 "days": response_days,
             }
@@ -483,6 +553,8 @@ class UserWorkoutService:
                 total_scheduled = len(workout_plan.workout_days)
                 db.session.refresh(active_plan)
                 completed_count = sum(1 for dp in active_plan.progress_details if dp.is_completed)
+                if not any(dp.id == day_progress.id for dp in active_plan.progress_details):
+                    completed_count += 1
                 active_plan.progress = (
                     (completed_count / total_scheduled) * 100 if total_scheduled else 0.0
                 )
@@ -492,3 +564,83 @@ class UserWorkoutService:
             logging.info("Workout progress saved for user %s.", user_uuid)
         except Exception:
             raise
+
+    @staticmethod
+    def apply_template_deletes(user_id: str, plan: WorkoutPlan, day_payload: Payload) -> None:
+        """Remove workout_day_exercises; clear session overrides for the removed template."""
+        or_repo = PlanSessionExerciseOverrideRepository()
+        ap_repo = ActivePlanRepository()
+        ap = ap_repo.get_active_for_user(uuid.UUID(user_id), plan.id)
+        for day in plan.workout_days:
+            day_key = (day.day_of_week or "").lower()
+            if day_key not in day_payload:
+                continue
+            ids_to_remove = {str(x) for x in day_payload[day_key]}
+            for wde in list(day.exercises):
+                if str(wde.exercise_id) in ids_to_remove:
+                    if ap:
+                        or_repo.delete_by_source_exercise(ap.id, day_key, wde.exercise_id)
+                    db.session.delete(wde)
+
+    @staticmethod
+    def apply_template_replacements(user_id: str, plan: WorkoutPlan, day_payload: Payload) -> None:
+        """Update exercise_id on WDE; clear overrides tied to the old template exercise."""
+        or_repo = PlanSessionExerciseOverrideRepository()
+        ap_repo = ActivePlanRepository()
+        ap = ap_repo.get_active_for_user(uuid.UUID(user_id), plan.id)
+        for day in plan.workout_days:
+            day_key = (day.day_of_week or "").lower()
+            if day_key not in day_payload:
+                continue
+            for wde in day.exercises:
+                for replacement in day_payload[day_key]:
+                    old = replacement.get("old_exercise_id")
+                    new = replacement.get("new_exercise")
+                    if not old or not new:
+                        continue
+                    if str(wde.exercise_id) == str(old):
+                        if ap:
+                            or_repo.delete_by_source_exercise(ap.id, day_key, wde.exercise_id)
+                        wde.exercise_id = uuid.UUID(str(new))
+
+    @staticmethod
+    def apply_instance_deletes(
+        user_id: str, plan_id: uuid.UUID, week_number: int, day_payload: Payload
+    ) -> None:
+        ap_repo = ActivePlanRepository()
+        ap = ap_repo.get_active_for_user(uuid.UUID(user_id), plan_id)
+        if not ap:
+            raise ValueError("No active plan for this user and workout plan.")
+        or_repo = PlanSessionExerciseOverrideRepository()
+        for day_name, ids in day_payload.items():
+            if not isinstance(ids, list):
+                continue
+            for eid in ids:
+                or_repo.upsert_remove(
+                    ap.id, week_number, str(day_name).lower(), uuid.UUID(str(eid))
+                )
+
+    @staticmethod
+    def apply_instance_replacements(
+        user_id: str, plan_id: uuid.UUID, week_number: int, day_payload: Payload
+    ) -> None:
+        ap_repo = ActivePlanRepository()
+        ap = ap_repo.get_active_for_user(uuid.UUID(user_id), plan_id)
+        if not ap:
+            raise ValueError("No active plan for this user and workout plan.")
+        or_repo = PlanSessionExerciseOverrideRepository()
+        for day_name, items in day_payload.items():
+            if not isinstance(items, list):
+                continue
+            for replacement in items:
+                old = replacement.get("old_exercise_id")
+                new = replacement.get("new_exercise")
+                if not old or not new:
+                    continue
+                or_repo.upsert_replace(
+                    ap.id,
+                    week_number,
+                    str(day_name).lower(),
+                    uuid.UUID(str(old)),
+                    uuid.UUID(str(new)),
+                )

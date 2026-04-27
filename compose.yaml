@@ -4,10 +4,10 @@ x-backend-build: &backend-build
   context: ./backend
   target: dev
 
+# DATABASE_URL is not set here so backend/.env is the only source (Compose "environment" overrides env_file).
 x-backend-env: &backend-env
   HOST: 0.0.0.0
   PORT: 5000
-  DATABASE_URL: postgresql://postgres:postgres@postgres:5432/twofit
   REDIS_URL: redis://redis:6379/0
   CORS_ORIGINS: http://localhost:3000
 
@@ -51,6 +51,9 @@ services:
     build: *backend-build
     image: 2fit-backend:dev
     restart: unless-stopped
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     env_file:
       - ./backend/.env
     environment:
@@ -82,6 +85,9 @@ services:
     pull_policy: never
     restart: unless-stopped
     command: ["celery", "-A", "app.celery_worker:celery_app", "worker", "--loglevel=info"]
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     env_file:
       - ./backend/.env
     environment:

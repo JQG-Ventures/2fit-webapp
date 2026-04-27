@@ -15,6 +15,7 @@ from app.models.progress import (
     CompletedWorkoutExercise,
     DayProgress,
     ExerciseProgress,
+    PlanSessionExerciseOverride,
     SavedWorkout,
 )
 
@@ -315,3 +316,107 @@ class CompletedChallengeDayRepository:
             .options(joinedload(CompletedChallengeDay.exercises))
         )
         return list(db.session.scalars(stmt).unique().all())
+
+
+class PlanSessionExerciseOverrideRepository:
+    def list_for_plan_and_week(
+        self, active_plan_id: uuid.UUID, week_number: int
+    ) -> list[PlanSessionExerciseOverride]:
+        stmt = select(PlanSessionExerciseOverride).where(
+            PlanSessionExerciseOverride.active_plan_id == active_plan_id,
+            PlanSessionExerciseOverride.week_number == week_number,
+        )
+        return list(db.session.scalars(stmt).all())
+
+    def delete_by_source_exercise(
+        self,
+        active_plan_id: uuid.UUID,
+        day_of_week: str,
+        source_exercise_id: uuid.UUID,
+    ) -> int:
+        day_key = day_of_week.lower()
+        rows = list(
+            db.session.scalars(
+                select(PlanSessionExerciseOverride).where(
+                    PlanSessionExerciseOverride.active_plan_id == active_plan_id,
+                    PlanSessionExerciseOverride.day_of_week == day_key,
+                    PlanSessionExerciseOverride.source_exercise_id == source_exercise_id,
+                )
+            ).all()
+        )
+        for row in rows:
+            db.session.delete(row)
+        return len(rows)
+
+    def upsert_remove(
+        self,
+        active_plan_id: uuid.UUID,
+        week_number: int,
+        day_of_week: str,
+        source_exercise_id: uuid.UUID,
+    ) -> PlanSessionExerciseOverride:
+        day_key = day_of_week.lower()
+        existing = cast(
+            PlanSessionExerciseOverride | None,
+            db.session.scalars(
+                select(PlanSessionExerciseOverride).where(
+                    PlanSessionExerciseOverride.active_plan_id == active_plan_id,
+                    PlanSessionExerciseOverride.week_number == week_number,
+                    PlanSessionExerciseOverride.day_of_week == day_key,
+                    PlanSessionExerciseOverride.source_exercise_id == source_exercise_id,
+                )
+            ).first(),
+        )
+        if existing:
+            existing.action = "remove"
+            existing.replacement_exercise_id = None
+            db.session.flush()
+            return existing
+        override = PlanSessionExerciseOverride(
+            active_plan_id=active_plan_id,
+            week_number=week_number,
+            day_of_week=day_key,
+            action="remove",
+            source_exercise_id=source_exercise_id,
+            replacement_exercise_id=None,
+        )
+        db.session.add(override)
+        db.session.flush()
+        return override
+
+    def upsert_replace(
+        self,
+        active_plan_id: uuid.UUID,
+        week_number: int,
+        day_of_week: str,
+        source_exercise_id: uuid.UUID,
+        replacement_exercise_id: uuid.UUID,
+    ) -> PlanSessionExerciseOverride:
+        day_key = day_of_week.lower()
+        existing = cast(
+            PlanSessionExerciseOverride | None,
+            db.session.scalars(
+                select(PlanSessionExerciseOverride).where(
+                    PlanSessionExerciseOverride.active_plan_id == active_plan_id,
+                    PlanSessionExerciseOverride.week_number == week_number,
+                    PlanSessionExerciseOverride.day_of_week == day_key,
+                    PlanSessionExerciseOverride.source_exercise_id == source_exercise_id,
+                )
+            ).first(),
+        )
+        if existing:
+            existing.action = "replace"
+            existing.replacement_exercise_id = replacement_exercise_id
+            db.session.flush()
+            return existing
+        override = PlanSessionExerciseOverride(
+            active_plan_id=active_plan_id,
+            week_number=week_number,
+            day_of_week=day_key,
+            action="replace",
+            source_exercise_id=source_exercise_id,
+            replacement_exercise_id=replacement_exercise_id,
+        )
+        db.session.add(override)
+        db.session.flush()
+        return override

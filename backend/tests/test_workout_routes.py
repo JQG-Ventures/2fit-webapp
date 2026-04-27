@@ -175,3 +175,41 @@ def test_plans_bulk_validation(app, client, db, sample_user) -> None:
     headers = auth_headers(app, str(sample_user.id))
     r = client.post("/api/workouts/plans/bulk", headers=headers, json=[{}])
     assert r.status_code == 400
+
+
+def test_weekly_progress_invalid_week_number(app, client, db, sample_user) -> None:
+    headers = auth_headers(app, str(sample_user.id))
+    r = client.get("/api/workouts/weekly-progress?week_number=not-a-number", headers=headers)
+    assert r.status_code == 400
+    assert "Invalid" in (r.get_json() or {}).get("message", "")
+
+
+def test_delete_exercises_instance_requires_week(
+    app, client, db, sample_user, plan_with_one_exercise
+) -> None:
+    headers = auth_headers(app, str(sample_user.id))
+    pid = str(plan_with_one_exercise.plan.id)
+    r = client.put(
+        f"/api/workouts/plans/{pid}/delete-exercises",
+        headers=headers,
+        json={"scope": "instance", "monday": [str(uuid.uuid4())]},
+    )
+    assert r.status_code == 400
+    assert "week_number" in (r.get_json() or {}).get("message", "").lower()
+
+
+def test_update_exercises_instance_requires_week(
+    app, client, db, sample_user, plan_with_one_exercise
+) -> None:
+    headers = auth_headers(app, str(sample_user.id))
+    pid = str(plan_with_one_exercise.plan.id)
+    r = client.put(
+        f"/api/workouts/plans/{pid}/update-exercises",
+        headers=headers,
+        json={
+            "scope": "instance",
+            "monday": [{"old_exercise_id": "x", "new_exercise": str(uuid.uuid4())}],
+        },
+    )
+    assert r.status_code == 400
+    assert "week_number" in (r.get_json() or {}).get("message", "").lower()

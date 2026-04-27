@@ -9,6 +9,7 @@ import { useApiGet } from '@/app/utils/apiClient';
 import { useDeleteWorkout } from '@/app/_services/userService';
 import axiosInstance from '@/app/utils/axiosInstance';
 import { API_ROUTES } from '@/lib/apiRoutes';
+import { WEEKLY_WORKOUT_PROGRESS_QUERY_KEY } from '@/app/_constants/queryKeys';
 import type { HomeDiscoveryCard, HomeLevelFilter } from '@/app/_types/homeDiscovery';
 import type {
     ActiveUserPlan,
@@ -51,7 +52,7 @@ export function useHomeDashboard(trainingLevel: HomeLevelFilter) {
     >(['homeByLevel', trainingLevel], homeByLevelUrl);
     const { data: activePlans, isLoading: loadingActivePlans } = useApiGet<
         ApiResponse<WeeklyProgressMessage>
-    >(['activePlans'], activePlansUrl);
+    >(WEEKLY_WORKOUT_PROGRESS_QUERY_KEY, activePlansUrl);
     const { data: userActivePlans, isLoading: loadingUserActivePlans } = useApiGet<
         ApiResponse<ActiveUserPlan[]>
     >(['userActivePlans'], getActivePlansUrl);
