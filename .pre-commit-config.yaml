@@ -46,17 +46,26 @@ repos:
     hooks:
       - id: frontend-lint
         name: Frontend lint
-        entry: npm --prefix frontend run lint
+        entry: /bin/zsh
+        args:
+          - -lc
+          - source ~/.nvm/nvm.sh && nvm use 24.11.1 >/dev/null && npm --prefix frontend run lint
         language: system
         pass_filenames: false
       - id: frontend-typecheck
         name: Frontend typecheck
-        entry: npm --prefix frontend run typecheck
+        entry: /bin/zsh
+        args:
+          - -lc
+          - source ~/.nvm/nvm.sh && nvm use 24.11.1 >/dev/null && npm --prefix frontend run typecheck
         language: system
         pass_filenames: false
       - id: frontend-depcheck
         name: Frontend dependency rules
-        entry: npm --prefix frontend run depcheck
+        entry: /bin/zsh
+        args:
+          - -lc
+          - source ~/.nvm/nvm.sh && nvm use 24.11.1 >/dev/null && npm --prefix frontend run depcheck
         language: system
         pass_filenames: false
       - id: backend-imports
