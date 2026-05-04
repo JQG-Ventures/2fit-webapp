@@ -13,6 +13,10 @@ interface FormData {
     password: string;
 }
 
+function logLoginClient(event: string, payload: Record<string, unknown>): void {
+    console.warn(`[AUTH_DEBUG][login-client] ${event}`, payload);
+}
+
 export default function Login() {
     const { t } = useTranslation('global');
     const router = useRouter();
@@ -33,23 +37,67 @@ export default function Login() {
         setIsSubmitting(true);
 
         const { email, password } = formData;
+        logLoginClient('submit:start', {
+            email,
+            passwordLength: password.length,
+            pathname: window.location.pathname,
+            href: window.location.href,
+        });
+
         if (!email || !password) {
             setErrors({
                 email: !email ? t('LoginPage.emailRequired') : undefined,
                 password: !password ? t('LoginPage.PasswordRequired') : undefined,
+            });
+            logLoginClient('submit:validation-error', {
+                hasEmail: Boolean(email),
+                hasPassword: Boolean(password),
             });
             setIsSubmitting(false);
             return;
         }
 
         const response = await signIn('credentials', { email, password, redirect: false });
+        logLoginClient('submit:signin-response', {
+            response,
+            ok: response?.ok ?? null,
+            error: response?.error ?? null,
+            status: response?.status ?? null,
+            url: response?.url ?? null,
+        });
+
         if (response?.ok) {
+            try {
+                const sessionResponse = await fetch('/api/auth/session', {
+                    method: 'GET',
+                    cache: 'no-store',
+                });
+                const sessionBody = await sessionResponse.text();
+                logLoginClient('submit:session-probe', {
+                    status: sessionResponse.status,
+                    ok: sessionResponse.ok,
+                    sessionBody,
+                });
+            } catch (probeError) {
+                logLoginClient('submit:session-probe-error', {
+                    error: probeError instanceof Error ? probeError.message : String(probeError),
+                });
+            }
+            logLoginClient('submit:router-push-home', {
+                fromPath: window.location.pathname,
+            });
             router.push('/home');
         } else if (response?.error) {
             setError(t('LoginPage.credsError'));
+            logLoginClient('submit:credentials-error', {
+                error: response.error,
+            });
             setIsSubmitting(false);
         } else {
             setError(t('LoginPage.unexpectedError'));
+            logLoginClient('submit:unexpected-response', {
+                response,
+            });
             setIsSubmitting(false);
         }
     };
@@ -61,11 +109,14 @@ export default function Login() {
 
     const handleSocialSignIn = async (provider: string) => {
         setIsSocialLoading((prev) => ({ ...prev, [provider]: true }));
+        logLoginClient('social:click', { provider });
         try {
             if (provider === 'google') await signIn('google', { callbackUrl: '/login/google' });
         } catch {
+            logLoginClient('social:error', { provider });
             setError(t('LoginPage.socialSignInError'));
         } finally {
+            logLoginClient('social:done', { provider });
             setIsSocialLoading((prev) => ({ ...prev, [provider]: false }));
         }
     };
