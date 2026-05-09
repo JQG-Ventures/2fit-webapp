@@ -59,11 +59,11 @@ export default function Step10Submit() {
 
                 if (payload.auth_provider === 'default') {
                     const response = await signIn('credentials', {
-                        email: payload.email,
+                        identifier: payload.email,
                         password: payload.password,
                         redirect: false,
                     });
-                    if (!response?.ok) {
+                    if (response?.error || !response?.ok) {
                         setErrorMessage(t('RegisterPagestep11.errormsg'));
                         setIsLoading(false);
                         setTimeout(() => router.push('/'), 1100);

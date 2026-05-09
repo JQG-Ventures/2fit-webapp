@@ -17,12 +17,8 @@ import { useApiGet } from '@/app/utils/apiClient';
 import type { ApiResponse } from '@/app/_types/api';
 import axiosInstance from '@/app/utils/axiosInstance';
 import LoadingScreen from '@/app/_components/animations/LoadingScreen';
-
-interface ActivePlanSummary {
-    id: string;
-    name: string;
-    plan_type: WorkoutPlan['plan_type'];
-}
+import { USER_ACTIVE_PLANS_QUERY_KEY } from '@/app/_constants/queryKeys';
+import type { ActiveUserPlan } from '@/app/_types/home';
 
 interface WorkoutProgressSummary {
     progress: number;
@@ -31,7 +27,7 @@ interface WorkoutProgressSummary {
 
 interface PlanProgressCard {
     id: string;
-    plan_type: WorkoutPlan['plan_type'];
+    plan_type: ActiveUserPlan['plan_type'];
     name: string;
     progressData: WorkoutProgressSummary;
 }
@@ -42,9 +38,11 @@ export default function Workouts() {
     const [isClicked, setIsClicked] = useState(false);
     const getActivePlansUrl = `/api/users/active-plans`;
     const getPopularWorkoutsUrl = `/api/workouts/popular`;
-    const { data: activePlansResponse, isError: errorActivePlans } = useApiGet<
-        ApiResponse<ActivePlanSummary[]>
-    >(['activePlans'], getActivePlansUrl);
+    const {
+        data: activePlansResponse,
+        isLoading: loadingActivePlans,
+        isError: errorActivePlans,
+    } = useApiGet<ApiResponse<ActiveUserPlan[]>>(USER_ACTIVE_PLANS_QUERY_KEY, getActivePlansUrl);
     const {
         data: popularWorkoutResponse,
         isLoading: loadingPopularWorkouts,
@@ -57,16 +55,32 @@ export default function Workouts() {
     const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
 
     useEffect(() => {
+        let cancelled = false;
+
         const fetchProgressData = async () => {
-            if (!activePlansResponse?.message?.length) {
-                setLoadingProgressData(false);
+            if (loadingActivePlans) {
                 return;
             }
 
-            setLoadingProgressData(true);
+            const activePlans = activePlansResponse?.message ?? [];
+
+            if (!activePlans.length) {
+                if (!cancelled) {
+                    setProgressData([]);
+                    setErrorProgressData(null);
+                    setLoadingProgressData(false);
+                }
+                return;
+            }
+
+            if (!cancelled) {
+                setLoadingProgressData(true);
+                setErrorProgressData(null);
+            }
+
             try {
-                const progressPromises: Promise<PlanProgressCard>[] =
-                    activePlansResponse.message.map(async (plan): Promise<PlanProgressCard> => {
+                const progressPromises: Promise<PlanProgressCard>[] = activePlans.map(
+                    async (plan): Promise<PlanProgressCard> => {
                         if (plan.plan_type === 'challenge') {
                             const response = await axiosInstance.get<
                                 ApiResponse<WorkoutProgressSummary>
@@ -92,23 +106,34 @@ export default function Workouts() {
                             name: plan.name,
                             progressData: response.data.message,
                         };
-                    });
+                    },
+                );
 
                 const progressResults = await Promise.all(progressPromises);
-                setProgressData(progressResults);
+                if (!cancelled) {
+                    setProgressData(progressResults);
+                }
             } catch (error) {
-                setErrorProgressData(
-                    error instanceof Error ? error.message : t('workouts.fetchingError'),
-                );
+                if (!cancelled) {
+                    setErrorProgressData(
+                        error instanceof Error ? error.message : t('workouts.fetchingError'),
+                    );
+                }
             } finally {
-                setLoadingProgressData(false);
+                if (!cancelled) {
+                    setLoadingProgressData(false);
+                }
             }
         };
 
         void fetchProgressData();
-    }, [activePlansResponse, t]);
 
-    const handleClick = (planId: string, workoutType: string) => {
+        return () => {
+            cancelled = true;
+        };
+    }, [activePlansResponse, loadingActivePlans, t]);
+
+    const handleClick = (planId: string, workoutType: ActiveUserPlan['plan_type']) => {
         if (isClicked || loadingPlanId) return;
         setIsClicked(true);
         setLoadingPlanId(planId);
@@ -120,7 +145,9 @@ export default function Workouts() {
         }
     };
 
-    if (loadingPopularWorkouts || loadingProgressData) return <LoadingScreen />;
+    if (loadingActivePlans || loadingPopularWorkouts || loadingProgressData) {
+        return <LoadingScreen />;
+    }
 
     if (errorActivePlans || errorProgressData || errorPopularWorkouts) {
         return (

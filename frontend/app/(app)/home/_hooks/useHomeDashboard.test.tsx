@@ -2,6 +2,10 @@ import React from 'react';
 import { QueryClient, QueryClientProvider, type UseQueryResult } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+    USER_ACTIVE_PLANS_QUERY_KEY,
+    WEEKLY_WORKOUT_PROGRESS_QUERY_KEY,
+} from '@/app/_constants/queryKeys';
 
 const navigation = vi.hoisted(() => ({
     push: vi.fn(),
@@ -62,9 +66,9 @@ function defaultApiMock(key: string[]) {
         return { data: { status: 'success', message: [] }, isLoading: false };
     if (k === 'homeExplore') return { data: { status: 'success', message: [] }, isLoading: false };
     if (k === 'homeByLevel') return { data: { status: 'success', message: [] }, isLoading: false };
-    if (k === 'activePlans')
+    if (k === WEEKLY_WORKOUT_PROGRESS_QUERY_KEY[0])
         return { data: { status: 'success', message: null }, isLoading: false };
-    if (k === 'userActivePlans')
+    if (k === USER_ACTIVE_PLANS_QUERY_KEY[0])
         return {
             data: {
                 status: 'success',
@@ -116,7 +120,7 @@ describe('useHomeDashboard', () => {
 
     it('does not call batch endpoint when there are no challenge plans', async () => {
         mockUseApiGet.mockImplementation((key: string[]) => {
-            if (key[0] === 'userActivePlans') {
+            if (key[0] === USER_ACTIVE_PLANS_QUERY_KEY[0]) {
                 return {
                     data: {
                         status: 'success',
@@ -215,7 +219,7 @@ describe('useHomeDashboard', () => {
         const iso = `${y}-${m}-${d}`;
 
         mockUseApiGet.mockImplementation((key: string[]) => {
-            if (key[0] === 'activePlans') {
+            if (key[0] === WEEKLY_WORKOUT_PROGRESS_QUERY_KEY[0]) {
                 return {
                     data: {
                         status: 'success',
@@ -264,7 +268,7 @@ describe('useHomeDashboard', () => {
         const iso = `${y}-${m}-${d}`;
 
         mockUseApiGet.mockImplementation((key: string[]) => {
-            if (key[0] === 'activePlans') {
+            if (key[0] === WEEKLY_WORKOUT_PROGRESS_QUERY_KEY[0]) {
                 return {
                     data: {
                         status: 'success',
@@ -327,7 +331,7 @@ describe('useHomeDashboard', () => {
         const iso = `${y}-${m}-${d}`;
 
         mockUseApiGet.mockImplementation((key: string[]) => {
-            if (key[0] === 'activePlans') {
+            if (key[0] === WEEKLY_WORKOUT_PROGRESS_QUERY_KEY[0]) {
                 return {
                     data: {
                         status: 'success',
@@ -373,7 +377,7 @@ describe('useHomeDashboard', () => {
 
     it('returns null todayExercise when weekly days do not include today', async () => {
         mockUseApiGet.mockImplementation((key: string[]) => {
-            if (key[0] === 'activePlans') {
+            if (key[0] === WEEKLY_WORKOUT_PROGRESS_QUERY_KEY[0]) {
                 return {
                     data: {
                         status: 'success',

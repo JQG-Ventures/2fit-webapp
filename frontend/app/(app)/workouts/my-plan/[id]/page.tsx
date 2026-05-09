@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
@@ -127,6 +127,9 @@ const MyPlan: React.FC = () => {
     const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
     const [weekSwipeStartX, setWeekSwipeStartX] = useState<number | null>(null);
     const [weekTransitionDirection, setWeekTransitionDirection] = useState(0);
+    const [completingExerciseIds, setCompletingExerciseIds] = useState<string[]>([]);
+    const [recentlyCompletedExerciseIds, setRecentlyCompletedExerciseIds] = useState<string[]>([]);
+    const completionHighlightTimeoutsRef = useRef<Record<string, number>>({});
 
     const {
         data: weeklyProgressData,
@@ -217,20 +220,6 @@ const MyPlan: React.FC = () => {
         [exercisesToDelete],
     );
     const deleteDayLabel = t(`workouts.my-plan.weekdays.${selectedDayName}`);
-
-    if (sessionLoading || (loadingWeeklyProgress && !weeklyProgressState)) {
-        return <LoadingScreen />;
-    }
-
-    if (weeklyProgressError) {
-        return (
-            <Modal
-                title="Error"
-                message={weeklyProgressError.message}
-                onClose={() => router.push('/workouts')}
-            />
-        );
-    }
 
     const handleDeleteMode = () => {
         setIsDeleteMode(true);
@@ -418,6 +407,9 @@ const MyPlan: React.FC = () => {
     };
 
     const handleExerciseComplete = (exerciseId: string) => {
+        setCompletingExerciseIds((currentIds) =>
+            currentIds.filter((currentId) => currentId !== exerciseId),
+        );
         setWeeklyProgressState((prevState) => {
             if (!prevState) {
                 return prevState;
@@ -453,6 +445,19 @@ const MyPlan: React.FC = () => {
                 }),
             };
         });
+        setRecentlyCompletedExerciseIds((currentIds) =>
+            currentIds.includes(exerciseId) ? currentIds : [...currentIds, exerciseId],
+        );
+        const currentTimeout = completionHighlightTimeoutsRef.current[exerciseId];
+        if (currentTimeout) {
+            window.clearTimeout(currentTimeout);
+        }
+        completionHighlightTimeoutsRef.current[exerciseId] = window.setTimeout(() => {
+            setRecentlyCompletedExerciseIds((currentIds) =>
+                currentIds.filter((currentId) => currentId !== exerciseId),
+            );
+            delete completionHighlightTimeoutsRef.current[exerciseId];
+        }, 1600);
         window.setTimeout(() => {
             void queryClient.invalidateQueries({
                 queryKey: WEEKLY_WORKOUT_PROGRESS_QUERY_KEY,
@@ -487,6 +492,12 @@ const MyPlan: React.FC = () => {
             return;
         }
 
+        setCompletingExerciseIds((currentIds) =>
+            currentIds.includes(exerciseProgress.exercise_id)
+                ? currentIds
+                : [...currentIds, exerciseProgress.exercise_id],
+        );
+
         completeWorkout(
             {
                 queryParams: { workout_plan_id: planId },
@@ -501,10 +512,40 @@ const MyPlan: React.FC = () => {
             },
             {
                 onSuccess: () => handleExerciseComplete(exerciseProgress.exercise_id),
-                onError: (error) => console.error('Error marking exercise complete:', error),
+                onError: (error) => {
+                    setCompletingExerciseIds((currentIds) =>
+                        currentIds.filter(
+                            (currentId) => currentId !== exerciseProgress.exercise_id,
+                        ),
+                    );
+                    console.error('Error marking exercise complete:', error);
+                },
             },
         );
     };
+
+    useEffect(() => {
+        return () => {
+            Object.values(completionHighlightTimeoutsRef.current).forEach((timeoutId) => {
+                window.clearTimeout(timeoutId);
+            });
+            completionHighlightTimeoutsRef.current = {};
+        };
+    }, []);
+
+    if (sessionLoading || (loadingWeeklyProgress && !weeklyProgressState)) {
+        return <LoadingScreen />;
+    }
+
+    if (weeklyProgressError) {
+        return (
+            <Modal
+                title="Error"
+                message={weeklyProgressError.message}
+                onClose={() => router.push('/workouts')}
+            />
+        );
+    }
 
     const handlePreviousWeek = () => {
         if (!canGoPreviousWeek) return;
@@ -756,19 +797,39 @@ const MyPlan: React.FC = () => {
                                     </div>
                                 </div>
                             )}
-                            {isSelectedDayComplete && (
-                                <div className="flex items-center gap-3 rounded-3xl border border-green-100 bg-green-50 p-4 text-green-700">
-                                    <FaCheckCircle className="h-6 w-6 shrink-0" />
-                                    <div>
-                                        <h2 className="font-semibold">
-                                            {t('workouts.my-plan.dayCompletedTitle')}
-                                        </h2>
-                                        <p className="text-sm text-green-700/80">
-                                            {t('workouts.my-plan.dayCompletedDescription')}
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
+                            <AnimatePresence initial={false}>
+                                {isSelectedDayComplete && (
+                                    <motion.div
+                                        key={selectedDay?.date ?? selectedDayName}
+                                        initial={{ opacity: 0, y: 14, scale: 0.97 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                                        transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+                                        className="flex items-center gap-3 rounded-3xl border border-green-100 bg-green-50 p-4 text-green-700"
+                                    >
+                                        <motion.div
+                                            initial={{ scale: 0.85, rotate: -10 }}
+                                            animate={{ scale: 1, rotate: 0 }}
+                                            transition={{
+                                                type: 'spring',
+                                                stiffness: 420,
+                                                damping: 18,
+                                                delay: 0.05,
+                                            }}
+                                        >
+                                            <FaCheckCircle className="h-6 w-6 shrink-0" />
+                                        </motion.div>
+                                        <div>
+                                            <h2 className="font-semibold">
+                                                {t('workouts.my-plan.dayCompletedTitle')}
+                                            </h2>
+                                            <p className="text-sm text-green-700/80">
+                                                {t('workouts.my-plan.dayCompletedDescription')}
+                                            </p>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                             {selectedExercises.map((exercise: Exercise, index) => {
                                 const rowId = exercise.exercise_id ?? exercise._id ?? '';
                                 return (
@@ -784,6 +845,12 @@ const MyPlan: React.FC = () => {
                                         onOptionalSelect={handleOptionalSelect}
                                         onCompleteSelect={handleQuickCompleteExercise}
                                         canComplete={canCompleteSelectedDay}
+                                        isCompleting={Boolean(
+                                            rowId && completingExerciseIds.includes(rowId),
+                                        )}
+                                        isRecentlyCompleted={Boolean(
+                                            rowId && recentlyCompletedExerciseIds.includes(rowId),
+                                        )}
                                         selectedForDelete={Boolean(
                                             rowId &&
                                             exercisesToDelete[selectedDayName]?.includes(rowId),

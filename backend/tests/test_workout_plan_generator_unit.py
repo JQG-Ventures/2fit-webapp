@@ -82,6 +82,24 @@ def test_generate_day_routine_includes_cardio_when_requested() -> None:
     assert len(routine) >= 1
 
 
+def test_generate_day_routine_dedupes_overlapping_strength_exercises() -> None:
+    random.seed(11)
+    exercises = [
+        SimpleNamespace(id="shared", muscle_group=["chest", "triceps"], category="strength"),
+        SimpleNamespace(id="chest-only", muscle_group=["chest"], category="strength"),
+        SimpleNamespace(id="triceps-only", muscle_group=["triceps"], category="strength"),
+        SimpleNamespace(id="cardio-1", muscle_group=["chest"], category="cardio"),
+    ]
+    settings = {"sets": 3, "reps": [8, 10], "rest": 90}
+
+    routine = WorkoutPlanGenerator.generate_day_routine(
+        ["push"], exercises, settings, "beginner", cardio=True
+    )
+
+    exercise_ids = [row["exercise_id"] for row in routine]
+    assert len(exercise_ids) == len(set(exercise_ids))
+
+
 def test_get_intensity_settings_unknown_level_falls_back_to_beginner_shape() -> None:
     s = WorkoutPlanGenerator.get_intensity_settings("not-a-level", "muscle")
     assert s["sets"] == 2 and "reps" in s

@@ -9,7 +9,10 @@ import { useApiGet } from '@/app/utils/apiClient';
 import { useDeleteWorkout } from '@/app/_services/userService';
 import axiosInstance from '@/app/utils/axiosInstance';
 import { API_ROUTES } from '@/lib/apiRoutes';
-import { WEEKLY_WORKOUT_PROGRESS_QUERY_KEY } from '@/app/_constants/queryKeys';
+import {
+    USER_ACTIVE_PLANS_QUERY_KEY,
+    WEEKLY_WORKOUT_PROGRESS_QUERY_KEY,
+} from '@/app/_constants/queryKeys';
 import type { HomeDiscoveryCard, HomeLevelFilter } from '@/app/_types/homeDiscovery';
 import type {
     ActiveUserPlan,
@@ -55,7 +58,7 @@ export function useHomeDashboard(trainingLevel: HomeLevelFilter) {
     >(WEEKLY_WORKOUT_PROGRESS_QUERY_KEY, activePlansUrl);
     const { data: userActivePlans, isLoading: loadingUserActivePlans } = useApiGet<
         ApiResponse<ActiveUserPlan[]>
-    >(['userActivePlans'], getActivePlansUrl);
+    >(USER_ACTIVE_PLANS_QUERY_KEY, getActivePlansUrl);
 
     const challengePlansForProgress = useMemo(
         () =>

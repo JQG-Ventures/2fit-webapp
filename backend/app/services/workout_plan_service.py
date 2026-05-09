@@ -93,6 +93,50 @@ class WorkoutPlanGenerator:
             return [["push", "cardio"], ["legs"], ["pull", "cardio"]]
 
     @staticmethod
+    def _exercise_id(exercise: Any) -> str:
+        return str(exercise.id)
+
+    @staticmethod
+    def _dedupe_exercises(exercises: list[Any]) -> list[Any]:
+        unique_exercises: dict[str, Any] = {}
+        for exercise in exercises:
+            unique_exercises.setdefault(WorkoutPlanGenerator._exercise_id(exercise), exercise)
+        return list(unique_exercises.values())
+
+    @staticmethod
+    def _normalize_muscle_groups(exercise: Any) -> set[str]:
+        return {muscle.lower() for muscle in getattr(exercise, "muscle_group", [])}
+
+    @staticmethod
+    def _expand_muscle_groups(muscle_groups: list[str]) -> list[str]:
+        expanded_groups: list[str] = []
+        seen_groups: set[str] = set()
+        for group in muscle_groups:
+            for mapped_group in WorkoutPlanGenerator.MUSCLE_GROUPS_MAPPING.get(group, []):
+                if mapped_group in seen_groups:
+                    continue
+                seen_groups.add(mapped_group)
+                expanded_groups.append(mapped_group)
+        return expanded_groups
+
+    @staticmethod
+    def _sample_unique_candidates(
+        candidates: list[Any], limit: int, selected_ids: set[str]
+    ) -> list[Any]:
+        if limit <= 0:
+            return []
+
+        available = [
+            exercise
+            for exercise in candidates
+            if WorkoutPlanGenerator._exercise_id(exercise) not in selected_ids
+        ]
+        if not available:
+            return []
+
+        return random.sample(available, min(limit, len(available)))
+
+    @staticmethod
     def generate_day_routine(
         muscle_groups: list[str],
         exercises: list[Any],
@@ -111,23 +155,73 @@ class WorkoutPlanGenerator:
             cardio_count = 0
 
         daily_exercises: list[dict[str, Any]] = []
-        expanded: set[str] = set()
-        for group in muscle_groups:
-            expanded.update(WorkoutPlanGenerator.MUSCLE_GROUPS_MAPPING.get(group, []))
+        unique_exercises = WorkoutPlanGenerator._dedupe_exercises(exercises)
+        expanded_groups = WorkoutPlanGenerator._expand_muscle_groups(muscle_groups)
+        normalized_groups_by_exercise = {
+            WorkoutPlanGenerator._exercise_id(
+                exercise
+            ): WorkoutPlanGenerator._normalize_muscle_groups(exercise)
+            for exercise in unique_exercises
+        }
 
         strength_exercises: list[Any] = []
-        for mg in expanded:
-            group_exs = [ex for ex in exercises if mg in [m.lower() for m in ex.muscle_group]]
-            if group_exs:
-                strength_exercises.extend(
-                    random.sample(group_exs, min(random.randint(1, 2), len(group_exs)))
+        selected_strength_ids: set[str] = set()
+        strength_pool = [
+            exercise
+            for exercise in unique_exercises
+            if exercise.category.lower() != "cardio"
+            and any(
+                group in normalized_groups_by_exercise[WorkoutPlanGenerator._exercise_id(exercise)]
+                for group in expanded_groups
+            )
+        ]
+
+        for muscle_group in expanded_groups:
+            remaining_strength_slots = strength_count - len(strength_exercises)
+            if remaining_strength_slots <= 0:
+                break
+
+            group_candidates = [
+                exercise
+                for exercise in strength_pool
+                if muscle_group
+                in normalized_groups_by_exercise[WorkoutPlanGenerator._exercise_id(exercise)]
+                and WorkoutPlanGenerator._exercise_id(exercise) not in selected_strength_ids
+            ]
+            if group_candidates:
+                sample_size = min(
+                    random.randint(1, 2),
+                    len(group_candidates),
+                    remaining_strength_slots,
+                )
+                sampled_group = random.sample(group_candidates, sample_size)
+                strength_exercises.extend(sampled_group)
+                selected_strength_ids.update(
+                    WorkoutPlanGenerator._exercise_id(exercise) for exercise in sampled_group
                 )
             if len(strength_exercises) >= strength_count:
                 break
 
+        remaining_strength_slots = strength_count - len(strength_exercises)
+        if remaining_strength_slots > 0:
+            backfill_strength = WorkoutPlanGenerator._sample_unique_candidates(
+                strength_pool,
+                remaining_strength_slots,
+                selected_strength_ids,
+            )
+            strength_exercises.extend(backfill_strength)
+            selected_strength_ids.update(
+                WorkoutPlanGenerator._exercise_id(exercise) for exercise in backfill_strength
+            )
+
         cardio_exercises: list[Any] = []
         if cardio:
-            available_cardio = [ex for ex in exercises if ex.category.lower() == "cardio"]
+            available_cardio = [
+                exercise
+                for exercise in unique_exercises
+                if exercise.category.lower() == "cardio"
+                and WorkoutPlanGenerator._exercise_id(exercise) not in selected_strength_ids
+            ]
             cardio_exercises = random.sample(
                 available_cardio, min(cardio_count, len(available_cardio))
             )

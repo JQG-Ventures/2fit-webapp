@@ -186,14 +186,14 @@ export default function Step0Credentials({ onNext }: StepProps) {
                         );
                     })}
 
-                    <label className="flex items-center justify-center gap-3 cursor-pointer">
+                    <label className="flex w-full items-start justify-start gap-3 cursor-pointer text-left">
                         <input
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => setIsChecked(!isChecked)}
-                            className="w-[22px] h-[22px] accent-emerald-500 cursor-pointer shrink-0 rounded"
+                            className="mt-0.5 h-[22px] w-[22px] shrink-0 cursor-pointer appearance-none rounded border border-gray-300 bg-white transition-colors checked:border-emerald-500 checked:bg-emerald-500"
                         />
-                        <span className="text-[12px] text-gray-500">
+                        <span className="text-[14px] text-gray-500">
                             {t('RegisterPage.policy.0')}{' '}
                             <a href="#" className="text-black font-semibold underline">
                                 {t('RegisterPage.policy.1')}

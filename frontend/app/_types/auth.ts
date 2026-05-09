@@ -6,6 +6,8 @@ export interface AuthApiTokenMessage {
     name?: string;
 }
 
+export type LoginFailureReason = 'invalid_credentials' | 'support';
+
 export interface AuthenticatedUser {
     accessToken: string;
     refreshToken: string;

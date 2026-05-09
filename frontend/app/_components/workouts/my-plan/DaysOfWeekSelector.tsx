@@ -1,7 +1,6 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
-import { IoMoonOutline } from 'react-icons/io5';
 
 interface DaysOfWeekSelectorProps {
     days: {
@@ -87,9 +86,6 @@ const DaysOfWeekSelector: React.FC<DaysOfWeekSelectorProps> = ({
                             <span className="text-lg font-semibold">
                                 {formatDayNumber(day.date)}
                             </span>
-                            {isRestDay && !isCompleted && (
-                                <IoMoonOutline className="absolute bottom-1 h-3.5 w-3.5" />
-                            )}
                         </button>
                     );
                 })}
