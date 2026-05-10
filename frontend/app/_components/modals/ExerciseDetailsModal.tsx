@@ -5,9 +5,10 @@ import { FaDumbbell } from 'react-icons/fa';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import type { AnimationOriginRect } from '@/app/_interfaces/ExerciseFlow';
+import type { WorkoutFlowExercise } from '@/app/_types/workoutProgress';
 
 interface ExerciseDetailsModalProp {
-    exercise: Exercise;
+    exercise: WorkoutFlowExercise;
     onClose: () => void;
     onStartExercise: () => void;
     animationOrigin?: AnimationOriginRect | null;
@@ -24,10 +25,11 @@ const ExerciseDetailsModal: React.FC<ExerciseDetailsModalProp> = ({
     startDisabledMessage,
 }) => {
     const { t } = useTranslation('global');
+    const exerciseName = exercise.name ?? t('workouts.my-plan.notAvailable');
     const muscleGroup = Array.isArray(exercise.muscle_group)
         ? exercise.muscle_group[0]
         : String(exercise.muscle_group ?? '');
-    const fallbackLabel = muscleGroup || exercise.name.slice(0, 3);
+    const fallbackLabel = muscleGroup || exerciseName.slice(0, 3);
     const restTime =
         exercise.rest_seconds >= 60
             ? `${Math.floor(exercise.rest_seconds / 60)}m${
@@ -90,7 +92,7 @@ const ExerciseDetailsModal: React.FC<ExerciseDetailsModalProp> = ({
                     ) : exercise.image_url ? (
                         <Image
                             src={exercise.image_url}
-                            alt={exercise.name}
+                            alt={exerciseName}
                             fill
                             sizes="100vw"
                             className="object-cover"
@@ -118,7 +120,7 @@ const ExerciseDetailsModal: React.FC<ExerciseDetailsModalProp> = ({
                         {t('workouts.my-plan.previewExercise')}
                     </p>
                     <h2 className="mt-1 text-2xl font-semibold leading-tight text-gray-950">
-                        {exercise.name}
+                        {exerciseName}
                     </h2>
                     <p className="mt-3 text-sm leading-6 text-gray-500">
                         {exercise.description || t('workouts.my-plan.noExerciseDescription')}

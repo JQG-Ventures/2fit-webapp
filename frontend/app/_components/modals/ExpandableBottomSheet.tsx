@@ -3,14 +3,15 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { FaCheckCircle } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import type { WorkoutFlowExercise } from '@/app/_types/workoutProgress';
 
 interface BottomSheetProps {
-    exercises: Exercise[];
+    exercises: WorkoutFlowExercise[];
     currentExerciseIndex: number;
     currentSet: number;
     onComplete?: () => void;
     isRestView?: boolean;
-    nextPreviewExercise?: Exercise;
+    nextPreviewExercise?: WorkoutFlowExercise;
     onAddTime?: () => void;
     onSubtractTime?: () => void;
     onSkipRest?: () => void;
@@ -30,6 +31,9 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     const restPreview = isRestView && nextPreviewExercise;
     const { t } = useTranslation('global');
     const [expanded, setExpanded] = useState(false);
+    const currentExercise = restPreview ? nextPreviewExercise : exercises[currentExerciseIndex];
+    const currentExerciseName = currentExercise?.name ?? t('workouts.my-plan.notAvailable');
+    const currentExerciseImage = currentExercise?.image_url;
 
     return (
         <div
@@ -46,21 +50,21 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                 <div className="space-y-5 px-5">
                     <div className="flex items-center gap-4 rounded-3xl border border-gray-100 bg-[#f8faf9] p-3">
                         <div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-2xl bg-gray-100">
-                            <Image
-                                src={
-                                    restPreview
-                                        ? nextPreviewExercise.image_url
-                                        : exercises[currentExerciseIndex].image_url
-                                }
-                                alt={
-                                    restPreview
-                                        ? nextPreviewExercise.name
-                                        : exercises[currentExerciseIndex].name
-                                }
-                                fill
-                                sizes="112px"
-                                className="object-cover"
-                            />
+                            {currentExerciseImage ? (
+                                <Image
+                                    src={currentExerciseImage}
+                                    alt={currentExerciseName}
+                                    fill
+                                    sizes="112px"
+                                    className="object-cover"
+                                />
+                            ) : (
+                                <div className="flex h-full w-full items-center justify-center">
+                                    <span className="text-xs font-semibold uppercase text-green-700">
+                                        {currentExerciseName.slice(0, 4)}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                         <div className="min-w-0 flex-1">
                             <p className="text-xs font-medium uppercase tracking-[0.16em] text-green-600">
@@ -69,14 +73,12 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                                     : t('workouts.my-plan.previewExercise')}
                             </p>
                             <h3 className="mt-1 truncate text-[1.35rem] font-semibold leading-tight text-gray-950">
-                                {restPreview
-                                    ? nextPreviewExercise.name
-                                    : exercises[currentExerciseIndex].name}
+                                {currentExerciseName}
                             </h3>
                             <p className="mt-2 text-sm text-gray-500">
-                                {restPreview
-                                    ? `${nextPreviewExercise.reps} reps • ${nextPreviewExercise.rest_seconds}s ${t('workouts.my-plan.restLabel')}`
-                                    : `${exercises[currentExerciseIndex].reps} reps • ${exercises[currentExerciseIndex].rest_seconds}s ${t('workouts.my-plan.restLabel')}`}
+                                {`${currentExercise?.reps ?? 0} reps • ${currentExercise?.rest_seconds ?? 0}s ${t(
+                                    'workouts.my-plan.restLabel',
+                                )}`}
                             </p>
                         </div>
                     </div>
@@ -128,9 +130,14 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                             const isCompleted = exIdx < currentExerciseIndex;
                             const isCurrent = exIdx === currentExerciseIndex;
                             const sets = Array.from({ length: exercise.sets }, (_, i) => i + 1);
+                            const exerciseName =
+                                exercise.name ?? t('workouts.my-plan.notAvailable');
 
                             return (
-                                <div key={`${exercise.exercise_id}-${exIdx}`} className="w-full">
+                                <div
+                                    key={`${exercise.exercise_id ?? exercise._id ?? exIdx}`}
+                                    className="w-full"
+                                >
                                     {sets.map((setNumber, _setIdx) => {
                                         const isSetCompleted =
                                             isCompleted || (isCurrent && setNumber < currentSet);
@@ -143,18 +150,26 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                                                 }`}
                                             >
                                                 <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-2xl bg-gray-100">
-                                                    <Image
-                                                        src={exercise.image_url}
-                                                        alt={exercise.name}
-                                                        fill
-                                                        sizes="96px"
-                                                        className="object-cover"
-                                                    />
+                                                    {exercise.image_url ? (
+                                                        <Image
+                                                            src={exercise.image_url}
+                                                            alt={exerciseName}
+                                                            fill
+                                                            sizes="96px"
+                                                            className="object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="flex h-full w-full items-center justify-center">
+                                                            <span className="text-xs font-semibold uppercase text-green-700">
+                                                                {exerciseName.slice(0, 4)}
+                                                            </span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center justify-between">
                                                         <h3 className="truncate text-base font-semibold text-gray-950">
-                                                            {exercise.name}
+                                                            {exerciseName}
                                                         </h3>
                                                         {isSetCompleted && (
                                                             <FaCheckCircle className="ml-2 text-xl text-green-500" />

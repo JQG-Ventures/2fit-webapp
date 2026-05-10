@@ -8,15 +8,16 @@ import { FiRefreshCw, FiRotateCcw } from 'react-icons/fi';
 import { IoClose } from 'react-icons/io5';
 import { useTranslation } from 'react-i18next';
 import type { AnimationOriginRect, ExerciseAnimationTargets } from '@/app/_interfaces/ExerciseFlow';
+import type { WorkoutFlowExercise } from '@/app/_types/workoutProgress';
 
 interface ExerciseCardProps {
-    exercise: Exercise;
+    exercise: WorkoutFlowExercise;
     onClick: (action: 'details' | 'start', targets?: ExerciseAnimationTargets) => void;
     isDeleteMode: boolean;
     isOptionalMode: boolean;
     onDeleteSelect: (exerciseId: string) => void;
     onOptionalSelect: (exerciseId: string) => void;
-    onCompleteSelect: (exercise: Exercise) => void;
+    onCompleteSelect: (exercise: WorkoutFlowExercise) => void;
     selectedForDelete: boolean;
     canComplete: boolean;
     isCompleting: boolean;
@@ -39,10 +40,11 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
     const { t } = useTranslation('global');
     const cardRef = useRef<HTMLDivElement>(null);
     const actionRef = useRef<HTMLButtonElement>(null);
+    const exerciseName = exercise.name ?? t('workouts.my-plan.notAvailable');
     const muscleGroup = Array.isArray(exercise.muscle_group)
         ? exercise.muscle_group[0]
         : String(exercise.muscle_group ?? '');
-    const fallbackLabel = muscleGroup || exercise.name.slice(0, 3);
+    const fallbackLabel = muscleGroup || exerciseName.slice(0, 3);
     const restTime =
         exercise.rest_seconds >= 60
             ? `${Math.floor(exercise.rest_seconds / 60)}m${
@@ -114,7 +116,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 {exercise.image_url ? (
                     <Image
                         src={exercise.image_url}
-                        alt={exercise.name}
+                        alt={exerciseName}
                         fill
                         sizes="112px"
                         className="object-cover"
@@ -139,7 +141,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                             : ''
                     }`}
                 >
-                    {exercise.name}
+                    {exerciseName}
                 </h3>
                 <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
                     <span className="flex items-center gap-1">
@@ -193,7 +195,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                             const id = exercise.exercise_id ?? exercise._id;
                             if (id) onDeleteSelect(id);
                         }}
-                        aria-label={`${t('a11y.markForRemoval')}: ${exercise.name}`}
+                        aria-label={`${t('a11y.markForRemoval')}: ${exerciseName}`}
                     >
                         <IoClose size={22} />
                     </button>
@@ -207,7 +209,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                             const id = exercise.exercise_id ?? exercise._id;
                             if (id) onOptionalSelect(id);
                         }}
-                        aria-label={`${t('a11y.changeExerciseChoice')}: ${exercise.name}`}
+                        aria-label={`${t('a11y.changeExerciseChoice')}: ${exerciseName}`}
                     >
                         <FiRefreshCw className="h-4 w-4" />
                     </button>
@@ -224,7 +226,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                             ease: 'easeInOut',
                         }}
                         className="flex h-11 w-11 items-center justify-center rounded-full bg-green-500 text-white shadow-[0_10px_22px_rgba(34,197,94,0.34)]"
-                        aria-label={`${t('workouts.my-plan.completingExercise')}: ${exercise.name}`}
+                        aria-label={`${t('workouts.my-plan.completingExercise')}: ${exerciseName}`}
                         aria-busy="true"
                         data-testid="exercise-completing-button"
                     >
@@ -239,7 +241,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                         animate={{ scale: [1, 1.14, 1] }}
                         transition={{ duration: 0.45, ease: 'easeOut' }}
                         className="relative flex h-11 w-11 items-center justify-center rounded-full bg-green-500 text-white shadow-[0_10px_22px_rgba(34,197,94,0.34)]"
-                        aria-label={`${t('workouts.my-plan.exerciseCompleted')}: ${exercise.name}`}
+                        aria-label={`${t('workouts.my-plan.exerciseCompleted')}: ${exerciseName}`}
                         data-testid="exercise-completed-button"
                     >
                         <motion.span
@@ -258,7 +260,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                         onClick={(e) => {
                             e.stopPropagation();
                         }}
-                        aria-label={`${t('workouts.my-plan.redoExercise')}: ${exercise.name}`}
+                        aria-label={`${t('workouts.my-plan.redoExercise')}: ${exerciseName}`}
                     >
                         <FiRotateCcw className="h-4 w-4" />
                     </button>
@@ -281,7 +283,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                             canComplete
                                 ? t('workouts.my-plan.markExerciseDone')
                                 : t('workouts.my-plan.onlyTodayCompletion')
-                        }: ${exercise.name}`}
+                        }: ${exerciseName}`}
                     >
                         <FaCheck className="h-4 w-4" />
                     </button>

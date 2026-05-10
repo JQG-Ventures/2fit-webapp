@@ -4,13 +4,14 @@ import { FiVolume2, FiVolumeX, FiX } from 'react-icons/fi';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import BottomSheet from '@/app/_components/modals/ExpandableBottomSheet';
+import type { WorkoutFlowExercise } from '@/app/_types/workoutProgress';
 
 interface ExerciseViewProp {
-    exercise: ExerciseView;
+    exercise: WorkoutFlowExercise & { currentSet?: number; totalSets?: number };
     onNext: () => void;
     onBack: () => void;
     currentExerciseIndex: number;
-    exercises: Exercise[];
+    exercises: WorkoutFlowExercise[];
     currentSet: number;
 }
 
@@ -27,6 +28,7 @@ const ExerciseView: React.FC<ExerciseViewProp> = ({
     const videoRef = useRef<HTMLVideoElement>(null);
 
     if (!exercise) return null;
+    const exerciseName = exercise.name ?? t('workouts.my-plan.notAvailable');
 
     const toggleMute = () => {
         if (videoRef.current) {
@@ -48,7 +50,7 @@ const ExerciseView: React.FC<ExerciseViewProp> = ({
                 </button>
                 <div className="mx-3 min-w-0 rounded-full bg-white/90 px-5 py-3 text-center shadow-lg backdrop-blur">
                     <h2 className="max-w-[14rem] truncate text-[1.05rem] font-semibold text-gray-950">
-                        {exercise.name}
+                        {exerciseName}
                     </h2>
                     <p className="text-sm font-medium text-gray-500">
                         Set {exercise.currentSet} {t('workouts.plan.of')} {exercise.totalSets}
@@ -70,7 +72,7 @@ const ExerciseView: React.FC<ExerciseViewProp> = ({
             <div className="relative flex h-[72dvh] w-full flex-col items-center justify-center overflow-hidden rounded-b-[2rem] bg-gray-100">
                 <video
                     ref={videoRef}
-                    src={exercise.video_url}
+                    src={exercise.video_url ?? undefined}
                     autoPlay
                     loop
                     muted={isMuted}

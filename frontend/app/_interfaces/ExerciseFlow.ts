@@ -1,3 +1,5 @@
+import type { WorkoutFlowExercise } from '@/app/_types/workoutProgress';
+
 export interface AnimationOriginRect {
     top: number;
     left: number;
@@ -11,7 +13,7 @@ export interface ExerciseAnimationTargets {
 }
 
 export interface ExerciseFlowProps {
-    exercises: Exercise[];
+    exercises: WorkoutFlowExercise[];
     onClose: () => void;
     onExerciseComplete: (exerciseId: string) => void;
     workoutType: string;
@@ -38,7 +40,7 @@ export interface State {
     isRest: boolean;
     isCompleted: boolean;
     restDuration: number;
-    nextExerciseDetails: Exercise | null;
+    nextExerciseDetails: WorkoutFlowExercise | null;
     completeMessage: string | null;
     exercisesProgress: ExerciseProgress[];
     exerciseStartTime: number | null;
@@ -49,7 +51,7 @@ export interface State {
 
 export type Action =
     | { type: 'END_COUNTDOWN' }
-    | { type: 'START_REST'; restDuration: number; nextExercise: Exercise | null }
+    | { type: 'START_REST'; restDuration: number; nextExercise: WorkoutFlowExercise | null }
     | { type: 'START_EXERCISE'; currentSet: number }
     | { type: 'COMPLETE_EXERCISE' }
     | { type: 'SET_EXERCISE_INDEX'; index: number }

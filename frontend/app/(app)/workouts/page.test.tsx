@@ -6,12 +6,7 @@ import type { QueryKey, UseQueryResult } from '@tanstack/react-query';
 import WorkoutsPage from './page';
 import { USER_ACTIVE_PLANS_QUERY_KEY } from '@/app/_constants/queryKeys';
 import type { ApiResponse } from '@/app/_types/api';
-import type { ActiveUserPlan } from '@/app/_types/home';
-
-interface WorkoutProgressSummary {
-    progress: number;
-    exercises_left?: Array<Pick<Exercise, '_id'>>;
-}
+import type { ActiveUserPlan, WorkoutProgressSummary } from '@/app/_types/workoutProgress';
 
 type WorkoutsPageQueryResult<T> = Pick<UseQueryResult<T>, 'data' | 'isLoading' | 'isError'>;
 type ActivePlansQueryResult = WorkoutsPageQueryResult<ApiResponse<ActiveUserPlan[]>>;
@@ -134,6 +129,7 @@ describe('Workouts page', () => {
                 message: [
                     {
                         id: 'plan-1',
+                        type: 'personalized',
                         name: 'Weekly plan',
                         plan_type: 'personalized',
                     },
@@ -164,7 +160,15 @@ describe('Workouts page', () => {
                 status: 'success',
                 message: {
                     progress: 60,
-                    exercises_left: [{ _id: 'exercise-1' }],
+                    exercises_left: [
+                        {
+                            exercise_id: 'exercise-1',
+                            reps: 12,
+                            rest_seconds: 45,
+                            sets_left: 1,
+                            total_sets: 3,
+                        },
+                    ],
                 },
             },
         });

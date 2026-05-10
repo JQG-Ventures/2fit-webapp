@@ -28,6 +28,12 @@ import { IoChevronBack, IoChevronForward } from 'react-icons/io5';
 import { FiRefreshCw, FiTrash2, FiX } from 'react-icons/fi';
 import type { ApiResponse } from '@/app/_types/api';
 import type { AnimationOriginRect, ExerciseAnimationTargets } from '@/app/_interfaces/ExerciseFlow';
+import type { AppClientSession } from '@/app/_types/appSession';
+import type {
+    WorkoutDisplayMessage,
+    WeeklyProgressMessage,
+    WorkoutFlowExercise,
+} from '@/app/_types/workoutProgress';
 
 const DEFAULT_SECONDS_PER_REP = 3;
 const WEEK_SWIPE_THRESHOLD_PX = 48;
@@ -43,41 +49,6 @@ const daysOfWeekFull = [
 ] as const;
 
 type WeekDayName = (typeof daysOfWeekFull)[number];
-
-interface WeeklyProgressDay {
-    day_of_week: string;
-    date?: string;
-    is_completed?: boolean;
-    exercises: Exercise[];
-}
-
-interface WeeklyProgressMessage {
-    week_start_date?: string;
-    week_end_date?: string;
-    current_week?: number;
-    week_number?: number;
-    total_weeks?: number;
-    progress?: number;
-    days: WeeklyProgressDay[];
-}
-
-interface SessionUserState {
-    id: string | null;
-    token: string | null;
-}
-
-function readSessionUser(user: unknown): SessionUserState {
-    if (typeof user !== 'object' || user === null) {
-        return { id: null, token: null };
-    }
-
-    const candidateUser = user as Record<string, unknown>;
-
-    return {
-        id: typeof candidateUser.id === 'string' ? candidateUser.id : null,
-        token: typeof candidateUser.token === 'string' ? candidateUser.token : null,
-    };
-}
 
 function getTodayDateKey(): string {
     const today = new Date();
@@ -95,14 +66,15 @@ const MyPlan: React.FC = () => {
     const { t } = useTranslation('global');
     const { data: session, status } = useSession();
     const planId = Array.isArray(id) ? id[0] : id;
-    const sessionUser = readSessionUser(session?.user);
+    const sessionData = session as AppClientSession | null;
+    const sessionUser = sessionData?.user;
 
     const sessionLoading = status === 'loading';
-    const userId = sessionUser.id ?? '';
-    const token = sessionUser.token;
+    const userId = sessionUser?.id ?? '';
+    const token = sessionUser?.token ?? null;
 
     const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
-    const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+    const [selectedExercise, setSelectedExercise] = useState<WorkoutFlowExercise | null>(null);
     const [exerciseAnimationOrigin, setExerciseAnimationOrigin] =
         useState<AnimationOriginRect | null>(null);
     const [exerciseCompletionTarget, setExerciseCompletionTarget] =
@@ -119,7 +91,7 @@ const MyPlan: React.FC = () => {
     const [isDeleteSheetOpen, setIsDeleteSheetOpen] = useState(false);
     const [deleteScope, setDeleteScope] = useState<PlanChangeScope>('template');
     const [replaceScope, setReplaceScope] = useState<PlanChangeScope>('template');
-    const [weeklyProgressState, setWeeklyProgressState] = useState<WeeklyProgressMessage | null>(
+    const [weeklyProgressState, setWeeklyProgressState] = useState<WorkoutDisplayMessage | null>(
         null,
     );
     const [similarExercises, setSimilarExercises] = useState<Exercise[]>([]);
@@ -156,8 +128,8 @@ const MyPlan: React.FC = () => {
         null,
     );
 
-    const normalizeExercises = (exercises: Exercise[]): Exercise[] => {
-        const uniqueExercises: Record<string, Exercise> = {};
+    const normalizeExercises = (exercises: WorkoutFlowExercise[]): WorkoutFlowExercise[] => {
+        const uniqueExercises: Record<string, WorkoutFlowExercise> = {};
 
         exercises.forEach((exercise) => {
             const exerciseId = exercise.exercise_id ?? exercise._id;
@@ -296,7 +268,7 @@ const MyPlan: React.FC = () => {
     };
 
     const handleExerciseCardClick = (
-        exercise: Exercise,
+        exercise: WorkoutFlowExercise,
         action: 'details' | 'start',
         targets?: ExerciseAnimationTargets,
     ) => {
@@ -319,7 +291,7 @@ const MyPlan: React.FC = () => {
         }
     };
 
-    const handleExerciseStart = (exercise: Exercise) => {
+    const handleExerciseStart = (exercise: WorkoutFlowExercise) => {
         if (!canCompleteSelectedDay) {
             return;
         }
@@ -379,7 +351,7 @@ const MyPlan: React.FC = () => {
 
                             return {
                                 ...dayData,
-                                exercises: dayData.exercises.map((exercise: Exercise) => {
+                                exercises: dayData.exercises.map((exercise) => {
                                     if (exercise.exercise_id === exerciseToReplaceId) {
                                         return {
                                             ...pendingReplacementExercise,
@@ -427,7 +399,7 @@ const MyPlan: React.FC = () => {
                     }
 
                     const updatedExercises = normalizeExercises(
-                        day.exercises.map((exercise: Exercise) => {
+                        day.exercises.map((exercise) => {
                             const currentExerciseId = exercise.exercise_id ?? exercise._id;
 
                             if (currentExerciseId === exerciseId && !exercise.is_completed) {
@@ -465,7 +437,7 @@ const MyPlan: React.FC = () => {
         }, 400);
     };
 
-    const buildDefaultExerciseProgress = (exercise: Exercise): ExerciseProgress => {
+    const buildDefaultExerciseProgress = (exercise: WorkoutFlowExercise): ExerciseProgress => {
         const sets = exercise.sets || 1;
         const reps = exercise.reps || 1;
         const workSeconds = sets * reps * DEFAULT_SECONDS_PER_REP;
@@ -481,7 +453,7 @@ const MyPlan: React.FC = () => {
         };
     };
 
-    const handleQuickCompleteExercise = (exercise: Exercise) => {
+    const handleQuickCompleteExercise = (exercise: WorkoutFlowExercise) => {
         if (!canCompleteSelectedDay) {
             return;
         }
@@ -830,7 +802,7 @@ const MyPlan: React.FC = () => {
                                     </motion.div>
                                 )}
                             </AnimatePresence>
-                            {selectedExercises.map((exercise: Exercise, index) => {
+                            {selectedExercises.map((exercise, index) => {
                                 const rowId = exercise.exercise_id ?? exercise._id ?? '';
                                 return (
                                     <ExerciseCard

@@ -66,13 +66,12 @@ function defaultApiMock(key: string[]) {
         return { data: { status: 'success', message: [] }, isLoading: false };
     if (k === 'homeExplore') return { data: { status: 'success', message: [] }, isLoading: false };
     if (k === 'homeByLevel') return { data: { status: 'success', message: [] }, isLoading: false };
-    if (k === WEEKLY_WORKOUT_PROGRESS_QUERY_KEY[0])
-        return { data: { status: 'success', message: null }, isLoading: false };
+    if (k === WEEKLY_WORKOUT_PROGRESS_QUERY_KEY[0]) return { data: undefined, isLoading: false };
     if (k === USER_ACTIVE_PLANS_QUERY_KEY[0])
         return {
             data: {
                 status: 'success',
-                message: [{ id: 'ch1', name: 'C', plan_type: 'challenge' }],
+                message: [{ id: 'ch1', type: 'challenge', name: 'C', plan_type: 'challenge' }],
             },
             isLoading: false,
         };
@@ -124,7 +123,7 @@ describe('useHomeDashboard', () => {
                 return {
                     data: {
                         status: 'success',
-                        message: [{ id: 'p1', name: 'Lib', plan_type: 'library' }],
+                        message: [{ id: 'p1', type: 'library', name: 'Lib', plan_type: 'library' }],
                     },
                     isLoading: false,
                 };
@@ -227,6 +226,9 @@ describe('useHomeDashboard', () => {
                             progress: 50,
                             week_start_date: iso,
                             week_end_date: iso,
+                            current_week: 1,
+                            week_number: 1,
+                            total_weeks: 1,
                             days: [
                                 {
                                     day_of_week: 'Sun',
@@ -276,6 +278,9 @@ describe('useHomeDashboard', () => {
                             progress: 10,
                             week_start_date: iso,
                             week_end_date: iso,
+                            current_week: 1,
+                            week_number: 1,
+                            total_weeks: 1,
                             days: [
                                 {
                                     day_of_week: 'Mon',
@@ -339,6 +344,9 @@ describe('useHomeDashboard', () => {
                             progress: 0,
                             week_start_date: iso,
                             week_end_date: iso,
+                            current_week: 1,
+                            week_number: 1,
+                            total_weeks: 1,
                             days: [
                                 {
                                     day_of_week: 'Sun',
@@ -385,6 +393,9 @@ describe('useHomeDashboard', () => {
                             progress: 0,
                             week_start_date: '2020-01-01',
                             week_end_date: '2020-01-07',
+                            current_week: 1,
+                            week_number: 1,
+                            total_weeks: 1,
                             days: [
                                 {
                                     day_of_week: 'Mon',

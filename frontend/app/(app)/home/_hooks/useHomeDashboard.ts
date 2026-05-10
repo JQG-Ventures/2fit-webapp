@@ -18,7 +18,7 @@ import type {
     ActiveUserPlan,
     WeeklyProgressExercise,
     WeeklyProgressMessage,
-} from '@/app/_types/home';
+} from '@/app/_types/workoutProgress';
 import type { PlanWithProgress, ChallengeProgress } from '@/app/_types/challenges';
 import type { ApiResponse } from '@/app/_types/api';
 import type { AppClientSession } from '@/app/_types/appSession';

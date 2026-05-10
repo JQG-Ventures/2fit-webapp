@@ -5,13 +5,14 @@ import { FiX } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import BottomSheet from '@/app/_components/modals/ExpandableBottomSheet';
+import type { WorkoutFlowExercise } from '@/app/_types/workoutProgress';
 
 interface RestViewProp {
     restDuration: number;
     onNext: () => void;
     onBack: () => void;
-    nextExercise: Exercise;
-    exercises: Exercise[];
+    nextExercise: WorkoutFlowExercise;
+    exercises: WorkoutFlowExercise[];
     currentExerciseIndex: number;
     currentSet: number;
 }
@@ -28,6 +29,7 @@ const RestView: React.FC<RestViewProp> = ({
     const { t } = useTranslation('global');
     const [duration, setDuration] = useState(restDuration);
     const [timerKey, setTimerKey] = useState(Date.now());
+    const nextExerciseName = nextExercise.name ?? t('workouts.my-plan.notAvailable');
 
     const addTime = () => {
         setDuration((prev) => prev + 5);
@@ -65,7 +67,7 @@ const RestView: React.FC<RestViewProp> = ({
                         {t('RestView.nextEx')}
                     </h2>
                     <p className="mt-1 max-w-xs truncate text-center text-[1.2rem] text-gray-500">
-                        {nextExercise.name}
+                        {nextExerciseName}
                     </p>
 
                     <div className="mt-8 flex items-center justify-center">

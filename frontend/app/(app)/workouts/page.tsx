@@ -18,18 +18,18 @@ import type { ApiResponse } from '@/app/_types/api';
 import axiosInstance from '@/app/utils/axiosInstance';
 import LoadingScreen from '@/app/_components/animations/LoadingScreen';
 import { USER_ACTIVE_PLANS_QUERY_KEY } from '@/app/_constants/queryKeys';
-import type { ActiveUserPlan } from '@/app/_types/home';
-
-interface WorkoutProgressSummary {
-    progress: number;
-    exercises_left?: Exercise[];
-}
+import type { ChallengeProgress } from '@/app/_types/challenges';
+import type {
+    ActivePlanProgressData,
+    ActiveUserPlan,
+    WorkoutProgressSummary,
+} from '@/app/_types/workoutProgress';
 
 interface PlanProgressCard {
     id: string;
     plan_type: ActiveUserPlan['plan_type'];
     name: string;
-    progressData: WorkoutProgressSummary;
+    progressData: ActivePlanProgressData;
 }
 
 export default function Workouts() {
@@ -83,7 +83,7 @@ export default function Workouts() {
                     async (plan): Promise<PlanProgressCard> => {
                         if (plan.plan_type === 'challenge') {
                             const response = await axiosInstance.get<
-                                ApiResponse<WorkoutProgressSummary>
+                                ApiResponse<ChallengeProgress>
                             >('/api/challenges/challenges/progress', {
                                 params: { challenge_id: plan.id },
                             });
@@ -145,6 +145,10 @@ export default function Workouts() {
         }
     };
 
+    const getExercisesLeft = (progress: ActivePlanProgressData): number => {
+        return 'exercises_left' in progress ? progress.exercises_left.length : 0;
+    };
+
     if (loadingActivePlans || loadingPopularWorkouts || loadingProgressData) {
         return <LoadingScreen />;
     }
@@ -179,47 +183,47 @@ export default function Workouts() {
                 pagination={{ clickable: true }}
                 className="h-[15vh] w-full overflow-hidden rounded-3xl shadow-xl lg:max-w-3xl"
             >
-                {progressData.map((plan) => (
-                    <SwiperSlide key={plan.id} className="flex justify-center items-center">
-                        <div
-                            className={`cursor-pointer flex flex-row justify-center items-center w-full h-full rounded-3xl bg-black px-6 
-          								hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
-                            onClick={() => handleClick(plan.id, plan.plan_type)}
-                        >
-                            <div className="w-1/2 flex flex-col justify-evenly pr-4">
-                                <h2 className="text-white text-3xl font-semibold">
-                                    {plan.plan_type === 'personalized'
-                                        ? t('workouts.weeklyRoutine')
-                                        : plan.plan_type === 'challenge'
-                                          ? t('workouts.challengeProgress')
-                                          : t('workouts.workoutProgress')}
-                                </h2>
-                                <span className="text-gray-200 text-2xl">
-                                    {plan.progressData?.exercises_left?.length || 0}{' '}
-                                    {t('workouts.exercise')}
-                                    {plan.progressData?.exercises_left?.length !== 1
-                                        ? 's'
-                                        : ''}{' '}
-                                    {t('workouts.left')}
-                                </span>
-                            </div>
+                {progressData.map((plan) => {
+                    const exercisesLeft = getExercisesLeft(plan.progressData);
 
-                            <div className="w-1/2 flex flex-col justify-center text-white">
-                                {loadingPlanId === plan.id ? (
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-green-500"></div>
-                                    </div>
-                                ) : (
-                                    <ProgressBar
-                                        percentage={
-                                            Number(Math.round(plan.progressData?.progress)) || 0
-                                        }
-                                    />
-                                )}
+                    return (
+                        <SwiperSlide key={plan.id} className="flex justify-center items-center">
+                            <div
+                                className={`cursor-pointer flex flex-row justify-center items-center w-full h-full rounded-3xl bg-black px-6 
+          								hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                                onClick={() => handleClick(plan.id, plan.plan_type)}
+                            >
+                                <div className="w-1/2 flex flex-col justify-evenly pr-4">
+                                    <h2 className="text-white text-3xl font-semibold">
+                                        {plan.plan_type === 'personalized'
+                                            ? t('workouts.weeklyRoutine')
+                                            : plan.plan_type === 'challenge'
+                                              ? t('workouts.challengeProgress')
+                                              : t('workouts.workoutProgress')}
+                                    </h2>
+                                    <span className="text-gray-200 text-2xl">
+                                        {exercisesLeft} {t('workouts.exercise')}
+                                        {exercisesLeft !== 1 ? 's' : ''} {t('workouts.left')}
+                                    </span>
+                                </div>
+
+                                <div className="w-1/2 flex flex-col justify-center text-white">
+                                    {loadingPlanId === plan.id ? (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-green-500"></div>
+                                        </div>
+                                    ) : (
+                                        <ProgressBar
+                                            percentage={
+                                                Number(Math.round(plan.progressData?.progress)) || 0
+                                            }
+                                        />
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    </SwiperSlide>
-                ))}
+                        </SwiperSlide>
+                    );
+                })}
             </Swiper>
 
             <div className="flex flex-row w-full lg:max-w-3xl">
