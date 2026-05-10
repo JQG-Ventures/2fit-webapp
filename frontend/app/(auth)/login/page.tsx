@@ -2,121 +2,118 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import type { SignInResponse } from 'next-auth/react';
+
 import { FaGoogle } from 'react-icons/fa';
 import { IoChevronBack, IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5';
 import { signIn } from 'next-auth/react';
 import ButtonWithSpinner from '@/app/_components/others/ButtonWithSpinner';
 import { useTranslation } from 'react-i18next';
+import { MdOutlineQuestionMark } from 'react-icons/md';
 
 interface FormData {
-    email: string;
+    identifier: string;
     password: string;
 }
 
-function logLoginClient(event: string, payload: Record<string, unknown>): void {
-    console.warn(`[AUTH_DEBUG][login-client] ${event}`, payload);
+interface LoginFeedback {
+    description: string;
+    title: string;
+    tone: 'critical' | 'warning';
+}
+
+function buildLoginFeedback(t: (key: string) => string, response?: SignInResponse): LoginFeedback {
+    if (response?.code === 'invalid_credentials' || response?.code === 'credentials') {
+        return {
+            title: t('LoginPage.invalidCredentialsTitle'),
+            description: t('LoginPage.invalidCredentialsDescription'),
+            tone: 'critical',
+        };
+    }
+
+    return {
+        title: t('LoginPage.supportErrorTitle'),
+        description: t('LoginPage.supportErrorDescription'),
+        tone: 'warning',
+    };
 }
 
 export default function Login() {
     const { t } = useTranslation('global');
     const router = useRouter();
-    const [formData, setFormData] = useState<FormData>({ email: '', password: '' });
+    const [formData, setFormData] = useState<FormData>({ identifier: '', password: '' });
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
-    const [error, setError] = useState<string | null>(null);
+    const [feedback, setFeedback] = useState<LoginFeedback | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSocialLoading, setIsSocialLoading] = useState<Record<string, boolean>>({
         google: false,
     });
     const [showPassword, setShowPassword] = useState(false);
     const [passwordFocused, setPasswordFocused] = useState(false);
+    const isSocialBusy = Object.values(isSocialLoading).some(Boolean);
+    const isAuthBusy = isSubmitting || isSocialBusy;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isAuthBusy) {
+            return;
+        }
+
         setErrors({});
-        setError(null);
+        setFeedback(null);
         setIsSubmitting(true);
 
-        const { email, password } = formData;
-        logLoginClient('submit:start', {
-            email,
-            passwordLength: password.length,
-            pathname: window.location.pathname,
-            href: window.location.href,
-        });
+        const { identifier, password } = formData;
 
-        if (!email || !password) {
+        if (!identifier || !password) {
             setErrors({
-                email: !email ? t('LoginPage.emailRequired') : undefined,
-                password: !password ? t('LoginPage.PasswordRequired') : undefined,
-            });
-            logLoginClient('submit:validation-error', {
-                hasEmail: Boolean(email),
-                hasPassword: Boolean(password),
+                identifier: !identifier ? t('LoginPage.identifierRequired') : undefined,
+                password: !password ? t('LoginPage.passwordRequired') : undefined,
             });
             setIsSubmitting(false);
             return;
         }
 
-        const response = await signIn('credentials', { email, password, redirect: false });
-        logLoginClient('submit:signin-response', {
-            response,
-            ok: response?.ok ?? null,
-            error: response?.error ?? null,
-            status: response?.status ?? null,
-            url: response?.url ?? null,
-        });
+        const response = await signIn('credentials', { identifier, password, redirect: false });
 
-        if (response?.ok) {
-            try {
-                const sessionResponse = await fetch('/api/auth/session', {
-                    method: 'GET',
-                    cache: 'no-store',
-                });
-                const sessionBody = await sessionResponse.text();
-                logLoginClient('submit:session-probe', {
-                    status: sessionResponse.status,
-                    ok: sessionResponse.ok,
-                    sessionBody,
-                });
-            } catch (probeError) {
-                logLoginClient('submit:session-probe-error', {
-                    error: probeError instanceof Error ? probeError.message : String(probeError),
-                });
-            }
-            logLoginClient('submit:router-push-home', {
-                fromPath: window.location.pathname,
-            });
-            router.push('/home');
-        } else if (response?.error) {
-            setError(t('LoginPage.credsError'));
-            logLoginClient('submit:credentials-error', {
-                error: response.error,
-            });
+        if (response?.error) {
+            setFeedback(buildLoginFeedback(t, response));
             setIsSubmitting(false);
+        } else if (response?.ok) {
+            router.push('/home');
         } else {
-            setError(t('LoginPage.unexpectedError'));
-            logLoginClient('submit:unexpected-response', {
-                response,
-            });
+            setFeedback(buildLoginFeedback(t));
             setIsSubmitting(false);
         }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        const field = name as keyof FormData;
+
+        setFormData((prev) => ({ ...prev, [field]: value }));
+        setErrors((prev) => ({ ...prev, [field]: undefined }));
+        if (feedback) {
+            setFeedback(null);
+        }
     };
 
     const handleSocialSignIn = async (provider: string) => {
+        if (isAuthBusy) {
+            return;
+        }
+
+        setFeedback(null);
         setIsSocialLoading((prev) => ({ ...prev, [provider]: true }));
-        logLoginClient('social:click', { provider });
         try {
             if (provider === 'google') await signIn('google', { callbackUrl: '/login/google' });
         } catch {
-            logLoginClient('social:error', { provider });
-            setError(t('LoginPage.socialSignInError'));
+            setFeedback({
+                title: t('LoginPage.supportErrorTitle'),
+                description: t('LoginPage.socialSignInError'),
+                tone: 'warning',
+            });
         } finally {
-            logLoginClient('social:done', { provider });
             setIsSocialLoading((prev) => ({ ...prev, [provider]: false }));
         }
     };
@@ -147,17 +144,22 @@ export default function Login() {
                     <div>
                         <input
                             type="text"
-                            name="email"
+                            name="identifier"
                             placeholder={t('LoginPage.emailOrPhone')}
-                            value={formData.email}
+                            value={formData.identifier}
                             onChange={handleChange}
+                            autoComplete="username"
+                            autoCapitalize="none"
+                            autoCorrect="off"
+                            spellCheck={false}
+                            aria-invalid={Boolean(errors.identifier)}
                             className={`w-full bg-gray-50 text-gray-900 placeholder-gray-400 rounded-xl
                                 py-[18px] px-5 text-[17px] border
-                                ${errors.email ? 'border-red-400' : 'border-gray-200'}
+                                ${errors.identifier ? 'border-red-400' : 'border-gray-200'}
                                 focus:outline-none focus:border-black focus:bg-white transition`}
                         />
-                        {errors.email && (
-                            <p className="text-red-500 text-sm mt-1.5 pl-1">{errors.email}</p>
+                        {errors.identifier && (
+                            <p className="text-red-500 text-sm mt-1.5 pl-1">{errors.identifier}</p>
                         )}
                     </div>
 
@@ -177,6 +179,8 @@ export default function Login() {
                                 onChange={handleChange}
                                 onFocus={() => setPasswordFocused(true)}
                                 onBlur={() => setPasswordFocused(false)}
+                                autoComplete="current-password"
+                                aria-invalid={Boolean(errors.password)}
                                 className={`w-full rounded-xl py-[18px] px-5 pr-14 text-[17px] border
                                     transition-all duration-300 focus:outline-none
                                     ${
@@ -200,7 +204,37 @@ export default function Login() {
                         )}
                     </div>
 
-                    {error && <p className="text-red-500 text-[15px] text-center">{error}</p>}
+                    {feedback && (
+                        <div
+                            role="alert"
+                            aria-live="polite"
+                            className={`rounded-2xl border px-4 py-4 ${
+                                feedback.tone === 'critical'
+                                    ? 'border-red-200 bg-red-50 text-red-700'
+                                    : 'border-orange-200 bg-orange-50 text-orange-950'
+                            }`}
+                        >
+                            <div className="flex items-center gap-3 py-4">
+                                <span
+                                    className={`flex h-8 w-8 shrink-0 items-center justify-center text-[30px] ${
+                                        feedback.tone === 'critical'
+                                            ? 'text-red-500'
+                                            : 'text-orange-500'
+                                    }`}
+                                >
+                                    <MdOutlineQuestionMark />
+                                </span>
+                                <div>
+                                    <p className="text-[15px] font-semibold leading-5">
+                                        {feedback.title}
+                                    </p>
+                                    <p className="mt-2 text-[14px] leading-5 opacity-80">
+                                        {feedback.description}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="text-right">
                         <a
@@ -214,8 +248,11 @@ export default function Login() {
                     <ButtonWithSpinner
                         type="submit"
                         loading={isSubmitting}
+                        disabled={isSocialBusy}
                         ariaLabel={t('LoginPage.signIn')}
                         className="w-full py-[18px] rounded-full text-[17px] font-bold bg-black text-white hover:bg-gray-800 cursor-pointer transition-colors duration-200"
+                        replaceContentOnLoading
+                        spinnerClassName="text-[18px]"
                     >
                         {t('LoginPage.signIn')}
                     </ButtonWithSpinner>
@@ -235,11 +272,14 @@ export default function Login() {
                         <ButtonWithSpinner
                             type="button"
                             loading={isSocialLoading['google']}
+                            disabled={isSubmitting}
                             onClick={() => handleSocialSignIn('google')}
                             ariaLabel={t('a11y.signInWithGoogle')}
                             className="w-[72px] h-[72px] rounded-2xl border border-gray-200 bg-white
                                 flex items-center justify-center text-[28px] text-[#ea4335]
                                 shadow-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                            replaceContentOnLoading
+                            spinnerClassName="text-[24px]"
                         >
                             <FaGoogle />
                         </ButtonWithSpinner>

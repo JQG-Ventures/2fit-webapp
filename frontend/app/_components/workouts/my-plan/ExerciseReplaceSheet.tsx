@@ -8,10 +8,11 @@ import { useTranslation } from 'react-i18next';
 import ReplacementExerciseCard from '@/app/_components/workouts/my-plan/ReplacementExerciseCard';
 import ExerciseScopeBlock from '@/app/_components/workouts/my-plan/ExerciseScopeBlock';
 import type { PlanChangeScope } from '@/app/_types/planChangeScope';
+import type { WorkoutFlowExercise } from '@/app/_types/workoutProgress';
 
 interface ExerciseReplaceSheetProps {
     isOpen: boolean;
-    currentExercise: Exercise | null;
+    currentExercise: WorkoutFlowExercise | null;
     options: Exercise[];
     selectedExercise: Exercise | null;
     onSelectExercise: (exercise: Exercise) => void;
@@ -38,10 +39,11 @@ const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
 
     if (!isOpen) return null;
 
+    const currentExerciseName = currentExercise?.name ?? t('workouts.my-plan.notAvailable');
     const currentMuscleGroup = Array.isArray(currentExercise?.muscle_group)
         ? currentExercise?.muscle_group[0]
         : String(currentExercise?.muscle_group ?? '');
-    const currentFallback = currentMuscleGroup || currentExercise?.name.slice(0, 3) || '';
+    const currentFallback = currentMuscleGroup || currentExerciseName.slice(0, 3);
     const selectedExerciseId = selectedExercise?._id ?? selectedExercise?.exercise_id;
 
     return (
@@ -62,7 +64,7 @@ const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
                             </p>
                             <h2 className="mt-2 text-xl font-semibold leading-tight text-gray-950">
                                 {t('workouts.my-plan.replaceExerciseSubtitle', {
-                                    exerciseName: currentExercise?.name ?? '',
+                                    exerciseName: currentExerciseName,
                                 })}
                             </h2>
                         </div>
@@ -93,7 +95,7 @@ const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
                                     {currentExercise.image_url ? (
                                         <Image
                                             src={currentExercise.image_url}
-                                            alt={currentExercise.name}
+                                            alt={currentExerciseName}
                                             fill
                                             sizes="112px"
                                             className="object-cover"
@@ -108,7 +110,7 @@ const ExerciseReplaceSheet: React.FC<ExerciseReplaceSheetProps> = ({
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <h3 className="truncate text-lg font-semibold text-gray-950">
-                                        {currentExercise.name}
+                                        {currentExerciseName}
                                     </h3>
                                     <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
                                         <span className="flex items-center gap-1">

@@ -122,6 +122,53 @@ def test_create_full_plan_persists_schedule(db) -> None:
     assert any(d.day_of_week == "monday" for d in loaded.workout_days)
 
 
+def test_create_full_plan_dedupes_duplicate_day_exercises(db) -> None:
+    ex = ExerciseFactory.create()
+    repo = WorkoutPlanRepository()
+
+    plan = repo.create_full_plan(
+        {
+            "name": "Deduped Plan",
+            "description": "",
+            "plan_type": "paid",
+            "level": "beginner",
+            "image_url": "",
+            "video_url": "",
+            "is_active": True,
+        },
+        [
+            {
+                "day_of_week": "monday",
+                "exercises": [
+                    {
+                        "exercise_id": str(ex.id),
+                        "sets": 3,
+                        "reps": 12,
+                        "rest_seconds": 45,
+                    },
+                    {
+                        "exercise_id": str(ex.id),
+                        "sets": 4,
+                        "reps": 10,
+                        "rest_seconds": 60,
+                    },
+                ],
+            }
+        ],
+    )
+
+    db.session.commit()
+    loaded = repo.get_with_schedule(plan.id)
+    assert loaded is not None
+    assert len(loaded.workout_days) == 1
+    assert len(loaded.workout_days[0].exercises) == 1
+    exercise = loaded.workout_days[0].exercises[0]
+    assert exercise.exercise_id == ex.id
+    assert exercise.sets == 3
+    assert exercise.reps == 12
+    assert exercise.rest_seconds == 45
+
+
 def test_replace_schedule(db, plan_with_one_exercise) -> None:
     ex2 = ExerciseFactory.create(name="Replacement")
     plan_id = plan_with_one_exercise.plan.id
@@ -147,3 +194,43 @@ def test_replace_schedule(db, plan_with_one_exercise) -> None:
     assert loaded is not None
     wde = loaded.workout_days[0].exercises[0]
     assert wde.exercise_id == ex2.id
+
+
+def test_replace_schedule_dedupes_duplicate_day_exercises(db, plan_with_one_exercise) -> None:
+    ex2 = ExerciseFactory.create(name="Replacement Deduped")
+    plan_id = plan_with_one_exercise.plan.id
+    repo = WorkoutPlanRepository()
+
+    repo.replace_schedule(
+        plan_id,
+        [
+            {
+                "sequence_day": 1,
+                "exercises": [
+                    {
+                        "exercise_id": str(ex2.id),
+                        "sets": 2,
+                        "reps": 12,
+                        "rest_seconds": 30,
+                    },
+                    {
+                        "exercise_id": str(ex2.id),
+                        "sets": 5,
+                        "reps": 6,
+                        "rest_seconds": 90,
+                    },
+                ],
+            }
+        ],
+    )
+
+    db.session.commit()
+    loaded = repo.get_with_schedule(plan_id)
+    assert loaded is not None
+    assert len(loaded.workout_days) == 1
+    assert len(loaded.workout_days[0].exercises) == 1
+    exercise = loaded.workout_days[0].exercises[0]
+    assert exercise.exercise_id == ex2.id
+    assert exercise.sets == 2
+    assert exercise.reps == 12
+    assert exercise.rest_seconds == 30

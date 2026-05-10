@@ -34,7 +34,7 @@ function buildUrl(baseUrl: string, queryParams?: QueryParams): string {
     return `${baseUrl}?${serializedParams.toString()}`;
 }
 
-export function useApiGet<T>(key: string[], url: string, options?: UseApiGetOptions<T>) {
+export function useApiGet<T>(key: QueryKey, url: string, options?: UseApiGetOptions<T>) {
     const { axiosConfig, suspense: _suspense, ...queryOptions } = options || {};
 
     return useQuery<T, AxiosError>({

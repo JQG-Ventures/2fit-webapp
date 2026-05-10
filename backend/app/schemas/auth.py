@@ -1,10 +1,28 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class LoginRequest(BaseModel):
     email: str | None = None
     phone: str | None = None
     password: str
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+
+        normalized = value.strip().lower()
+        return normalized or None
+
+    @field_validator("phone", mode="before")
+    @classmethod
+    def normalize_phone(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+
+        normalized = value.strip()
+        return normalized or None
 
 
 class GoogleAuthRequest(BaseModel):

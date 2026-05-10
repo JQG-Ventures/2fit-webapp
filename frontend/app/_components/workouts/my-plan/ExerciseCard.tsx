@@ -1,23 +1,27 @@
 'use client';
 
 import Image from 'next/image';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useRef } from 'react';
-import { FaCheck, FaClock, FaFire } from 'react-icons/fa';
+import { FaCheck, FaClock, FaFire, FaSpinner } from 'react-icons/fa';
 import { FiRefreshCw, FiRotateCcw } from 'react-icons/fi';
 import { IoClose } from 'react-icons/io5';
 import { useTranslation } from 'react-i18next';
 import type { AnimationOriginRect, ExerciseAnimationTargets } from '@/app/_interfaces/ExerciseFlow';
+import type { WorkoutFlowExercise } from '@/app/_types/workoutProgress';
 
 interface ExerciseCardProps {
-    exercise: Exercise;
+    exercise: WorkoutFlowExercise;
     onClick: (action: 'details' | 'start', targets?: ExerciseAnimationTargets) => void;
     isDeleteMode: boolean;
     isOptionalMode: boolean;
     onDeleteSelect: (exerciseId: string) => void;
     onOptionalSelect: (exerciseId: string) => void;
-    onCompleteSelect: (exercise: Exercise) => void;
+    onCompleteSelect: (exercise: WorkoutFlowExercise) => void;
     selectedForDelete: boolean;
     canComplete: boolean;
+    isCompleting: boolean;
+    isRecentlyCompleted: boolean;
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({
@@ -30,14 +34,17 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
     onCompleteSelect,
     selectedForDelete,
     canComplete,
+    isCompleting,
+    isRecentlyCompleted,
 }) => {
     const { t } = useTranslation('global');
     const cardRef = useRef<HTMLDivElement>(null);
     const actionRef = useRef<HTMLButtonElement>(null);
+    const exerciseName = exercise.name ?? t('workouts.my-plan.notAvailable');
     const muscleGroup = Array.isArray(exercise.muscle_group)
         ? exercise.muscle_group[0]
         : String(exercise.muscle_group ?? '');
-    const fallbackLabel = muscleGroup || exercise.name.slice(0, 3);
+    const fallbackLabel = muscleGroup || exerciseName.slice(0, 3);
     const restTime =
         exercise.rest_seconds >= 60
             ? `${Math.floor(exercise.rest_seconds / 60)}m${
@@ -61,24 +68,55 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
     });
 
     return (
-        <div
+        <motion.div
             ref={cardRef}
-            className={`relative flex items-center gap-4 rounded-3xl border border-gray-100 bg-white p-3 shadow-sm transition-all ${
-                exercise.is_completed ? 'bg-gray-50' : 'hover:shadow-md'
+            layout
+            initial={false}
+            animate={
+                isCompleting
+                    ? {
+                          scale: [1, 1.01, 1],
+                          y: [0, -1, 0],
+                      }
+                    : isRecentlyCompleted
+                      ? {
+                            scale: [1, 1.018, 1],
+                            y: [0, -2, 0],
+                        }
+                      : {
+                            scale: 1,
+                            y: 0,
+                        }
+            }
+            transition={{
+                duration: isCompleting ? 1.1 : isRecentlyCompleted ? 0.48 : 0.18,
+                ease: 'easeOut',
+            }}
+            className={`relative flex items-center gap-4 rounded-3xl border p-3 shadow-sm transition-all ${
+                isCompleting
+                    ? 'border-green-200 bg-green-50/80 shadow-[0_14px_34px_rgba(34,197,94,0.14)]'
+                    : isRecentlyCompleted
+                      ? 'border-green-200 bg-green-50/70 shadow-[0_14px_34px_rgba(34,197,94,0.12)]'
+                      : exercise.is_completed
+                        ? 'border-gray-100 bg-gray-50'
+                        : 'border-gray-100 bg-white hover:shadow-md'
             } ${selectedForDelete ? 'border-red-300 bg-red-50' : ''}`}
             onClick={() =>
-                !isDeleteMode && !isOptionalMode && onClick('details', getAnimationTargets())
+                !isDeleteMode &&
+                !isOptionalMode &&
+                !isCompleting &&
+                onClick('details', getAnimationTargets())
             }
         >
             <div
                 className={`relative h-24 w-28 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-green-50 to-gray-100 ${
-                    exercise.is_completed ? 'opacity-70' : ''
+                    exercise.is_completed && !isRecentlyCompleted ? 'opacity-70' : ''
                 }`}
             >
                 {exercise.image_url ? (
                     <Image
                         src={exercise.image_url}
-                        alt={exercise.name}
+                        alt={exerciseName}
                         fill
                         sizes="112px"
                         className="object-cover"
@@ -93,15 +131,17 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             </div>
             <div
                 className={`flex min-w-0 flex-1 flex-col justify-center ${
-                    exercise.is_completed ? 'opacity-70' : ''
+                    exercise.is_completed && !isRecentlyCompleted ? 'opacity-70' : ''
                 }`}
             >
                 <h3
                     className={`truncate text-base font-semibold text-gray-900 ${
-                        exercise.is_completed ? 'line-through decoration-gray-400' : ''
+                        exercise.is_completed && !isRecentlyCompleted
+                            ? 'line-through decoration-gray-400'
+                            : ''
                     }`}
                 >
-                    {exercise.name}
+                    {exerciseName}
                 </h3>
                 <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
                     <span className="flex items-center gap-1">
@@ -118,6 +158,30 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                         {muscleGroup}
                     </span>
                 )}
+                <AnimatePresence initial={false}>
+                    {isCompleting && (
+                        <motion.span
+                            key="completing"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            className="mt-2 w-fit rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700"
+                        >
+                            {t('workouts.my-plan.completingExercise')}
+                        </motion.span>
+                    )}
+                    {!isCompleting && isRecentlyCompleted && (
+                        <motion.span
+                            key="completed"
+                            initial={{ opacity: 0, y: 6, scale: 0.92 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            className="mt-2 w-fit rounded-full bg-green-600 px-2.5 py-1 text-xs font-semibold text-white"
+                        >
+                            {t('workouts.my-plan.exerciseCompleted')}
+                        </motion.span>
+                    )}
+                </AnimatePresence>
             </div>
 
             <div className="flex shrink-0 items-center justify-center">
@@ -131,7 +195,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                             const id = exercise.exercise_id ?? exercise._id;
                             if (id) onDeleteSelect(id);
                         }}
-                        aria-label={`${t('a11y.markForRemoval')}: ${exercise.name}`}
+                        aria-label={`${t('a11y.markForRemoval')}: ${exerciseName}`}
                     >
                         <IoClose size={22} />
                     </button>
@@ -145,10 +209,49 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                             const id = exercise.exercise_id ?? exercise._id;
                             if (id) onOptionalSelect(id);
                         }}
-                        aria-label={`${t('a11y.changeExerciseChoice')}: ${exercise.name}`}
+                        aria-label={`${t('a11y.changeExerciseChoice')}: ${exerciseName}`}
                     >
                         <FiRefreshCw className="h-4 w-4" />
                     </button>
+                ) : isCompleting ? (
+                    <motion.button
+                        ref={actionRef}
+                        type="button"
+                        disabled
+                        initial={false}
+                        animate={{ scale: [1, 1.05, 1] }}
+                        transition={{
+                            duration: 1,
+                            repeat: Number.POSITIVE_INFINITY,
+                            ease: 'easeInOut',
+                        }}
+                        className="flex h-11 w-11 items-center justify-center rounded-full bg-green-500 text-white shadow-[0_10px_22px_rgba(34,197,94,0.34)]"
+                        aria-label={`${t('workouts.my-plan.completingExercise')}: ${exerciseName}`}
+                        aria-busy="true"
+                        data-testid="exercise-completing-button"
+                    >
+                        <FaSpinner className="h-4 w-4 animate-spin" />
+                    </motion.button>
+                ) : exercise.is_completed && isRecentlyCompleted ? (
+                    <motion.button
+                        ref={actionRef}
+                        type="button"
+                        disabled
+                        initial={{ scale: 0.86 }}
+                        animate={{ scale: [1, 1.14, 1] }}
+                        transition={{ duration: 0.45, ease: 'easeOut' }}
+                        className="relative flex h-11 w-11 items-center justify-center rounded-full bg-green-500 text-white shadow-[0_10px_22px_rgba(34,197,94,0.34)]"
+                        aria-label={`${t('workouts.my-plan.exerciseCompleted')}: ${exerciseName}`}
+                        data-testid="exercise-completed-button"
+                    >
+                        <motion.span
+                            className="absolute inset-0 rounded-full border-2 border-green-300"
+                            initial={{ scale: 0.8, opacity: 0.9 }}
+                            animate={{ scale: 1.5, opacity: 0 }}
+                            transition={{ duration: 0.55, ease: 'easeOut' }}
+                        />
+                        <FaCheck className="h-4 w-4" />
+                    </motion.button>
                 ) : exercise.is_completed ? (
                     <button
                         ref={actionRef}
@@ -157,7 +260,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                         onClick={(e) => {
                             e.stopPropagation();
                         }}
-                        aria-label={`${t('workouts.my-plan.redoExercise')}: ${exercise.name}`}
+                        aria-label={`${t('workouts.my-plan.redoExercise')}: ${exerciseName}`}
                     >
                         <FiRotateCcw className="h-4 w-4" />
                     </button>
@@ -165,7 +268,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                     <button
                         ref={actionRef}
                         type="button"
-                        disabled={!canComplete}
+                        disabled={!canComplete || isCompleting}
                         className={`flex h-11 w-11 items-center justify-center rounded-full shadow-sm transition-colors ${
                             canComplete
                                 ? 'bg-green-500 text-white hover:bg-green-600'
@@ -180,13 +283,13 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                             canComplete
                                 ? t('workouts.my-plan.markExerciseDone')
                                 : t('workouts.my-plan.onlyTodayCompletion')
-                        }: ${exercise.name}`}
+                        }: ${exerciseName}`}
                     >
                         <FaCheck className="h-4 w-4" />
                     </button>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 };
 

@@ -10,6 +10,8 @@ interface ButtonWithSpinnerProps {
     className?: string;
     style?: React.CSSProperties;
     ariaLabel: string;
+    replaceContentOnLoading?: boolean;
+    spinnerClassName?: string;
 }
 
 const ButtonWithSpinner: React.FC<ButtonWithSpinnerProps> = ({
@@ -21,6 +23,8 @@ const ButtonWithSpinner: React.FC<ButtonWithSpinnerProps> = ({
     className = '',
     style,
     ariaLabel,
+    replaceContentOnLoading = false,
+    spinnerClassName = '',
 }) => {
     return (
         <button
@@ -33,8 +37,12 @@ const ButtonWithSpinner: React.FC<ButtonWithSpinnerProps> = ({
             }`}
             style={style}
         >
-            {children}
-            {loading && <FaSpinner className="ml-4 animate-spin" />}
+            {!loading || !replaceContentOnLoading ? children : null}
+            {loading && (
+                <FaSpinner
+                    className={`${replaceContentOnLoading ? '' : 'ml-4'} animate-spin ${spinnerClassName}`.trim()}
+                />
+            )}
         </button>
     );
 };

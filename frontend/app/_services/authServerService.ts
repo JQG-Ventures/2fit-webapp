@@ -1,97 +1,89 @@
 import type { ApiResponse } from '@/app/_types/api';
 import type { AuthApiTokenMessage, AuthenticatedUser, AuthTokenState } from '@/app/_types/auth';
 import type { JWT } from 'next-auth/jwt';
+import { LoginFailureError } from '@/app/_services/authErrors';
 import { parseJson } from '@/app/utils/http';
 
 const apiBaseUrl = process.env.API_BASE_URL_INTERNAL || process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
-type AuthApiResponse = ApiResponse<AuthApiTokenMessage>;
+type AuthApiResponse = ApiResponse<AuthApiTokenMessage | string>;
+type AuthTokenApiResponse = ApiResponse<AuthApiTokenMessage>;
 
-function logAuthServer(event: string, payload: Record<string, unknown>): void {
-    console.warn(`[AUTH_DEBUG][authServerService] ${event}`, payload);
+function normalizeIdentifier(identifier?: string): string | null {
+    const normalized = identifier?.trim();
+    return normalized ? normalized : null;
+}
+
+function buildLoginPayload(
+    identifier: string,
+    password: string,
+): { email: string; password: string } | { phone: string; password: string } {
+    return identifier.includes('@')
+        ? { email: identifier.toLowerCase(), password }
+        : { phone: identifier, password };
+}
+
+function mapLoginFailure(status: number): LoginFailureError {
+    if (status === 401 || status === 404) {
+        return new LoginFailureError('invalid_credentials');
+    }
+
+    return new LoginFailureError('support');
+}
+
+function isTokenMessage(message: AuthApiResponse['message']): message is AuthApiTokenMessage {
+    return (
+        typeof message === 'object' &&
+        message !== null &&
+        typeof message.access_token === 'string' &&
+        typeof message.expires_at === 'number'
+    );
 }
 
 export async function loginWithCredentials(
-    email?: string,
+    identifier?: string,
     password?: string,
-): Promise<AuthenticatedUser | null> {
-    logAuthServer('loginWithCredentials:start', {
-        hasEmail: Boolean(email),
-        hasPassword: Boolean(password),
-        email,
-        apiBaseUrl,
-    });
-
-    if (!email || !password) {
-        logAuthServer('loginWithCredentials:missing-input', {
-            email,
-            hasPassword: Boolean(password),
-        });
-        return null;
+): Promise<AuthenticatedUser> {
+    const normalizedIdentifier = normalizeIdentifier(identifier);
+    if (!normalizedIdentifier || !password) {
+        throw new LoginFailureError('support');
     }
 
-    const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            email,
-            password,
-        }),
-    });
-
-    const data = await parseJson<AuthApiResponse>(response);
-    const messageKeys = data?.message ? Object.keys(data.message) : [];
-
-    logAuthServer('loginWithCredentials:response', {
-        status: response.status,
-        ok: response.ok,
-        messageKeys,
-        hasAccessToken: Boolean(data?.message?.access_token),
-        hasRefreshToken: Boolean(data?.message?.refresh_token),
-        expiresAt: data?.message?.expires_at ?? null,
-        userId: data?.message?.user_id ?? null,
-        name: data?.message?.name ?? null,
-    });
-
-    if (!response.ok || !data?.message?.access_token) {
-        logAuthServer('loginWithCredentials:failed', {
-            status: response.status,
-            ok: response.ok,
-            hasAccessToken: Boolean(data?.message?.access_token),
+    try {
+        const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(buildLoginPayload(normalizedIdentifier, password)),
         });
-        return null;
+
+        const data = await parseJson<AuthApiResponse>(response);
+        if (!response.ok) {
+            throw mapLoginFailure(response.status);
+        }
+
+        const message = data.message;
+        if (!isTokenMessage(message)) {
+            throw new LoginFailureError('support');
+        }
+
+        return {
+            accessToken: message.access_token,
+            refreshToken: message.refresh_token ?? '',
+            userId: message.user_id ?? '',
+            userName: message.name ?? '',
+            accessTokenExpires: message.expires_at * 1000,
+        };
+    } catch (error) {
+        if (error instanceof LoginFailureError) {
+            throw error;
+        }
+
+        throw new LoginFailureError('support');
     }
-
-    const result = {
-        accessToken: data.message.access_token,
-        refreshToken: data.message.refresh_token ?? '',
-        userId: data.message.user_id ?? '',
-        userName: data.message.name ?? '',
-        accessTokenExpires: data.message.expires_at * 1000,
-    };
-
-    logAuthServer('loginWithCredentials:success', {
-        userId: result.userId,
-        userName: result.userName,
-        accessTokenLength: result.accessToken.length,
-        refreshTokenLength: result.refreshToken.length,
-        accessTokenExpires: result.accessTokenExpires,
-    });
-
-    return result;
 }
 
 export async function refreshServerAccessToken(token: AuthTokenState): Promise<JWT> {
-    logAuthServer('refreshServerAccessToken:start', {
-        hasRefreshToken: Boolean(token.refreshToken),
-        accessTokenExpires: token.accessTokenExpires ?? null,
-        userId: token.userId ?? null,
-    });
-
     if (!token.refreshToken) {
-        logAuthServer('refreshServerAccessToken:missing-refresh-token', {
-            userId: token.userId ?? null,
-        });
         return { ...token, error: 'RefreshAccessTokenError' };
     }
 
@@ -104,25 +96,13 @@ export async function refreshServerAccessToken(token: AuthTokenState): Promise<J
             },
         });
 
-        logAuthServer('refreshServerAccessToken:response', {
-            status: response.status,
-            ok: response.ok,
-        });
-
         if (!response.ok) {
             throw new Error('Failed to refresh access token');
         }
 
-        const refreshed = await parseJson<AuthApiResponse>(response);
+        const refreshed = await parseJson<AuthTokenApiResponse>(response);
         const newAccess = refreshed.message.access_token;
         const newExp = refreshed.message.expires_at * 1000;
-
-        logAuthServer('refreshServerAccessToken:success', {
-            hasNewAccessToken: Boolean(newAccess),
-            newAccessTokenLength: newAccess?.length ?? 0,
-            newExp,
-            userId: token.userId ?? null,
-        });
 
         return {
             ...token,
@@ -130,9 +110,6 @@ export async function refreshServerAccessToken(token: AuthTokenState): Promise<J
             accessTokenExpires: newExp,
         };
     } catch {
-        logAuthServer('refreshServerAccessToken:error', {
-            userId: token.userId ?? null,
-        });
         return { ...token, error: 'RefreshAccessTokenError' };
     }
 }

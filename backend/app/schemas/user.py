@@ -2,6 +2,8 @@ from datetime import date, datetime
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from app.constants.weekdays import is_valid_weekday, normalize_weekday
+
 
 class TrainingPreferencesCreate(BaseModel):
     preferred_muscle_groups: list[str] = []
@@ -12,11 +14,11 @@ class TrainingPreferencesCreate(BaseModel):
     @field_validator("available_days", mode="before")
     @classmethod
     def validate_days(cls, v: list[str]) -> list[str]:
-        valid = {"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}
-        for day in v:
-            if day not in valid:
+        normalized = [normalize_weekday(day) for day in v]
+        for day in normalized:
+            if not is_valid_weekday(day):
                 raise ValueError(f"Invalid day: {day}")
-        return v
+        return normalized
 
 
 class PreferencesCreate(BaseModel):

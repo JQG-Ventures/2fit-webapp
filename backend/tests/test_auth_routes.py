@@ -106,6 +106,22 @@ def test_login_missing_credentials(client, db) -> None:
     assert "Missing credentials" in body.get("message", "")
 
 
+def test_login_invalid_payload_returns_400(client, db) -> None:
+    r = client.post("/api/auth/login", data="not-json", content_type="text/plain")
+    assert r.status_code == 400
+    body = r.get_json()
+    assert body is not None
+    assert "Invalid login payload" in body.get("message", "")
+
+
+def test_login_json_array_payload_returns_400(client, db) -> None:
+    r = client.post("/api/auth/login", json=["email", "password"])
+    assert r.status_code == 400
+    body = r.get_json()
+    assert body is not None
+    assert "Invalid login payload" in body.get("message", "")
+
+
 def test_login_user_not_found(client, db) -> None:
     r = client.post(
         "/api/auth/login",
@@ -137,6 +153,17 @@ def test_login_success(app, client, db) -> None:
     assert "access_token" in msg
     assert "refresh_token" in msg
     assert msg.get("user_id")
+
+
+def test_login_normalizes_email_before_lookup(app, client, db) -> None:
+    u = UserFactory.create(email="mixedcase@example.com")
+    u.password_hash = generate_password_hash("correct")
+    db.session.commit()
+    r = client.post(
+        "/api/auth/login",
+        json={"email": "  MixedCase@Example.com  ", "password": "correct"},
+    )
+    assert r.status_code == 200
 
 
 def test_login_with_phone(app, client, db) -> None:

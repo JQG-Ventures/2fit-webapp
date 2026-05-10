@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import type { ActiveUserPlan } from '@/app/_types/home';
+import type { ActiveUserPlan } from '@/app/_types/workoutProgress';
 import type { ChallengeProgress } from '@/app/_types/challenges';
 
 import { mergeChallengePlansWithProgress } from './mergeChallengeProgress';
 
 const basePlan = (id: string, name: string): ActiveUserPlan & { plan_type: 'challenge' } => ({
     id,
+    type: 'challenge',
     name,
     plan_type: 'challenge',
 });

@@ -1,4 +1,4 @@
-import type { ActiveUserPlan } from '@/app/_types/home';
+import type { ActiveUserPlan } from '@/app/_types/workoutProgress';
 import type { ChallengeProgress, PlanWithProgress } from '@/app/_types/challenges';
 
 /**

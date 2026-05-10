@@ -5,6 +5,7 @@ from typing import Any
 
 from sqlalchemy import select
 
+from app.constants.weekdays import WEEKDAY_ORDER, normalize_weekday
 from app.extensions import db
 from app.models.exercise import Exercise
 from app.models.workout_plan import WorkoutPlan
@@ -208,6 +209,11 @@ class UserWorkoutService:
 
     @staticmethod
     def get_weekly_workout_progress(user_id: str, week_number: int | None = None) -> Payload:
+        """Return weekly workout progress including all seven weekdays.
+
+        Days not present in the plan schedule are returned as explicit rest days
+        with empty ``exercises``.
+        """
         try:
             user_uuid = uuid.UUID(user_id)
             plan_repo = ActivePlanRepository()
@@ -246,30 +252,26 @@ class UserWorkoutService:
             start_of_week = start_date + timedelta(weeks=(requested_week - 1))
             end_of_week = start_of_week + timedelta(days=6)
 
-            days_of_week = [
-                "monday",
-                "tuesday",
-                "wednesday",
-                "thursday",
-                "friday",
-                "saturday",
-                "sunday",
-            ]
+            days_of_week = WEEKDAY_ORDER
             completed_days = 0
             total_scheduled = 0
             response_days: list[Payload] = []
 
-            day_map = {d.day_of_week: d for d in workout_plan.workout_days if d.day_of_week}
+            day_map = {
+                normalize_weekday(d.day_of_week): d
+                for d in workout_plan.workout_days
+                if d.day_of_week
+            }
             progress_map: dict[str, Any] = {}
             for progress_detail in active_plan.progress_details:
                 if progress_detail.week_number == requested_week and progress_detail.day_of_week:
-                    progress_map[progress_detail.day_of_week] = progress_detail
+                    progress_map[normalize_weekday(progress_detail.day_of_week)] = progress_detail
 
             or_repo = PlanSessionExerciseOverrideRepository()
             overrides = or_repo.list_for_plan_and_week(active_plan.id, requested_week)
             ov_index: dict[tuple[str, str], Any] = {}
             for o in overrides:
-                ov_index[(o.day_of_week.lower(), str(o.source_exercise_id))] = o
+                ov_index[(normalize_weekday(o.day_of_week), str(o.source_exercise_id))] = o
             replacement_ids = {
                 o.replacement_exercise_id
                 for o in overrides
@@ -284,10 +286,8 @@ class UserWorkoutService:
 
             for day_name in days_of_week:
                 day_workout = day_map.get(day_name)
-                if not day_workout:
-                    continue
-
-                total_scheduled += 1
+                if day_workout:
+                    total_scheduled += 1
                 dp = progress_map.get(day_name)
                 completed_exercise_ids: set[str] = set()
                 if dp:
@@ -296,58 +296,59 @@ class UserWorkoutService:
                             completed_exercise_ids.add(str(ep.exercise_id))
 
                 day_date = (start_of_week + timedelta(days=days_of_week.index(day_name))).date()
-                exercises = []
+                exercises: list[Payload] = []
                 all_done = True
-                for wde in day_workout.exercises:
-                    ov = ov_index.get((day_name, str(wde.exercise_id)))
-                    if ov and ov.action == "remove":
-                        continue
-                    ex = wde.exercise
-                    if ov and ov.action == "replace" and ov.replacement_exercise_id:
-                        repl = ex_cache.get(ov.replacement_exercise_id)
-                        if not repl:
-                            repl = db.session.get(Exercise, ov.replacement_exercise_id)
-                            if repl:
-                                ex_cache[ov.replacement_exercise_id] = repl
-                        if repl:
-                            is_done = (
-                                str(wde.exercise_id) in completed_exercise_ids
-                                or str(repl.id) in completed_exercise_ids
-                            )
-                            if not is_done:
-                                all_done = False
-                            exercises.append(
-                                {
-                                    "exercise_id": str(repl.id),
-                                    "name": repl.name,
-                                    "sets": wde.sets,
-                                    "reps": wde.reps,
-                                    "rest_seconds": wde.rest_seconds,
-                                    "difficulty": repl.difficulty,
-                                    "description": repl.description,
-                                    "image_url": repl.image_url,
-                                    "video_url": repl.video_url,
-                                    "is_completed": is_done,
-                                }
-                            )
+                if day_workout:
+                    for wde in day_workout.exercises:
+                        ov = ov_index.get((day_name, str(wde.exercise_id)))
+                        if ov and ov.action == "remove":
                             continue
-                    is_done = str(wde.exercise_id) in completed_exercise_ids
-                    if not is_done:
-                        all_done = False
-                    exercises.append(
-                        {
-                            "exercise_id": str(wde.exercise_id),
-                            "name": ex.name if ex else None,
-                            "sets": wde.sets,
-                            "reps": wde.reps,
-                            "rest_seconds": wde.rest_seconds,
-                            "difficulty": ex.difficulty if ex else None,
-                            "description": ex.description if ex else None,
-                            "image_url": ex.image_url if ex else None,
-                            "video_url": ex.video_url if ex else None,
-                            "is_completed": is_done,
-                        }
-                    )
+                        ex = wde.exercise
+                        if ov and ov.action == "replace" and ov.replacement_exercise_id:
+                            repl = ex_cache.get(ov.replacement_exercise_id)
+                            if not repl:
+                                repl = db.session.get(Exercise, ov.replacement_exercise_id)
+                                if repl:
+                                    ex_cache[ov.replacement_exercise_id] = repl
+                            if repl:
+                                is_done = (
+                                    str(wde.exercise_id) in completed_exercise_ids
+                                    or str(repl.id) in completed_exercise_ids
+                                )
+                                if not is_done:
+                                    all_done = False
+                                exercises.append(
+                                    {
+                                        "exercise_id": str(repl.id),
+                                        "name": repl.name,
+                                        "sets": wde.sets,
+                                        "reps": wde.reps,
+                                        "rest_seconds": wde.rest_seconds,
+                                        "difficulty": repl.difficulty,
+                                        "description": repl.description,
+                                        "image_url": repl.image_url,
+                                        "video_url": repl.video_url,
+                                        "is_completed": is_done,
+                                    }
+                                )
+                                continue
+                        is_done = str(wde.exercise_id) in completed_exercise_ids
+                        if not is_done:
+                            all_done = False
+                        exercises.append(
+                            {
+                                "exercise_id": str(wde.exercise_id),
+                                "name": ex.name if ex else None,
+                                "sets": wde.sets,
+                                "reps": wde.reps,
+                                "rest_seconds": wde.rest_seconds,
+                                "difficulty": ex.difficulty if ex else None,
+                                "description": ex.description if ex else None,
+                                "image_url": ex.image_url if ex else None,
+                                "video_url": ex.video_url if ex else None,
+                                "is_completed": is_done,
+                            }
+                        )
 
                 is_completed = all_done and bool(exercises)
                 if is_completed:

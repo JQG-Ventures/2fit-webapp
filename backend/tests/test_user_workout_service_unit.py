@@ -294,7 +294,19 @@ def test_get_weekly_builds_days(
     ):
         out = UserWorkoutService.get_weekly_workout_progress(UID)
     assert "days" in out and out["week_start_date"]
-    assert any(d["day_of_week"] == "monday" for d in out["days"])
+    assert len(out["days"]) == 7
+    assert [d["day_of_week"] for d in out["days"]] == [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+    ]
+    assert len(out["days"][0]["exercises"]) == 1
+    assert out["days"][5]["exercises"] == []
+    assert out["days"][6]["exercises"] == []
 
 
 @patch("app.services.user_workout_service.PlanSessionExerciseOverrideRepository")
@@ -351,6 +363,62 @@ def test_get_weekly_accepts_requested_week(
     assert out["total_weeks"] == 4
     assert out["week_start_date"] == "2024-01-08"
     assert out["days"][0]["is_completed"] is True
+
+
+@patch("app.services.user_workout_service.PlanSessionExerciseOverrideRepository")
+@patch("app.services.user_workout_service.WorkoutPlanRepository")
+@patch("app.services.user_workout_service.ActivePlanRepository")
+def test_get_weekly_with_five_training_days_includes_weekend_rest_days(
+    mock_ap: MagicMock, mock_wp: MagicMock, mock_or_repo: MagicMock
+) -> None:
+    wpid = uuid.uuid4()
+    ex_obj = SimpleNamespace(
+        name="Squat",
+        difficulty="medium",
+        description="d",
+        image_url="i",
+        video_url="v",
+    )
+    training_days = []
+    for day_name in ["monday", "tuesday", "wednesday", "thursday", "friday"]:
+        wde = SimpleNamespace(
+            exercise_id=uuid.uuid4(),
+            sets=3,
+            reps=8,
+            rest_seconds=45,
+            exercise=ex_obj,
+        )
+        training_days.append(SimpleNamespace(day_of_week=day_name, exercises=[wde]))
+
+    mock_ap.return_value.get_by_user.return_value = [
+        SimpleNamespace(
+            id=uuid.uuid4(),
+            is_completed=False,
+            plan_type="personalized",
+            workout_plan_id=wpid,
+            start_date=datetime(2024, 1, 1, tzinfo=UTC),
+            progress_details=[],
+        )
+    ]
+    mock_wp.return_value.get_with_schedule.return_value = SimpleNamespace(
+        duration_weeks=4,
+        workout_days=training_days,
+    )
+    mock_or_repo.return_value.list_for_plan_and_week.return_value = []
+
+    with patch(
+        "app.services.user_workout_service.datetime",
+        new=_dt_proxy(datetime(2024, 1, 2, 12, 0, 0, tzinfo=UTC)),
+    ):
+        out = UserWorkoutService.get_weekly_workout_progress(UID)
+
+    assert len(out["days"]) == 7
+    assert out["days"][5]["day_of_week"] == "saturday"
+    assert out["days"][5]["exercises"] == []
+    assert out["days"][5]["is_completed"] is False
+    assert out["days"][6]["day_of_week"] == "sunday"
+    assert out["days"][6]["exercises"] == []
+    assert out["days"][6]["is_completed"] is False
 
 
 @patch("app.services.user_workout_service.db.session.get")
@@ -445,6 +513,251 @@ def test_get_weekly_merges_session_overrides(
     assert str(e_rm) not in ids
     assert str(e_repl) in ids
     assert str(wde3.exercise_id) in ids
+
+
+@patch("app.services.user_workout_service.db.session.get")
+@patch("app.services.user_workout_service.db.session.scalars")
+@patch("app.services.user_workout_service.PlanSessionExerciseOverrideRepository")
+@patch("app.services.user_workout_service.WorkoutPlanRepository")
+@patch("app.services.user_workout_service.ActivePlanRepository")
+def test_get_weekly_normalizes_day_names_across_plan_progress_and_overrides(
+    mock_ap: MagicMock,
+    mock_wp: MagicMock,
+    mock_or_cls: MagicMock,
+    mock_scalars: MagicMock,
+    mock_get: MagicMock,
+) -> None:
+    wpid = uuid.uuid4()
+    apid = uuid.uuid4()
+    replacement_id = uuid.uuid4()
+    original = SimpleNamespace(
+        name="Original",
+        difficulty="easy",
+        description="d",
+        image_url="i",
+        video_url="v",
+    )
+    replacement = SimpleNamespace(
+        id=replacement_id,
+        name="Replacement",
+        difficulty="medium",
+        description="d2",
+        image_url="i2",
+        video_url="v2",
+    )
+    workout_exercise = SimpleNamespace(
+        exercise_id=E1,
+        sets=3,
+        reps=10,
+        rest_seconds=45,
+        exercise=original,
+    )
+    day = SimpleNamespace(day_of_week=" Monday ", exercises=[workout_exercise])
+    progress_detail = SimpleNamespace(
+        week_number=1,
+        day_of_week=" MONDAY ",
+        exercises=[SimpleNamespace(exercise_id=replacement_id, is_completed=True)],
+    )
+    override = SimpleNamespace(
+        day_of_week=" monday ",
+        source_exercise_id=E1,
+        action="replace",
+        replacement_exercise_id=replacement_id,
+    )
+
+    mock_or_cls.return_value.list_for_plan_and_week.return_value = [override]
+    mock_scalars.return_value = iter([replacement])
+    mock_get.return_value = None
+    mock_ap.return_value.get_by_user.return_value = [
+        SimpleNamespace(
+            id=apid,
+            is_completed=False,
+            plan_type="personalized",
+            workout_plan_id=wpid,
+            start_date=datetime(2024, 1, 1, tzinfo=UTC),
+            progress_details=[progress_detail],
+        )
+    ]
+    mock_wp.return_value.get_with_schedule.return_value = SimpleNamespace(
+        duration_weeks=4,
+        workout_days=[day],
+    )
+
+    with patch(
+        "app.services.user_workout_service.datetime",
+        new=_dt_proxy(datetime(2024, 1, 1, 12, 0, 0, tzinfo=UTC)),
+    ):
+        out = UserWorkoutService.get_weekly_workout_progress(UID, week_number=1)
+
+    monday = next(day_out for day_out in out["days"] if day_out["day_of_week"] == "monday")
+    assert monday["is_completed"] is True
+    assert monday["exercises"] == [
+        {
+            "exercise_id": str(replacement_id),
+            "name": "Replacement",
+            "sets": 3,
+            "reps": 10,
+            "rest_seconds": 45,
+            "difficulty": "medium",
+            "description": "d2",
+            "image_url": "i2",
+            "video_url": "v2",
+            "is_completed": True,
+        }
+    ]
+
+
+@patch("app.services.user_workout_service.db.session.get")
+@patch("app.services.user_workout_service.db.session.scalars")
+@patch("app.services.user_workout_service.PlanSessionExerciseOverrideRepository")
+@patch("app.services.user_workout_service.WorkoutPlanRepository")
+@patch("app.services.user_workout_service.ActivePlanRepository")
+def test_get_weekly_fetches_replacement_from_session_when_not_prefetched(
+    mock_ap: MagicMock,
+    mock_wp: MagicMock,
+    mock_or_cls: MagicMock,
+    mock_scalars: MagicMock,
+    mock_get: MagicMock,
+) -> None:
+    wpid = uuid.uuid4()
+    replacement_id = uuid.uuid4()
+    original = SimpleNamespace(
+        name="Original",
+        difficulty="easy",
+        description="d",
+        image_url="i",
+        video_url="v",
+    )
+    replacement = SimpleNamespace(
+        id=replacement_id,
+        name="Fetched replacement",
+        difficulty="hard",
+        description="fresh",
+        image_url="img",
+        video_url="vid",
+    )
+    workout_exercise = SimpleNamespace(
+        exercise_id=E1,
+        sets=4,
+        reps=8,
+        rest_seconds=60,
+        exercise=original,
+    )
+    day = SimpleNamespace(day_of_week="monday", exercises=[workout_exercise])
+    override = SimpleNamespace(
+        day_of_week="monday",
+        source_exercise_id=E1,
+        action="replace",
+        replacement_exercise_id=replacement_id,
+    )
+
+    mock_or_cls.return_value.list_for_plan_and_week.return_value = [override]
+    mock_scalars.return_value = iter([])
+    mock_get.return_value = replacement
+    mock_ap.return_value.get_by_user.return_value = [
+        SimpleNamespace(
+            id=uuid.uuid4(),
+            is_completed=False,
+            plan_type="personalized",
+            workout_plan_id=wpid,
+            start_date=datetime(2024, 1, 1, tzinfo=UTC),
+            progress_details=[],
+        )
+    ]
+    mock_wp.return_value.get_with_schedule.return_value = SimpleNamespace(
+        duration_weeks=4,
+        workout_days=[day],
+    )
+
+    with patch(
+        "app.services.user_workout_service.datetime",
+        new=_dt_proxy(datetime(2024, 1, 1, 12, 0, 0, tzinfo=UTC)),
+    ):
+        out = UserWorkoutService.get_weekly_workout_progress(UID, week_number=1)
+
+    monday = next(day_out for day_out in out["days"] if day_out["day_of_week"] == "monday")
+    assert monday["exercises"][0]["exercise_id"] == str(replacement_id)
+    assert mock_get.call_count == 1
+    called_model, called_id = mock_get.call_args[0]
+    assert called_model.__name__ == "Exercise"
+    assert called_id == replacement_id
+
+
+@patch("app.services.user_workout_service.db.session.get")
+@patch("app.services.user_workout_service.db.session.scalars")
+@patch("app.services.user_workout_service.PlanSessionExerciseOverrideRepository")
+@patch("app.services.user_workout_service.WorkoutPlanRepository")
+@patch("app.services.user_workout_service.ActivePlanRepository")
+def test_get_weekly_keeps_original_exercise_when_replacement_is_missing(
+    mock_ap: MagicMock,
+    mock_wp: MagicMock,
+    mock_or_cls: MagicMock,
+    mock_scalars: MagicMock,
+    mock_get: MagicMock,
+) -> None:
+    wpid = uuid.uuid4()
+    replacement_id = uuid.uuid4()
+    original = SimpleNamespace(
+        name="Original",
+        difficulty="easy",
+        description="d",
+        image_url="i",
+        video_url="v",
+    )
+    workout_exercise = SimpleNamespace(
+        exercise_id=E1,
+        sets=4,
+        reps=8,
+        rest_seconds=60,
+        exercise=original,
+    )
+    day = SimpleNamespace(day_of_week="monday", exercises=[workout_exercise])
+    override = SimpleNamespace(
+        day_of_week="monday",
+        source_exercise_id=E1,
+        action="replace",
+        replacement_exercise_id=replacement_id,
+    )
+
+    mock_or_cls.return_value.list_for_plan_and_week.return_value = [override]
+    mock_scalars.return_value = iter([])
+    mock_get.return_value = None
+    mock_ap.return_value.get_by_user.return_value = [
+        SimpleNamespace(
+            id=uuid.uuid4(),
+            is_completed=False,
+            plan_type="personalized",
+            workout_plan_id=wpid,
+            start_date=datetime(2024, 1, 1, tzinfo=UTC),
+            progress_details=[],
+        )
+    ]
+    mock_wp.return_value.get_with_schedule.return_value = SimpleNamespace(
+        duration_weeks=4,
+        workout_days=[day],
+    )
+
+    with patch(
+        "app.services.user_workout_service.datetime",
+        new=_dt_proxy(datetime(2024, 1, 1, 12, 0, 0, tzinfo=UTC)),
+    ):
+        out = UserWorkoutService.get_weekly_workout_progress(UID, week_number=1)
+
+    monday = next(day_out for day_out in out["days"] if day_out["day_of_week"] == "monday")
+    assert monday["exercises"] == [
+        {
+            "exercise_id": str(E1),
+            "name": "Original",
+            "sets": 4,
+            "reps": 8,
+            "rest_seconds": 60,
+            "difficulty": "easy",
+            "description": "d",
+            "image_url": "i",
+            "video_url": "v",
+            "is_completed": False,
+        }
+    ]
 
 
 @patch("app.services.user_workout_service.CompletedChallengeDayRepository")

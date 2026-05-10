@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
@@ -28,6 +28,12 @@ import { IoChevronBack, IoChevronForward } from 'react-icons/io5';
 import { FiRefreshCw, FiTrash2, FiX } from 'react-icons/fi';
 import type { ApiResponse } from '@/app/_types/api';
 import type { AnimationOriginRect, ExerciseAnimationTargets } from '@/app/_interfaces/ExerciseFlow';
+import type { AppClientSession } from '@/app/_types/appSession';
+import type {
+    WorkoutDisplayMessage,
+    WeeklyProgressMessage,
+    WorkoutFlowExercise,
+} from '@/app/_types/workoutProgress';
 
 const DEFAULT_SECONDS_PER_REP = 3;
 const WEEK_SWIPE_THRESHOLD_PX = 48;
@@ -43,41 +49,6 @@ const daysOfWeekFull = [
 ] as const;
 
 type WeekDayName = (typeof daysOfWeekFull)[number];
-
-interface WeeklyProgressDay {
-    day_of_week: string;
-    date?: string;
-    is_completed?: boolean;
-    exercises: Exercise[];
-}
-
-interface WeeklyProgressMessage {
-    week_start_date?: string;
-    week_end_date?: string;
-    current_week?: number;
-    week_number?: number;
-    total_weeks?: number;
-    progress?: number;
-    days: WeeklyProgressDay[];
-}
-
-interface SessionUserState {
-    id: string | null;
-    token: string | null;
-}
-
-function readSessionUser(user: unknown): SessionUserState {
-    if (typeof user !== 'object' || user === null) {
-        return { id: null, token: null };
-    }
-
-    const candidateUser = user as Record<string, unknown>;
-
-    return {
-        id: typeof candidateUser.id === 'string' ? candidateUser.id : null,
-        token: typeof candidateUser.token === 'string' ? candidateUser.token : null,
-    };
-}
 
 function getTodayDateKey(): string {
     const today = new Date();
@@ -95,14 +66,15 @@ const MyPlan: React.FC = () => {
     const { t } = useTranslation('global');
     const { data: session, status } = useSession();
     const planId = Array.isArray(id) ? id[0] : id;
-    const sessionUser = readSessionUser(session?.user);
+    const sessionData = session as AppClientSession | null;
+    const sessionUser = sessionData?.user;
 
     const sessionLoading = status === 'loading';
-    const userId = sessionUser.id ?? '';
-    const token = sessionUser.token;
+    const userId = sessionUser?.id ?? '';
+    const token = sessionUser?.token ?? null;
 
     const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
-    const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+    const [selectedExercise, setSelectedExercise] = useState<WorkoutFlowExercise | null>(null);
     const [exerciseAnimationOrigin, setExerciseAnimationOrigin] =
         useState<AnimationOriginRect | null>(null);
     const [exerciseCompletionTarget, setExerciseCompletionTarget] =
@@ -119,7 +91,7 @@ const MyPlan: React.FC = () => {
     const [isDeleteSheetOpen, setIsDeleteSheetOpen] = useState(false);
     const [deleteScope, setDeleteScope] = useState<PlanChangeScope>('template');
     const [replaceScope, setReplaceScope] = useState<PlanChangeScope>('template');
-    const [weeklyProgressState, setWeeklyProgressState] = useState<WeeklyProgressMessage | null>(
+    const [weeklyProgressState, setWeeklyProgressState] = useState<WorkoutDisplayMessage | null>(
         null,
     );
     const [similarExercises, setSimilarExercises] = useState<Exercise[]>([]);
@@ -127,6 +99,9 @@ const MyPlan: React.FC = () => {
     const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
     const [weekSwipeStartX, setWeekSwipeStartX] = useState<number | null>(null);
     const [weekTransitionDirection, setWeekTransitionDirection] = useState(0);
+    const [completingExerciseIds, setCompletingExerciseIds] = useState<string[]>([]);
+    const [recentlyCompletedExerciseIds, setRecentlyCompletedExerciseIds] = useState<string[]>([]);
+    const completionHighlightTimeoutsRef = useRef<Record<string, number>>({});
 
     const {
         data: weeklyProgressData,
@@ -153,8 +128,8 @@ const MyPlan: React.FC = () => {
         null,
     );
 
-    const normalizeExercises = (exercises: Exercise[]): Exercise[] => {
-        const uniqueExercises: Record<string, Exercise> = {};
+    const normalizeExercises = (exercises: WorkoutFlowExercise[]): WorkoutFlowExercise[] => {
+        const uniqueExercises: Record<string, WorkoutFlowExercise> = {};
 
         exercises.forEach((exercise) => {
             const exerciseId = exercise.exercise_id ?? exercise._id;
@@ -217,20 +192,6 @@ const MyPlan: React.FC = () => {
         [exercisesToDelete],
     );
     const deleteDayLabel = t(`workouts.my-plan.weekdays.${selectedDayName}`);
-
-    if (sessionLoading || (loadingWeeklyProgress && !weeklyProgressState)) {
-        return <LoadingScreen />;
-    }
-
-    if (weeklyProgressError) {
-        return (
-            <Modal
-                title="Error"
-                message={weeklyProgressError.message}
-                onClose={() => router.push('/workouts')}
-            />
-        );
-    }
 
     const handleDeleteMode = () => {
         setIsDeleteMode(true);
@@ -307,7 +268,7 @@ const MyPlan: React.FC = () => {
     };
 
     const handleExerciseCardClick = (
-        exercise: Exercise,
+        exercise: WorkoutFlowExercise,
         action: 'details' | 'start',
         targets?: ExerciseAnimationTargets,
     ) => {
@@ -330,7 +291,7 @@ const MyPlan: React.FC = () => {
         }
     };
 
-    const handleExerciseStart = (exercise: Exercise) => {
+    const handleExerciseStart = (exercise: WorkoutFlowExercise) => {
         if (!canCompleteSelectedDay) {
             return;
         }
@@ -390,7 +351,7 @@ const MyPlan: React.FC = () => {
 
                             return {
                                 ...dayData,
-                                exercises: dayData.exercises.map((exercise: Exercise) => {
+                                exercises: dayData.exercises.map((exercise) => {
                                     if (exercise.exercise_id === exerciseToReplaceId) {
                                         return {
                                             ...pendingReplacementExercise,
@@ -418,6 +379,9 @@ const MyPlan: React.FC = () => {
     };
 
     const handleExerciseComplete = (exerciseId: string) => {
+        setCompletingExerciseIds((currentIds) =>
+            currentIds.filter((currentId) => currentId !== exerciseId),
+        );
         setWeeklyProgressState((prevState) => {
             if (!prevState) {
                 return prevState;
@@ -435,7 +399,7 @@ const MyPlan: React.FC = () => {
                     }
 
                     const updatedExercises = normalizeExercises(
-                        day.exercises.map((exercise: Exercise) => {
+                        day.exercises.map((exercise) => {
                             const currentExerciseId = exercise.exercise_id ?? exercise._id;
 
                             if (currentExerciseId === exerciseId && !exercise.is_completed) {
@@ -453,6 +417,19 @@ const MyPlan: React.FC = () => {
                 }),
             };
         });
+        setRecentlyCompletedExerciseIds((currentIds) =>
+            currentIds.includes(exerciseId) ? currentIds : [...currentIds, exerciseId],
+        );
+        const currentTimeout = completionHighlightTimeoutsRef.current[exerciseId];
+        if (currentTimeout) {
+            window.clearTimeout(currentTimeout);
+        }
+        completionHighlightTimeoutsRef.current[exerciseId] = window.setTimeout(() => {
+            setRecentlyCompletedExerciseIds((currentIds) =>
+                currentIds.filter((currentId) => currentId !== exerciseId),
+            );
+            delete completionHighlightTimeoutsRef.current[exerciseId];
+        }, 1600);
         window.setTimeout(() => {
             void queryClient.invalidateQueries({
                 queryKey: WEEKLY_WORKOUT_PROGRESS_QUERY_KEY,
@@ -460,7 +437,7 @@ const MyPlan: React.FC = () => {
         }, 400);
     };
 
-    const buildDefaultExerciseProgress = (exercise: Exercise): ExerciseProgress => {
+    const buildDefaultExerciseProgress = (exercise: WorkoutFlowExercise): ExerciseProgress => {
         const sets = exercise.sets || 1;
         const reps = exercise.reps || 1;
         const workSeconds = sets * reps * DEFAULT_SECONDS_PER_REP;
@@ -476,7 +453,7 @@ const MyPlan: React.FC = () => {
         };
     };
 
-    const handleQuickCompleteExercise = (exercise: Exercise) => {
+    const handleQuickCompleteExercise = (exercise: WorkoutFlowExercise) => {
         if (!canCompleteSelectedDay) {
             return;
         }
@@ -486,6 +463,12 @@ const MyPlan: React.FC = () => {
         if (!exerciseProgress.exercise_id || !planId || !selectedDayName) {
             return;
         }
+
+        setCompletingExerciseIds((currentIds) =>
+            currentIds.includes(exerciseProgress.exercise_id)
+                ? currentIds
+                : [...currentIds, exerciseProgress.exercise_id],
+        );
 
         completeWorkout(
             {
@@ -501,10 +484,40 @@ const MyPlan: React.FC = () => {
             },
             {
                 onSuccess: () => handleExerciseComplete(exerciseProgress.exercise_id),
-                onError: (error) => console.error('Error marking exercise complete:', error),
+                onError: (error) => {
+                    setCompletingExerciseIds((currentIds) =>
+                        currentIds.filter(
+                            (currentId) => currentId !== exerciseProgress.exercise_id,
+                        ),
+                    );
+                    console.error('Error marking exercise complete:', error);
+                },
             },
         );
     };
+
+    useEffect(() => {
+        return () => {
+            Object.values(completionHighlightTimeoutsRef.current).forEach((timeoutId) => {
+                window.clearTimeout(timeoutId);
+            });
+            completionHighlightTimeoutsRef.current = {};
+        };
+    }, []);
+
+    if (sessionLoading || (loadingWeeklyProgress && !weeklyProgressState)) {
+        return <LoadingScreen />;
+    }
+
+    if (weeklyProgressError) {
+        return (
+            <Modal
+                title="Error"
+                message={weeklyProgressError.message}
+                onClose={() => router.push('/workouts')}
+            />
+        );
+    }
 
     const handlePreviousWeek = () => {
         if (!canGoPreviousWeek) return;
@@ -756,20 +769,40 @@ const MyPlan: React.FC = () => {
                                     </div>
                                 </div>
                             )}
-                            {isSelectedDayComplete && (
-                                <div className="flex items-center gap-3 rounded-3xl border border-green-100 bg-green-50 p-4 text-green-700">
-                                    <FaCheckCircle className="h-6 w-6 shrink-0" />
-                                    <div>
-                                        <h2 className="font-semibold">
-                                            {t('workouts.my-plan.dayCompletedTitle')}
-                                        </h2>
-                                        <p className="text-sm text-green-700/80">
-                                            {t('workouts.my-plan.dayCompletedDescription')}
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
-                            {selectedExercises.map((exercise: Exercise, index) => {
+                            <AnimatePresence initial={false}>
+                                {isSelectedDayComplete && (
+                                    <motion.div
+                                        key={selectedDay?.date ?? selectedDayName}
+                                        initial={{ opacity: 0, y: 14, scale: 0.97 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                                        transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+                                        className="flex items-center gap-3 rounded-3xl border border-green-100 bg-green-50 p-4 text-green-700"
+                                    >
+                                        <motion.div
+                                            initial={{ scale: 0.85, rotate: -10 }}
+                                            animate={{ scale: 1, rotate: 0 }}
+                                            transition={{
+                                                type: 'spring',
+                                                stiffness: 420,
+                                                damping: 18,
+                                                delay: 0.05,
+                                            }}
+                                        >
+                                            <FaCheckCircle className="h-6 w-6 shrink-0" />
+                                        </motion.div>
+                                        <div>
+                                            <h2 className="font-semibold">
+                                                {t('workouts.my-plan.dayCompletedTitle')}
+                                            </h2>
+                                            <p className="text-sm text-green-700/80">
+                                                {t('workouts.my-plan.dayCompletedDescription')}
+                                            </p>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                            {selectedExercises.map((exercise, index) => {
                                 const rowId = exercise.exercise_id ?? exercise._id ?? '';
                                 return (
                                     <ExerciseCard
@@ -784,6 +817,12 @@ const MyPlan: React.FC = () => {
                                         onOptionalSelect={handleOptionalSelect}
                                         onCompleteSelect={handleQuickCompleteExercise}
                                         canComplete={canCompleteSelectedDay}
+                                        isCompleting={Boolean(
+                                            rowId && completingExerciseIds.includes(rowId),
+                                        )}
+                                        isRecentlyCompleted={Boolean(
+                                            rowId && recentlyCompletedExerciseIds.includes(rowId),
+                                        )}
                                         selectedForDelete={Boolean(
                                             rowId &&
                                             exercisesToDelete[selectedDayName]?.includes(rowId),

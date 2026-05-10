@@ -19,6 +19,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import app.settings as s
 from app.extensions import db
 from app.models.notification import NotificationDevice
+from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.schemas.auth import LoginRequest, PlayerIDRequest
 from app.schemas.user import UserCreate
@@ -39,6 +40,39 @@ def _birthdate_str_to_date(value: str) -> date:
             s = s[:-1] + "+00:00"
         return datetime.fromisoformat(s).date()
     return date.fromisoformat(s)
+
+
+def _login_error(message: str, status_code: int) -> ResponseTuple:
+    return {"status": "error", "message": message}, status_code
+
+
+def _resolve_login_identifier(schema: LoginRequest) -> str | None:
+    return schema.email or schema.phone
+
+
+def _get_login_user(repo: UserRepository, identifier: str) -> User | None:
+    if "@" in identifier:
+        return repo.get_by_email(identifier)
+
+    return repo.get_by_number(identifier)
+
+
+def _build_login_success_response(user: User) -> ResponseTuple:
+    user_id_str = str(user.id)
+    access_token = create_access_token(identity=user_id_str)
+    refresh_token = create_refresh_token(identity=user_id_str)
+    exp = decode_token(access_token)["exp"]
+
+    return {
+        "status": "success",
+        "message": {
+            "access_token": access_token,
+            "expires_at": exp,
+            "refresh_token": refresh_token,
+            "user_id": user_id_str,
+            "name": f"{user.name} {user.last}",
+        },
+    }, 200
 
 
 @api.route("/check-email")
@@ -178,43 +212,29 @@ class RegisterResource(Resource):
 class LoginResource(Resource):
     def post(self) -> ResponseTuple:
         try:
-            data = request.json
-            schema = LoginRequest(**data)
-            email_or_phone = schema.email or schema.phone
+            payload = request.get_json(silent=True) or {}
+            if not isinstance(payload, dict):
+                return _login_error("Invalid login payload", 400)
 
-            if not email_or_phone:
-                return {"status": "error", "message": "Missing credentials"}, 400
+            schema = LoginRequest(**payload)
+            identifier = _resolve_login_identifier(schema)
+            if not identifier:
+                return _login_error("Missing credentials", 400)
 
             repo = UserRepository()
-            if "@" in email_or_phone:
-                user = repo.get_by_email(email_or_phone)
-            else:
-                user = repo.get_by_number(email_or_phone)
-
+            user = _get_login_user(repo, identifier)
             if not user:
-                return {"status": "error", "message": "Invalid credentials"}, 404
+                return _login_error("Invalid credentials", 404)
 
             if not check_password_hash(user.password_hash, schema.password):
-                return {"status": "error", "message": "Invalid credentials"}, 401
+                return _login_error("Invalid credentials", 401)
 
-            user_id_str = str(user.id)
-            access_token = create_access_token(identity=user_id_str)
-            refresh_token = create_refresh_token(identity=user_id_str)
-            exp = decode_token(access_token)["exp"]
-
-            return {
-                "status": "success",
-                "message": {
-                    "access_token": access_token,
-                    "expires_at": exp,
-                    "refresh_token": refresh_token,
-                    "user_id": user_id_str,
-                    "name": f"{user.name} {user.last}",
-                },
-            }, 200
+            return _build_login_success_response(user)
+        except ValidationError:
+            return _login_error("Invalid login payload", 400)
         except Exception as e:
             logger.exception("Login error: %s", e)
-            return {"status": "error", "message": "Could not handle the user login"}, 500
+            return _login_error("Could not handle the user login", 500)
 
 
 @api.route("/refresh-token")
