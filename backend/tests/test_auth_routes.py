@@ -114,6 +114,14 @@ def test_login_invalid_payload_returns_400(client, db) -> None:
     assert "Invalid login payload" in body.get("message", "")
 
 
+def test_login_json_array_payload_returns_400(client, db) -> None:
+    r = client.post("/api/auth/login", json=["email", "password"])
+    assert r.status_code == 400
+    body = r.get_json()
+    assert body is not None
+    assert "Invalid login payload" in body.get("message", "")
+
+
 def test_login_user_not_found(client, db) -> None:
     r = client.post(
         "/api/auth/login",

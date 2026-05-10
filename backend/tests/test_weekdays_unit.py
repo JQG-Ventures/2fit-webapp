@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from app.constants import WEEKDAY_SET
 from app.constants.weekdays import WEEKDAY_ORDER, Weekday, is_valid_weekday, normalize_weekday
 from app.schemas.user import TrainingPreferencesCreate
 
@@ -11,6 +12,7 @@ pytestmark = pytest.mark.unit
 def test_weekday_order_matches_enum_values() -> None:
     assert WEEKDAY_ORDER == tuple(day.value for day in Weekday)
     assert len(WEEKDAY_ORDER) == 7
+    assert WEEKDAY_SET == set(WEEKDAY_ORDER)
 
 
 def test_normalize_and_validate_weekday() -> None:

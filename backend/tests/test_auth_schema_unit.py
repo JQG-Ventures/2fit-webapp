@@ -33,3 +33,11 @@ def test_login_request_maps_blank_identifiers_to_none() -> None:
     assert schema.email is None
     assert schema.phone is None
     assert _resolve_login_identifier(schema) is None
+
+
+def test_login_request_keeps_none_identifiers_as_none() -> None:
+    schema = LoginRequest(email=None, phone=None, password="secret")
+
+    assert schema.email is None
+    assert schema.phone is None
+    assert _resolve_login_identifier(schema) is None

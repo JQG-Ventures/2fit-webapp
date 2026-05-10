@@ -100,6 +100,56 @@ def test_generate_day_routine_dedupes_overlapping_strength_exercises() -> None:
     assert len(exercise_ids) == len(set(exercise_ids))
 
 
+def test_dedupe_exercises_keeps_first_instance_per_id() -> None:
+    first = SimpleNamespace(
+        id="shared",
+        muscle_group=["chest"],
+        category="strength",
+        marker="first",
+    )
+    duplicate = SimpleNamespace(
+        id="shared", muscle_group=["back"], category="strength", marker="second"
+    )
+    unique = SimpleNamespace(id="unique", muscle_group=["legs"], category="strength", marker="only")
+
+    deduped = WorkoutPlanGenerator._dedupe_exercises([first, duplicate, unique])
+
+    assert deduped == [first, unique]
+
+
+def test_expand_muscle_groups_preserves_order_without_duplicates() -> None:
+    expanded = WorkoutPlanGenerator._expand_muscle_groups(["push", "upper_body"])
+
+    assert expanded == ["chest", "shoulders", "triceps", "back", "arms"]
+
+
+def test_sample_unique_candidates_handles_empty_and_zero_limit() -> None:
+    candidates = [SimpleNamespace(id="a"), SimpleNamespace(id="b")]
+
+    assert WorkoutPlanGenerator._sample_unique_candidates(candidates, 0, set()) == []
+    assert WorkoutPlanGenerator._sample_unique_candidates(candidates, 2, {"a", "b"}) == []
+
+
+def test_generate_day_routine_backfills_remaining_strength_slots() -> None:
+    exercises = [
+        SimpleNamespace(id="chest-1", muscle_group=["chest"], category="strength"),
+        SimpleNamespace(id="shoulders-1", muscle_group=["shoulders"], category="strength"),
+        SimpleNamespace(id="triceps-1", muscle_group=["triceps"], category="strength"),
+        SimpleNamespace(id="chest-2", muscle_group=["chest"], category="strength"),
+        SimpleNamespace(id="triceps-2", muscle_group=["triceps"], category="strength"),
+    ]
+    settings = {"sets": 3, "reps": [8], "rest": 90}
+
+    with patch("app.services.workout_plan_service.random.randint", side_effect=[5, 1, 1, 1]):
+        routine = WorkoutPlanGenerator.generate_day_routine(
+            ["push"], exercises, settings, "beginner", cardio=False
+        )
+
+    exercise_ids = [row["exercise_id"] for row in routine]
+    assert len(routine) == 5
+    assert len(exercise_ids) == len(set(exercise_ids))
+
+
 def test_get_intensity_settings_unknown_level_falls_back_to_beginner_shape() -> None:
     s = WorkoutPlanGenerator.get_intensity_settings("not-a-level", "muscle")
     assert s["sets"] == 2 and "reps" in s
