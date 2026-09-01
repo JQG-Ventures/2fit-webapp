@@ -1,6 +1,6 @@
 import logging
 import uuid
-from datetime import datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import select
@@ -14,6 +14,7 @@ from app.repositories.progress_repository import (
     ActiveChallengeRepository,
     ActivePlanRepository,
     CompletedChallengeDayRepository,
+    CompletedSessionRepository,
     CompletedWorkoutRepository,
     DayProgressRepository,
     PlanSessionExerciseOverrideRepository,
@@ -24,6 +25,25 @@ Payload = dict[str, Any]
 
 
 class UserWorkoutService:
+    @staticmethod
+    def get_home_stats(user_id: str, today: date | None = None) -> Payload:
+        user_uuid = uuid.UUID(user_id)
+        daily_session_counts = CompletedSessionRepository().get_daily_session_counts(user_uuid)
+        total_sessions = sum(daily_session_counts.values())
+
+        current_date = today or datetime.now(UTC).date()
+        if current_date not in daily_session_counts:
+            current_date -= timedelta(days=1)
+            if current_date not in daily_session_counts:
+                return {"streak_days": 0, "total_sessions": total_sessions}
+
+        streak_days = 0
+        while current_date in daily_session_counts:
+            streak_days += 1
+            current_date -= timedelta(days=1)
+
+        return {"streak_days": streak_days, "total_sessions": total_sessions}
+
     @staticmethod
     def calculate_week_number(start_date: datetime, completed_date: datetime) -> int:
         if start_date.tzinfo is None and completed_date.tzinfo is not None:

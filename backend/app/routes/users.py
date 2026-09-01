@@ -4,8 +4,9 @@ from datetime import UTC, datetime
 from random import randint
 
 from flask import Blueprint, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
-from flask_restx import Api, Resource
+from flask_jwt_extended import get_jwt_identity, jwt_required, verify_jwt_in_request
+from flask_jwt_extended.exceptions import JWTExtendedException
+from flask_restx import Api, Resource, fields
 from openai import OpenAI
 from pydantic import ValidationError as PydanticValidationError
 from twilio.base.exceptions import TwilioRestException
@@ -27,8 +28,52 @@ api = Api(users_bp, doc="/docs")
 logger = logging.getLogger(__name__)
 codes: dict[str, str] = {}
 
+home_stats_message_model = api.model(
+    "HomeStatsMessage",
+    {
+        "streak_days": fields.Integer(
+            required=True,
+            min=0,
+            description="Current streak in consecutive UTC calendar days.",
+        ),
+        "total_sessions": fields.Integer(
+            required=True,
+            min=0,
+            description="Non-skipped completed workouts and challenge days.",
+        ),
+    },
+)
+home_stats_response_model = api.model(
+    "HomeStatsResponse",
+    {
+        "status": fields.String(required=True, enum=["success"]),
+        "message": fields.Nested(home_stats_message_model, required=True),
+    },
+)
+
 ResponseBody = dict[str, object]
 ResponseTuple = tuple[ResponseBody, int]
+
+
+@api.route("/home-stats")
+class HomeStatsResource(Resource):
+    @api.response(200, "Home stats retrieved successfully", home_stats_response_model)
+    @api.response(401, "Unauthorized")
+    @api.response(500, "Internal server error")
+    def get(self) -> ResponseTuple:
+        try:
+            verify_jwt_in_request()
+            user_id = get_jwt_identity()
+            if not isinstance(user_id, str):
+                return {"status": "error", "message": "User not authenticated"}, 401
+
+            stats = UserWorkoutService.get_home_stats(user_id)
+            return {"status": "success", "message": stats}, 200
+        except JWTExtendedException:
+            return {"status": "error", "message": "User not authenticated"}, 401
+        except Exception as e:
+            logger.exception("Error retrieving home stats: %s", e)
+            return {"status": "error", "message": "Internal server error"}, 500
 
 
 @api.route("/workouts/complete")

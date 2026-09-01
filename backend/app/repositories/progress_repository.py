@@ -1,7 +1,9 @@
 import uuid
+from datetime import date
 from typing import Any, cast
 
-from sqlalchemy import select
+from sqlalchemy import Date, func, select, union_all
+from sqlalchemy import cast as sql_cast
 from sqlalchemy.orm import joinedload
 
 from app.extensions import db
@@ -232,6 +234,33 @@ class CompletedWorkoutRepository:
             .options(joinedload(CompletedWorkout.exercises))
         )
         return list(db.session.scalars(stmt).unique().all())
+
+
+class CompletedSessionRepository:
+    def get_daily_session_counts(self, user_id: uuid.UUID) -> dict[date, int]:
+        workout_date = sql_cast(func.timezone("UTC", CompletedWorkout.date), Date)
+        challenge_date = sql_cast(func.timezone("UTC", CompletedChallengeDay.date), Date)
+
+        completed_sessions = union_all(
+            select(workout_date.label("session_date")).where(
+                CompletedWorkout.user_id == user_id,
+                CompletedWorkout.was_skipped.is_(False),
+            ),
+            select(challenge_date.label("session_date")).where(
+                CompletedChallengeDay.user_id == user_id,
+                CompletedChallengeDay.was_skipped.is_(False),
+            ),
+        ).subquery()
+
+        stmt = (
+            select(
+                completed_sessions.c.session_date,
+                func.count().label("session_count"),
+            )
+            .group_by(completed_sessions.c.session_date)
+            .order_by(completed_sessions.c.session_date)
+        )
+        return {row.session_date: int(row.session_count) for row in db.session.execute(stmt)}
 
 
 class ActiveChallengeRepository:
