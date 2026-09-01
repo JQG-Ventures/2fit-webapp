@@ -1,0 +1,980 @@
+{
+  "components": {
+    "schemas": {
+      "HomeStatsMessage": {
+        "properties": {
+          "streak_days": {
+            "description": "Current streak in consecutive UTC calendar days.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "total_sessions": {
+            "description": "Non-skipped completed workouts and challenge days.",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "streak_days",
+          "total_sessions"
+        ],
+        "type": "object"
+      },
+      "HomeStatsResponse": {
+        "properties": {
+          "message": {
+            "$ref": "#/components/schemas/HomeStatsMessage"
+          },
+          "status": {
+            "enum": [
+              "success"
+            ],
+            "example": "success",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "status"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Merged Flask-RESTX specs. Canonical OpenAPI 3 is contracts/openapi.json.",
+    "title": "2fit API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/active-plans": {
+      "get": {
+        "operationId": "get_user_resource_plans",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/by-email/{email}": {
+      "get": {
+        "operationId": "get_user_by_email_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "email",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/by-number/{number}": {
+      "get": {
+        "operationId": "get_user_by_number_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "number",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/challenge-progress": {
+      "get": {
+        "operationId": "get_challenge_progress_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/challenges": {
+      "get": {
+        "operationId": "get_challenge_list_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "post": {
+        "operationId": "post_challenge_list_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/challenges/complete": {
+      "post": {
+        "operationId": "post_complete_challenge_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/challenges/progress": {
+      "get": {
+        "operationId": "get_user_challenge_progress_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/challenges/progress/batch": {
+      "get": {
+        "operationId": "get_user_challenge_progress_batch_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "post": {
+        "operationId": "post_user_challenge_progress_batch_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/challenges/{challenge_id}": {
+      "delete": {
+        "operationId": "delete_challenge_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "get": {
+        "operationId": "get_challenge_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "challenge_id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "put": {
+        "operationId": "put_challenge_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/chat": {
+      "post": {
+        "operationId": "post_chat_bot_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/check-email": {
+      "post": {
+        "operationId": "post_check_email_availability_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/check-phone": {
+      "post": {
+        "operationId": "post_check_phone_availability_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/content": {
+      "get": {
+        "operationId": "get_content_by_tags_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/content/upload": {
+      "post": {
+        "operationId": "post_content_upload_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/conversation": {
+      "get": {
+        "operationId": "get_user_conversation_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/exercises": {
+      "get": {
+        "operationId": "get_exercise_list_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "post": {
+        "operationId": "post_exercise_list_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/exercises/bulk": {
+      "post": {
+        "operationId": "post_bulk_exercise_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/exercises/muscles/taxonomy": {
+      "get": {
+        "operationId": "get_muscle_taxonomy_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/exercises/{exercise_id}": {
+      "delete": {
+        "operationId": "delete_exercise_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "get": {
+        "operationId": "get_exercise_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "exercise_id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "put": {
+        "operationId": "put_exercise_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/google": {
+      "post": {
+        "operationId": "post_google_auth_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/google-login": {
+      "post": {
+        "operationId": "post_google_login_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/home-stats": {
+      "get": {
+        "operationId": "get_home_stats_resource",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/HomeStatsResponse"
+                }
+              }
+            },
+            "description": "Home stats retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/home/by-level": {
+      "get": {
+        "operationId": "get_home_by_level_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/home/explore": {
+      "get": {
+        "operationId": "get_home_explore_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/library": {
+      "get": {
+        "operationId": "get_library_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/library/difficulty/{difficulty}": {
+      "get": {
+        "operationId": "get_workout_plan_by_difficulty_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "difficulty",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/library/muscle_group/{muscle_group}": {
+      "get": {
+        "operationId": "get_library_muscle_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "muscle_group",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/login": {
+      "post": {
+        "operationId": "post_login_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/messages/motivational": {
+      "post": {
+        "operationId": "post_motivational_messages_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/notifications/player-id": {
+      "post": {
+        "operationId": "post_player_id_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/plans": {
+      "get": {
+        "operationId": "get_workout_plan_list_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "post": {
+        "operationId": "post_workout_plan_list_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/plans/bulk": {
+      "post": {
+        "operationId": "post_bulk_workout_plan_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/plans/one-day": {
+      "get": {
+        "operationId": "get_one_day_workout_plan_list_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/plans/{plan_id}": {
+      "delete": {
+        "operationId": "delete_workout_plan_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "get": {
+        "operationId": "get_workout_plan_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "plan_id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "put": {
+        "operationId": "put_workout_plan_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/plans/{plan_id}/delete-exercises": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "plan_id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "put": {
+        "operationId": "put_delete_exercises_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/plans/{plan_id}/update-exercises": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "plan_id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "put": {
+        "operationId": "put_update_exercises_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/popular": {
+      "get": {
+        "operationId": "get_popular_workouts_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/profile": {
+      "get": {
+        "operationId": "get_user_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "put": {
+        "operationId": "put_user_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/profile/image": {
+      "post": {
+        "operationId": "post_user_profile_image_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/refresh-token": {
+      "post": {
+        "operationId": "post_refresh_token_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/register": {
+      "post": {
+        "operationId": "post_register_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/save": {
+      "post": {
+        "operationId": "post_store_email_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/saved": {
+      "delete": {
+        "operationId": "delete_user_workout_saved_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "get": {
+        "operationId": "get_user_workout_saved_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "post": {
+        "operationId": "post_user_workout_saved_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/send-code": {
+      "post": {
+        "operationId": "post_send_code_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/similar-exercises/{exercise_id}": {
+      "get": {
+        "operationId": "get_exercise_resource_similar",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "exercise_id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/transcribe": {
+      "post": {
+        "operationId": "post_transcribe_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/verify-code": {
+      "post": {
+        "operationId": "post_verify_code_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/weekly-progress": {
+      "get": {
+        "operationId": "get_weekly_workout_progress_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/workouts/complete": {
+      "post": {
+        "operationId": "post_complete_workout_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    },
+    "/workouts/progress": {
+      "get": {
+        "operationId": "get_user_progress_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      },
+      "post": {
+        "operationId": "post_user_progress_resource",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "tags": [
+          "default"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "tags": [
+    {
+      "description": "Default namespace",
+      "name": "default"
+    }
+  ]
+}
